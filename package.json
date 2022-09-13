@@ -1,21 +1,63 @@
 {
-  "name": "vyper-otc-ui",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "export": "next export"
-  },
-  "dependencies": {
-    "cypress": "^10.0.3",
-    "next": "^12.1.5",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "18.0.19",
-    "sass": "^1.54.9",
-    "typescript": "4.8.3"
-  }
+	"name": "vyper-otc-ui",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"export": "next export",
+		"lint": "next lint",
+		"format": "prettier --write \"components/**/*.tsx\" \"pages/**/*.tsx\"",
+		"commit": "git add . && cz",
+		"first-release": "standard-version -- --first-release",
+		"release": "standard-version",
+		"release:minor": "standard-version --release-as minor",
+		"release:patch": "standard-version --release-as patch",
+		"release:major": "standard-version --release-as major",
+		"push-tags": "git push --follow-tags origin master",
+		"prepare": "husky install"
+	},
+	"dependencies": {
+		"classnames": "^2.3.2",
+		"next": "^12.1.5",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0",
+		"react-query": "^3.39.2"
+	},
+	"devDependencies": {
+		"@next/eslint-plugin-next": "^12.3.0",
+		"@types/react": "18.0.19",
+		"@typescript-eslint/eslint-plugin": "^5.37.0",
+		"@typescript-eslint/parser": "^5.37.0",
+		"cypress": "^10.0.3",
+		"cz-conventional-changelog": "^3.3.0",
+		"eslint": "^8.23.1",
+		"eslint-config-standard": "^17.0.0",
+		"eslint-plugin-css-modules": "^2.11.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-n": "^15.2.5",
+		"eslint-plugin-promise": "^6.0.1",
+		"eslint-plugin-react": "^7.31.8",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"husky": "^8.0.1",
+		"lint-staged": "^13.0.3",
+		"prettier": "^2.7.1",
+		"sass": "^1.54.9",
+		"standard-version": "^9.5.0",
+		"typescript": "4.8.3"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
+	"lint-staged": {
+		"*.{js,jsx,ts,tsx}": [
+			"prettier --write",
+			"eslint --cache --fix"
+		],
+		"*.{json,html,md,yml,css,scss}": [
+			"prettier --write"
+		]
+	}
 }
