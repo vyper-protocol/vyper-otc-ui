@@ -8,6 +8,9 @@ import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from
 import { clusterApiUrl } from '@solana/web3.js';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
+// Solana wallet adapter default styles
+require('@solana/wallet-adapter-react-ui/styles.css');
+
 export const queryClient = new QueryClient();
 
 const Application = ({ Component, pageProps }) => {
