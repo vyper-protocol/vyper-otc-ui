@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { Button, Pane, Text, majorScale, Table } from 'evergreen-ui';
-import { getFetchOTCStateQuery } from 'queries/generator';
+import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { AnchorProvider } from '@project-serum/anchor';
@@ -15,7 +15,7 @@ export default function SummaryPage() {
 	const wallet = useWallet();
 	const provider = new AnchorProvider(connection, wallet, {});
 
-	const rateStateQuery = getFetchOTCStateQuery(provider, id as string);
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
 
 	return (
 		<Pane clearfix margin={24}>
