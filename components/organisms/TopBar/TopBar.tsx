@@ -1,6 +1,7 @@
 import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
 import { Pane, Heading, Button } from 'evergreen-ui';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const menuItems = [
 	{
@@ -10,6 +11,8 @@ const menuItems = [
 ];
 
 const TopBar = () => {
+	const router = useRouter();
+
 	return (
 		<Pane display="flex" padding={16} background="lightgray">
 			<Pane flex={1} alignItems="center" display="flex">
@@ -20,7 +23,7 @@ const TopBar = () => {
 				<Pane marginLeft={30}>
 					{menuItems.map((menuItem) => {
 						return (
-							<Link key={menuItem.name} href={menuItem.path}>
+							<Link key={menuItem.name} href={menuItem.path} as={menuItem.path} replace>
 								<Button>{menuItem.name}</Button>
 							</Link>
 						);
