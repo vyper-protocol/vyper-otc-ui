@@ -1,15 +1,16 @@
-import { Address, AnchorProvider, Program } from '@project-serum/anchor';
+import { AnchorProvider, Program } from '@project-serum/anchor';
+import { getAccount } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
+import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { OtcState } from '../types/OtcState';
-import PROGRAMS from '../../configs/programs.json';
-import { getAccount } from '@solana/spl-token';
 import RateSwitchboardState from 'queries/types/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'queries/types/RedeemLogicForwardState';
-import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
+
+import PROGRAMS from '../../configs/programs.json';
+import { OtcState } from '../types/OtcState';
 
 export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<OtcState> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);

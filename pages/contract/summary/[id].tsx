@@ -1,9 +1,8 @@
-import { useRouter } from 'next/router';
-import { Button, Pane, Text, majorScale, Table } from 'evergreen-ui';
-import { getFetchOTCStateQuery } from 'queries/generator';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import { AnchorProvider } from '@project-serum/anchor';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { Pane, Text, Table } from 'evergreen-ui';
+import { useRouter } from 'next/router';
+import { getFetchOTCStateQuery } from 'queries/generator';
 
 // test account: WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
@@ -29,12 +28,14 @@ export default function SummaryPage() {
 				{rateStateQuery.data && (
 					<Table>
 						<Table.Body>
-							{Object.keys(rateStateQuery.data).map((k) => (
-								<Table.Row key={k}>
-									<Table.TextCell>{k}</Table.TextCell>
-									<Table.TextCell>{rateStateQuery.data[k]?.toString()}</Table.TextCell>
-								</Table.Row>
-							))}
+							{Object.keys(rateStateQuery.data).map((k) => {
+								return (
+									<Table.Row key={k}>
+										<Table.TextCell>{k}</Table.TextCell>
+										<Table.TextCell>{rateStateQuery.data[k]?.toString()}</Table.TextCell>
+									</Table.Row>
+								);
+							})}
 						</Table.Body>
 					</Table>
 				)}
