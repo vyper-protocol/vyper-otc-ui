@@ -1,22 +1,11 @@
-import Head from 'next/head';
-import Header from 'components/Header';
-import Footer from 'components/Footer';
-import React from 'react';
+import Header from 'components/templates/Header/Header';
+import Layout from 'components/templates/Layout/Layout';
 
 const Home = () => {
 	return (
-		<div className="container">
-			<Head>
-				<title>Vyper OTC</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
-
-			<main>
-				<Header title="Welcome to the best derivatives platform!" />
-			</main>
-
-			<Footer />
-		</div>
+		<Layout>
+			<Header title="Welcome to the best derivatives platform!" />
+		</Layout>
 	);
 };
 

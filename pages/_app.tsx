@@ -1,18 +1,15 @@
 import 'styles/globals.css';
-import { clusterApiUrl } from '@solana/web3.js';
 import { useMemo } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { FakeWalletAdapter } from '@solana/wallet-adapter-wallets';
-import {
-	PhantomWalletAdapter,
-	PhantomWalletAdapterConfig,
-	SlopeWalletAdapter,
-	SolflareWalletAdapter,
-	SolletWalletAdapter
-} from '@solana/wallet-adapter-wallets';
-import { WalletModalProvider, WalletDisconnectButton, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { clusterApiUrl } from '@solana/web3.js';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+// Solana wallet adapter default styles
+require('@solana/wallet-adapter-react-ui/styles.css');
 
 export const queryClient = new QueryClient();
 
@@ -21,12 +18,13 @@ const Application = ({ Component, pageProps }) => {
 	const network = WalletAdapterNetwork.Devnet;
 
 	// You can also provide a custom RPC endpoint.
-	const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+	const endpoint = useMemo(() => {
+		return clusterApiUrl(network);
+	}, [network]);
 
-	const wallets = useMemo(
-		() => [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new SolletWalletAdapter()],
-		[]
-	);
+	const wallets = useMemo(() => {
+		return [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new SolletWalletAdapter()];
+	}, []);
 
 	return (
 		<QueryClientProvider client={queryClient}>

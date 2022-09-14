@@ -15,7 +15,7 @@ export const useGetFetchOTCStateQuery = (provider: AnchorProvider, otcState: Add
 	return useQuery<OtcState>(
 		['otc-state', otcState],
 		() => {
-			if (otcState != undefined) return fetchOtcState(provider, new PublicKey(otcState));
+			if (otcState !== undefined) return fetchOtcState(provider, new PublicKey(otcState));
 		},
 		defaultOptions('otc-state')
 	);

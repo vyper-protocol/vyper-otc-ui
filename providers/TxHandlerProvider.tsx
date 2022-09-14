@@ -4,8 +4,8 @@ import { createContext } from 'react';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, ConfirmOptions, SendOptions, clusterApiUrl } from '@solana/web3.js';
-import { TxPackage } from 'models/TxPackage';
 import { toaster } from 'evergreen-ui';
+import { TxPackage } from 'models/TxPackage';
 
 export type TxHandler = {
 	handleTxs: (...txs: TxPackage[]) => Promise<void>;
@@ -39,6 +39,7 @@ export const TxHandlerProvider = ({ children }) => {
 		for (let i = 0; i < txs.length; i++) {
 			console.group(`sending tx# ${i + 1} / ${txs.length} `);
 
+			// eslint-disable-next-line prefer-const
 			let { tx, signers, description } = txs[i];
 			try {
 				if (description) console.log('description: ' + description);
