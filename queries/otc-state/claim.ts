@@ -3,7 +3,7 @@ import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { TxPackage } from 'providers/TxHandler';
+import { TxPackage } from 'models/TxPackage';
 import PROGRAMS from '../../configs/programs.json';
 
 /**

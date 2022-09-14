@@ -3,7 +3,7 @@ import { PublicKey } from '@solana/web3.js';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { TxPackage } from 'providers/TxHandler';
+import { TxPackage } from 'models/TxPackage';
 import PROGRAMS from '../../configs/programs.json';
 
 /**
