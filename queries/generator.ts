@@ -4,7 +4,7 @@ import { queryClient } from 'pages/_app';
 import { useQuery, UseQueryResult } from 'react-query';
 
 import { fetchOtcState } from './otc-state/fecthOtcState';
-import { OtcState } from './types/OtcState';
+import { OtcState } from '../models/OtcState';
 
 /**
  * Get the query to fetch an OTC state

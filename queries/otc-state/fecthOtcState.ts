@@ -6,11 +6,11 @@ import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboar
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import RateSwitchboardState from 'queries/types/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'queries/types/RedeemLogicForwardState';
+import RateSwitchboardState from 'models/RateSwitchboardState';
+import { RedeemLogicForwardState } from 'models/RedeemLogicForwardState';
 
 import PROGRAMS from '../../configs/programs.json';
-import { OtcState } from '../types/OtcState';
+import { OtcState } from '../../models/OtcState';
 
 export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<OtcState> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
