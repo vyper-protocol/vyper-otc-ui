@@ -4,11 +4,11 @@ import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboar
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { OtcState } from '../types/OtcState';
+import { OtcState } from '../../models/OtcState';
 import PROGRAMS from '../../configs/programs.json';
 import { getAccount } from '@solana/spl-token';
-import RateSwitchboardState from 'queries/types/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'queries/types/RedeemLogicForwardState';
+import RateSwitchboardState from 'models/RateSwitchboardState';
+import { RedeemLogicForwardState } from 'models/RedeemLogicForwardState';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 
 export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<OtcState> => {
