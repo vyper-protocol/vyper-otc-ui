@@ -1,18 +1,25 @@
 import { AnchorProvider, Program, utils } from '@project-serum/anchor';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { TxPackage } from 'models/TxPackage';
+
 import PROGRAMS from '../../configs/programs.json';
 
 /**
- * OTC settlement
+ * Deposit assets in the otc state containter
  * @param provider anchor provider with connection and user wallet
  * @param otcState public key of the current otc state
+ * @param isSeniorSide flag: if true the user will deposit as senior, otherwise as junior
  * @returns transaction package ready to submit
  */
-export const settle = async (provider: AnchorProvider, otcState: PublicKey): Promise<TxPackage> => {
+export const deposit = async (
+	provider: AnchorProvider,
+	otcState: PublicKey,
+	isSeniorSide: boolean
+): Promise<TxPackage> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(
 		VyperCoreIDL,
@@ -38,13 +45,21 @@ export const settle = async (provider: AnchorProvider, otcState: PublicKey): Pro
 		vyperCoreAccountInfo.rateProgramState
 	);
 
-	return {
+	const atokenAccount = await getAssociatedTokenAddress(
+		new PublicKey(vyperCoreAccountInfo.reserveMint),
+		provider.wallet.publicKey
+	);
+
+	const otcDepositTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
-			.settle()
+			.deposit({
+				isSeniorSide
+			})
 			.accounts({
+				userReserveTokenAccount: atokenAccount,
+				beneficiaryTokenAccount: atokenAccount,
 				otcState,
 				otcAuthority,
-
 				otcSeniorReserveTokenAccount: otcStateAccountInfo.otcSeniorReserveTokenAccount,
 				otcJuniorReserveTokenAccount: otcStateAccountInfo.otcJuniorReserveTokenAccount,
 				otcSeniorTrancheTokenAccount: otcStateAccountInfo.otcSeniorTrancheTokenAccount,
@@ -88,6 +103,8 @@ export const settle = async (provider: AnchorProvider, otcState: PublicKey): Pro
 					.instruction()
 			])
 			.transaction(),
-		description: 'Settle'
+		description: 'Deposit'
 	};
+
+	return otcDepositTx;
 };
