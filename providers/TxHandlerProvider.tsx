@@ -51,7 +51,6 @@ export const TxHandlerProvider = ({ children }) => {
 					hasCloseButton: false,
 					id: description
 				});
-				// enqueueTempSnackbar(`Signing tx ${i + 1} / ${txs.length} ${description}`);
 				console.log('signing txs...');
 				tx = await wallet.signTransaction(tx);
 				(signers ?? []).forEach((kp) => {
