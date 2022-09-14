@@ -26,16 +26,18 @@ export class OtcState {
 	redeemLogicState: RedeemLogicForwardState;
 	rateState: RateSwitchboardState;
 
-	get isDepositSeniorAvailable(): boolean {
+	get isDepositExpired(): boolean {
 		// current UTC timestamp in seconds
 		const nowSeconds = Math.round(Date.now() / MILISECONDS);
-		return nowSeconds < this.depositExpiration_sec && this.seniorSideBeneficiaryTokenAccount == null;
+		return nowSeconds > this.depositExpiration_sec;
+	}
+
+	get isDepositSeniorAvailable(): boolean {
+		return !this.isDepositExpired && this.seniorSideBeneficiaryTokenAccount == null;
 	}
 
 	get isDepositJuniorAvailable(): boolean {
-		// current UTC timestamp in seconds
-		const nowSeconds = Math.round(Date.now() / MILISECONDS);
-		return nowSeconds < this.depositExpiration_sec && this.juniorSideBeneficiaryTokenAccount == null;
+		return !this.isDepositExpired && this.juniorSideBeneficiaryTokenAccount == null;
 	}
 
 	get isSettlementAvailable(): boolean {
@@ -54,5 +56,21 @@ export class OtcState {
 
 	get isClaimJuniorAvailable(): boolean {
 		return this.settleExecuted && this.otcJuniorReserveTokenAccountAmount > 0;
+	}
+
+	get isWithdrawSeniorAvailable(): boolean {
+		return (
+			this.isDepositExpired &&
+			this.seniorSideBeneficiaryTokenAccount != null &&
+			this.juniorSideBeneficiaryTokenAccount == null
+		);
+	}
+
+	get isWithdrawJuniorAvailable(): boolean {
+		return (
+			this.isDepositExpired &&
+			this.seniorSideBeneficiaryTokenAccount == null &&
+			this.juniorSideBeneficiaryTokenAccount != null
+		);
 	}
 }
