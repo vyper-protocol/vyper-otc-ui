@@ -62,7 +62,8 @@ export class OtcState {
 		return (
 			this.isDepositExpired &&
 			this.seniorSideBeneficiaryTokenAccount != null &&
-			this.juniorSideBeneficiaryTokenAccount == null
+			this.juniorSideBeneficiaryTokenAccount == null &&
+			this.otcSeniorReserveTokenAccountAmount > 0
 		);
 	}
 
@@ -70,7 +71,8 @@ export class OtcState {
 		return (
 			this.isDepositExpired &&
 			this.seniorSideBeneficiaryTokenAccount == null &&
-			this.juniorSideBeneficiaryTokenAccount != null
+			this.juniorSideBeneficiaryTokenAccount != null &&
+			this.otcJuniorReserveTokenAccountAmount > 0
 		);
 	}
 }
