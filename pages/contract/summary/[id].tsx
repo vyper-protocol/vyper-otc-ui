@@ -32,6 +32,7 @@ export default function SummaryPage() {
 		} catch (err) {
 			console.log(err);
 		}
+		rateStateQuery.refetch();
 	};
 	const onDepositJuniorClick = async () => {
 		try {
@@ -40,6 +41,7 @@ export default function SummaryPage() {
 		} catch (err) {
 			console.log(err);
 		}
+		rateStateQuery.refetch();
 	};
 	const onWithdrawClick = async () => {
 		try {
@@ -48,6 +50,7 @@ export default function SummaryPage() {
 		} catch (err) {
 			console.log(err);
 		}
+		rateStateQuery.refetch();
 	};
 	const onSettleClick = async () => {
 		try {
@@ -56,6 +59,7 @@ export default function SummaryPage() {
 		} catch (err) {
 			console.log(err);
 		}
+		rateStateQuery.refetch();
 	};
 	const onClaimClick = async () => {
 		try {
@@ -64,6 +68,7 @@ export default function SummaryPage() {
 		} catch (err) {
 			console.log(err);
 		}
+		rateStateQuery.refetch();
 	};
 
 	return (
