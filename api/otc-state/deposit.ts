@@ -50,6 +50,32 @@ export const deposit = async (
 		provider.wallet.publicKey
 	);
 
+	const vc_ix = await vyperCoreProgram.methods
+		.refreshTrancheFairValue()
+		.accounts({
+			trancheConfig: otcStateAccountInfo.vyperTrancheConfig,
+			seniorTrancheMint: vyperCoreAccountInfo.seniorTrancheMint,
+			juniorTrancheMint: vyperCoreAccountInfo.juniorTrancheMint,
+			rateProgramState: vyperCoreAccountInfo.rateProgramState,
+			redeemLogicProgram: vyperCoreAccountInfo.redeemLogicProgram,
+			redeemLogicProgramState: vyperCoreAccountInfo.redeemLogicProgramState
+		})
+		.instruction();
+	const switchboard_ix = await rateSwitchboardProgram.methods
+		.refresh()
+		.accounts({
+			rateData: vyperCoreAccountInfo.rateProgramState
+		})
+		.remainingAccounts(
+			(rateSwitchboardAccountInfo.switchboardAggregators as (null | PublicKey)[])
+				.filter((c) => {
+					return c != null;
+				})
+				.map((c) => {
+					return { pubkey: c, isSigner: false, isWritable: false };
+				})
+		)
+		.instruction();
 	const otcDepositTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
 			.deposit({
@@ -74,34 +100,7 @@ export const deposit = async (
 				vyperReserve: vyperCoreAccountInfo.reserve,
 				vyperCore: vyperCoreProgram.programId
 			})
-			.preInstructions([
-				await rateSwitchboardProgram.methods
-					.refresh()
-					.accounts({
-						rateData: vyperCoreAccountInfo.rateProgramState
-					})
-					.remainingAccounts(
-						(rateSwitchboardAccountInfo.switchboardAggregators as (null | PublicKey)[])
-							.filter((c) => {
-								return c != null;
-							})
-							.map((c) => {
-								return { pubkey: c, isSigner: false, isWritable: false };
-							})
-					)
-					.instruction(),
-				await vyperCoreProgram.methods
-					.refreshTrancheFairValue()
-					.accounts({
-						trancheConfig: otcStateAccountInfo.vyperTrancheConfig,
-						seniorTrancheMint: vyperCoreAccountInfo.seniorTrancheMint,
-						juniorTrancheMint: vyperCoreAccountInfo.juniorTrancheMint,
-						rateProgramState: vyperCoreAccountInfo.rateProgramState,
-						redeemLogicProgram: vyperCoreAccountInfo.redeemLogicProgram,
-						redeemLogicProgramState: vyperCoreAccountInfo.redeemLogicProgramState
-					})
-					.instruction()
-			])
+			.preInstructions([switchboard_ix, vc_ix])
 			.transaction(),
 		description: 'Deposit'
 	};
