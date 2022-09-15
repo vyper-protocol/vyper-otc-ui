@@ -7,6 +7,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { TxHandlerProvider } from 'providers/TxHandlerProvider';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -31,7 +32,9 @@ const Application = ({ Component, pageProps }) => {
 			<ConnectionProvider endpoint={endpoint}>
 				<WalletProvider wallets={wallets} autoConnect>
 					<WalletModalProvider>
-						<Component {...pageProps} />
+						<TxHandlerProvider>
+							<Component {...pageProps} />
+						</TxHandlerProvider>
 					</WalletModalProvider>
 				</WalletProvider>
 			</ConnectionProvider>
