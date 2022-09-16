@@ -25,12 +25,11 @@ const SearchBar = ({ searchState }: SearchBarProps) => {
 		try {
 			new PublicKey(searchState.value);
 			setHasError(false);
+			searchState.setValue('');
 		} catch (err) {
 			setHasError(true);
 		}
 	};
-
-	console.log(hasError);
 
 	// test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
