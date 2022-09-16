@@ -1,0 +1,16 @@
+.wrapper {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.error {
+	color: red !important;
+	font-style: italic;
+}
+
+.hidden {
+	display: none;
+}
+.visible {
+	display: block;
+}
