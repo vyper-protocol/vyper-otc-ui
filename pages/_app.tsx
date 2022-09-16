@@ -8,6 +8,7 @@ import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from
 import { clusterApiUrl } from '@solana/web3.js';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { TxHandlerProvider } from 'providers/TxHandlerProvider';
+import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -15,13 +16,8 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 export const queryClient = new QueryClient();
 
 const Application = ({ Component, pageProps }) => {
-	// The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-	const network = WalletAdapterNetwork.Devnet;
-
 	// You can also provide a custom RPC endpoint.
-	const endpoint = useMemo(() => {
-		return clusterApiUrl(network);
-	}, [network]);
+	const endpoint = RPC_ENDPOINTS.find((c) => c.cluster == 'devnet').endpoints[0];
 
 	const wallets = useMemo(() => {
 		return [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new SolletWalletAdapter()];
