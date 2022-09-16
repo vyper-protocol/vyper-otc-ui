@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -7,6 +7,7 @@ import { claim } from 'api/otc-state/claim';
 import { deposit } from 'api/otc-state/deposit';
 import { settle } from 'api/otc-state/settle';
 import { withdraw } from 'api/otc-state/withdraw';
+import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
 import { Pane, Text, Table, Button } from 'evergreen-ui';
@@ -25,6 +26,8 @@ export default function SummaryPage() {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
+
+	const [searchValue, setSearchValue] = useState('');
 
 	const onDepositSeniorClick = async (e) => {
 		try {
@@ -75,6 +78,7 @@ export default function SummaryPage() {
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
+				<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} />
 				<StatsPanel />
 
 				{/* <Pane justifyContent="center" alignItems="center" flexDirection="column" marginBottom={24} marginTop={100}>
