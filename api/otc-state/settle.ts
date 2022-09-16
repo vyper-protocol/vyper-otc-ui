@@ -39,6 +39,32 @@ export const settle = async (provider: AnchorProvider, otcState: PublicKey): Pro
 		vyperCoreAccountInfo.rateProgramState
 	);
 
+	const switchboard_ix = await rateSwitchboardProgram.methods
+		.refresh()
+		.accounts({
+			rateData: vyperCoreAccountInfo.rateProgramState
+		})
+		.remainingAccounts(
+			(rateSwitchboardAccountInfo.switchboardAggregators as (null | PublicKey)[])
+				.filter((c) => {
+					return c != null;
+				})
+				.map((c) => {
+					return { pubkey: c, isSigner: false, isWritable: false };
+				})
+		)
+		.instruction();
+	const vc_ix = await vyperCoreProgram.methods
+		.refreshTrancheFairValue()
+		.accounts({
+			trancheConfig: otcStateAccountInfo.vyperTrancheConfig,
+			seniorTrancheMint: vyperCoreAccountInfo.seniorTrancheMint,
+			juniorTrancheMint: vyperCoreAccountInfo.juniorTrancheMint,
+			rateProgramState: vyperCoreAccountInfo.rateProgramState,
+			redeemLogicProgram: vyperCoreAccountInfo.redeemLogicProgram,
+			redeemLogicProgramState: vyperCoreAccountInfo.redeemLogicProgramState
+		})
+		.instruction();
 	return {
 		tx: await vyperOtcProgram.methods
 			.settle()
@@ -60,34 +86,7 @@ export const settle = async (provider: AnchorProvider, otcState: PublicKey): Pro
 				vyperReserve: vyperCoreAccountInfo.reserve,
 				vyperCore: vyperCoreProgram.programId
 			})
-			.preInstructions([
-				await rateSwitchboardProgram.methods
-					.refresh()
-					.accounts({
-						rateData: vyperCoreAccountInfo.rateProgramState
-					})
-					.remainingAccounts(
-						(rateSwitchboardAccountInfo.switchboardAggregators as (null | PublicKey)[])
-							.filter((c) => {
-								return c != null;
-							})
-							.map((c) => {
-								return { pubkey: c, isSigner: false, isWritable: false };
-							})
-					)
-					.instruction(),
-				await vyperCoreProgram.methods
-					.refreshTrancheFairValue()
-					.accounts({
-						trancheConfig: otcStateAccountInfo.vyperTrancheConfig,
-						seniorTrancheMint: vyperCoreAccountInfo.seniorTrancheMint,
-						juniorTrancheMint: vyperCoreAccountInfo.juniorTrancheMint,
-						rateProgramState: vyperCoreAccountInfo.rateProgramState,
-						redeemLogicProgram: vyperCoreAccountInfo.redeemLogicProgram,
-						redeemLogicProgramState: vyperCoreAccountInfo.redeemLogicProgramState
-					})
-					.instruction()
-			])
+			.preInstructions([switchboard_ix, vc_ix])
 			.transaction(),
 		description: 'Settle'
 	};
