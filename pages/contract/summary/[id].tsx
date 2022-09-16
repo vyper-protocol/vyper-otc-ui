@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -7,14 +7,14 @@ import { claim } from 'api/otc-state/claim';
 import { deposit } from 'api/otc-state/deposit';
 import { settle } from 'api/otc-state/settle';
 import { withdraw } from 'api/otc-state/withdraw';
-import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
-import { Pane, Text, Table, Button } from 'evergreen-ui';
+import { Pane, Button } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
+import { formatCurrency } from 'utils/numberHelpers';
 
 export default function SummaryPage() {
 	const router = useRouter();
@@ -73,91 +73,99 @@ export default function SummaryPage() {
 		rateStateQuery.refetch();
 	};
 
+	// TODO replace mock data with switchboard or chain data
+	const contractData = {
+		pubkey: id as string,
+		asset: 'BTC_CHF',
+		stats: [
+			{
+				name: 'Asset Price',
+				value: formatCurrency(19897.56, true)
+			},
+			{
+				name: 'Leverage',
+				value: '20x'
+			},
+			{
+				name: 'Collateral',
+				value: formatCurrency(39794, true)
+			},
+			{
+				name: 'Duration',
+				value: 1663869600
+			},
+			{
+				name: 'Strike',
+				value: 19897
+			}
+		],
+		timestamps: {
+			createdAt: moment(rateStateQuery?.data?.created_sec * 1000).format('Do MMMM YYYY'),
+			depositExpiraton: moment(rateStateQuery?.data?.depositExpiration_sec * 1000).fromNow(),
+			settleAvailable: moment(rateStateQuery?.data?.settleAvailableFrom_sec * 1000).fromNow()
+		},
+
+		amounts: {
+			seniorDepositAmount: rateStateQuery?.data?.seniorDepositAmount,
+			juniorDepositAmount: rateStateQuery?.data?.juniorDepositAmount,
+			seniorReserveTokens: rateStateQuery?.data?.otcSeniorReserveTokenAccountAmount,
+			juniorReserveTokens: rateStateQuery?.data?.otcJuniorReserveTokenAccountAmount
+		},
+		beneficiaries: {
+			seniorAccount: rateStateQuery?.data?.seniorSideBeneficiaryTokenAccount,
+			seniorOwner: rateStateQuery?.data?.seniorSideBeneficiaryOwner,
+			juniorAccount: rateStateQuery?.data?.juniorSideBeneficiaryTokenAccount,
+			juniorOwner: rateStateQuery?.data?.juniorSideBeneficiaryOwner
+		},
+		states: {
+			rateState: rateStateQuery?.data?.rateState,
+			redeemLogicState: rateStateQuery?.data?.redeemLogicState
+		}
+	};
+
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
-				<StatsPanel />
+				{/* @ts-ignore */}
+				<StatsPanel contract={contractData} />
 
-				{/* <Pane justifyContent="center" alignItems="center" flexDirection="column" marginBottom={24} marginTop={100}>
-					<Text>
-						using public key: <code>{id}</code>
-					</Text>
-				</Pane>
-
-				<Pane justifyContent="center" alignItems="center" flexDirection="column">
-					{!rateStateQuery.data && <Text>Fetching</Text>}
-					{rateStateQuery.data && (
-						<>
-							{rateStateQuery.data.isDepositSeniorAvailable && (
-								<Button onClick={onDepositSeniorClick} marginRight={16}>
-									Deposit Senior
-								</Button>
-							)}
-							{rateStateQuery.data.isDepositJuniorAvailable && (
-								<Button onClick={onDepositJuniorClick} marginRight={16}>
-									Deposit Junior
-								</Button>
-							)}
-							{rateStateQuery.data.isWithdrawSeniorAvailable && (
-								<Button onClick={onWithdrawClick} marginRight={16}>
-									Withdraw Senior
-								</Button>
-							)}
-							{rateStateQuery.data.isWithdrawJuniorAvailable && (
-								<Button onClick={onWithdrawClick} marginRight={16}>
-									Withdraw Junior
-								</Button>
-							)}
-							{rateStateQuery.data.isSettlementAvailable && (
-								<Button onClick={onSettleClick} marginRight={16}>
-									Settle
-								</Button>
-							)}
-							{rateStateQuery.data.isClaimSeniorAvailable && (
-								<Button onClick={onClaimClick} marginRight={16}>
-									Claim Senior
-								</Button>
-							)}
-							{rateStateQuery.data.isClaimJuniorAvailable && (
-								<Button onClick={onClaimClick} marginRight={16}>
-									Claim Junior
-								</Button>
-							)}
-							<Table marginBottom={24}>
-								<Table.Body>
-									<Table.Row>
-										<Table.TextCell>Created</Table.TextCell>
-										<Table.TextCell>{moment(rateStateQuery.data.created_sec * 1000).fromNow()}</Table.TextCell>
-									</Table.Row>
-									<Table.Row>
-										<Table.TextCell>Deposit expiration</Table.TextCell>
-										<Table.TextCell>
-											{moment(rateStateQuery.data.depositExpiration_sec * 1000).fromNow()}
-										</Table.TextCell>
-									</Table.Row>
-									<Table.Row>
-										<Table.TextCell>Settle available</Table.TextCell>
-										<Table.TextCell>
-											{moment(rateStateQuery.data.settleAvailableFrom_sec * 1000).fromNow()}
-										</Table.TextCell>
-									</Table.Row>
-								</Table.Body>
-							</Table>
-							<Table marginBottom={24}>
-								<Table.Body>
-									{Object.keys(rateStateQuery.data).map((k) => {
-										return (
-											<Table.Row key={k}>
-												<Table.TextCell>{k}</Table.TextCell>
-												<Table.TextCell>{rateStateQuery.data[k]?.toString()}</Table.TextCell>
-											</Table.Row>
-										);
-									})}
-								</Table.Body>
-							</Table>
-						</>
+				<>
+					{rateStateQuery?.data?.isDepositSeniorAvailable && (
+						<Button width="100%" onClick={onDepositSeniorClick} appearance="primary" intent="success">
+							Deposit Senior
+						</Button>
 					)}
-				</Pane> */}
+					{rateStateQuery?.data?.isDepositJuniorAvailable && (
+						<Button width="100%" onClick={onDepositJuniorClick} appearance="primary" intent="danger">
+							Deposit Junior
+						</Button>
+					)}
+					{rateStateQuery?.data?.isWithdrawSeniorAvailable && (
+						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
+							Withdraw Senior
+						</Button>
+					)}
+					{rateStateQuery?.data?.isWithdrawJuniorAvailable && (
+						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
+							Withdraw Junior
+						</Button>
+					)}
+					{rateStateQuery?.data?.isSettlementAvailable && (
+						<Button width="100%" onClick={onSettleClick} appearance="primary" intent="none">
+							Settle
+						</Button>
+					)}
+					{rateStateQuery?.data?.isClaimSeniorAvailable && (
+						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
+							Claim Senior
+						</Button>
+					)}
+					{rateStateQuery?.data?.isClaimJuniorAvailable && (
+						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
+							Claim Junior
+						</Button>
+					)}
+				</>
 			</Pane>
 		</Layout>
 	);
