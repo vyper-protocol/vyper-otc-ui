@@ -27,8 +27,6 @@ export default function SummaryPage() {
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
 
-	const [searchValue, setSearchValue] = useState('');
-
 	const onDepositSeniorClick = async (e) => {
 		try {
 			const tx = await deposit(provider, new PublicKey(id), true);
@@ -78,7 +76,6 @@ export default function SummaryPage() {
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
-				<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} />
 				<StatsPanel />
 
 				{/* <Pane justifyContent="center" alignItems="center" flexDirection="column" marginBottom={24} marginTop={100}>

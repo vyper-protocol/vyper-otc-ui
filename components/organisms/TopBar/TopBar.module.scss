@@ -1,0 +1,50 @@
+.searchbar {
+	display: flex;
+	justify-content: center;
+}
+
+.topbar {
+	display: flex;
+	justify-content: space-between;
+	padding: 15px 25px;
+
+	.nav {
+		display: flex;
+		justify-content: center;
+		margin-top: 10px;
+
+		.item {
+			margin-left: 50px;
+
+			span {
+				font-size: 14px;
+				color: var(--color-text-disabled);
+			}
+
+			svg {
+				margin-bottom: -2px;
+				margin-right: 5px;
+			}
+		}
+
+		.item:hover {
+			cursor: pointer;
+			span {
+				color: var(--color-black);
+			}
+		}
+
+		.active {
+			span {
+				color: var(--color-black);
+			}
+		}
+
+		.disabled {
+			pointer-events: none;
+			span {
+				color: var(--color-text-disabled);
+			}
+		}
+	}
+}

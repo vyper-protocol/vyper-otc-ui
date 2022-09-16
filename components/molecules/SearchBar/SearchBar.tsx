@@ -13,29 +13,31 @@ type SearchBarProps = {
 		value: string;
 		setValue: React.Dispatch<any>;
 	};
+	className?: string;
 };
 
-const SearchBar = ({ searchState }: SearchBarProps) => {
+const SearchBar = ({ searchState, className }: SearchBarProps) => {
 	const router = useRouter();
 
 	const [hasError, setHasError] = useState(false);
 
 	const handleSubmit = () => {
-		router.push(`/contract/summary/${searchState.value}`);
 		try {
 			new PublicKey(searchState.value);
+			router.push(`/contract/summary/${searchState.value}`);
 			setHasError(false);
 			searchState.setValue('');
 		} catch (err) {
 			setHasError(true);
+			return;
 		}
 	};
 
 	// test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
 	return (
-		<Pane className={styles.wrapper}>
-			<Pane>
+		<Pane className={cn(styles.wrapper, className)}>
+			<Pane marginRight={4}>
 				<SearchInput
 					onChange={(e) => {
 						return searchState.setValue(e.target.value);
@@ -43,10 +45,13 @@ const SearchBar = ({ searchState }: SearchBarProps) => {
 					value={searchState.value}
 					placeholder="Search for contract with pubkey..."
 				/>
+
 				<Text className={cn(styles.error, !hasError ? styles.hidden : styles.visible)}>Invalid Public Key</Text>
 			</Pane>
 
-			<Button onClick={handleSubmit}>Submit</Button>
+			<Button onClick={handleSubmit} appearance="primary">
+				Submit
+			</Button>
 		</Pane>
 	);
 };

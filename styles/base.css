@@ -133,7 +133,7 @@ button {
 
 a {
 	text-decoration: none;
-	color: var(--color-white);
+	color: var(--color-primary);
 	transition: all 0.25s ease;
 }
 
