@@ -1,11 +1,7 @@
-import styles from './Footer.module.css';
+import styles from './Footer.module.scss';
 
 const Footer = () => {
-	return (
-		<>
-			<footer className={styles.footer}>Vyper</footer>
-		</>
-	);
+	return <footer className={styles.footer}>Vyper</footer>;
 };
 
 export default Footer;

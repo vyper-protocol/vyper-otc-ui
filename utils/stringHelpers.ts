@@ -1,5 +1,3 @@
-/* eslint-disable no-magic-numbers */
-
 /**
  * Display the short form of a string (H8gFJF3...)
  */

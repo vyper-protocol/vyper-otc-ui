@@ -76,10 +76,10 @@ export default function SummaryPage() {
 
 	return (
 		<Layout>
-			<Pane clearfix margin={24}>
+			<Pane clearfix margin={24} maxWidth={400}>
 				<StatsPanel />
 
-				<Pane justifyContent="center" alignItems="center" flexDirection="column" marginBottom={24} marginTop={100}>
+				{/* <Pane justifyContent="center" alignItems="center" flexDirection="column" marginBottom={24} marginTop={100}>
 					<Text>
 						using public key: <code>{id}</code>
 					</Text>
@@ -158,7 +158,7 @@ export default function SummaryPage() {
 							</Table>
 						</>
 					)}
-				</Pane>
+				</Pane> */}
 			</Pane>
 		</Layout>
 	);

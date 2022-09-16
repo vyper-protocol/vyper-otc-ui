@@ -1,34 +1,214 @@
-html,
-body {
-	padding: 0;
-	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@import-normalize;
+
+:root {
+	--font-primary: 'Inter', -apple-system, system-ui, blinkmacsystemfont, 'Helvetica Neue', arial, sans-serif;
+
+	--color-black: #191919;
+	--color-white: #fff;
+	--color-black-100: #f8f9fa;
+	--color-black-200: #f0f2f5;
+	--color-black-300: #dee2e6;
+	--color-black-400: #ced4da;
+	--color-black-500: #adb5bd;
+	--color-black-600: #6c757d;
+	--color-black-700: #495057;
+	--color-black-800: #343a40;
+	--color-black-900: #212529;
+
+	--color-primary: #9281ff;
+	--color-primary-light: #b57cff;
+	--color-secondary: #daa1a1;
+	--color-tertiary: #2e90a5;
+	--color-quaternary: #725689cc;
+	--color-supp: #3c3869;
+
+	--color-error: #ed254e;
+	--color-warning: #fde12d;
+	--color-success: #41d161;
+
+	--color-background: #1e1e2d;
+	--color-fill-container: #2a2a3c;
+	--color-fill-content: #333347;
+
+	--color-shadow: #d0b1f9;
+
+	--border-radius-base: 8px;
+	--border-radius-extend: 10px;
+
+	--font-h1: 46px;
+	--font-h2: 40px;
+	--font-h3: 36px;
+	--font-h4: 32px;
+	--font-h5: 28px;
+	--font-h6: 24px;
+	--font-heading: 20px;
+	--font-p-large: 18px;
+	--font-p-medium: 16px;
+	--font-p: 14px;
+	--font-p-small: 12px;
+
+	--padding-base: 16px;
+	--space-128: 128px;
+	--space-64: 64px;
+	--space-40: 40px;
+	--space-36: 36px;
+	--space-32: 32px;
+	--space-24: 24px;
+	--space-20: 20px;
+	--space-16: 16px;
+	--space-14: 14px;
+	--space-12: 12px;
+	--space-10: 10px;
+	--space-8: 8px;
+	--space-6: 6px;
+	--space-4: 4px;
+	--space-2: 2px;
+
+	--transition: all 0.25s ease;
+	--max-width: 100%;
+	--container-width: 1395px;
+
+	--mobile: 414px;
+	--tablet: 768px;
+	--laptop: 1366px;
+	--desktop: 1920px;
 }
 
-* {
+*,
+*::before,
+*::after {
 	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: geometricPrecision;
+}
+
+html,
+body {
+	color: var(--color-white);
+	font-family: var(--font-primary);
+	height: 100%;
+	overflow-x: hidden;
+}
+
+img {
+	display: inline-block;
+	height: auto;
+	max-width: 100%;
+	outline: 0;
+}
+
+fieldset {
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+blockquote {
+	margin: 0;
+}
+
+menu ul,
+menu li,
+nav ul,
+nav li {
+	margin: 0;
+	padding: 0;
+}
+
+hr {
+	border: none;
+	border-bottom: 1px solid var(--color-black-800);
+	height: var(--space-10);
+	margin-bottom: var(--space-10);
+	width: 100%;
+}
+
+button {
+	appearance: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}
+
+a {
+	text-decoration: none;
+	color: var(--color-white);
+	transition: all 0.25s ease;
 }
 
 main {
-	padding: 5rem 0;
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	background: var(--color-background);
 }
 
-code {
-	background: #fafafa;
-	border-radius: 5px;
-	padding: 0.75rem;
-	font-family: Menlo, Monaco, Lucida Console, Courier New, monospace;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+small {
+	font-family: var(--font-primary);
+	letter-spacing: -0.3px;
 }
 
-.container {
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+h1 {
+	font-size: var(--font-h1);
+	line-height: 1.3;
+	margin: 0 0 38px 0;
+}
+
+h2 {
+	font-size: var(--font-h2);
+	line-height: 1.3;
+	margin: 0 0 22px 0;
+}
+
+h3 {
+	font-size: var(--font-h3);
+	line-height: 1.3;
+	margin: 0 0 22px 0;
+}
+
+h4 {
+	font-size: var(--font-h4);
+	line-height: 1.3;
+	margin: 0 0 14px 0;
+}
+
+h5 {
+	font-size: var(--font-h5);
+	line-height: 1.3;
+	margin: 0 0 14px 0;
+}
+
+h6 {
+	font-size: var(--font-h6);
+	line-height: 1.3;
+	margin: 0 0 6px 0;
+}
+
+p {
+	font-size: var(--font-p);
+	font-weight: 400;
+	line-height: 1.3;
+	margin: 4px 0;
+}
+
+/* Input number field */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Hide scrollbar */
+body::-webkit-scrollbar {
+	display: none;
+}
+body {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
