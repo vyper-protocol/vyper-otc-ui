@@ -50,4 +50,5 @@ export interface IContract {
 		redeemLogicState: RedeemLogicForwardState;
 		rateState: RateSwitchboardState;
 	};
+	aggregatorLastValue: number;
 }

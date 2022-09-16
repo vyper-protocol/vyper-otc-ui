@@ -19,25 +19,9 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 		new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID),
 		provider
 	);
-	const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
-		RedeemLogicForwardIDL,
-		PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID,
-		provider
-	);
-	const rateSwitchboardProgram = new Program<RateSwitchboard>(
-		RateSwitchboardIDL,
-		new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID),
-		provider
-	);
 
 	const accountInfo = await vyperOtcProgram.account.otcState.fetch(otcStateAddress);
 	const trancheConfigAccountInfo = await vyperCoreProgram.account.trancheConfig.fetch(accountInfo.vyperTrancheConfig);
-	const redeemLogicAccountInfo = await redeemLogicForwardProgram.account.redeemLogicConfig.fetch(
-		trancheConfigAccountInfo.redeemLogicProgramState
-	);
-	const rateStateAccountInfo = await rateSwitchboardProgram.account.rateState.fetch(
-		trancheConfigAccountInfo.rateProgramState
-	);
 
 	const res = new OtcState();
 	res.publickey = otcStateAddress;
@@ -65,8 +49,35 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 		res.juniorSideBeneficiaryOwner = (await getAccount(provider.connection, accountInfo.juniorSideBeneficiary)).owner;
 	}
 
-	res.rateState = new RateSwitchboardState(rateStateAccountInfo.switchboardAggregators[0]);
+	// Rate plugin
+
 	try {
+		const rateSwitchboardProgram = new Program<RateSwitchboard>(
+			RateSwitchboardIDL,
+			new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID),
+			provider
+		);
+		const rateStateAccountInfo = await rateSwitchboardProgram.account.rateState.fetch(
+			trancheConfigAccountInfo.rateProgramState
+		);
+		res.rateState = new RateSwitchboardState(rateStateAccountInfo.switchboardAggregators[0]);
+		await res.rateState.loadAggregatorData(provider);
+	} catch (err) {
+		console.error(err);
+	}
+
+	// Redeem logic plugin
+
+	try {
+		const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
+			RedeemLogicForwardIDL,
+			PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID,
+			provider
+		);
+		const redeemLogicAccountInfo = await redeemLogicForwardProgram.account.redeemLogicConfig.fetch(
+			trancheConfigAccountInfo.redeemLogicProgramState
+		);
+
 		const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 		const isLinear = redeemLogicAccountInfo.isLinear;
 		const notional = redeemLogicAccountInfo.notional.toNumber();

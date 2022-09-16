@@ -1,0 +1,10 @@
+[
+	{
+		"cluster": "devnet",
+		"endpoints": ["https://api.devnet.solana.com"]
+	},
+	{
+		"cluster": "mainnet-beta",
+		"endpoints": ["https://api.mainnet-beta.solana.com"]
+	}
+]

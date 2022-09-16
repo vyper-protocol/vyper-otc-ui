@@ -33,8 +33,6 @@ const SearchBar = ({ searchState, className }: SearchBarProps) => {
 		}
 	};
 
-	// test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
-
 	return (
 		<Pane className={cn(styles.wrapper, className)}>
 			<Pane marginRight={4}>

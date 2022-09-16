@@ -13,9 +13,14 @@ import { Pane, Button } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { formatCurrency } from 'utils/numberHelpers';
+
+const ReactJson = dynamic(import('react-json-view'), { ssr: false });
+
+// test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
 export default function SummaryPageId() {
 	const router = useRouter();
@@ -121,7 +126,8 @@ export default function SummaryPageId() {
 		states: {
 			rateState: rateStateQuery?.data?.rateState,
 			redeemLogicState: rateStateQuery?.data?.redeemLogicState
-		}
+		},
+		aggregatorLastValue: rateStateQuery?.data?.rateState?.aggregatorLastValue
 	};
 
 	const loading = !rateStateQuery?.data?.depositExpiration_sec || !rateStateQuery?.data?.settleAvailableFrom_sec;
@@ -169,6 +175,8 @@ export default function SummaryPageId() {
 						</Button>
 					)}
 				</>
+
+				{/* <ReactJson collapsed src={rateStateQuery.data} /> */}
 			</Pane>
 		</Layout>
 	);

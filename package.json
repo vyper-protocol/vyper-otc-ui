@@ -28,15 +28,18 @@
 		"@solana/wallet-adapter-wallets": "^0.18.9",
 		"@solana/web3.js": "^1.61.0",
 		"@supabase/supabase-js": "^1.35.6",
+		"@switchboard-xyz/switchboard-v2": "^0.0.132",
 		"@vyper-protocol/explorer-link-helper": "^0.1.0",
 		"@vyper-protocol/rust-decimal-wrapper": "^0.1.3",
 		"bignumber.js": "^9.1.0",
 		"classnames": "^2.3.2",
+		"coingecko-api": "^1.0.10",
 		"evergreen-ui": "^6.10.3",
 		"moment": "^2.29.4",
 		"next": "^12.1.5",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0",
+		"react-json-view": "^1.21.3",
 		"react-query": "^3.39.2"
 	},
 	"devDependencies": {
