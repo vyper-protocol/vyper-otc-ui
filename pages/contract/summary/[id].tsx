@@ -10,13 +10,14 @@ import { withdraw } from 'api/otc-state/withdraw';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
 import { Pane, Button } from 'evergreen-ui';
+import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { formatCurrency } from 'utils/numberHelpers';
 
-export default function SummaryPage() {
+export default function SummaryPageId() {
 	const router = useRouter();
 	const { id } = router.query;
 
@@ -123,11 +124,13 @@ export default function SummaryPage() {
 		}
 	};
 
+	const loading = !rateStateQuery?.data?.depositExpiration_sec || !rateStateQuery?.data?.settleAvailableFrom_sec;
+
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
 				{/* @ts-ignore */}
-				<StatsPanel contract={contractData} />
+				{loading ? <Spinner /> : <StatsPanel contract={contractData} />}
 
 				<>
 					{rateStateQuery?.data?.isDepositSeniorAvailable && (

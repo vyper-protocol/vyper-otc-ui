@@ -26,7 +26,7 @@ const menuItems = [
 	{
 		name: 'Summary',
 		icon: <ListDetailViewIcon />,
-		path: '/contract/summary/WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3',
+		path: '/contract/summary',
 		wip: false
 	}
 ];
