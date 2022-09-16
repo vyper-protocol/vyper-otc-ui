@@ -23,7 +23,11 @@ const StatsPanel = ({ contract }: StatsPanelProps) => {
 		<>
 			<div className={styles.title}>
 				<h5 className={styles.symbol}>{contract.asset}</h5>
-				{contract.pubkey && <p className={styles.disabled}>{abbreviateAddress(contract.pubkey.toString())}</p>}
+				{contract.pubkey && (
+					<p className={styles.disabled} onClick={handleAddressClick} data-id={contract.pubkey.toString()}>
+						{abbreviateAddress(contract.pubkey.toString())}
+					</p>
+				)}
 			</div>
 
 			<div className={styles.funded}>
