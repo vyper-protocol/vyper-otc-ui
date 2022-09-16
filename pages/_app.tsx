@@ -1,4 +1,4 @@
-import 'styles/globals.css';
+import 'styles/base.css';
 import { useMemo } from 'react';
 
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -6,8 +6,8 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { TxHandlerProvider } from 'providers/TxHandlerProvider';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');

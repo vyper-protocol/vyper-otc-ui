@@ -1,9 +1,7 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable no-await-in-loop */
 import { createContext } from 'react';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, ConfirmOptions, SendOptions, clusterApiUrl } from '@solana/web3.js';
+import { ConfirmOptions, SendOptions } from '@solana/web3.js';
 import { toaster } from 'evergreen-ui';
 import { TxPackage } from 'models/TxPackage';
 

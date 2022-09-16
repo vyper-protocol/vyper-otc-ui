@@ -5,7 +5,6 @@ import { Pane } from 'evergreen-ui';
 import Head from 'next/head';
 
 import Footer from '../Footer/Footer';
-import styles from './Layout.module.scss';
 
 type LayoutProps = {
 	children: ReactNode;
@@ -13,16 +12,19 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
 	return (
-		<Pane backgroundColor="#f3f5f6">
+		<Pane>
 			<Head>
 				<title>Vyper OTC</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<div className={styles.main}>
+
+			<Pane>
 				<TopBar />
+
 				<main>{children}</main>
+
 				<Footer />
-			</div>
+			</Pane>
 		</Pane>
 	);
 };

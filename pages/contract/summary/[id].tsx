@@ -7,13 +7,13 @@ import { claim } from 'api/otc-state/claim';
 import { deposit } from 'api/otc-state/deposit';
 import { settle } from 'api/otc-state/settle';
 import { withdraw } from 'api/otc-state/withdraw';
+import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
 import { Pane, Text, Table, Button } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
-import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 
 // test account: WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 

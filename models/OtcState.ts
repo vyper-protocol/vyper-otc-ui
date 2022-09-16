@@ -1,6 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
-import { RedeemLogicForwardState } from './RedeemLogicForwardState';
+
 import RateSwitchboardState from './RateSwitchboardState';
+import { RedeemLogicForwardState } from './RedeemLogicForwardState';
 
 const MILISECONDS = 1000;
 
