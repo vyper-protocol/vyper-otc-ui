@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-
+import dynamic from 'next/dynamic';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -13,6 +13,8 @@ import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
+
+const ReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 export default function SummaryPage() {
 	const router = useRouter();
@@ -136,20 +138,15 @@ export default function SummaryPage() {
 											{moment(rateStateQuery.data.settleAvailableFrom_sec * 1000).fromNow()}
 										</Table.TextCell>
 									</Table.Row>
+
+									<Table.Row>
+										<Table.TextCell>Aggreator data last value</Table.TextCell>
+										<Table.TextCell>{rateStateQuery.data.rateState.aggregatorLastValue}</Table.TextCell>
+									</Table.Row>
 								</Table.Body>
 							</Table>
-							<Table marginBottom={24}>
-								<Table.Body>
-									{Object.keys(rateStateQuery.data).map((k) => {
-										return (
-											<Table.Row key={k}>
-												<Table.TextCell>{k}</Table.TextCell>
-												<Table.TextCell>{rateStateQuery.data[k]?.toString()}</Table.TextCell>
-											</Table.Row>
-										);
-									})}
-								</Table.Body>
-							</Table>
+
+							<ReactJson collapsed src={rateStateQuery.data} />
 						</>
 					)}
 				</Pane>

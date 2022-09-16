@@ -61,6 +61,7 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 			trancheConfigAccountInfo.rateProgramState
 		);
 		res.rateState = new RateSwitchboardState(rateStateAccountInfo.switchboardAggregators[0]);
+		await res.rateState.loadAggregatorData(provider);
 	} catch (err) {
 		console.error(err);
 	}
