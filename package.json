@@ -15,7 +15,8 @@
 		"release:patch": "standard-version --release-as patch",
 		"release:major": "standard-version --release-as major",
 		"push-tags": "git push --follow-tags origin master",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"cypress": "cypress open"
 	},
 	"dependencies": {
 		"@project-serum/anchor": "0.24.2",
