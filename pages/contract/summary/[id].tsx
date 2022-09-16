@@ -15,8 +15,6 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 
-// test account: WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
-
 export default function SummaryPage() {
 	const router = useRouter();
 	const { id } = router.query;
