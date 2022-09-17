@@ -129,20 +129,20 @@ export default function SummaryPageId() {
 			settleAvailable: rateStateQuery?.data?.settleAvailableFrom_sec * 1000
 		},
 		amounts: {
-			seniorDepositAmount: rateStateQuery?.data?.seniorDepositAmount,
-			juniorDepositAmount: rateStateQuery?.data?.juniorDepositAmount,
-			seniorReserveTokens: rateStateQuery?.data?.otcSeniorReserveTokenAccountAmount,
-			juniorReserveTokens: rateStateQuery?.data?.otcJuniorReserveTokenAccountAmount
+			seniorDepositAmount: rateStateQuery?.data?.buyerDepositAmount,
+			juniorDepositAmount: rateStateQuery?.data?.sellerDepositAmount,
+			seniorReserveTokens: rateStateQuery?.data?.programBuyerTAAmount,
+			juniorReserveTokens: rateStateQuery?.data?.programSellerTAAmount
 		},
 		conditions: {
 			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositSeniorAvailable(),
 			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositJuniorAvailable()
 		},
 		beneficiaries: {
-			seniorAccount: rateStateQuery?.data?.seniorSideBeneficiaryTokenAccount,
-			seniorOwner: rateStateQuery?.data?.seniorSideBeneficiaryOwner,
-			juniorAccount: rateStateQuery?.data?.juniorSideBeneficiaryTokenAccount,
-			juniorOwner: rateStateQuery?.data?.juniorSideBeneficiaryOwner
+			seniorAccount: rateStateQuery?.data?.buyerTA,
+			seniorOwner: rateStateQuery?.data?.buyerWallet,
+			juniorAccount: rateStateQuery?.data?.sellerTA,
+			juniorOwner: rateStateQuery?.data?.sellerWallet
 		},
 		states: {
 			rateState: rateStateQuery?.data?.rateState,
