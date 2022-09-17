@@ -17,8 +17,10 @@
 			margin-left: 50px;
 
 			span {
-				font-size: 14px;
+				font-family: var(--font-primary) !important;
+				font-size: 15px;
 				color: var(--color-text-disabled);
+				font-weight: 500;
 			}
 
 			svg {

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import cn from 'classnames';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
-import { Text, Pane, Heading, HomeIcon, CubeAddIcon, ListDetailViewIcon } from 'evergreen-ui';
+import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, ListDetailViewIcon } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -13,7 +13,7 @@ import styles from './TopBar.module.scss';
 const menuItems = [
 	{
 		name: 'Home',
-		icon: <HomeIcon />,
+		icon: <StackedChartIcon />,
 		path: '/',
 		wip: false
 	},

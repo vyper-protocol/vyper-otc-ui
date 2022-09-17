@@ -1,5 +1,6 @@
 :root {
-	--font-primary: 'Inter', -apple-system, system-ui, blinkmacsystemfont, 'Helvetica Neue', arial, sans-serif;
+	--font-primary: ui-sans-serif, system-ui, -apple-system, 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue',
+		'Arial', 'Noto Sans', sans-serif;
 
 	--color-black: #191919;
 	--color-white: #fff;
