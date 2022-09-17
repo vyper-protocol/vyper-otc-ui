@@ -12,7 +12,6 @@ import Layout from 'components/templates/Layout/Layout';
 import { Pane, Button } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
