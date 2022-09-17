@@ -12,19 +12,19 @@ export class OtcState {
 	publickey: PublicKey;
 
 	/**
-	 * Creation timestamp in seconds
+	 * Creation timestamp in ms
 	 */
-	created_sec: number;
+	createdAt: number;
 
 	/**
-	 * Deposit expiration timestamp in seconds
+	 * Deposit expiration timestamp in ms
 	 */
-	depositExpiration_sec: number;
+	depositExpirationAt: number;
 
 	/**
-	 * Settlement available from timestamp in seconds
+	 * Settlement available from timestamp in ms
 	 */
-	settleAvailableFrom_sec: number;
+	settleAvailableFromAt: number;
 
 	/**
 	 * Flag for the settlement execution
@@ -82,9 +82,7 @@ export class OtcState {
 	rateState: RateSwitchboardState;
 
 	isDepositExpired(): boolean {
-		// current UTC timestamp in seconds
-		const nowSeconds = Math.round(Date.now() / MILISECONDS);
-		return nowSeconds > this.depositExpiration_sec;
+		return Date.now() > this.depositExpirationAt;
 	}
 
 	isDepositSeniorAvailable(): boolean {
@@ -96,9 +94,7 @@ export class OtcState {
 	}
 
 	isSettlementAvailable(): boolean {
-		// current UTC timestamp in seconds
-		const nowSeconds = Math.round(Date.now() / MILISECONDS);
-		return nowSeconds > this.settleAvailableFrom_sec && !this.settleExecuted;
+		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted;
 	}
 
 	isClaimAvailable(): boolean {

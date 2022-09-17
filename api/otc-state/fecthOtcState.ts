@@ -25,9 +25,9 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 
 	const res = new OtcState();
 	res.publickey = otcStateAddress;
-	res.created_sec = accountInfo.created.toNumber();
-	res.depositExpiration_sec = accountInfo.depositEnd.toNumber();
-	res.settleAvailableFrom_sec = accountInfo.settleStart.toNumber();
+	res.createdAt = accountInfo.created.toNumber() * 1000;
+	res.depositExpirationAt = accountInfo.depositEnd.toNumber() * 1000;
+	res.settleAvailableFromAt = accountInfo.settleStart.toNumber() * 1000;
 	res.settleExecuted = accountInfo.settleExecuted;
 	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber();
 	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber();

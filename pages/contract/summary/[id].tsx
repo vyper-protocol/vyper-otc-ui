@@ -127,12 +127,12 @@ export default function SummaryPageId() {
 		timestamps: [
 			{
 				name: 'Created at',
-				value: moment(rateStateQuery?.data?.created_sec * 1000).format('Do MMMM YYYY')
+				value: moment(rateStateQuery?.data?.createdAt).format('Do MMMM YYYY')
 			},
-			{ name: 'Deposit expire', value: moment(rateStateQuery?.data?.depositExpiration_sec * 1000).fromNow() },
+			{ name: 'Deposit expire', value: moment(rateStateQuery?.data?.depositExpirationAt).fromNow() },
 			{
 				name: 'Settle available',
-				value: moment(rateStateQuery?.data?.settleAvailableFrom_sec * 1000).fromNow()
+				value: moment(rateStateQuery?.data?.settleAvailableFromAt).fromNow()
 			}
 		],
 		amounts: {
@@ -217,7 +217,7 @@ export default function SummaryPageId() {
 		}
 	];
 
-	const loadingSpinner = !rateStateQuery?.data?.depositExpiration_sec || !rateStateQuery?.data?.settleAvailableFrom_sec;
+	const loadingSpinner = !rateStateQuery?.data?.depositExpirationAt || !rateStateQuery?.data?.settleAvailableFromAt;
 
 	return (
 		<Layout>
