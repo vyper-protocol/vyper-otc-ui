@@ -17,6 +17,11 @@ export class OtcState {
 	createdAt: number;
 
 	/**
+	 * Deposit available from timestamp in ms
+	 */
+	depositAvailableFrom: number;
+
+	/**
 	 * Deposit expiration timestamp in ms
 	 */
 	depositExpirationAt: number;

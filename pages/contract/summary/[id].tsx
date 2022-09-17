@@ -101,38 +101,33 @@ export default function SummaryPageId() {
 	// TODO replace hardcoded mock data with switchboard or chain data
 	const contractData = {
 		pubkey: id as string,
-		asset: 'BTC_CHF',
+		asset: 'BTC_TBD',
 		stats: [
 			{
-				name: 'Asset Price',
-				value: formatCurrency(19897.56, true)
-			},
-			{
-				name: 'Leverage',
-				value: '20x'
-			},
-			{
-				name: 'Collateral',
-				value: formatCurrency(39794, true)
+				name: 'Aggregator value',
+				value: formatCurrency(rateStateQuery?.data?.rateState.aggregatorLastValue, true)
 			},
 			{
 				name: 'Duration',
-				value: 1663869600
+				value: moment
+					.duration(rateStateQuery?.data?.settleAvailableFromAt - rateStateQuery?.data?.depositExpirationAt)
+					.humanize()
 			},
 			{
 				name: 'Strike',
-				value: 19897
+				value: rateStateQuery?.data?.redeemLogicState.strike.toFixed(4)
 			}
 		],
 		timestamps: [
 			{
 				name: 'Created at',
-				value: moment(rateStateQuery?.data?.createdAt).format('Do MMMM YYYY')
+				value: moment(rateStateQuery?.data?.createdAt).format('d/M/YY HH:mm::ss')
 			},
-			{ name: 'Deposit expire', value: moment(rateStateQuery?.data?.depositExpirationAt).fromNow() },
+			{ name: 'Deposit start', value: moment(rateStateQuery?.data?.depositAvailableFrom).format('d/M/YY HH:mm::ss') },
+			{ name: 'Deposit expire', value: moment(rateStateQuery?.data?.depositExpirationAt).format('d/M/YY HH:mm::ss') },
 			{
 				name: 'Settle available',
-				value: moment(rateStateQuery?.data?.settleAvailableFromAt).fromNow()
+				value: moment(rateStateQuery?.data?.settleAvailableFromAt).format('d/M/YY HH:mm::ss')
 			}
 		],
 		amounts: {
