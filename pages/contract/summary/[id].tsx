@@ -18,6 +18,8 @@ import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { formatCurrency } from 'utils/numberHelpers';
 
+import styles from './summary.module.scss';
+
 const ReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 // test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
@@ -117,6 +119,10 @@ export default function SummaryPageId() {
 			seniorReserveTokens: rateStateQuery?.data?.otcSeniorReserveTokenAccountAmount,
 			juniorReserveTokens: rateStateQuery?.data?.otcJuniorReserveTokenAccountAmount
 		},
+		conditions: {
+			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositSeniorAvailable,
+			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositJuniorAvailable
+		},
 		beneficiaries: {
 			seniorAccount: rateStateQuery?.data?.seniorSideBeneficiaryTokenAccount,
 			seniorOwner: rateStateQuery?.data?.seniorSideBeneficiaryOwner,
@@ -138,43 +144,43 @@ export default function SummaryPageId() {
 				{/* @ts-ignore */}
 				{loading ? <Spinner /> : <StatsPanel contract={contractData} />}
 
-				<>
+				<div className={styles.buttons}>
 					{rateStateQuery?.data?.isDepositSeniorAvailable && (
-						<Button width="100%" onClick={onDepositSeniorClick} appearance="primary" intent="success">
+						<Button width="90%" onClick={onDepositSeniorClick} appearance="primary" intent="success">
 							Deposit Senior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isDepositJuniorAvailable && (
-						<Button width="100%" onClick={onDepositJuniorClick} appearance="primary" intent="danger">
+						<Button width="90%" onClick={onDepositJuniorClick} appearance="primary" intent="danger">
 							Deposit Junior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isWithdrawSeniorAvailable && (
-						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
+						<Button width="90%" onClick={onWithdrawClick} appearance="primary" intent="none">
 							Withdraw Senior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isWithdrawJuniorAvailable && (
-						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
+						<Button width="90%" onClick={onWithdrawClick} appearance="primary" intent="none">
 							Withdraw Junior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isSettlementAvailable && (
-						<Button width="100%" onClick={onSettleClick} appearance="primary" intent="none">
+						<Button width="90%" onClick={onSettleClick} appearance="primary" intent="none">
 							Settle
 						</Button>
 					)}
 					{rateStateQuery?.data?.isClaimSeniorAvailable && (
-						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
+						<Button width="90%" onClick={onClaimClick} appearance="primary" intent="success">
 							Claim Senior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isClaimJuniorAvailable && (
-						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
+						<Button width="90%" onClick={onClaimClick} appearance="primary" intent="success">
 							Claim Junior
 						</Button>
 					)}
-				</>
+				</div>
 
 				{/* <ReactJson collapsed src={rateStateQuery.data} /> */}
 			</Pane>

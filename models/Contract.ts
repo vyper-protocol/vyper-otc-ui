@@ -39,13 +39,16 @@ export interface IContract {
 		seniorReserveTokens: number;
 		juniorReserveTokens: number;
 	};
+	conditions: {
+		isDepositSeniorAvailable: boolean;
+		isDepositJuniorAvailable: boolean;
+	};
 	beneficiaries: {
 		seniorAccount: PublicKey;
 		seniorOwner: PublicKey;
 		juniorAccount: PublicKey;
 		juniorOwner: PublicKey;
 	};
-
 	states: {
 		redeemLogicState: RedeemLogicForwardState;
 		rateState: RateSwitchboardState;

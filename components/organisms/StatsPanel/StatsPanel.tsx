@@ -16,9 +16,6 @@ const StatsPanel = ({ contract }: StatsPanelProps) => {
 		});
 	};
 
-	const hasSeniorDeposited = contract.amounts.seniorDepositAmount !== 0;
-	const hasJuniorDeposited = contract.amounts.juniorDepositAmount !== 0;
-
 	return (
 		<>
 			<div className={styles.title}>
@@ -31,11 +28,11 @@ const StatsPanel = ({ contract }: StatsPanelProps) => {
 			</div>
 
 			<div className={styles.funded}>
-				<StatusIndicator color={hasSeniorDeposited ? 'success' : 'danger'}>
-					{hasSeniorDeposited ? 'Senior Funded' : 'Senior not Funded'}
+				<StatusIndicator color={!contract.conditions.isDepositSeniorAvailable ? 'success' : 'danger'}>
+					{!contract.conditions.isDepositSeniorAvailable ? 'Senior Funded' : 'Senior not Funded'}
 				</StatusIndicator>
-				<StatusIndicator color={hasJuniorDeposited ? 'success' : 'danger'}>
-					{hasJuniorDeposited ? 'Junior Funded' : 'Junior not Funded'}
+				<StatusIndicator color={!contract.conditions.isDepositJuniorAvailable ? 'success' : 'danger'}>
+					{!contract.conditions.isDepositJuniorAvailable ? 'Junior Funded' : 'Junior not Funded'}
 				</StatusIndicator>
 			</div>
 			<div className={styles.box}>
