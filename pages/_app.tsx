@@ -7,6 +7,7 @@ import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import { TxHandlerProvider } from 'providers/TxHandlerProvider';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -34,6 +35,7 @@ const Application = ({ Component, pageProps }) => {
 					</WalletModalProvider>
 				</WalletProvider>
 			</ConnectionProvider>
+			<ReactQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>
 	);
 };

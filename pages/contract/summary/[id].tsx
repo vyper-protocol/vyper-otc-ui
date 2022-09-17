@@ -108,9 +108,9 @@ export default function SummaryPageId() {
 			}
 		],
 		timestamps: {
-			createdAt: moment(rateStateQuery?.data?.created_sec * 1000).format('Do MMMM YYYY'),
-			depositExpiraton: moment(rateStateQuery?.data?.depositExpiration_sec * 1000).fromNow(),
-			settleAvailable: moment(rateStateQuery?.data?.settleAvailableFrom_sec * 1000).fromNow()
+			createdAt: rateStateQuery?.data?.created_sec * 1000,
+			depositExpiraton: rateStateQuery?.data?.depositExpiration_sec * 1000,
+			settleAvailable: rateStateQuery?.data?.settleAvailableFrom_sec * 1000
 		},
 
 		amounts: {
@@ -146,37 +146,37 @@ export default function SummaryPageId() {
 
 				<div className={styles.buttons}>
 					{rateStateQuery?.data?.isDepositSeniorAvailable && (
-						<Button width="90%" onClick={onDepositSeniorClick} appearance="primary" intent="success">
+						<Button width="100%" onClick={onDepositSeniorClick} appearance="primary" intent="success">
 							Deposit Senior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isDepositJuniorAvailable && (
-						<Button width="90%" onClick={onDepositJuniorClick} appearance="primary" intent="danger">
+						<Button width="100%" onClick={onDepositJuniorClick} appearance="primary" intent="danger">
 							Deposit Junior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isWithdrawSeniorAvailable && (
-						<Button width="90%" onClick={onWithdrawClick} appearance="primary" intent="none">
+						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
 							Withdraw Senior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isWithdrawJuniorAvailable && (
-						<Button width="90%" onClick={onWithdrawClick} appearance="primary" intent="none">
+						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
 							Withdraw Junior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isSettlementAvailable && (
-						<Button width="90%" onClick={onSettleClick} appearance="primary" intent="none">
+						<Button width="100%" onClick={onSettleClick} appearance="primary" intent="none">
 							Settle
 						</Button>
 					)}
 					{rateStateQuery?.data?.isClaimSeniorAvailable && (
-						<Button width="90%" onClick={onClaimClick} appearance="primary" intent="success">
+						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
 							Claim Senior
 						</Button>
 					)}
 					{rateStateQuery?.data?.isClaimJuniorAvailable && (
-						<Button width="90%" onClick={onClaimClick} appearance="primary" intent="success">
+						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
 							Claim Junior
 						</Button>
 					)}

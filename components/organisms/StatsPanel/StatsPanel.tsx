@@ -1,5 +1,6 @@
 import { Badge, StatusIndicator, toaster } from 'evergreen-ui';
 import { IContract } from 'models/Contract';
+import moment from 'moment';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './StatsPanel.module.scss';
@@ -52,15 +53,18 @@ const StatsPanel = ({ contract }: StatsPanelProps) => {
 				<div className={styles.expirations}>
 					<div>
 						<p>Deposit expire</p>
-						<p>{contract.timestamps.depositExpiraton}</p>
+						<p>{moment(contract.timestamps.depositExpiraton).fromNow()}</p>
 					</div>
 					<div className={styles.left}>
 						<p>Settle available</p>
-						<p>{contract.timestamps.settleAvailable}</p>
+						<p>{moment(contract.timestamps.settleAvailable).fromNow()}</p>
 					</div>
 				</div>
 			</div>
-			<p className={styles.created}> Created at {contract.timestamps.createdAt}</p>
+			<p className={styles.created}>
+				{' '}
+				Created at {moment(contract.timestamps.createdAt).format('Do MMMM YYYY, h:mm a')}
+			</p>
 		</>
 	);
 };
