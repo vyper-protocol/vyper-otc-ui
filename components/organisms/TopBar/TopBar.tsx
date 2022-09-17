@@ -36,6 +36,9 @@ const TopBar = () => {
 
 	const [searchValue, setSearchValue] = useState('');
 
+	const routerArray = router.asPath.split('/');
+	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
+
 	return (
 		<>
 			<Pane className={styles.topbar}>
@@ -45,13 +48,16 @@ const TopBar = () => {
 
 				<Pane className={styles.nav}>
 					{menuItems.map((menuItem) => {
+						const itemPathArray = menuItem.path.split('/');
+						const itemPathCondition = `/${itemPathArray[1]}/${itemPathArray[2]}`;
+
 						return (
 							<div
 								key={menuItem.name}
 								className={cn(
 									styles.item,
 									menuItem.wip && styles.disabled,
-									router.asPath === menuItem.path && styles.active
+									routerCondition === itemPathCondition && styles.active
 								)}
 							>
 								<Link href={menuItem.path} as={menuItem.path}>
