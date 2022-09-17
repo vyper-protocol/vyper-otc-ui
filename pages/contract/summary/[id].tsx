@@ -135,8 +135,8 @@ export default function SummaryPageId() {
 			juniorReserveTokens: rateStateQuery?.data?.otcJuniorReserveTokenAccountAmount
 		},
 		conditions: {
-			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositSeniorAvailable,
-			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositJuniorAvailable
+			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositSeniorAvailable(),
+			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositJuniorAvailable()
 		},
 		beneficiaries: {
 			seniorAccount: rateStateQuery?.data?.seniorSideBeneficiaryTokenAccount,
@@ -154,7 +154,7 @@ export default function SummaryPageId() {
 	const buttonConditions = [
 		{
 			name: 'Deposit Senior',
-			condition: rateStateQuery?.data?.isDepositSeniorAvailable,
+			condition: rateStateQuery?.data?.isDepositSeniorAvailable(),
 			event: onDepositSeniorClick,
 			color: 'success' as 'success',
 			icon: <PlusIcon />,
@@ -162,7 +162,7 @@ export default function SummaryPageId() {
 		},
 		{
 			name: 'Deposit Junior',
-			condition: rateStateQuery?.data?.isDepositJuniorAvailable,
+			condition: rateStateQuery?.data?.isDepositJuniorAvailable(),
 			event: onDepositJuniorClick,
 			color: 'error' as 'error',
 			icon: <MinusIcon />,
@@ -170,7 +170,7 @@ export default function SummaryPageId() {
 		},
 		{
 			name: 'Withdraw Senior',
-			condition: rateStateQuery?.data?.isWithdrawSeniorAvailable,
+			condition: rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet?.publicKey),
 			event: onWithdrawClick,
 			color: 'info' as 'info',
 			icon: <ResetIcon />,
@@ -178,7 +178,7 @@ export default function SummaryPageId() {
 		},
 		{
 			name: 'Withdraw Junior',
-			condition: rateStateQuery?.data?.isWithdrawJuniorAvailable,
+			condition: rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet?.publicKey),
 			event: onWithdrawClick,
 			color: 'info' as 'info',
 			icon: <ResetIcon />,
@@ -186,7 +186,7 @@ export default function SummaryPageId() {
 		},
 		{
 			name: 'Settle',
-			condition: rateStateQuery?.data?.isSettlementAvailable,
+			condition: rateStateQuery?.data?.isSettlementAvailable(),
 			event: onSettleClick,
 			color: 'info' as 'info',
 			icon: <RecordIcon />,
@@ -194,7 +194,7 @@ export default function SummaryPageId() {
 		},
 		{
 			name: 'Claim Senior',
-			condition: rateStateQuery?.data?.isClaimSeniorAvailable,
+			condition: rateStateQuery?.data?.isClaimSeniorAvailable(wallet?.publicKey),
 			event: onClaimClick,
 			color: 'success' as 'success',
 			icon: <CleanIcon />,
@@ -202,7 +202,7 @@ export default function SummaryPageId() {
 		},
 		{
 			name: 'Claim Junior',
-			condition: rateStateQuery?.data?.isClaimJuniorAvailable,
+			condition: rateStateQuery?.data?.isClaimJuniorAvailable(wallet?.publicKey),
 			event: onClaimClick,
 			color: 'success' as 'success',
 			icon: <CleanIcon />,

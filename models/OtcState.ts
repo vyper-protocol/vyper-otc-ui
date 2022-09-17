@@ -27,52 +27,62 @@ export class OtcState {
 	redeemLogicState: RedeemLogicForwardState;
 	rateState: RateSwitchboardState;
 
-	get isDepositExpired(): boolean {
+	isDepositExpired(): boolean {
 		// current UTC timestamp in seconds
 		const nowSeconds = Math.round(Date.now() / MILISECONDS);
 		return nowSeconds > this.depositExpiration_sec;
 	}
 
-	get isDepositSeniorAvailable(): boolean {
+	isDepositSeniorAvailable(): boolean {
 		return !this.isDepositExpired && this.seniorSideBeneficiaryTokenAccount == null;
 	}
 
-	get isDepositJuniorAvailable(): boolean {
+	isDepositJuniorAvailable(): boolean {
 		return !this.isDepositExpired && this.juniorSideBeneficiaryTokenAccount == null;
 	}
 
-	get isSettlementAvailable(): boolean {
+	isSettlementAvailable(): boolean {
 		// current UTC timestamp in seconds
 		const nowSeconds = Math.round(Date.now() / MILISECONDS);
 		return nowSeconds > this.settleAvailableFrom_sec && !this.settleExecuted;
 	}
 
-	get isClaimAvailable(): boolean {
+	isClaimAvailable(): boolean {
 		return this.settleExecuted;
 	}
 
-	get isClaimSeniorAvailable(): boolean {
-		return this.settleExecuted && this.otcSeniorReserveTokenAccountAmount > 0;
-	}
-
-	get isClaimJuniorAvailable(): boolean {
-		return this.settleExecuted && this.otcJuniorReserveTokenAccountAmount > 0;
-	}
-
-	get isWithdrawSeniorAvailable(): boolean {
+	isClaimSeniorAvailable(currentUserWallet: PublicKey): boolean {
 		return (
-			this.isDepositExpired &&
-			this.seniorSideBeneficiaryTokenAccount != null &&
-			this.juniorSideBeneficiaryTokenAccount == null &&
+			this.settleExecuted &&
+			this.seniorSideBeneficiaryOwner.equals(currentUserWallet) &&
 			this.otcSeniorReserveTokenAccountAmount > 0
 		);
 	}
 
-	get isWithdrawJuniorAvailable(): boolean {
+	isClaimJuniorAvailable(currentUserWallet: PublicKey): boolean {
+		return (
+			this.settleExecuted &&
+			this.juniorSideBeneficiaryOwner.equals(currentUserWallet) &&
+			this.otcJuniorReserveTokenAccountAmount > 0
+		);
+	}
+
+	isWithdrawSeniorAvailable(currentUserWallet: PublicKey): boolean {
+		return (
+			this.isDepositExpired &&
+			this.seniorSideBeneficiaryTokenAccount != null &&
+			this.juniorSideBeneficiaryTokenAccount == null &&
+			this.seniorSideBeneficiaryOwner.equals(currentUserWallet) &&
+			this.otcSeniorReserveTokenAccountAmount > 0
+		);
+	}
+
+	isWithdrawJuniorAvailable(currentUserWallet: PublicKey): boolean {
 		return (
 			this.isDepositExpired &&
 			this.seniorSideBeneficiaryTokenAccount == null &&
 			this.juniorSideBeneficiaryTokenAccount != null &&
+			this.juniorSideBeneficiaryOwner.equals(currentUserWallet) &&
 			this.otcJuniorReserveTokenAccountAmount > 0
 		);
 	}
