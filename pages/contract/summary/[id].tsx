@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -9,7 +9,7 @@ import { settle } from 'api/otc-state/settle';
 import { withdraw } from 'api/otc-state/withdraw';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
-import { Pane, Button } from 'evergreen-ui';
+import { Pane, PlusIcon, MinusIcon, ResetIcon, RecordIcon, CleanIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import dynamic from 'next/dynamic';
@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { formatCurrency } from 'utils/numberHelpers';
 
+import ButtonPill from './atoms/ButtonPill/ButtonPill';
 import styles from './summary.module.scss';
 
 const ReactJson = dynamic(import('react-json-view'), { ssr: false });
@@ -34,53 +35,69 @@ export default function SummaryPageId() {
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
 
+	const [loadingDepositSenior, setLoadingDepositSenior] = useState(false);
+	const [loadingDepositJunior, setLoadingDepositJunior] = useState(false);
+	const [loadingWithdraw, setLoadingWithdraw] = useState(false);
+	const [loadingSettle, setLoadingSettle] = useState(false);
+	const [loadingClaim, setLoadingClaim] = useState(false);
+
 	const onDepositSeniorClick = async (e) => {
 		try {
+			setLoadingDepositSenior(true);
 			const tx = await deposit(provider, new PublicKey(id), true);
 			await txHandler.handleTxs(tx);
 		} catch (err) {
 			console.log(err);
 		}
+		setLoadingDepositSenior(false);
 		rateStateQuery.refetch();
 	};
 	const onDepositJuniorClick = async () => {
 		try {
+			setLoadingDepositJunior(true);
 			const tx = await deposit(provider, new PublicKey(id), false);
 			await txHandler.handleTxs(tx);
 		} catch (err) {
 			console.log(err);
 		}
+		setLoadingDepositJunior(false);
 		rateStateQuery.refetch();
 	};
 	const onWithdrawClick = async () => {
 		try {
+			setLoadingWithdraw(true);
 			const tx = await withdraw(provider, new PublicKey(id));
 			await txHandler.handleTxs(tx);
 		} catch (err) {
 			console.log(err);
 		}
+		setLoadingWithdraw(false);
 		rateStateQuery.refetch();
 	};
 	const onSettleClick = async () => {
 		try {
+			setLoadingSettle(true);
 			const tx = await settle(provider, new PublicKey(id));
 			await txHandler.handleTxs(tx);
 		} catch (err) {
 			console.log(err);
 		}
+		setLoadingSettle(false);
 		rateStateQuery.refetch();
 	};
 	const onClaimClick = async () => {
 		try {
+			setLoadingClaim(true);
 			const tx = await claim(provider, new PublicKey(id));
 			await txHandler.handleTxs(tx);
 		} catch (err) {
 			console.log(err);
 		}
+		setLoadingClaim(false);
 		rateStateQuery.refetch();
 	};
 
-	// TODO replace mock data with switchboard or chain data
+	// TODO replace hardcoded mock data with switchboard or chain data
 	const contractData = {
 		pubkey: id as string,
 		asset: 'BTC_CHF',
@@ -111,7 +128,6 @@ export default function SummaryPageId() {
 			depositExpiraton: rateStateQuery?.data?.depositExpiration_sec * 1000,
 			settleAvailable: rateStateQuery?.data?.settleAvailableFrom_sec * 1000
 		},
-
 		amounts: {
 			seniorDepositAmount: rateStateQuery?.data?.seniorDepositAmount,
 			juniorDepositAmount: rateStateQuery?.data?.juniorDepositAmount,
@@ -135,50 +151,88 @@ export default function SummaryPageId() {
 		aggregatorLastValue: rateStateQuery?.data?.rateState?.aggregatorLastValue
 	};
 
-	const loading = !rateStateQuery?.data?.depositExpiration_sec || !rateStateQuery?.data?.settleAvailableFrom_sec;
+	const buttonConditions = [
+		{
+			name: 'Deposit Senior',
+			condition: rateStateQuery?.data?.isDepositSeniorAvailable,
+			event: onDepositSeniorClick,
+			color: 'success' as 'success',
+			icon: <PlusIcon />,
+			loading: loadingDepositSenior
+		},
+		{
+			name: 'Deposit Junior',
+			condition: rateStateQuery?.data?.isDepositJuniorAvailable,
+			event: onDepositJuniorClick,
+			color: 'error' as 'error',
+			icon: <MinusIcon />,
+			loading: loadingDepositJunior
+		},
+		{
+			name: 'Withdraw Senior',
+			condition: rateStateQuery?.data?.isWithdrawSeniorAvailable,
+			event: onWithdrawClick,
+			color: 'info' as 'info',
+			icon: <ResetIcon />,
+			loading: loadingWithdraw
+		},
+		{
+			name: 'Withdraw Junior',
+			condition: rateStateQuery?.data?.isWithdrawJuniorAvailable,
+			event: onWithdrawClick,
+			color: 'info' as 'info',
+			icon: <ResetIcon />,
+			loading: loadingWithdraw
+		},
+		{
+			name: 'Settle',
+			condition: rateStateQuery?.data?.isSettlementAvailable,
+			event: onSettleClick,
+			color: 'info' as 'info',
+			icon: <RecordIcon />,
+			loading: loadingSettle
+		},
+		{
+			name: 'Claim Senior',
+			condition: rateStateQuery?.data?.isClaimSeniorAvailable,
+			event: onClaimClick,
+			color: 'success' as 'success',
+			icon: <CleanIcon />,
+			loading: loadingClaim
+		},
+		{
+			name: 'Claim Junior',
+			condition: rateStateQuery?.data?.isClaimJuniorAvailable,
+			event: onClaimClick,
+			color: 'success' as 'success',
+			icon: <CleanIcon />,
+			loading: loadingClaim
+		}
+	];
+
+	const loadingSpinner = !rateStateQuery?.data?.depositExpiration_sec || !rateStateQuery?.data?.settleAvailableFrom_sec;
 
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
 				{/* @ts-ignore */}
-				{loading ? <Spinner /> : <StatsPanel contract={contractData} />}
+				{loadingSpinner ? <Spinner /> : <StatsPanel contract={contractData} />}
 
 				<div className={styles.buttons}>
-					{rateStateQuery?.data?.isDepositSeniorAvailable && (
-						<Button width="100%" onClick={onDepositSeniorClick} appearance="primary" intent="success">
-							Deposit Senior
-						</Button>
-					)}
-					{rateStateQuery?.data?.isDepositJuniorAvailable && (
-						<Button width="100%" onClick={onDepositJuniorClick} appearance="primary" intent="danger">
-							Deposit Junior
-						</Button>
-					)}
-					{rateStateQuery?.data?.isWithdrawSeniorAvailable && (
-						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
-							Withdraw Senior
-						</Button>
-					)}
-					{rateStateQuery?.data?.isWithdrawJuniorAvailable && (
-						<Button width="100%" onClick={onWithdrawClick} appearance="primary" intent="none">
-							Withdraw Junior
-						</Button>
-					)}
-					{rateStateQuery?.data?.isSettlementAvailable && (
-						<Button width="100%" onClick={onSettleClick} appearance="primary" intent="none">
-							Settle
-						</Button>
-					)}
-					{rateStateQuery?.data?.isClaimSeniorAvailable && (
-						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
-							Claim Senior
-						</Button>
-					)}
-					{rateStateQuery?.data?.isClaimJuniorAvailable && (
-						<Button width="100%" onClick={onClaimClick} appearance="primary" intent="success">
-							Claim Junior
-						</Button>
-					)}
+					{buttonConditions.map((buttonCondition) => {
+						return (
+							buttonCondition.condition && (
+								<ButtonPill
+									key={buttonCondition.name}
+									mode={buttonCondition.color}
+									text={buttonCondition.name}
+									onClick={buttonCondition.event}
+									icon={buttonCondition.icon}
+									loading={buttonCondition.loading}
+								/>
+							)
+						);
+					})}
 				</div>
 
 				{/* <ReactJson collapsed src={rateStateQuery.data} /> */}
