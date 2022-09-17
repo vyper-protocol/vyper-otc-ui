@@ -17,7 +17,7 @@ import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { formatCurrency } from 'utils/numberHelpers';
 
-import ButtonPill from './atoms/ButtonPill/ButtonPill';
+import ButtonPill from '../../../components/atoms/ButtonPill/ButtonPill';
 import styles from './summary.module.scss';
 
 const ReactJson = dynamic(import('react-json-view'), { ssr: false });

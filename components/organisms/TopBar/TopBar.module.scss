@@ -3,6 +3,10 @@
 	justify-content: center;
 }
 
+.hover:hover {
+	cursor: pointer;
+}
+
 .topbar {
 	display: flex;
 	justify-content: space-between;
@@ -43,7 +47,6 @@
 		}
 
 		.disabled {
-			pointer-events: none;
 			span {
 				color: var(--color-text-disabled);
 			}
