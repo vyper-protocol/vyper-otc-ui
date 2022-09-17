@@ -28,11 +28,17 @@ export interface IContract {
 			value: number;
 		}
 	];
-	timestamps: {
-		createdAt: number;
-		depositExpiraton: number;
-		settleAvailable: number;
-	};
+	timestamps: [
+		{
+			name: 'Created at';
+			value: string;
+		},
+		{ name: 'Deposit expire'; value: string },
+		{
+			name: 'Settle available';
+			value: string;
+		}
+	];
 	amounts: {
 		seniorDepositAmount: number;
 		juniorDepositAmount: number;

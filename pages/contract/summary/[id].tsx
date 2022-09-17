@@ -12,6 +12,7 @@ import Layout from 'components/templates/Layout/Layout';
 import { Pane, PlusIcon, MinusIcon, ResetIcon, RecordIcon, CleanIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
+import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
@@ -123,11 +124,17 @@ export default function SummaryPageId() {
 				value: 19897
 			}
 		],
-		timestamps: {
-			createdAt: rateStateQuery?.data?.created_sec * 1000,
-			depositExpiraton: rateStateQuery?.data?.depositExpiration_sec * 1000,
-			settleAvailable: rateStateQuery?.data?.settleAvailableFrom_sec * 1000
-		},
+		timestamps: [
+			{
+				name: 'Created at',
+				value: moment(rateStateQuery?.data?.created_sec * 1000).format('Do MMMM YYYY')
+			},
+			{ name: 'Deposit expire', value: moment(rateStateQuery?.data?.depositExpiration_sec * 1000).fromNow() },
+			{
+				name: 'Settle available',
+				value: moment(rateStateQuery?.data?.settleAvailableFrom_sec * 1000).fromNow()
+			}
+		],
 		amounts: {
 			seniorDepositAmount: rateStateQuery?.data?.buyerDepositAmount,
 			juniorDepositAmount: rateStateQuery?.data?.sellerDepositAmount,
@@ -215,25 +222,32 @@ export default function SummaryPageId() {
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
-				{/* @ts-ignore */}
-				{loadingSpinner ? <Spinner /> : <StatsPanel contract={contractData} />}
-
-				<div className={styles.buttons}>
-					{buttonConditions.map((buttonCondition) => {
-						return (
-							buttonCondition.condition && (
-								<ButtonPill
-									key={buttonCondition.name}
-									mode={buttonCondition.color}
-									text={buttonCondition.name}
-									onClick={buttonCondition.event}
-									icon={buttonCondition.icon}
-									loading={buttonCondition.loading}
-								/>
-							)
-						);
-					})}
-				</div>
+				{loadingSpinner ? (
+					<Spinner />
+				) : (
+					<StatsPanel
+						//  @ts-ignore
+						contract={contractData}
+						buttons={
+							<div className={styles.buttons}>
+								{buttonConditions.map((buttonCondition) => {
+									return (
+										buttonCondition.condition && (
+											<ButtonPill
+												key={buttonCondition.name}
+												mode={buttonCondition.color}
+												text={buttonCondition.name}
+												onClick={buttonCondition.event}
+												icon={buttonCondition.icon}
+												loading={buttonCondition.loading}
+											/>
+										)
+									);
+								})}
+							</div>
+						}
+					/>
+				)}
 
 				{/* <ReactJson collapsed src={rateStateQuery.data} /> */}
 			</Pane>
