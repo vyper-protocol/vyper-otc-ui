@@ -10,7 +10,7 @@ import { OtcState } from 'models/OtcState';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { useContext, useState } from 'react';
 
-export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -52,3 +52,5 @@ export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: strin
 		/>
 	);
 };
+
+export default ClaimButton;

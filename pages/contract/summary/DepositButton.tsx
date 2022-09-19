@@ -9,7 +9,7 @@ import { OtcState } from 'models/OtcState';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { useContext, useState } from 'react';
 
-export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -51,3 +51,5 @@ export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: str
 		/>
 	);
 };
+
+export default DepositButton;

@@ -20,10 +20,10 @@ import { formatCurrency } from 'utils/numberHelpers';
 
 import ButtonPill from '../../../components/atoms/ButtonPill/ButtonPill';
 import styles from './summary.module.scss';
-import { DepositButton } from './DepositButton';
-import { WithdrawButton } from './WithdrawButton';
-import { SettleButton } from './SettleButton';
-import { ClaimButton } from './ClaimButton';
+import DepositButton from './DepositButton';
+import WithdrawButton from './WithdrawButton';
+import SettleButton from './SettleButton';
+import ClaimButton from './ClaimButton';
 
 const ReactJson = dynamic(import('react-json-view'), { ssr: false });
 
