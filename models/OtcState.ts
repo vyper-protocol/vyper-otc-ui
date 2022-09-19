@@ -1,78 +1,132 @@
 import { PublicKey } from '@solana/web3.js';
-import { RedeemLogicForwardState } from './RedeemLogicForwardState';
+
 import RateSwitchboardState from './RateSwitchboardState';
+import { RedeemLogicForwardState } from './RedeemLogicForwardState';
 
 const MILISECONDS = 1000;
 
 export class OtcState {
+	/**
+	 * Current Contract public key
+	 */
 	publickey: PublicKey;
 
-	created_sec: number;
-	depositExpiration_sec: number;
-	settleAvailableFrom_sec: number;
+	/**
+	 * Creation timestamp in ms
+	 */
+	createdAt: number;
+
+	/**
+	 * Deposit available from timestamp in ms
+	 */
+	depositAvailableFrom: number;
+
+	/**
+	 * Deposit expiration timestamp in ms
+	 */
+	depositExpirationAt: number;
+
+	/**
+	 * Settlement available from timestamp in ms
+	 */
+	settleAvailableFromAt: number;
+
+	/**
+	 * Flag for the settlement execution
+	 */
 	settleExecuted: boolean;
 
-	seniorDepositAmount: number;
-	juniorDepositAmount: number;
+	/**
+	 * Amount of tokens the buyer needs to deposit
+	 */
+	buyerDepositAmount: number;
 
-	otcSeniorReserveTokenAccountAmount: number;
-	otcJuniorReserveTokenAccountAmount: number;
+	/**
+	 * Amount of tokens the seller needs to deposit
+	 */
+	sellerDepositAmount: number;
 
-	seniorSideBeneficiaryTokenAccount: undefined | PublicKey;
-	seniorSideBeneficiaryOwner: undefined | PublicKey;
-	juniorSideBeneficiaryTokenAccount: undefined | PublicKey;
-	juniorSideBeneficiaryOwner: undefined | PublicKey;
+	/**
+	 * OTC program token account for buyer tokens
+	 */
+	programBuyerTAAmount: number;
 
+	/**
+	 * OTC program token account for seller tokens
+	 */
+	programSellerTAAmount: number;
+
+	/**
+	 * Buyer wallet
+	 */
+	buyerWallet: undefined | PublicKey;
+
+	/**
+	 * Buyer token account
+	 */
+	buyerTA: undefined | PublicKey;
+
+	/**
+	 * Seller wallet
+	 */
+	sellerWallet: undefined | PublicKey;
+
+	/**
+	 * Seller token account
+	 */
+	sellerTA: undefined | PublicKey;
+
+	/**
+	 * Redeem logic state
+	 */
 	redeemLogicState: RedeemLogicForwardState;
+
+	/**
+	 * Rate state
+	 */
 	rateState: RateSwitchboardState;
 
-	get isDepositExpired(): boolean {
-		// current UTC timestamp in seconds
-		const nowSeconds = Math.round(Date.now() / MILISECONDS);
-		return nowSeconds > this.depositExpiration_sec;
+	isDepositExpired(): boolean {
+		return Date.now() > this.depositExpirationAt;
 	}
 
-	get isDepositSeniorAvailable(): boolean {
-		return !this.isDepositExpired && this.seniorSideBeneficiaryTokenAccount == null;
+	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
+		return !this.isDepositExpired() && this.buyerTA == null && !currentUserWallet.equals(this.sellerWallet);
 	}
 
-	get isDepositJuniorAvailable(): boolean {
-		return !this.isDepositExpired && this.juniorSideBeneficiaryTokenAccount == null;
+	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
+		return !this.isDepositExpired() && this.sellerTA == null && !currentUserWallet.equals(this.buyerWallet);
 	}
 
-	get isSettlementAvailable(): boolean {
-		// current UTC timestamp in seconds
-		const nowSeconds = Math.round(Date.now() / MILISECONDS);
-		return nowSeconds > this.settleAvailableFrom_sec && !this.settleExecuted;
+	isSettlementAvailable(): boolean {
+		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted;
 	}
 
-	get isClaimAvailable(): boolean {
-		return this.settleExecuted;
+	isClaimSeniorAvailable(currentUserWallet: PublicKey): boolean {
+		return this.settleExecuted && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0;
 	}
 
-	get isClaimSeniorAvailable(): boolean {
-		return this.settleExecuted && this.otcSeniorReserveTokenAccountAmount > 0;
+	isClaimJuniorAvailable(currentUserWallet: PublicKey): boolean {
+		return this.settleExecuted && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0;
 	}
 
-	get isClaimJuniorAvailable(): boolean {
-		return this.settleExecuted && this.otcJuniorReserveTokenAccountAmount > 0;
-	}
-
-	get isWithdrawSeniorAvailable(): boolean {
+	isWithdrawSeniorAvailable(currentUserWallet: PublicKey): boolean {
 		return (
 			this.isDepositExpired &&
-			this.seniorSideBeneficiaryTokenAccount != null &&
-			this.juniorSideBeneficiaryTokenAccount == null &&
-			this.otcSeniorReserveTokenAccountAmount > 0
+			this.buyerTA != null &&
+			this.sellerTA == null &&
+			this.buyerWallet.equals(currentUserWallet) &&
+			this.programBuyerTAAmount > 0
 		);
 	}
 
-	get isWithdrawJuniorAvailable(): boolean {
+	isWithdrawJuniorAvailable(currentUserWallet: PublicKey): boolean {
 		return (
 			this.isDepositExpired &&
-			this.seniorSideBeneficiaryTokenAccount == null &&
-			this.juniorSideBeneficiaryTokenAccount != null &&
-			this.otcJuniorReserveTokenAccountAmount > 0
+			this.buyerTA == null &&
+			this.sellerTA != null &&
+			this.sellerWallet.equals(currentUserWallet) &&
+			this.programSellerTAAmount > 0
 		);
 	}
 }

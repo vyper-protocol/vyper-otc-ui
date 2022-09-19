@@ -1,39 +1,85 @@
+/* eslint-disable css-modules/no-unused-class */
+import { useState } from 'react';
+
+import cn from 'classnames';
+import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
-import { Pane, Heading } from 'evergreen-ui';
+import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, Tooltip } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import styles from './TopBar.module.scss';
+
 const menuItems = [
 	{
-		name: 'Summary (test)',
-		path: '/contract/summary/5ktgP8XxbcgoZC2a54TiPy7JKpEgyY1GMCWy1u95ZrPc'
+		name: 'Home',
+		icon: <StackedChartIcon />,
+		path: '/',
+		wip: false,
+		tooltip: false
+	},
+	{
+		name: 'Create Contract',
+		icon: <CubeAddIcon />,
+		path: '/contract/create_contract',
+		wip: true,
+		tooltip: 'Coming soon'
 	}
 ];
 
 const TopBar = () => {
+	const router = useRouter();
+
+	const [searchValue, setSearchValue] = useState('');
+
+	const routerArray = router.asPath.split('/');
+	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
+
 	return (
-		<Pane display="flex" padding={16} background="lightgray">
-			<Pane flex={1} alignItems="center" display="flex">
+		<>
+			<Pane className={styles.topbar}>
 				<Link href="/">
-					<Heading size={600}>Vyper OTC</Heading>
+					<Heading size={600} className={styles.hover}>
+						Vyper OTC
+					</Heading>
 				</Link>
 
-				<Pane marginLeft={30}>
+				<Pane className={styles.nav}>
 					{menuItems.map((menuItem) => {
+						const itemPathArray = menuItem.path.split('/');
+						const itemPathCondition = `/${itemPathArray[1]}/${itemPathArray[2]}`;
+
 						return (
-							<div key={menuItem.name}>
+							<div
+								key={menuItem.name}
+								className={cn(
+									styles.item,
+									menuItem.wip && styles.disabled,
+									routerCondition === itemPathCondition && styles.active
+								)}
+							>
 								<Link href={menuItem.path} as={menuItem.path}>
-									{menuItem.name}
+									{menuItem.tooltip ? (
+										<Tooltip content={menuItem.tooltip}>
+											<Text>
+												{menuItem.icon} {menuItem.name}
+											</Text>
+										</Tooltip>
+									) : (
+										<Text>
+											{menuItem.icon} {menuItem.name}
+										</Text>
+									)}
 								</Link>
 							</div>
 						);
 					})}
 				</Pane>
-			</Pane>
-			<Pane>
+
 				<SelectWallet />
 			</Pane>
-		</Pane>
+			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+		</>
 	);
 };
 

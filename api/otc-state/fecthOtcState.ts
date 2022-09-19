@@ -25,28 +25,29 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 
 	const res = new OtcState();
 	res.publickey = otcStateAddress;
-	res.created_sec = accountInfo.created.toNumber();
-	res.depositExpiration_sec = accountInfo.depositEnd.toNumber();
-	res.settleAvailableFrom_sec = accountInfo.settleStart.toNumber();
+	res.createdAt = accountInfo.created.toNumber() * 1000;
+	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
+	res.depositExpirationAt = accountInfo.depositEnd.toNumber() * 1000;
+	res.settleAvailableFromAt = accountInfo.settleStart.toNumber() * 1000;
 	res.settleExecuted = accountInfo.settleExecuted;
-	res.seniorDepositAmount = accountInfo.seniorDepositAmount.toNumber();
-	res.juniorDepositAmount = accountInfo.juniorDepositAmount.toNumber();
+	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber();
+	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber();
 
-	res.otcSeniorReserveTokenAccountAmount = Number(
+	res.programBuyerTAAmount = Number(
 		(await getAccount(provider.connection, accountInfo.otcSeniorReserveTokenAccount)).amount
 	);
-	res.otcJuniorReserveTokenAccountAmount = Number(
+	res.programSellerTAAmount = Number(
 		(await getAccount(provider.connection, accountInfo.otcJuniorReserveTokenAccount)).amount
 	);
 
-	res.seniorSideBeneficiaryTokenAccount = accountInfo.seniorSideBeneficiary;
-	if (res.seniorSideBeneficiaryTokenAccount) {
-		res.seniorSideBeneficiaryOwner = (await getAccount(provider.connection, accountInfo.seniorSideBeneficiary)).owner;
+	res.buyerTA = accountInfo.seniorSideBeneficiary;
+	if (res.buyerTA) {
+		res.buyerWallet = (await getAccount(provider.connection, accountInfo.seniorSideBeneficiary)).owner;
 	}
 
-	res.juniorSideBeneficiaryTokenAccount = accountInfo.juniorSideBeneficiary;
-	if (res.juniorSideBeneficiaryTokenAccount) {
-		res.juniorSideBeneficiaryOwner = (await getAccount(provider.connection, accountInfo.juniorSideBeneficiary)).owner;
+	res.sellerTA = accountInfo.juniorSideBeneficiary;
+	if (res.sellerTA) {
+		res.sellerWallet = (await getAccount(provider.connection, accountInfo.juniorSideBeneficiary)).owner;
 	}
 
 	// Rate plugin

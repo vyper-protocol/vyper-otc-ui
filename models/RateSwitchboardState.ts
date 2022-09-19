@@ -6,7 +6,9 @@ export default class RateSwitchboardState {
 	aggregatorData: any;
 	aggregatorLastValue: number;
 
-	constructor(public switchboarAggregator: PublicKey) {}
+	constructor(public switchboarAggregator: PublicKey) {
+		//
+	}
 
 	async loadAggregatorData(provider: AnchorProvider) {
 		this.aggregatorData = await getAggregatorData(provider, this.switchboarAggregator);

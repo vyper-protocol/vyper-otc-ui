@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 
 import TopBar from 'components/organisms/TopBar/TopBar';
+import { Pane } from 'evergreen-ui';
 import Head from 'next/head';
 
 import Footer from '../Footer/Footer';
@@ -11,18 +12,20 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
 	return (
-		<div>
+		<Pane>
 			<Head>
 				<title>Vyper OTC</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<TopBar />
+			<Pane>
+				<TopBar />
 
-			<main>{children}</main>
+				<main>{children}</main>
 
-			<Footer />
-		</div>
+				<Footer />
+			</Pane>
+		</Pane>
 	);
 };
 
