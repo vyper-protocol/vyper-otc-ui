@@ -90,20 +90,16 @@ export class OtcState {
 		return Date.now() > this.depositExpirationAt;
 	}
 
-	isDepositSeniorAvailable(): boolean {
-		return !this.isDepositExpired && this.buyerTA == null;
+	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
+		return !this.isDepositExpired() && this.buyerTA == null && !currentUserWallet.equals(this.sellerWallet);
 	}
 
-	isDepositJuniorAvailable(): boolean {
-		return !this.isDepositExpired && this.sellerTA == null;
+	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
+		return !this.isDepositExpired() && this.sellerTA == null && !currentUserWallet.equals(this.buyerWallet);
 	}
 
 	isSettlementAvailable(): boolean {
 		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted;
-	}
-
-	isClaimAvailable(): boolean {
-		return this.settleExecuted;
 	}
 
 	isClaimSeniorAvailable(currentUserWallet: PublicKey): boolean {

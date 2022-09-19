@@ -20,6 +20,10 @@ import { formatCurrency } from 'utils/numberHelpers';
 
 import ButtonPill from '../../../components/atoms/ButtonPill/ButtonPill';
 import styles from './summary.module.scss';
+import { DepositButton } from './DepositButton';
+import { WithdrawButton } from './WithdrawButton';
+import { SettleButton } from './SettleButton';
+import { ClaimButton } from './ClaimButton';
 
 const ReactJson = dynamic(import('react-json-view'), { ssr: false });
 
@@ -31,72 +35,9 @@ export default function SummaryPageId() {
 
 	const { connection } = useConnection();
 	const wallet = useWallet();
-	const txHandler = useContext(TxHandlerContext);
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
-
-	const [loadingDepositSenior, setLoadingDepositSenior] = useState(false);
-	const [loadingDepositJunior, setLoadingDepositJunior] = useState(false);
-	const [loadingWithdraw, setLoadingWithdraw] = useState(false);
-	const [loadingSettle, setLoadingSettle] = useState(false);
-	const [loadingClaim, setLoadingClaim] = useState(false);
-
-	const onDepositSeniorClick = async (e) => {
-		try {
-			setLoadingDepositSenior(true);
-			const tx = await deposit(provider, new PublicKey(id), true);
-			await txHandler.handleTxs(tx);
-		} catch (err) {
-			console.log(err);
-		}
-		setLoadingDepositSenior(false);
-		rateStateQuery.refetch();
-	};
-	const onDepositJuniorClick = async () => {
-		try {
-			setLoadingDepositJunior(true);
-			const tx = await deposit(provider, new PublicKey(id), false);
-			await txHandler.handleTxs(tx);
-		} catch (err) {
-			console.log(err);
-		}
-		setLoadingDepositJunior(false);
-		rateStateQuery.refetch();
-	};
-	const onWithdrawClick = async () => {
-		try {
-			setLoadingWithdraw(true);
-			const tx = await withdraw(provider, new PublicKey(id));
-			await txHandler.handleTxs(tx);
-		} catch (err) {
-			console.log(err);
-		}
-		setLoadingWithdraw(false);
-		rateStateQuery.refetch();
-	};
-	const onSettleClick = async () => {
-		try {
-			setLoadingSettle(true);
-			const tx = await settle(provider, new PublicKey(id));
-			await txHandler.handleTxs(tx);
-		} catch (err) {
-			console.log(err);
-		}
-		setLoadingSettle(false);
-		rateStateQuery.refetch();
-	};
-	const onClaimClick = async () => {
-		try {
-			setLoadingClaim(true);
-			const tx = await claim(provider, new PublicKey(id));
-			await txHandler.handleTxs(tx);
-		} catch (err) {
-			console.log(err);
-		}
-		setLoadingClaim(false);
-		rateStateQuery.refetch();
-	};
 
 	// TODO replace hardcoded mock data with switchboard or chain data
 	const contractData = {
@@ -137,8 +78,8 @@ export default function SummaryPageId() {
 			juniorReserveTokens: rateStateQuery?.data?.programSellerTAAmount
 		},
 		conditions: {
-			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositSeniorAvailable(),
-			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositJuniorAvailable()
+			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey),
+			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
 		},
 		beneficiaries: {
 			seniorAccount: rateStateQuery?.data?.buyerTA,
@@ -153,65 +94,6 @@ export default function SummaryPageId() {
 		aggregatorLastValue: rateStateQuery?.data?.rateState?.aggregatorLastValue
 	};
 
-	const buttonConditions = [
-		{
-			name: 'Deposit Senior',
-			condition: rateStateQuery?.data?.isDepositSeniorAvailable(),
-			event: onDepositSeniorClick,
-			color: 'success' as 'success',
-			icon: <PlusIcon />,
-			loading: loadingDepositSenior
-		},
-		{
-			name: 'Deposit Junior',
-			condition: rateStateQuery?.data?.isDepositJuniorAvailable(),
-			event: onDepositJuniorClick,
-			color: 'error' as 'error',
-			icon: <MinusIcon />,
-			loading: loadingDepositJunior
-		},
-		{
-			name: 'Withdraw Senior',
-			condition: rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet?.publicKey),
-			event: onWithdrawClick,
-			color: 'info' as 'info',
-			icon: <ResetIcon />,
-			loading: loadingWithdraw
-		},
-		{
-			name: 'Withdraw Junior',
-			condition: rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet?.publicKey),
-			event: onWithdrawClick,
-			color: 'info' as 'info',
-			icon: <ResetIcon />,
-			loading: loadingWithdraw
-		},
-		{
-			name: 'Settle',
-			condition: rateStateQuery?.data?.isSettlementAvailable(),
-			event: onSettleClick,
-			color: 'info' as 'info',
-			icon: <RecordIcon />,
-			loading: loadingSettle
-		},
-		{
-			name: 'Claim Senior',
-			condition: rateStateQuery?.data?.isClaimSeniorAvailable(wallet?.publicKey),
-			event: onClaimClick,
-			color: 'success' as 'success',
-			icon: <CleanIcon />,
-			loading: loadingClaim
-		},
-		{
-			name: 'Claim Junior',
-			condition: rateStateQuery?.data?.isClaimJuniorAvailable(wallet?.publicKey),
-			event: onClaimClick,
-			color: 'success' as 'success',
-			icon: <CleanIcon />,
-			loading: loadingClaim
-		}
-	];
-
 	const loadingSpinner = !rateStateQuery?.data?.depositExpirationAt || !rateStateQuery?.data?.settleAvailableFromAt;
 
 	return (
@@ -225,20 +107,13 @@ export default function SummaryPageId() {
 						contract={contractData}
 						buttons={
 							<div className={styles.buttons}>
-								{buttonConditions.map((buttonCondition) => {
-									return (
-										buttonCondition.condition && (
-											<ButtonPill
-												key={buttonCondition.name}
-												mode={buttonCondition.color}
-												text={buttonCondition.name}
-												onClick={buttonCondition.event}
-												icon={buttonCondition.icon}
-												loading={buttonCondition.loading}
-											/>
-										)
-									);
-								})}
+								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
+								<DepositButton otcStatePubkey={id as string} isBuyer={false} />
+								<WithdrawButton otcStatePubkey={id as string} isBuyer={true} />
+								<WithdrawButton otcStatePubkey={id as string} isBuyer={false} />
+								<SettleButton otcStatePubkey={id as string} />
+								<ClaimButton otcStatePubkey={id as string} isBuyer={true} />
+								<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
 							</div>
 						}
 					/>
