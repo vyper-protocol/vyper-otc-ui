@@ -3,7 +3,12 @@
 		"browser": true,
 		"es2021": true
 	},
-	"extends": ["plugin:@next/next/recommended", "plugin:react/recommended", "plugin:react-hooks/recommended", "plugin:css-modules/recommended"],
+	"extends": [
+		"plugin:@next/next/recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:css-modules/recommended"
+	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
 		"ecmaFeatures": {
@@ -53,7 +58,7 @@
 		"no-empty-function": 2,
 		"no-floating-decimal": 2,
 		"no-inline-comments": 1,
-		"no-lonely-if": 2,
+		"no-lonely-if": 1,
 		"no-multi-spaces": 2,
 		"no-multiple-empty-lines": [
 			2,
