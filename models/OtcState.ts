@@ -91,26 +91,37 @@ export class OtcState {
 	}
 
 	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
-		return !this.isDepositExpired() && this.buyerTA == null && !currentUserWallet.equals(this.sellerWallet);
+		return (
+			!this.isDepositExpired() && this.buyerTA == null && currentUserWallet.toBase58() !== this.sellerWallet?.toBase58()
+		);
 	}
 
 	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
-		return !this.isDepositExpired() && this.sellerTA == null && !currentUserWallet.equals(this.buyerWallet);
+		if (currentUserWallet == undefined) return false;
+		return (
+			!this.isDepositExpired() && this.sellerTA == null && currentUserWallet.toBase58() !== this.buyerWallet?.toBase58()
+		);
 	}
 
 	isSettlementAvailable(): boolean {
 		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted;
 	}
 
-	isClaimSeniorAvailable(currentUserWallet: PublicKey): boolean {
+	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+		if (currentUserWallet == undefined) return false;
+
 		return this.settleExecuted && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0;
 	}
 
-	isClaimJuniorAvailable(currentUserWallet: PublicKey): boolean {
+	isClaimJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+		if (currentUserWallet == undefined) return false;
+
 		return this.settleExecuted && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0;
 	}
 
-	isWithdrawSeniorAvailable(currentUserWallet: PublicKey): boolean {
+	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+		if (currentUserWallet == undefined) return false;
+
 		return (
 			this.isDepositExpired &&
 			this.buyerTA != null &&
@@ -120,7 +131,9 @@ export class OtcState {
 		);
 	}
 
-	isWithdrawJuniorAvailable(currentUserWallet: PublicKey): boolean {
+	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+		if (currentUserWallet == undefined) return false;
+
 		return (
 			this.isDepositExpired &&
 			this.buyerTA == null &&
