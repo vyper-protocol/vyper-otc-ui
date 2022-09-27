@@ -1,31 +1,19 @@
-import { useContext, useState } from 'react';
-
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
-import { claim } from 'api/otc-state/claim';
-import { deposit } from 'api/otc-state/deposit';
-import { settle } from 'api/otc-state/settle';
-import { withdraw } from 'api/otc-state/withdraw';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
-import { Pane, PlusIcon, MinusIcon, ResetIcon, RecordIcon, CleanIcon } from 'evergreen-ui';
+import { Pane } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { formatCurrency } from 'utils/numberHelpers';
 
-import ButtonPill from '../../../components/atoms/ButtonPill/ButtonPill';
-import styles from './summary.module.scss';
-import { DepositButton } from './DepositButton';
-import { WithdrawButton } from './WithdrawButton';
-import { SettleButton } from './SettleButton';
 import { ClaimButton } from './ClaimButton';
-
-const ReactJson = dynamic(import('react-json-view'), { ssr: false });
+import { DepositButton } from './DepositButton';
+import { SettleButton } from './SettleButton';
+import styles from './summary.module.scss';
+import { WithdrawButton } from './WithdrawButton';
 
 // test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
@@ -118,8 +106,6 @@ export default function SummaryPageId() {
 						}
 					/>
 				)}
-
-				{/* <ReactJson collapsed src={rateStateQuery.data} /> */}
 			</Pane>
 		</Layout>
 	);

@@ -1,14 +1,13 @@
+import { useContext, useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { deposit } from 'api/otc-state/deposit';
 import { withdraw } from 'api/otc-state/withdraw';
 import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
-import { MinusIcon, PlusIcon } from 'evergreen-ui';
+import { MinusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import { OtcState } from 'models/OtcState';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
-import { useContext, useState } from 'react';
 
 export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
@@ -36,10 +35,8 @@ export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: st
 		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else {
-		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet.publicKey)) {
-			return <></>;
-		}
+	} else if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet.publicKey)) {
+		return <></>;
 	}
 
 	return <ButtonPill mode="error" text="Withdraw" onClick={onWithdrawClick} icon={<MinusIcon />} loading={isLoading} />;
