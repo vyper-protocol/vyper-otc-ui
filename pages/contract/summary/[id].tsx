@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';

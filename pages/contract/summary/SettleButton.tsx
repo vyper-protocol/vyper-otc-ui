@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useContext, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
