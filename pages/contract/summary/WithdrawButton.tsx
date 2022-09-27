@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useContext, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
@@ -18,7 +19,7 @@ export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: st
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onWithdrawClick = async (e) => {
+	const onWithdrawClick = async () => {
 		try {
 			setIsLoading(true);
 			const tx = await withdraw(provider, new PublicKey(otcStatePubkey));
@@ -32,10 +33,10 @@ export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: st
 	};
 
 	if (isBuyer) {
-		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

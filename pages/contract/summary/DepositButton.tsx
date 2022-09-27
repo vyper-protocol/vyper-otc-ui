@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useContext, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
@@ -18,7 +19,7 @@ export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: str
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onDepositClick = async (e) => {
+	const onDepositClick = async () => {
 		try {
 			setIsLoading(true);
 			const tx = await deposit(provider, new PublicKey(otcStatePubkey), isBuyer);
@@ -32,10 +33,10 @@ export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: str
 	};
 
 	if (isBuyer) {
-		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 
