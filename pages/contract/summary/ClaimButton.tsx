@@ -18,7 +18,7 @@ export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: strin
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onClaimClick = async (e) => {
+	const onClaimClick = async () => {
 		try {
 			setIsLoading(true);
 			const tx = await claim(provider, new PublicKey(otcStatePubkey));
@@ -32,10 +32,10 @@ export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: strin
 	};
 
 	if (isBuyer) {
-		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isClaimSeniorAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimSeniorAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isClaimJuniorAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimJuniorAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

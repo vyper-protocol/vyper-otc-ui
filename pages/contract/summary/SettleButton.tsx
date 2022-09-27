@@ -18,7 +18,7 @@ export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => 
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onSettleClick = async (e) => {
+	const onSettleClick = async () => {
 		try {
 			setIsLoading(true);
 			const tx = await settle(provider, new PublicKey(otcStatePubkey));
@@ -31,7 +31,7 @@ export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => 
 		}
 	};
 
-	if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
+	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
 		return <></>;
 	}
 
