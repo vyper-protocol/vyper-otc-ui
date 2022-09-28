@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { AnchorProvider, Program, utils } from '@project-serum/anchor';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
@@ -69,7 +70,7 @@ export const deposit = async (
 		.remainingAccounts(
 			(rateSwitchboardAccountInfo.switchboardAggregators as (null | PublicKey)[])
 				.filter((c) => {
-					return c != null;
+					return c !== null;
 				})
 				.map((c) => {
 					return { pubkey: c, isSigner: false, isWritable: false };

@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { PublicKey } from '@solana/web3.js';
 
 import RateSwitchboardState from './RateSwitchboardState';
@@ -90,14 +91,18 @@ export class OtcState {
 
 	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
 		return (
-			!this.isDepositExpired() && this.buyerTA == null && currentUserWallet.toBase58() !== this.sellerWallet?.toBase58()
+			!this.isDepositExpired() &&
+			this.buyerTA === null &&
+			currentUserWallet.toBase58() !== this.sellerWallet?.toBase58()
 		);
 	}
 
 	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
-		if (currentUserWallet == undefined) return false;
+		if (currentUserWallet === undefined) return false;
 		return (
-			!this.isDepositExpired() && this.sellerTA == null && currentUserWallet.toBase58() !== this.buyerWallet?.toBase58()
+			!this.isDepositExpired() &&
+			this.sellerTA === null &&
+			currentUserWallet.toBase58() !== this.buyerWallet?.toBase58()
 		);
 	}
 
@@ -106,36 +111,36 @@ export class OtcState {
 	}
 
 	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet == undefined) return false;
+		if (currentUserWallet === undefined) return false;
 
 		return this.settleExecuted && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0;
 	}
 
 	isClaimJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet == undefined) return false;
+		if (currentUserWallet === undefined) return false;
 
 		return this.settleExecuted && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0;
 	}
 
 	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet == undefined) return false;
+		if (currentUserWallet === undefined) return false;
 
 		return (
 			this.isDepositExpired &&
-			this.buyerTA != null &&
-			this.sellerTA == null &&
+			this.buyerTA !== null &&
+			this.sellerTA === null &&
 			this.buyerWallet.equals(currentUserWallet) &&
 			this.programBuyerTAAmount > 0
 		);
 	}
 
 	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet == undefined) return false;
+		if (currentUserWallet === undefined) return false;
 
 		return (
 			this.isDepositExpired &&
-			this.buyerTA == null &&
-			this.sellerTA != null &&
+			this.buyerTA === null &&
+			this.sellerTA !== null &&
 			this.sellerWallet.equals(currentUserWallet) &&
 			this.programSellerTAAmount > 0
 		);

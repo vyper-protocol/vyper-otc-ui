@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 import { createContext } from 'react';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';

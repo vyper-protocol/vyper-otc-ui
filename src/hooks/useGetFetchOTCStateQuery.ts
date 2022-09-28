@@ -1,6 +1,6 @@
 import { Address, AnchorProvider } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
-import { fetchOtcState } from 'api/otc-state/fecthOtcState';
+import { fetchOtcState } from 'api/otc-state/fetchOtcState';
 import { OtcState } from 'models/OtcState';
 import { useQuery, UseQueryResult } from 'react-query';
 import { defaultOptions } from 'utils/queries/options';

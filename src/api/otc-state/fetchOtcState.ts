@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { AnchorProvider, Program } from '@project-serum/anchor';
 import { getAccount } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';

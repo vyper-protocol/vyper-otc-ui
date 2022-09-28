@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { AnchorProvider, Program, utils } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
@@ -47,7 +48,7 @@ export const settle = async (provider: AnchorProvider, otcState: PublicKey): Pro
 		.remainingAccounts(
 			(rateSwitchboardAccountInfo.switchboardAggregators as (null | PublicKey)[])
 				.filter((c) => {
-					return c != null;
+					return c !== null;
 				})
 				.map((c) => {
 					return { pubkey: c, isSigner: false, isWritable: false };

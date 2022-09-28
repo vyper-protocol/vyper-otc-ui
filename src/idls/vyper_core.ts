@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 export type VyperCore = {
 	version: '0.1.0';
 	name: 'vyper_core';

@@ -22,9 +22,9 @@ export const getAggregatorLatestValue = async (provider: AnchorProvider, aggrega
 
 export const getAggregatorData = async (provider: AnchorProvider, aggregator: PublicKey): Promise<any> => {
 	const program = await loadSwitchboardProgram(
-		RPC_ENDPOINTS.find((c) => c.endpoints.includes(provider.connection.rpcEndpoint)).cluster as
-			| 'devnet'
-			| 'mainnet-beta',
+		RPC_ENDPOINTS.find((c) => {
+			return c.endpoints.includes(provider.connection.rpcEndpoint);
+		}).cluster as 'devnet' | 'mainnet-beta',
 		provider.connection
 	);
 
