@@ -13,6 +13,10 @@
 		background: linear-gradient(94.77deg, #ff659c 6.23%, #3fa1ff 95.59%);
 		@include gradient-letters;
 	}
+
+	.pubkey {
+		cursor: pointer;
+	}
 }
 
 .funded {

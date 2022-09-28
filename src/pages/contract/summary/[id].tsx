@@ -1,6 +1,7 @@
 /* eslint-disable space-before-function-paren */
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import cn from 'classnames';
 import { ClaimButton } from 'components/organisms/actionButtons/ClaimButton';
 import { DepositButton } from 'components/organisms/actionButtons/DepositButton';
 import { SettleButton } from 'components/organisms/actionButtons/SettleButton';
@@ -9,25 +10,26 @@ import Layout from 'components/templates/Layout/Layout';
 import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import moment from 'moment';
 import { useRouter } from 'next/router';
+import { momentDate, momentDuration } from 'utils/momentHelpers';
 import { formatCurrency } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
-import * as solanaFuncs from '@solana/web3.js';
 
 import styles from './summary.module.scss';
 
 // test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
-export default function SummaryPageId() {
+const SummaryPageId = () => {
 	const router = useRouter();
-	const { id } = router.query;
-
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
+	const { id } = router.query;
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
+	const asset = String.fromCharCode
+		.apply(null, rateStateQuery?.data?.rateState?.aggregatorData?.name)
+		.split('\u0000')[0];
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -36,61 +38,33 @@ export default function SummaryPageId() {
 		});
 	};
 
-	const assetName = rateStateQuery?.data?.rateState?.aggregatorData?.name;
+	const details = [
+		{
+			text: 'Aggregator value',
+			value: formatCurrency(rateStateQuery?.data?.rateState.aggregatorLastValue, true)
+		},
+		{
+			text: 'Duration',
+			value: momentDuration(rateStateQuery?.data?.settleAvailableFromAt - rateStateQuery?.data?.depositExpirationAt)
+		},
+		{
+			text: 'Strike',
+			value: rateStateQuery?.data?.redeemLogicState.strike.toFixed(4)
+		}
+	];
 
-	const contractData = {
-		pubkey: id as string,
-		asset: String.fromCharCode.apply(null, assetName).split('\u0000')[0],
-		stats: [
-			{
-				name: 'Aggregator value',
-				value: formatCurrency(rateStateQuery?.data?.rateState.aggregatorLastValue, true)
-			},
-			{
-				name: 'Duration',
-				value: moment
-					.duration(rateStateQuery?.data?.settleAvailableFromAt - rateStateQuery?.data?.depositExpirationAt)
-					.humanize()
-			},
-			{
-				name: 'Strike',
-				value: rateStateQuery?.data?.redeemLogicState.strike.toFixed(4)
-			}
-		],
-		timestamps: [
-			{
-				name: 'Created at',
-				value: moment(rateStateQuery?.data?.createdAt).format('d/M/YY HH:mm::ss')
-			},
-			{ name: 'Deposit start', value: moment(rateStateQuery?.data?.depositAvailableFrom).format('d/M/YY HH:mm::ss') },
-			{ name: 'Deposit expire', value: moment(rateStateQuery?.data?.depositExpirationAt).format('d/M/YY HH:mm::ss') },
-			{
-				name: 'Settle available',
-				value: moment(rateStateQuery?.data?.settleAvailableFromAt).format('d/M/YY HH:mm::ss')
-			}
-		],
-		amounts: {
-			seniorDepositAmount: rateStateQuery?.data?.buyerDepositAmount,
-			juniorDepositAmount: rateStateQuery?.data?.sellerDepositAmount,
-			seniorReserveTokens: rateStateQuery?.data?.programBuyerTAAmount,
-			juniorReserveTokens: rateStateQuery?.data?.programSellerTAAmount
+	const timestamps = [
+		{
+			text: 'Created at',
+			value: momentDate(rateStateQuery?.data?.createdAt)
 		},
-		conditions: {
-			isDepositSeniorAvailable: rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey),
-			isDepositJuniorAvailable: rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
-		},
-		beneficiaries: {
-			seniorAccount: rateStateQuery?.data?.buyerTA,
-			seniorOwner: rateStateQuery?.data?.buyerWallet,
-			juniorAccount: rateStateQuery?.data?.sellerTA,
-			juniorOwner: rateStateQuery?.data?.sellerWallet
-		},
-		states: {
-			rateState: rateStateQuery?.data?.rateState,
-			redeemLogicState: rateStateQuery?.data?.redeemLogicState
-		},
-		aggregatorLastValue: rateStateQuery?.data?.rateState?.aggregatorLastValue
-	};
+		{ text: 'Deposit start', value: momentDate(rateStateQuery?.data?.depositAvailableFrom) },
+		{ text: 'Deposit expire', value: momentDate(rateStateQuery?.data?.depositExpirationAt) },
+		{
+			text: 'Settle available',
+			value: momentDate(rateStateQuery?.data?.settleAvailableFromAt)
+		}
+	];
 
 	const loadingSpinner = !rateStateQuery?.data?.depositExpirationAt || !rateStateQuery?.data?.settleAvailableFromAt;
 
@@ -103,40 +77,52 @@ export default function SummaryPageId() {
 					<>
 						<div className={styles.box}>
 							<div className={styles.title}>
-								<h5 className={styles.symbol}>{contractData.asset}</h5>
-								{contractData.pubkey && (
-									<p className={styles.disabled} onClick={handleAddressClick} data-id={contractData.pubkey.toString()}>
-										{abbreviateAddress(contractData.pubkey.toString())}
+								<h5 className={styles.symbol}>{asset}</h5>
+								{id && (
+									<p
+										className={cn(styles.disabled, styles.pubkey)}
+										onClick={handleAddressClick}
+										data-id={id.toString()}
+									>
+										{abbreviateAddress(id.toString())}
 									</p>
 								)}
 							</div>
 
 							<div className={styles.funded}>
-								<StatusIndicator color={!contractData.conditions.isDepositSeniorAvailable ? 'success' : 'danger'}>
-									{!contractData.conditions.isDepositSeniorAvailable ? 'Senior Funded' : 'Senior not Funded'}
+								<StatusIndicator
+									color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}
+								>
+									{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)
+										? 'Senior Funded'
+										: 'Senior not Funded'}
 								</StatusIndicator>
-								<StatusIndicator color={!contractData.conditions.isDepositJuniorAvailable ? 'success' : 'danger'}>
-									{!contractData.conditions.isDepositJuniorAvailable ? 'Junior Funded' : 'Junior not Funded'}
+								<StatusIndicator
+									color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}
+								>
+									{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
+										? 'Junior Funded'
+										: 'Junior not Funded'}
 								</StatusIndicator>
 							</div>
 							<hr />
 							<div className={styles.content}>
-								{contractData.stats.map((mockItem) => {
+								{details.map((detail) => {
 									return (
-										<div key={mockItem.name} className={styles.column}>
-											<p>{mockItem.name}</p>
-											<p>{mockItem.value}</p>
+										<div key={detail.text} className={styles.column}>
+											<p>{detail.text}</p>
+											<p>{detail.value}</p>
 										</div>
 									);
 								})}
 							</div>
 							<hr />
 
-							{contractData.timestamps.map((timestamp) => {
+							{timestamps.map((timestamp) => {
 								return (
-									<div key={timestamp.name} className={styles.expirations}>
+									<div key={timestamp.text} className={styles.expirations}>
 										<div>
-											<p>{timestamp.name}</p>
+											<p>{timestamp.text}</p>
 										</div>
 										<div>
 											<p>{timestamp.value}</p>
@@ -160,4 +146,6 @@ export default function SummaryPageId() {
 			</Pane>
 		</Layout>
 	);
-}
+};
+
+export default SummaryPageId;
