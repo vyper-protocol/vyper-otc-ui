@@ -5,14 +5,14 @@ import { ClaimButton } from 'components/organisms/actionButtons/ClaimButton';
 import { DepositButton } from 'components/organisms/actionButtons/DepositButton';
 import { SettleButton } from 'components/organisms/actionButtons/SettleButton';
 import { WithdrawButton } from 'components/organisms/actionButtons/WithdrawButton';
-import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
-import { Pane } from 'evergreen-ui';
+import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { formatCurrency } from 'utils/numberHelpers';
+import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';
 
@@ -27,6 +27,13 @@ export default function SummaryPageId() {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
+
+	const handleAddressClick = (e) => {
+		copyToClipboard(e.target.getAttribute('data-id'));
+		toaster.notify('Address copied to clipboard', {
+			duration: 1
+		});
+	};
 
 	// TODO replace hardcoded mock data with switchboard or chain data
 	const contractData = {
@@ -91,10 +98,51 @@ export default function SummaryPageId() {
 				{loadingSpinner ? (
 					<Spinner />
 				) : (
-					<StatsPanel
-						//  @ts-ignore
-						contract={contractData}
-						buttons={
+					<>
+						<div className={styles.box}>
+							<div className={styles.title}>
+								<h5 className={styles.symbol}>{contractData.asset}</h5>
+								{contractData.pubkey && (
+									<p className={styles.disabled} onClick={handleAddressClick} data-id={contractData.pubkey.toString()}>
+										{abbreviateAddress(contractData.pubkey.toString())}
+									</p>
+								)}
+							</div>
+
+							<div className={styles.funded}>
+								<StatusIndicator color={!contractData.conditions.isDepositSeniorAvailable ? 'success' : 'danger'}>
+									{!contractData.conditions.isDepositSeniorAvailable ? 'Senior Funded' : 'Senior not Funded'}
+								</StatusIndicator>
+								<StatusIndicator color={!contractData.conditions.isDepositJuniorAvailable ? 'success' : 'danger'}>
+									{!contractData.conditions.isDepositJuniorAvailable ? 'Junior Funded' : 'Junior not Funded'}
+								</StatusIndicator>
+							</div>
+							<hr />
+							<div className={styles.content}>
+								{contractData.stats.map((mockItem) => {
+									return (
+										<div key={mockItem.name} className={styles.column}>
+											<p>{mockItem.name}</p>
+											<p>{mockItem.value}</p>
+										</div>
+									);
+								})}
+							</div>
+							<hr />
+
+							{contractData.timestamps.map((timestamp) => {
+								return (
+									<div key={timestamp.name} className={styles.expirations}>
+										<div>
+											<p>{timestamp.name}</p>
+										</div>
+										<div>
+											<p>{timestamp.value}</p>
+										</div>
+									</div>
+								);
+							})}
+
 							<div className={styles.buttons}>
 								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
 								<DepositButton otcStatePubkey={id as string} isBuyer={false} />
@@ -104,8 +152,8 @@ export default function SummaryPageId() {
 								<ClaimButton otcStatePubkey={id as string} isBuyer={true} />
 								<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
 							</div>
-						}
-					/>
+						</div>
+					</>
 				)}
 			</Pane>
 		</Layout>
