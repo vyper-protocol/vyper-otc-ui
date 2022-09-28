@@ -4,13 +4,13 @@ import { useContext, useState } from 'react';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { withdraw } from 'api/otc-state/withdraw';
+import { settle } from 'api/otc-state/settle';
 import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
-import { MinusIcon } from 'evergreen-ui';
+import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
+import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import { TxHandlerContext } from 'providers/TxHandlerProvider';
 
-export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -19,10 +19,10 @@ export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: st
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onWithdrawClick = async () => {
+	const onSettleClick = async () => {
 		try {
 			setIsLoading(true);
-			const tx = await withdraw(provider, new PublicKey(otcStatePubkey));
+			const tx = await settle(provider, new PublicKey(otcStatePubkey));
 			await txHandler.handleTxs(tx);
 		} catch (err) {
 			console.log(err);
@@ -32,13 +32,9 @@ export const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: st
 		}
 	};
 
-	if (isBuyer) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet.publicKey)) {
-			return <></>;
-		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet.publicKey)) {
+	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
 		return <></>;
 	}
 
-	return <ButtonPill mode="error" text="Withdraw" onClick={onWithdrawClick} icon={<MinusIcon />} loading={isLoading} />;
+	return <ButtonPill mode="info" text="Settle" onClick={onSettleClick} icon={<PlusIcon />} loading={isLoading} />;
 };

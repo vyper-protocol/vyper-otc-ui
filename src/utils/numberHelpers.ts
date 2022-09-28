@@ -3,7 +3,7 @@
  * and dots for decimals
  */
 export const formatCurrency = (x: number, d: boolean): string | number => {
-	if (x == null || isNaN(x)) {
+	if (x === null || isNaN(x)) {
 		return 0;
 	} else {
 		let parts = x.toString().split('.');

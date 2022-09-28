@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
-import { TxHandlerProvider } from 'providers/TxHandlerProvider';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
