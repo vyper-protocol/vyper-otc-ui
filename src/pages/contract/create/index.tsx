@@ -1,15 +1,16 @@
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import { create } from 'api/otc-state/create';
+import { getAggregatorName } from 'api/switchboard/switchboardHelper';
+import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout/Layout';
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 function AmountPicker({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) {
 	return (
@@ -39,14 +40,7 @@ function StrikePicker({
 	const onRefresh = async () => {
 		try {
 			setIsLoading(true);
-			const program = await loadSwitchboardProgram('devnet', connection);
-
-			const aggregatorAccount = new AggregatorAccount({
-				program,
-				publicKey: new PublicKey(switchboardAggregator)
-			});
-
-			const latestResult = await aggregatorAccount.getLatestValue();
+			const latestResult = await getLastSwitchboardValue(connection, switchboardAggregator);
 			onChange(latestResult.toNumber());
 		} catch (err) {
 			alert(err);
@@ -66,14 +60,31 @@ function StrikePicker({
 	);
 }
 
-function TimePicker({ title, value, onChange }: { title: string; value: number; onChange: (val: number) => void }) {
+async function getLastSwitchboardValue(connection: Connection, switchboardAggregator: string) {
+	const program = await loadSwitchboardProgram('devnet', connection);
+
+	const aggregatorAccount = new AggregatorAccount({
+		program,
+		publicKey: new PublicKey(switchboardAggregator)
+	});
+
+	const latestResult = await aggregatorAccount.getLatestValue();
+	return latestResult;
+}
+
+function DurationPicker({ title, value, onChange }: { title: string; value: number; onChange: (val: number) => void }) {
 	return (
 		<Pane margin={6}>
-			<TextInputField label={title} description={moment(value).format()} readOnly value={moment(value).fromNow()} />
+			<TextInputField label={title} readOnly value={moment.duration(value, 'milliseconds').humanize()} />
 			<Pane display="flex" alignItems="center">
-				<Button onClick={(e) => onChange(moment().toDate().getTime())}>now</Button>
-				<Button onClick={(e) => onChange(moment(value).add(5, 'minutes').toDate().getTime())}>+ 5min</Button>
-				<Button onClick={(e) => onChange(moment(value).subtract(5, 'minutes').toDate().getTime())}>- 5min</Button>
+				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds())}>
+					+ 5min
+				</Button>
+				<Button
+					onClick={(e) => onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds())}
+				>
+					- 5min
+				</Button>
 			</Pane>
 		</Pane>
 	);
@@ -88,9 +99,25 @@ function SwitchboardAggregatorPicker({
 	value: string;
 	onChange: (val: string) => void;
 }) {
+	const [aggregatorName, setAggregatorName] = useState('');
+	const { connection } = useConnection();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const n = await getAggregatorName(connection, new PublicKey(value));
+			setAggregatorName(n);
+		};
+		fetchData();
+	}, [value]);
+
 	return (
 		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField width="100%" label={title} value={value} onChange={(e) => onChange(e.target.value)} />
+			<TextInputField
+				width="100%"
+				label={title + ' ' + aggregatorName}
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+			/>
 			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
 				<IconButton icon={ShareIcon} intent="success" />
 			</a>
@@ -108,9 +135,9 @@ export default function CreateContractPage() {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [depositStart, setDepositStart] = useState(moment().toDate().getTime());
-	const [depositEnd, setDepositEnd] = useState(moment().add(20, 'minutes').toDate().getTime());
-	const [settleStart, setSettleStart] = useState(moment().add(40, 'minutes').toDate().getTime());
+	const [depositStart, setDepositStart] = useState(moment.duration(0, 'minutes').asMilliseconds());
+	const [depositEnd, setDepositEnd] = useState(moment.duration(5, 'minutes').asMilliseconds());
+	const [settleStart, setSettleStart] = useState(moment.duration(15, 'minutes').asMilliseconds());
 
 	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
@@ -120,15 +147,21 @@ export default function CreateContractPage() {
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
 
+	useEffect(() => {
+		getLastSwitchboardValue(provider.connection, switchboardAggregator)
+			.then((v) => setStrike(v))
+			.catch((e) => setStrike(0));
+	}, [switchboardAggregator]);
+
 	const createContract = async () => {
 		try {
 			setIsLoading(true);
 
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
-				depositStart,
-				depositEnd,
-				settleStart,
+				depositStart: Date.now() + depositStart,
+				depositEnd: Date.now() + depositEnd,
+				settleStart: Date.now() + settleStart,
 				seniorDepositAmount,
 				juniorDepositAmount,
 				rateOption: {
@@ -154,13 +187,14 @@ export default function CreateContractPage() {
 			setIsLoading(false);
 		}
 	};
+
 	return (
 		<Layout>
 			<Pane>
 				<Pane display="flex" alignItems="center">
-					<TimePicker title="Deposit Start" value={depositStart} onChange={setDepositStart} />
-					<TimePicker title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
-					<TimePicker title="Settle Start" value={settleStart} onChange={setSettleStart} />
+					<DurationPicker title="Deposit Start" value={depositStart} onChange={setDepositStart} />
+					<DurationPicker title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
+					<DurationPicker title="Settle Start" value={settleStart} onChange={setSettleStart} />
 				</Pane>
 
 				<Pane display="flex" alignItems="center">
@@ -182,7 +216,7 @@ export default function CreateContractPage() {
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
 
-				<Button isLoading={isLoading} onClick={createContract}>
+				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={createContract}>
 					Create Contract
 				</Button>
 			</Pane>

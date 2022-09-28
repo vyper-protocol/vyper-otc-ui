@@ -7,7 +7,7 @@ import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboar
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import { TxPackage } from 'models/TxPackage';
 import PROGRAMS from '../../configs/programs.json';
-import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { getAssociatedTokenAddress, getMint } from '@solana/spl-token';
 
 export const create = async (
 	provider: AnchorProvider,
@@ -19,6 +19,8 @@ export const create = async (
 		new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID),
 		provider
 	);
+
+	const reserveMintInfo = await getMint(provider.connection, params.reserveMint);
 
 	const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
 		RedeemLogicForwardIDL,
@@ -55,7 +57,7 @@ export const create = async (
 	const redeemLogicInixIX = await redeemLogicForwardProgram.methods
 		.initialize(
 			params.redeemLogicOption.strike,
-			new BN(params.redeemLogicOption.notional),
+			new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
 			params.redeemLogicOption.isLinear
 		)
 		.accounts({
@@ -98,8 +100,8 @@ export const create = async (
 	const otcInitTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
 			.initialize({
-				seniorDepositAmount: new BN(params.seniorDepositAmount),
-				juniorDepositAmount: new BN(params.juniorDepositAmount),
+				seniorDepositAmount: new BN(params.seniorDepositAmount * 10 ** reserveMintInfo.decimals),
+				juniorDepositAmount: new BN(params.juniorDepositAmount * 10 ** reserveMintInfo.decimals),
 				depositStart: new BN(params.depositStart / 1000),
 				depositEnd: new BN(params.depositEnd / 1000),
 				settleStart: new BN(params.settleStart / 1000),

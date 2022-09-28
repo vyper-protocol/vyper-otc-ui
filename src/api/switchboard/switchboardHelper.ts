@@ -1,5 +1,5 @@
 import { AnchorProvider } from '@project-serum/anchor';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 
@@ -34,4 +34,19 @@ export const getAggregatorData = async (provider: AnchorProvider, aggregator: Pu
 	});
 
 	return await aggregatorAccount.loadData();
+};
+
+export const getAggregatorName = async (connection: Connection, aggregator: PublicKey): Promise<any> => {
+	const program = await loadSwitchboardProgram(
+		RPC_ENDPOINTS.find((c) => c.endpoints.includes(connection.rpcEndpoint)).cluster as 'devnet' | 'mainnet-beta',
+		connection
+	);
+
+	const aggregatorAccount = new AggregatorAccount({
+		program,
+		publicKey: aggregator
+	});
+
+	const data = await aggregatorAccount.loadData();
+	return String.fromCharCode.apply(null, data.name).split('\u0000')[0];
 };
