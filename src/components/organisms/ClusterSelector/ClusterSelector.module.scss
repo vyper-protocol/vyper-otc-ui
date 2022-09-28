@@ -1,0 +1,10 @@
+.wrapper {
+	background-color: var(--color-white);
+	padding: var(--space-10) var(--space-12);
+	border-radius: var(--space-10);
+}
+
+.wrapper:hover {
+	background-color: var(--color-black-100);
+	cursor: pointer;
+}

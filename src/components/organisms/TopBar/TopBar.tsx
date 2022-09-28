@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import styles from './TopBar.module.scss';
+import ClusterSelector from '../ClusterSelector/ClusterSelector';
 
 const menuItems = [
 	{
@@ -76,7 +77,10 @@ const TopBar = () => {
 					})}
 				</Pane>
 
-				<SelectWallet />
+				<Pane display="flex" alignItems="center">
+					<ClusterSelector className={styles.cluster} />
+					<SelectWallet />
+				</Pane>
 			</Pane>
 			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
 		</>
