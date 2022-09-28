@@ -16,4 +16,14 @@ export default class RateSwitchboardState {
 		this.aggregatorData = await getAggregatorData(provider, this.switchboarAggregator);
 		this.aggregatorLastValue = await getAggregatorLatestValue(provider, this.switchboarAggregator);
 	}
+
+	getAggregatorName() {
+		let name = '';
+		try {
+			name = String.fromCharCode.apply(null, this.aggregatorData.name).split('\u0000')[0];
+		} catch (error) {
+			name = 'Not found';
+		}
+		return name;
+	}
 }

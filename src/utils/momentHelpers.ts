@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-export const momentDate = (timestamp: number) => {
-	const date = moment(timestamp).format('d/M/YY HH:mm::ss');
+export const momentDate = (timestamp: number, formatString: string = 'd/M/YY HH:mm:ss') => {
+	const date = moment(timestamp).format(formatString);
 	return date;
 };
 
