@@ -13,6 +13,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import { formatCurrency } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
+import * as solanaFuncs from '@solana/web3.js';
 
 import styles from './summary.module.scss';
 
@@ -35,10 +36,11 @@ export default function SummaryPageId() {
 		});
 	};
 
-	// TODO replace hardcoded mock data with switchboard or chain data
+	const assetName = rateStateQuery?.data?.rateState?.aggregatorData?.name;
+
 	const contractData = {
 		pubkey: id as string,
-		asset: 'BTC_TBD',
+		asset: String.fromCharCode.apply(null, assetName).split('\u0000')[0],
 		stats: [
 			{
 				name: 'Aggregator value',
