@@ -3,45 +3,35 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import { create } from 'api/otc-state/create';
-import { getAggregatorName } from 'api/switchboard/switchboardHelper';
+import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout/Layout';
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { SyntheticEvent, useContext, useEffect, useState } from 'react';
 
-function AmountPicker({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) {
+const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e) => onChange(e.target.value)} />
+			<TextInputField label={title} type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(Number(e.target.value))} />
 			<Button onClick={(e) => onChange(100)}>reset</Button>
 			<Button onClick={(e) => onChange(value + 100)}>+ 100</Button>
 			<Button onClick={(e) => onChange(value - 100)}>- 100</Button>
 		</Pane>
 	);
-}
+};
 
-function StrikePicker({
-	title,
-	value,
-	onChange,
-	switchboardAggregator
-}: {
-	title: string;
-	value: number;
-	onChange: (val: number) => void;
-	switchboardAggregator: string;
-}) {
+const StrikePicker = ({ title, value, onChange, switchboardAggregator }: { title: string; value: number; onChange: (val: number) => void; switchboardAggregator: string }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const { connection } = useConnection();
 
 	const onRefresh = async () => {
 		try {
 			setIsLoading(true);
-			const latestResult = await getLastSwitchboardValue(connection, switchboardAggregator);
-			onChange(latestResult.toNumber());
+			const latestResult = await getAggregatorLatestValue(connection, new PublicKey(switchboardAggregator));
+			onChange(latestResult);
 		} catch (err) {
 			alert(err);
 			console.error(err);
@@ -58,47 +48,21 @@ function StrikePicker({
 			<Button onClick={(e) => onChange(value / 2)}>/ 2</Button>
 		</Pane>
 	);
-}
+};
 
-async function getLastSwitchboardValue(connection: Connection, switchboardAggregator: string) {
-	const program = await loadSwitchboardProgram('devnet', connection);
-
-	const aggregatorAccount = new AggregatorAccount({
-		program,
-		publicKey: new PublicKey(switchboardAggregator)
-	});
-
-	const latestResult = await aggregatorAccount.getLatestValue();
-	return latestResult;
-}
-
-function DurationPicker({ title, value, onChange }: { title: string; value: number; onChange: (val: number) => void }) {
+const DurationPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (val: number) => void }) => {
 	return (
 		<Pane margin={6}>
 			<TextInputField label={title} readOnly value={moment.duration(value, 'milliseconds').humanize()} />
 			<Pane display="flex" alignItems="center">
-				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds())}>
-					+ 5min
-				</Button>
-				<Button
-					onClick={(e) => onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds())}
-				>
-					- 5min
-				</Button>
+				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds())}>+ 5min</Button>
+				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds())}>- 5min</Button>
 			</Pane>
 		</Pane>
 	);
-}
+};
 
-function SwitchboardAggregatorPicker({
-	title,
-	value,
-	onChange
-}: {
-	title: string;
-	value: string;
-	onChange: (val: string) => void;
-}) {
+const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
 	const [aggregatorName, setAggregatorName] = useState('');
 	const { connection } = useConnection();
 
@@ -112,20 +76,15 @@ function SwitchboardAggregatorPicker({
 
 	return (
 		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField
-				width="100%"
-				label={title + ' ' + aggregatorName}
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-			/>
+			<TextInputField width="100%" label={title + ' ' + aggregatorName} value={value} onChange={(e) => onChange(e.target.value)} />
 			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
 				<IconButton icon={ShareIcon} intent="success" />
 			</a>
 		</Pane>
 	);
-}
+};
 
-export default function CreateContractPage() {
+const CreateContractPage = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -148,7 +107,7 @@ export default function CreateContractPage() {
 	const [strike, setStrike] = useState(0);
 
 	useEffect(() => {
-		getLastSwitchboardValue(provider.connection, switchboardAggregator)
+		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator))
 			.then((v) => setStrike(v))
 			.catch((e) => setStrike(0));
 	}, [switchboardAggregator]);
@@ -201,18 +160,9 @@ export default function CreateContractPage() {
 					<AmountPicker title="Side A amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
 					<AmountPicker title="Side B amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
 				</Pane>
-				<SwitchboardAggregatorPicker
-					title="Switchboard Aggregator"
-					value={switchboardAggregator}
-					onChange={setSwitchboardAggregator}
-				/>
+				<SwitchboardAggregatorPicker title="Switchboard Aggregator" value={switchboardAggregator} onChange={setSwitchboardAggregator} />
 				<Pane display="flex" alignItems="center">
-					<StrikePicker
-						title="Strike"
-						value={strike}
-						onChange={setStrike}
-						switchboardAggregator={switchboardAggregator}
-					/>
+					<StrikePicker title="Strike" value={strike} onChange={setStrike} switchboardAggregator={switchboardAggregator} />
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
 
@@ -222,4 +172,6 @@ export default function CreateContractPage() {
 			</Pane>
 		</Layout>
 	);
-}
+};
+
+export default CreateContractPage;
