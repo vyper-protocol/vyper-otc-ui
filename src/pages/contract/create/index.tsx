@@ -4,12 +4,12 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import { create } from 'api/otc-state/create';
 import { getAggregatorName } from 'api/switchboard/switchboardHelper';
+import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout/Layout';
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { TxHandlerContext } from 'providers/TxHandlerProvider';
 import { useContext, useEffect, useState } from 'react';
 
 function AmountPicker({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) {
@@ -216,7 +216,7 @@ export default function CreateContractPage() {
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
 
-				<Button isLoading={isLoading} onClick={createContract}>
+				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={createContract}>
 					Create Contract
 				</Button>
 			</Pane>
