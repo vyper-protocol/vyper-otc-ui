@@ -1,33 +1,22 @@
 .button {
 	background-color: var(--color-primary);
-	height: 40px;
+	height: 50px;
 	border-radius: 12px;
 }
 
-.active_badge {
-	border-radius: 50%;
-	margin-left: var(--space-8);
-	height: 8px;
-	width: 8px;
-	transform: scale(1);
-	background: #00f299;
-	box-shadow: 0 0 0 0 #00f299;
-	animation: pulse-green 2s infinite;
+.flex_center {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	height: 20px;
 }
 
-@keyframes pulse-green {
-	0% {
-		transform: scale(0.95);
-		box-shadow: 0 0 0 0 rgba(51, 217, 178, 0.7);
-	}
+.fit {
+	margin-top: 2px;
+	margin-left: 2px;
+}
 
-	70% {
-		transform: scale(1);
-		box-shadow: 0 0 0 10px rgba(51, 217, 178, 0);
-	}
-
-	100% {
-		transform: scale(0.95);
-		box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
-	}
+.disabled {
+	font-size: 12px;
+	opacity: 0.6;
 }
