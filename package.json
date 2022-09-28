@@ -7,7 +7,7 @@
 		"build": "next build",
 		"export": "next export",
 		"lint": "next lint",
-		"format": "prettier --write \"components/**/*.tsx\" \"pages/**/*.tsx\"",
+		"format": "prettier --write \"src/**/*.tsx\" \"src/**/*.ts\" ",
 		"commit": "git add . && cz",
 		"first-release": "standard-version -- --first-release",
 		"release": "standard-version",

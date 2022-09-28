@@ -1,0 +1,61 @@
+@import 'styles/variables.scss';
+
+.buttons {
+	display: flex;
+	margin-top: 20px;
+}
+
+.title {
+	text-align: center;
+	margin-bottom: 30px;
+
+	.symbol {
+		background: linear-gradient(94.77deg, #ff659c 6.23%, #3fa1ff 95.59%);
+		@include gradient-letters;
+	}
+
+	.pubkey {
+		cursor: pointer;
+	}
+}
+
+.funded {
+	display: flex;
+	justify-content: center;
+
+	:first-child {
+		margin-right: 10px;
+	}
+
+	svg {
+		margin-top: -4px;
+	}
+}
+
+.disabled {
+	color: var(--color-text-disabled);
+}
+
+.box {
+	max-width: 450px;
+	width: 310px;
+	background-color: var(--color-white);
+	border-radius: 10px;
+	padding: 20px;
+
+	.content {
+		p {
+			font-weight: 600;
+		}
+		.column {
+			display: flex;
+			justify-content: space-between;
+		}
+	}
+}
+
+.expirations {
+	display: flex;
+	justify-content: space-between;
+	color: var(--color-text-disabled);
+}
