@@ -4,11 +4,11 @@ import { useContext, useState } from 'react';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { PlusIcon } from 'evergreen-ui';
 import { deposit } from 'api/otc-state/deposit';
 import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
-import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
+import { PlusIcon } from 'evergreen-ui';
+import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
 export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
