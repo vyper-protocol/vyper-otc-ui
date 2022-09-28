@@ -3,7 +3,8 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "next dev",
+		"prebuild": "rimraf .next",
+		"dev": "yarn prebuild && next dev",
 		"build": "next build",
 		"export": "next export",
 		"lint": "next lint",
@@ -60,6 +61,7 @@
 		"husky": "^8.0.1",
 		"lint-staged": "^13.0.3",
 		"prettier": "^2.7.1",
+		"rimraf": "^3.0.2",
 		"sass": "^1.54.9",
 		"standard-version": "^9.5.0",
 		"typescript": "4.8.3"
