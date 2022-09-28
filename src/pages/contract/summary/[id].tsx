@@ -49,7 +49,7 @@ const SummaryPageId = () => {
 		},
 		{
 			text: 'Strike',
-			value: rateStateQuery?.data?.redeemLogicState.strike.toFixed(4)
+			value: formatCurrency(rateStateQuery?.data?.redeemLogicState.strike, true)
 		}
 	];
 
