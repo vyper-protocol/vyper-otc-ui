@@ -3,8 +3,6 @@ import { PublicKey } from '@solana/web3.js';
 import RateSwitchboardState from './RateSwitchboardState';
 import { RedeemLogicForwardState } from './RedeemLogicForwardState';
 
-const MILISECONDS = 1000;
-
 export class OtcState {
 	/**
 	 * Current Contract public key

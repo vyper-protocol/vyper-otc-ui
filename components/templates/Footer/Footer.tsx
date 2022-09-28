@@ -1,4 +1,5 @@
 import { Pane } from 'evergreen-ui';
+
 import styles from './Footer.module.scss';
 
 const Footer = () => {

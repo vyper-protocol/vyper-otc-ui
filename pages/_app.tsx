@@ -17,7 +17,7 @@ export const queryClient = new QueryClient();
 const Application = ({ Component, pageProps }) => {
 	// You can also provide a custom RPC endpoint.
 	const endpoint = RPC_ENDPOINTS.find((c) => {
-		return c.cluster == 'devnet';
+		return c.cluster === 'devnet';
 	}).endpoints[0];
 
 	const wallets = useMemo(() => {

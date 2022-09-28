@@ -1,14 +1,14 @@
+/* eslint-disable no-console */
+import { useContext, useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { claim } from 'api/otc-state/claim';
-import { deposit } from 'api/otc-state/deposit';
 import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import { OtcState } from 'models/OtcState';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
-import { useContext, useState } from 'react';
 
 export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
@@ -19,7 +19,7 @@ export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: strin
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onClaimClick = async (e) => {
+	const onClaimClick = async () => {
 		try {
 			setIsLoading(true);
 			const tx = await claim(provider, new PublicKey(otcStatePubkey));
@@ -33,13 +33,11 @@ export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: strin
 	};
 
 	if (isBuyer) {
-		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isClaimSeniorAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimSeniorAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else {
-		if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isClaimJuniorAvailable(wallet.publicKey)) {
-			return <></>;
-		}
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimJuniorAvailable(wallet.publicKey)) {
+		return <></>;
 	}
 
 	return (

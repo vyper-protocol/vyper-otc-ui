@@ -1,14 +1,14 @@
+/* eslint-disable no-console */
+import { useContext, useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { deposit } from 'api/otc-state/deposit';
 import { settle } from 'api/otc-state/settle';
 import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import { OtcState } from 'models/OtcState';
 import { TxHandlerContext } from 'providers/TxHandlerProvider';
-import { useContext, useState } from 'react';
 
 export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const { connection } = useConnection();
@@ -19,7 +19,7 @@ export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => 
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onSettleClick = async (e) => {
+	const onSettleClick = async () => {
 		try {
 			setIsLoading(true);
 			const tx = await settle(provider, new PublicKey(otcStatePubkey));
@@ -32,7 +32,7 @@ export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => 
 		}
 	};
 
-	if (rateStateQuery?.data == undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
+	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
 		return <></>;
 	}
 
