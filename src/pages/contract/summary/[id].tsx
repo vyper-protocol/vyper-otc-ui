@@ -1,6 +1,10 @@
 /* eslint-disable space-before-function-paren */
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { ClaimButton } from 'components/organisms/actionButtons/ClaimButton';
+import { DepositButton } from 'components/organisms/actionButtons/DepositButton';
+import { SettleButton } from 'components/organisms/actionButtons/SettleButton';
+import { WithdrawButton } from 'components/organisms/actionButtons/WithdrawButton';
 import StatsPanel from 'components/organisms/StatsPanel/StatsPanel';
 import Layout from 'components/templates/Layout/Layout';
 import { Pane } from 'evergreen-ui';
@@ -10,11 +14,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import { formatCurrency } from 'utils/numberHelpers';
 
-import { ClaimButton } from './ClaimButton';
-import { DepositButton } from './DepositButton';
-import { SettleButton } from './SettleButton';
 import styles from './summary.module.scss';
-import { WithdrawButton } from './WithdrawButton';
 
 // test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
