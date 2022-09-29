@@ -1,7 +1,6 @@
 /* eslint-disable space-before-function-paren */
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import cn from 'classnames';
 import { ClaimButton } from 'components/organisms/actionButtons/ClaimButton';
 import { DepositButton } from 'components/organisms/actionButtons/DepositButton';
@@ -11,7 +10,6 @@ import Layout from 'components/templates/Layout/Layout';
 import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import RateSwitchboardState from 'models/RateSwitchboardState';
 import { useRouter } from 'next/router';
 import { momentDate, momentDuration } from 'utils/momentHelpers';
 import { formatCurrency } from 'utils/numberHelpers';
@@ -30,6 +28,13 @@ const SummaryPageId = () => {
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
+
+	if (rateStateQuery.status === 'error') {
+		toaster.danger('Account not found. Check that you have selected the right Network & refresh.', {
+			duration: 5,
+			id: 'account-error'
+		});
+	}
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -74,74 +79,76 @@ const SummaryPageId = () => {
 				{loadingSpinner ? (
 					<Spinner />
 				) : (
-					<>
-						<div className={styles.box}>
-							<div className={styles.title}>
-								<h5 className={styles.symbol}>{asset}</h5>
-								{id && (
-									<p
-										className={cn(styles.disabled, styles.pubkey)}
-										onClick={handleAddressClick}
-										data-id={id.toString()}
-									>
-										{abbreviateAddress(id.toString())}
-									</p>
-								)}
-							</div>
+					rateStateQuery.status !== 'error' && (
+						<>
+							<div className={styles.box}>
+								<div className={styles.title}>
+									<h5 className={styles.symbol}>{asset}</h5>
+									{id && (
+										<p
+											className={cn(styles.disabled, styles.pubkey)}
+											onClick={handleAddressClick}
+											data-id={id.toString()}
+										>
+											{abbreviateAddress(id.toString())}
+										</p>
+									)}
+								</div>
 
-							<div className={styles.funded}>
-								<StatusIndicator
-									color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}
-								>
-									{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)
-										? 'Senior Funded'
-										: 'Senior not Funded'}
-								</StatusIndicator>
-								<StatusIndicator
-									color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}
-								>
-									{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
-										? 'Junior Funded'
-										: 'Junior not Funded'}
-								</StatusIndicator>
-							</div>
-							<hr />
-							<div className={styles.content}>
-								{details.map((detail) => {
+								<div className={styles.funded}>
+									<StatusIndicator
+										color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}
+									>
+										{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)
+											? 'Senior Funded'
+											: 'Senior not Funded'}
+									</StatusIndicator>
+									<StatusIndicator
+										color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}
+									>
+										{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
+											? 'Junior Funded'
+											: 'Junior not Funded'}
+									</StatusIndicator>
+								</div>
+								<hr />
+								<div className={styles.content}>
+									{details.map((detail) => {
+										return (
+											<div key={detail.text} className={styles.column}>
+												<p>{detail.text}</p>
+												<p>{detail.value}</p>
+											</div>
+										);
+									})}
+								</div>
+								<hr />
+
+								{timestamps.map((timestamp) => {
 									return (
-										<div key={detail.text} className={styles.column}>
-											<p>{detail.text}</p>
-											<p>{detail.value}</p>
+										<div key={timestamp.text} className={styles.expirations}>
+											<div>
+												<p>{timestamp.text}</p>
+											</div>
+											<div>
+												<p>{timestamp.value}</p>
+											</div>
 										</div>
 									);
 								})}
-							</div>
-							<hr />
 
-							{timestamps.map((timestamp) => {
-								return (
-									<div key={timestamp.text} className={styles.expirations}>
-										<div>
-											<p>{timestamp.text}</p>
-										</div>
-										<div>
-											<p>{timestamp.value}</p>
-										</div>
-									</div>
-								);
-							})}
-
-							<div className={styles.buttons}>
-								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
-								<DepositButton otcStatePubkey={id as string} isBuyer={false} />
-								<WithdrawButton otcStatePubkey={id as string} isBuyer={true} />
-								<WithdrawButton otcStatePubkey={id as string} isBuyer={false} />
-								<SettleButton otcStatePubkey={id as string} />
-								<ClaimButton otcStatePubkey={id as string} isBuyer={true} />
-								<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
+								<div className={styles.buttons}>
+									<DepositButton otcStatePubkey={id as string} isBuyer={true} />
+									<DepositButton otcStatePubkey={id as string} isBuyer={false} />
+									<WithdrawButton otcStatePubkey={id as string} isBuyer={true} />
+									<WithdrawButton otcStatePubkey={id as string} isBuyer={false} />
+									<SettleButton otcStatePubkey={id as string} />
+									<ClaimButton otcStatePubkey={id as string} isBuyer={true} />
+									<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
+								</div>
 							</div>
-						</div>
-					</>
+						</>
+					)
 				)}
 			</Pane>
 		</Layout>

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import cn from 'classnames';
-import rpcEndpoints from 'configs/rpc_endpoints.json';
-import { SettingsIcon, Pane, RadioGroup, Popover } from 'evergreen-ui';
+import { SettingsIcon, Pane, RadioGroup, Popover, toaster } from 'evergreen-ui';
+import { useClusterStore } from 'store/clusterStore';
 
 import styles from './ClusterSelector.module.scss';
 
@@ -12,14 +12,22 @@ type ClusterSelectorProps = {
 
 // TODO create background overlay
 const ClusterSelector = ({ className }: ClusterSelectorProps) => {
+	const clusterStore = useClusterStore((state) => {
+		return state;
+	});
+
 	const [clusters] = useState([
-		{ label: 'Devnet', value: 'Devnet' },
-		{ label: 'Mainnet', value: 'Mainnet' }
+		{ label: 'Devnet', value: 'devnet' },
+		{ label: 'Mainnet-beta', value: 'mainnet-beta' }
 	]);
-	const [selectedCluster, setSelectedCluster] = useState('Devnet');
+	const [selectedCluster, setSelectedCluster] = useState(clusterStore.cluster);
 
 	const handleClusterSwitch = (event) => {
-		return setSelectedCluster(event.target.value);
+		setSelectedCluster(event.target.value);
+		clusterStore.switchCluster(event.target.value);
+		toaster.notify(`Network updated to ${event.target.value}`, {
+			duration: 3
+		});
 	};
 
 	const popupContent = (
