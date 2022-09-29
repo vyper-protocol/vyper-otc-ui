@@ -1,5 +1,5 @@
 /* eslint-disable css-modules/no-unused-class */
-import { useState } from 'react';
+import { MouseEventHandler, useState } from 'react';
 
 import cn from 'classnames';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
@@ -17,13 +17,6 @@ const menuItems = [
 		path: '/',
 		wip: false,
 		tooltip: false
-	},
-	{
-		name: 'Create Contract',
-		icon: <CubeAddIcon />,
-		path: '/contract/create_contract',
-		wip: true,
-		tooltip: 'Coming soon'
 	}
 ];
 
@@ -34,6 +27,10 @@ const TopBar = () => {
 
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
+
+	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		if (e.altKey) router.push('/contract/create');
+	};
 
 	return (
 		<>
@@ -74,6 +71,13 @@ const TopBar = () => {
 							</div>
 						);
 					})}
+					<div className={cn(styles.item)}>
+						<Tooltip content="Coming soon">
+							<Text onClick={onCreateContractClick}>
+								<CubeAddIcon /> Create contract
+							</Text>
+						</Tooltip>
+					</div>
 				</Pane>
 
 				<SelectWallet />
