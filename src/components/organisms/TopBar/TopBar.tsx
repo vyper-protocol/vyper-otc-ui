@@ -1,23 +1,12 @@
 /* eslint-disable css-modules/no-unused-class */
-import { useState } from 'react';
+import { MouseEventHandler, useState } from 'react';
 
 import cn from 'classnames';
 import DiscordIcon from 'components/atoms/Icons/Discord';
 import TwitterIcon from 'components/atoms/Icons/Twitter';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
-import {
-	Text,
-	Pane,
-	Heading,
-	StackedChartIcon,
-	CubeAddIcon,
-	GridViewIcon,
-	ChevronDownIcon,
-	Tooltip,
-	Popover,
-	Position
-} from 'evergreen-ui';
+import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -30,13 +19,6 @@ const menuItems = [
 		path: '/',
 		wip: false,
 		tooltip: false
-	},
-	{
-		name: 'Create Contract',
-		icon: <CubeAddIcon />,
-		path: '/contract/create_contract',
-		wip: true,
-		tooltip: 'Coming soon'
 	}
 ];
 
@@ -61,6 +43,10 @@ const TopBar = () => {
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
 
+	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		if (e.altKey) router.push('/contract/create');
+	};
+
 	return (
 		<>
 			<Pane className={styles.topbar}>
@@ -76,14 +62,7 @@ const TopBar = () => {
 						const itemPathCondition = `/${itemPathArray[1]}/${itemPathArray[2]}`;
 
 						return (
-							<div
-								key={menuItem.name}
-								className={cn(
-									styles.item,
-									menuItem.wip && styles.disabled,
-									routerCondition === itemPathCondition && styles.active
-								)}
-							>
+							<div key={menuItem.name} className={cn(styles.item, menuItem.wip && styles.disabled, routerCondition === itemPathCondition && styles.active)}>
 								<Link href={menuItem.path} as={menuItem.path}>
 									{menuItem.tooltip ? (
 										<Tooltip content={menuItem.tooltip}>
@@ -101,6 +80,14 @@ const TopBar = () => {
 						);
 					})}
 
+					<div className={cn(styles.item)}>
+						<Tooltip content="Coming soon">
+							<Text onClick={onCreateContractClick}>
+								<CubeAddIcon /> Create contract
+							</Text>
+						</Tooltip>
+					</div>
+
 					<Popover
 						statelessProps={{
 							className: cn(styles.popover)
@@ -110,13 +97,7 @@ const TopBar = () => {
 							<Pane className={styles.container}>
 								{socialMediaItems.map((item) => {
 									return (
-										<a
-											key={item.name}
-											className={styles.item}
-											href={item.link}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
+										<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
 											{item.icon}
 											<Text>{item.name}</Text>
 										</a>
