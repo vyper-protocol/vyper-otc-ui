@@ -8,8 +8,8 @@ import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, Tooltip } from 'eve
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import styles from './TopBar.module.scss';
 import ClusterSelector from '../ClusterSelector/ClusterSelector';
+import styles from './TopBar.module.scss';
 
 const menuItems = [
 	{
