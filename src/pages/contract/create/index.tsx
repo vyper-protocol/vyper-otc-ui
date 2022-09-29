@@ -23,7 +23,17 @@ const AmountPicker = ({ title, value, onChange }: { title: string; value: number
 	);
 };
 
-const StrikePicker = ({ title, value, onChange, switchboardAggregator }: { title: string; value: number; onChange: (val: number) => void; switchboardAggregator: string }) => {
+const StrikePicker = ({
+	title,
+	value,
+	onChange,
+	switchboardAggregator
+}: {
+	title: string;
+	value: number;
+	onChange: (val: number) => void;
+	switchboardAggregator: string;
+}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const { connection } = useConnection();
 
@@ -94,9 +104,18 @@ const CreateContractPage = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [depositStart, setDepositStart] = useState(moment.duration(0, 'minutes').asMilliseconds());
-	const [depositEnd, setDepositEnd] = useState(moment.duration(5, 'minutes').asMilliseconds());
-	const [settleStart, setSettleStart] = useState(moment.duration(15, 'minutes').asMilliseconds());
+	const [depositStart, setDepositStart] = useState(0);
+	useEffect(() => {
+		setDepositStart(moment.duration(0, 'minutes').asMilliseconds());
+	}, []);
+	const [depositEnd, setDepositEnd] = useState(0);
+	useEffect(() => {
+		setDepositEnd(moment.duration(5, 'minutes').asMilliseconds());
+	}, []);
+	const [settleStart, setSettleStart] = useState(moment.duration(0, 'minutes').asMilliseconds());
+	useEffect(() => {
+		setSettleStart(moment.duration(15, 'minutes').asMilliseconds());
+	}, []);
 
 	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
