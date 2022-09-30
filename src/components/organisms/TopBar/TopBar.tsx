@@ -30,15 +30,16 @@ const TopBar = () => {
 
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
+	const { cluster } = router.query;
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (e.altKey) router.push('/contract/create/');
+		if (e.altKey) router.push(`/contract/create/?cluster=${cluster}`);
 	};
 
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href="/">
+				<Link href={`/?cluster=${cluster}`}>
 					<Heading size={600} className={styles.hover}>
 						Vyper OTC
 					</Heading>
@@ -51,7 +52,7 @@ const TopBar = () => {
 
 						return (
 							<div key={menuItem.name} className={cn(styles.item, menuItem.wip && styles.disabled, routerCondition === itemPathCondition && styles.active)}>
-								<Link href={menuItem.path} as={menuItem.path}>
+								<Link href={`${menuItem.path}?cluster=${cluster}`}>
 									{menuItem.tooltip ? (
 										<Tooltip content={menuItem.tooltip}>
 											<Text>

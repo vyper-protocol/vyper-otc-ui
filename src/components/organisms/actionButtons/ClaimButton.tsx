@@ -9,14 +9,18 @@ import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
+import { useRouter } from 'next/router';
 
 export const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
 
+	const router = useRouter();
+	const { cluster } = router.query;
+
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey, cluster);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onClaimClick = async () => {

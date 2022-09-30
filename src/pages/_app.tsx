@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import 'styles/base.css';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -6,9 +7,9 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+import { useRouter } from 'next/router';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { useClusterStore } from 'store/clusterStore';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -16,19 +17,35 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 export const queryClient = new QueryClient();
 
 const Application = ({ Component, pageProps }) => {
-	const clusterStore = useClusterStore((state) => {
-		return state;
+	const router = useRouter();
+	const initialCluster = RPC_ENDPOINTS.find((cluster) => {
+		return cluster.cluster === 'devnet';
 	});
 
-	const [currentEndpoint, setCurrentEndpoint] = useState(clusterStore.cluster);
+	let { cluster } = router.query;
+
+	const [routeWithParams, setRouteWithParams] = useState(initialCluster.cluster);
+	const [endpoint, setEndpoint] = useState(initialCluster.endpoints[0]);
 
 	useEffect(() => {
-		setCurrentEndpoint(clusterStore.cluster);
-	}, [clusterStore.cluster]);
+		const cleanParams = router.asPath.split('?');
 
-	const endpoint = RPC_ENDPOINTS.find((c) => {
-		return c.cluster === currentEndpoint;
-	}).endpoints[0];
+		if ((cluster === undefined || cluster === 'undefined') && cleanParams[0].length === 1) {
+			router.push(cleanParams[0].concat('?cluster=', routeWithParams));
+		} else {
+			setRouteWithParams(cluster as string);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (cluster) {
+			const newEndpoint = RPC_ENDPOINTS.find((c) => {
+				return c.cluster === cluster;
+			}).endpoints[0];
+
+			setEndpoint(newEndpoint);
+		}
+	}, [cluster]);
 
 	const wallets = useMemo(() => {
 		return [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new SolletWalletAdapter()];

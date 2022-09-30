@@ -1,10 +1,9 @@
 import clusters from 'configs/rpc_endpoints.json';
-import { Cluster } from 'store/clusterStore';
 
 /**
  * Get cluster's RPC url from config json file
  */
-export const getClusterRpc = (cluster: Cluster): any => {
+export const getClusterRpc = (cluster: string): any => {
 	const clusterMatch = clusters.find((network) => {
 		return network.cluster === cluster;
 	});

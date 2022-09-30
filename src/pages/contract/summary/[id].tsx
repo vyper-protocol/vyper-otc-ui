@@ -1,4 +1,6 @@
 /* eslint-disable space-before-function-paren */
+import { useEffect, useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -11,7 +13,6 @@ import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
-import { useClusterStore } from 'store/clusterStore';
 import { momentDate, momentDuration } from 'utils/momentHelpers';
 import { formatCurrency } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
@@ -19,21 +20,37 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 import styles from './summary.module.scss';
 
 // test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
+// localhost:3000/contract/summary/5sEVKL6WpGjXSnQyvgurys8QbUmho1ia77pyEsXP2Vzk?cluster=mainnet-beta
 
 const SummaryPageId = () => {
-	const clusterStore = useClusterStore((state) => {
-		return state;
-	});
-
 	const router = useRouter();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
-	const { id } = router.query;
+	const { id, cluster } = router.query;
+
 	const provider = new AnchorProvider(connection, wallet, {});
 	// Pass the cluster option as a unique indetifier to the query
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, clusterStore.cluster);
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, cluster);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
+
+	const [loadingSpinner, setLoadingSpinner] = useState(rateStateQuery?.isLoading);
+	const [errorMessage, setErrorMessage] = useState(rateStateQuery?.isError);
+	const [showContent, setShowContent] = useState(rateStateQuery?.isSuccess);
+
+	useEffect(() => {
+		rateStateQuery.refetch();
+
+		setLoadingSpinner(rateStateQuery?.isLoading);
+		setErrorMessage(rateStateQuery?.isError);
+		setShowContent(rateStateQuery?.isSuccess);
+	}, [cluster]);
+
+	useEffect(() => {
+		setLoadingSpinner(rateStateQuery?.isLoading);
+		setErrorMessage(rateStateQuery?.isError);
+		setShowContent(rateStateQuery?.isSuccess);
+	}, [rateStateQuery?.isError, rateStateQuery?.isLoading]);
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -70,10 +87,6 @@ const SummaryPageId = () => {
 		}
 	];
 
-	const loadingSpinner = rateStateQuery?.status === 'loading';
-	const errorMessage = rateStateQuery?.status === 'error';
-	const showContent = rateStateQuery?.status === 'success';
-
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
@@ -81,7 +94,7 @@ const SummaryPageId = () => {
 
 				{errorMessage && <p>Contract not found</p>}
 
-				{showContent && (
+				{showContent && !errorMessage && !loadingSpinner && (
 					<>
 						<div className={styles.box}>
 							<div className={styles.title}>

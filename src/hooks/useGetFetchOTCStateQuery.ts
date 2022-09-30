@@ -11,9 +11,9 @@ import { defaultOptions } from 'utils/queries/options';
  * @param otcState public key for the otc state
  * @returns query for the otc state
  */
-export const useGetFetchOTCStateQuery = (provider: AnchorProvider, otcState: Address, uniqueId?: string): UseQueryResult<OtcState> => {
+export const useGetFetchOTCStateQuery = (provider: AnchorProvider, otcState: Address, cluster: any): UseQueryResult<OtcState> => {
 	return useQuery<OtcState>(
-		['otc-state', otcState, uniqueId],
+		['otc-state', otcState, cluster],
 		() => {
 			if (otcState !== undefined) return fetchOtcState(provider, new PublicKey(otcState));
 		},

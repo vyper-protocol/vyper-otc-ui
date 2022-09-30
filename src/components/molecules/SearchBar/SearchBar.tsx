@@ -5,7 +5,6 @@ import { PublicKey } from '@solana/web3.js';
 import cn from 'classnames';
 import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
 import { useRouter } from 'next/router';
-import { useClusterStore } from 'store/clusterStore';
 
 import styles from './SearchBar.module.scss';
 
@@ -18,19 +17,17 @@ type SearchBarProps = {
 };
 
 const SearchBar = ({ searchState, className }: SearchBarProps) => {
-	const clusterStore = useClusterStore((state) => {
-		return state;
-	});
-
 	const router = useRouter();
 
 	const [hasError, setHasError] = useState(false);
+
+	const { cluster } = router.query;
 
 	const handleEnterPress = (event) => {
 		if (event.keyCode === 13) {
 			try {
 				new PublicKey(searchState.value);
-				router.push(`/contract/summary/${clusterStore.cluster}/${searchState.value}`);
+				router.push(`/contract/summary/${searchState.value}?cluster=${cluster}`);
 				setHasError(false);
 				searchState.setValue('');
 			} catch (err) {

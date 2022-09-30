@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
-import { ChangeEvent, SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -13,7 +13,6 @@ import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { useClusterStore } from 'store/clusterStore';
 
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
 	return (
@@ -169,13 +168,10 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 };
 
 const CreateContractPage = () => {
-	const clusterStore = useClusterStore((state) => {
-		return state;
-	});
-
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
+	const { cluster } = router.query;
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const txHandler = useContext(TxHandlerContext);
@@ -241,7 +237,7 @@ const CreateContractPage = () => {
 
 			const [txs, otcPublicKey] = await create(provider, initParams);
 			await txHandler.handleTxs(...txs);
-			router.push(`/contract/summary/${clusterStore.cluster}/${otcPublicKey.toBase58()}`);
+			router.push(`/contract/summary/${otcPublicKey.toBase58()}?cluster=${cluster}`);
 		} catch (err) {
 			console.error(err);
 		} finally {
