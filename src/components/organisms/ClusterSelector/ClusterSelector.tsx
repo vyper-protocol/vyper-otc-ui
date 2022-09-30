@@ -33,14 +33,7 @@ const ClusterSelector = ({ className }: ClusterSelectorProps) => {
 	const popupContent = (
 		<Pane width={220} height={220} padding={20} display="flex" flexDirection="column">
 			<h6>Settings</h6>
-			<RadioGroup
-				label="Clusters"
-				size={16}
-				value={selectedCluster}
-				options={clusters}
-				onChange={handleClusterSwitch}
-				marginTop={20}
-			/>
+			<RadioGroup label="Clusters" size={16} value={selectedCluster} options={clusters} onChange={handleClusterSwitch} marginTop={20} />
 		</Pane>
 	);
 

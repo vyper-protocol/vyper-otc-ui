@@ -1,5 +1,5 @@
 /* eslint-disable css-modules/no-unused-class */
-import { MouseEventHandler, useState } from 'react';
+import { useState } from 'react';
 
 import cn from 'classnames';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
@@ -30,7 +30,7 @@ const TopBar = () => {
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (e.altKey) router.push('/contract/create');
+		if (e.altKey) router.push('/contract/create/');
 	};
 
 	return (
@@ -48,14 +48,7 @@ const TopBar = () => {
 						const itemPathCondition = `/${itemPathArray[1]}/${itemPathArray[2]}`;
 
 						return (
-							<div
-								key={menuItem.name}
-								className={cn(
-									styles.item,
-									menuItem.wip && styles.disabled,
-									routerCondition === itemPathCondition && styles.active
-								)}
-							>
+							<div key={menuItem.name} className={cn(styles.item, menuItem.wip && styles.disabled, routerCondition === itemPathCondition && styles.active)}>
 								<Link href={menuItem.path} as={menuItem.path}>
 									{menuItem.tooltip ? (
 										<Tooltip content={menuItem.tooltip}>

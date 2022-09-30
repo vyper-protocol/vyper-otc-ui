@@ -90,20 +90,12 @@ export class OtcState {
 	}
 
 	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
-		return (
-			!this.isDepositExpired() &&
-			this.buyerTA === null &&
-			currentUserWallet.toBase58() !== this.sellerWallet?.toBase58()
-		);
+		return !this.isDepositExpired() && this.buyerTA === null && currentUserWallet.toBase58() !== this.sellerWallet?.toBase58();
 	}
 
 	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
 		if (currentUserWallet === undefined) return false;
-		return (
-			!this.isDepositExpired() &&
-			this.sellerTA === null &&
-			currentUserWallet.toBase58() !== this.buyerWallet?.toBase58()
-		);
+		return !this.isDepositExpired() && this.sellerTA === null && currentUserWallet.toBase58() !== this.buyerWallet?.toBase58();
 	}
 
 	isSettlementAvailable(): boolean {
@@ -126,11 +118,7 @@ export class OtcState {
 		if (currentUserWallet === undefined) return false;
 
 		return (
-			this.isDepositExpired &&
-			this.buyerTA !== null &&
-			this.sellerTA === null &&
-			this.buyerWallet.equals(currentUserWallet) &&
-			this.programBuyerTAAmount > 0
+			this.isDepositExpired && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
 		);
 	}
 
@@ -138,11 +126,7 @@ export class OtcState {
 		if (currentUserWallet === undefined) return false;
 
 		return (
-			this.isDepositExpired &&
-			this.buyerTA === null &&
-			this.sellerTA !== null &&
-			this.sellerWallet.equals(currentUserWallet) &&
-			this.programSellerTAAmount > 0
+			this.isDepositExpired && this.buyerTA === null && this.sellerTA !== null && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0
 		);
 	}
 }

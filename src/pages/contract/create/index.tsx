@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-console */
+import { ChangeEvent, SyntheticEvent, useContext, useEffect, useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
+import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
@@ -10,15 +13,40 @@ import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { useClusterStore } from 'store/clusterStore';
 
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(Number(e.target.value))} />
-			<Button onClick={(e) => onChange(100)}>reset</Button>
-			<Button onClick={(e) => onChange(value + 100)}>+ 100</Button>
-			<Button onClick={(e) => onChange(value - 100)}>- 100</Button>
+			<TextInputField
+				label={title}
+				type="number"
+				value={value}
+				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+					return onChange(Number(e.target.value));
+				}}
+			/>
+			<Button
+				onClick={() => {
+					return onChange(100);
+				}}
+			>
+				reset
+			</Button>
+			<Button
+				onClick={() => {
+					return onChange(value + 100);
+				}}
+			>
+				+ 100
+			</Button>
+			<Button
+				onClick={() => {
+					return onChange(value - 100);
+				}}
+			>
+				- 100
+			</Button>
 		</Pane>
 	);
 };
@@ -52,10 +80,36 @@ const StrikePicker = ({
 
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e) => onChange(e.target.value)} />
-			<IconButton isLoading={isLoading} icon={RefreshIcon} onClick={(e) => onRefresh()} intent="success" />
-			<Button onClick={(e) => onChange(value * 2)}>* 2</Button>
-			<Button onClick={(e) => onChange(value / 2)}>/ 2</Button>
+			<TextInputField
+				label={title}
+				type="number"
+				value={value}
+				onChange={(e) => {
+					return onChange(e.target.value);
+				}}
+			/>
+			<IconButton
+				isLoading={isLoading}
+				icon={RefreshIcon}
+				onClick={() => {
+					return onRefresh();
+				}}
+				intent="success"
+			/>
+			<Button
+				onClick={() => {
+					return onChange(value * 2);
+				}}
+			>
+				* 2
+			</Button>
+			<Button
+				onClick={() => {
+					return onChange(value / 2);
+				}}
+			>
+				/ 2
+			</Button>
 		</Pane>
 	);
 };
@@ -65,8 +119,20 @@ const DurationPicker = ({ title, value, onChange }: { title: string; value: numb
 		<Pane margin={6}>
 			<TextInputField label={title} readOnly value={moment.duration(value, 'milliseconds').humanize()} />
 			<Pane display="flex" alignItems="center">
-				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds())}>+ 5min</Button>
-				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds())}>- 5min</Button>
+				<Button
+					onClick={() => {
+						return onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds());
+					}}
+				>
+					+ 5min
+				</Button>
+				<Button
+					onClick={() => {
+						return onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds());
+					}}
+				>
+					- 5min
+				</Button>
 			</Pane>
 		</Pane>
 	);
@@ -82,11 +148,19 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 			setAggregatorName(n);
 		};
 		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value]);
 
 	return (
 		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField width="100%" label={title + ' ' + aggregatorName} value={value} onChange={(e) => onChange(e.target.value)} />
+			<TextInputField
+				width="100%"
+				label={title + ' ' + aggregatorName}
+				value={value}
+				onChange={(e) => {
+					return onChange(e.target.value);
+				}}
+			/>
 			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
 				<IconButton icon={ShareIcon} intent="success" />
 			</a>
@@ -95,6 +169,10 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 };
 
 const CreateContractPage = () => {
+	const clusterStore = useClusterStore((state) => {
+		return state;
+	});
+
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -127,8 +205,13 @@ const CreateContractPage = () => {
 
 	useEffect(() => {
 		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator))
-			.then((v) => setStrike(v))
-			.catch((e) => setStrike(0));
+			.then((v) => {
+				return setStrike(v);
+			})
+			.catch((e) => {
+				return setStrike(0);
+			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [switchboardAggregator]);
 
 	const createContract = async () => {
@@ -158,7 +241,7 @@ const CreateContractPage = () => {
 
 			const [txs, otcPublicKey] = await create(provider, initParams);
 			await txHandler.handleTxs(...txs);
-			router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
+			router.push(`/contract/summary/${clusterStore.cluster}/${otcPublicKey.toBase58()}`);
 		} catch (err) {
 			console.error(err);
 		} finally {

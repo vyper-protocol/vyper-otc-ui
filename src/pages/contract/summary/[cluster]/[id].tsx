@@ -85,30 +85,18 @@ const SummaryPageId = () => {
 								<div className={styles.title}>
 									<h5 className={styles.symbol}>{asset}</h5>
 									{id && (
-										<p
-											className={cn(styles.disabled, styles.pubkey)}
-											onClick={handleAddressClick}
-											data-id={id.toString()}
-										>
+										<p className={cn(styles.disabled, styles.pubkey)} onClick={handleAddressClick} data-id={id.toString()}>
 											{abbreviateAddress(id.toString())}
 										</p>
 									)}
 								</div>
 
 								<div className={styles.funded}>
-									<StatusIndicator
-										color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}
-									>
-										{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)
-											? 'Senior Funded'
-											: 'Senior not Funded'}
+									<StatusIndicator color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
+										{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'Senior Funded' : 'Senior not Funded'}
 									</StatusIndicator>
-									<StatusIndicator
-										color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}
-									>
-										{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
-											? 'Junior Funded'
-											: 'Junior not Funded'}
+									<StatusIndicator color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
+										{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'Junior Funded' : 'Junior not Funded'}
 									</StatusIndicator>
 								</div>
 								<hr />
