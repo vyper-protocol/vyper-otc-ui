@@ -1,11 +1,11 @@
 /* eslint-disable css-modules/no-unused-class */
-import { MouseEventHandler, useState } from 'react';
+import { useState } from 'react';
 
 import cn from 'classnames';
-import DiscordIcon from 'components/atoms/Icons/Discord';
-import TwitterIcon from 'components/atoms/Icons/Twitter';
+import Icon, { AvailableIconNames } from 'components/atoms/Icon/Icon';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
+import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,19 +19,6 @@ const menuItems = [
 		path: '/',
 		wip: false,
 		tooltip: false
-	}
-];
-
-const socialMediaItems = [
-	{
-		name: 'Twitter',
-		icon: <TwitterIcon />,
-		link: 'https://twitter.com/VyperProtocol'
-	},
-	{
-		name: 'Discord',
-		icon: <DiscordIcon />,
-		link: 'https://discord.com/invite/DuXVSgjmuW'
 	}
 ];
 
@@ -95,10 +82,10 @@ const TopBar = () => {
 						position={Position.BOTTOM}
 						content={
 							<Pane className={styles.container}>
-								{socialMediaItems.map((item) => {
+								{resources.socialMedias.map((item) => {
 									return (
 										<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
-											{item.icon}
+											<Icon name={item.icon as AvailableIconNames} />
 											<Text>{item.name}</Text>
 										</a>
 									);

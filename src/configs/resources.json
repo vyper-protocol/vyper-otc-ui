@@ -1,0 +1,14 @@
+{
+  "socialMedias": [
+    {
+      "name": "Twitter",
+      "icon": "FaTwitter",
+      "link": "https://twitter.com/VyperProtocol"
+    },
+    {
+      "name": "Discord",
+      "icon": "FaDiscord",
+      "link": "https://discord.com/invite/DuXVSgjmuW"
+    }
+  ]
+}
