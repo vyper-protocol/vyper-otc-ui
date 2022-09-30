@@ -1,10 +1,12 @@
 /* eslint-disable css-modules/no-unused-class */
-import { MouseEventHandler, useState } from 'react';
+import { useState } from 'react';
 
 import cn from 'classnames';
+import Icon, { AvailableIconNames } from 'components/atoms/Icon/Icon';
 import SearchBar from 'components/molecules/SearchBar/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
-import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, Tooltip } from 'evergreen-ui';
+import resources from 'configs/resources.json';
+import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -47,14 +49,7 @@ const TopBar = () => {
 						const itemPathCondition = `/${itemPathArray[1]}/${itemPathArray[2]}`;
 
 						return (
-							<div
-								key={menuItem.name}
-								className={cn(
-									styles.item,
-									menuItem.wip && styles.disabled,
-									routerCondition === itemPathCondition && styles.active
-								)}
-							>
+							<div key={menuItem.name} className={cn(styles.item, menuItem.wip && styles.disabled, routerCondition === itemPathCondition && styles.active)}>
 								<Link href={menuItem.path} as={menuItem.path}>
 									{menuItem.tooltip ? (
 										<Tooltip content={menuItem.tooltip}>
@@ -71,6 +66,7 @@ const TopBar = () => {
 							</div>
 						);
 					})}
+
 					<div className={cn(styles.item)}>
 						<Tooltip content="Coming soon">
 							<Text onClick={onCreateContractClick}>
@@ -78,6 +74,31 @@ const TopBar = () => {
 							</Text>
 						</Tooltip>
 					</div>
+
+					<Popover
+						statelessProps={{
+							className: cn(styles.popover)
+						}}
+						position={Position.BOTTOM}
+						content={
+							<Pane className={styles.container}>
+								{resources.socialMedias.map((item) => {
+									return (
+										<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
+											<Icon name={item.icon as AvailableIconNames} />
+											<Text>{item.name}</Text>
+										</a>
+									);
+								})}
+							</Pane>
+						}
+					>
+						<div className={styles.item}>
+							<Text>
+								<GridViewIcon /> More <ChevronDownIcon />
+							</Text>
+						</div>
+					</Popover>
 				</Pane>
 
 				<SelectWallet />
