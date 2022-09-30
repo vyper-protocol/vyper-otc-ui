@@ -13,8 +13,8 @@ export default class RateSwitchboardState {
 	}
 
 	async loadAggregatorData(provider: AnchorProvider) {
-		this.aggregatorData = await getAggregatorData(provider, this.switchboarAggregator);
-		this.aggregatorLastValue = await getAggregatorLatestValue(provider, this.switchboarAggregator);
+		this.aggregatorData = await getAggregatorData(provider.connection, this.switchboarAggregator);
+		this.aggregatorLastValue = await getAggregatorLatestValue(provider.connection, this.switchboarAggregator);
 	}
 
 	getAggregatorName() {
