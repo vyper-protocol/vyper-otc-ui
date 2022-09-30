@@ -11,6 +11,7 @@ import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
+import { useClusterStore } from 'store/clusterStore';
 import { momentDate, momentDuration } from 'utils/momentHelpers';
 import { formatCurrency } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
@@ -20,21 +21,19 @@ import styles from './summary.module.scss';
 // test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
 
 const SummaryPageId = () => {
+	const clusterStore = useClusterStore((state) => {
+		return state;
+	});
+
 	const router = useRouter();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
 	const { id } = router.query;
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
+	// Pass the cluster option as a unique indetifier to the query
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, clusterStore.cluster);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
-
-	if (rateStateQuery.status === 'error') {
-		toaster.danger('Account not found. Check that you have selected the right Network & refresh.', {
-			duration: 5,
-			id: 'account-error'
-		});
-	}
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -71,72 +70,74 @@ const SummaryPageId = () => {
 		}
 	];
 
-	const loadingSpinner = !rateStateQuery?.data?.depositExpirationAt || !rateStateQuery?.data?.settleAvailableFromAt;
+	const loadingSpinner = rateStateQuery?.status === 'loading';
+	const errorMessage = rateStateQuery?.status === 'error';
+	const showContent = rateStateQuery?.status === 'success';
 
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
-				{loadingSpinner ? (
-					<Spinner />
-				) : (
-					rateStateQuery.status !== 'error' && (
-						<>
-							<div className={styles.box}>
-								<div className={styles.title}>
-									<h5 className={styles.symbol}>{asset}</h5>
-									{id && (
-										<p className={cn(styles.disabled, styles.pubkey)} onClick={handleAddressClick} data-id={id.toString()}>
-											{abbreviateAddress(id.toString())}
-										</p>
-									)}
-								</div>
+				{loadingSpinner && <Spinner />}
 
-								<div className={styles.funded}>
-									<StatusIndicator color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
-										{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'Senior Funded' : 'Senior not Funded'}
-									</StatusIndicator>
-									<StatusIndicator color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
-										{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'Junior Funded' : 'Junior not Funded'}
-									</StatusIndicator>
-								</div>
-								<hr />
-								<div className={styles.content}>
-									{details.map((detail) => {
-										return (
-											<div key={detail.text} className={styles.column}>
-												<p>{detail.text}</p>
-												<p>{detail.value}</p>
-											</div>
-										);
-									})}
-								</div>
-								<hr />
+				{errorMessage && <p>Contract not found</p>}
 
-								{timestamps.map((timestamp) => {
+				{showContent && (
+					<>
+						<div className={styles.box}>
+							<div className={styles.title}>
+								<h5 className={styles.symbol}>{asset}</h5>
+								{id && (
+									<p className={cn(styles.disabled, styles.pubkey)} onClick={handleAddressClick} data-id={id.toString()}>
+										{abbreviateAddress(id.toString())}
+									</p>
+								)}
+							</div>
+
+							<div className={styles.funded}>
+								<StatusIndicator color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
+									{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'Senior Funded' : 'Senior not Funded'}
+								</StatusIndicator>
+								<StatusIndicator color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
+									{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'Junior Funded' : 'Junior not Funded'}
+								</StatusIndicator>
+							</div>
+							<hr />
+							<div className={styles.content}>
+								{details.map((detail) => {
 									return (
-										<div key={timestamp.text} className={styles.expirations}>
-											<div>
-												<p>{timestamp.text}</p>
-											</div>
-											<div>
-												<p>{timestamp.value}</p>
-											</div>
+										<div key={detail.text} className={styles.column}>
+											<p>{detail.text}</p>
+											<p>{detail.value}</p>
 										</div>
 									);
 								})}
-
-								<div className={styles.buttons}>
-									<DepositButton otcStatePubkey={id as string} isBuyer={true} />
-									<DepositButton otcStatePubkey={id as string} isBuyer={false} />
-									<WithdrawButton otcStatePubkey={id as string} isBuyer={true} />
-									<WithdrawButton otcStatePubkey={id as string} isBuyer={false} />
-									<SettleButton otcStatePubkey={id as string} />
-									<ClaimButton otcStatePubkey={id as string} isBuyer={true} />
-									<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
-								</div>
 							</div>
-						</>
-					)
+							<hr />
+
+							{timestamps.map((timestamp) => {
+								return (
+									<div key={timestamp.text} className={styles.expirations}>
+										<div>
+											<p>{timestamp.text}</p>
+										</div>
+										<div>
+											<p>{timestamp.value}</p>
+										</div>
+									</div>
+								);
+							})}
+
+							<div className={styles.buttons}>
+								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
+								<DepositButton otcStatePubkey={id as string} isBuyer={false} />
+								<WithdrawButton otcStatePubkey={id as string} isBuyer={true} />
+								<WithdrawButton otcStatePubkey={id as string} isBuyer={false} />
+								<SettleButton otcStatePubkey={id as string} />
+								<ClaimButton otcStatePubkey={id as string} isBuyer={true} />
+								<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
+							</div>
+						</div>
+					</>
 				)}
 			</Pane>
 		</Layout>
