@@ -7,6 +7,7 @@
 		"dev": "yarn prebuild && next dev",
 		"build": "next build",
 		"export": "next export",
+		"analyze": "ANALYZE=true yarn build",
 		"lint": "next lint",
 		"format": "prettier --write \"src/**/*.tsx\" \"src/**/*.ts\" ",
 		"commit": "git add . && cz",
@@ -20,6 +21,7 @@
 		"cypress": "cypress open"
 	},
 	"dependencies": {
+		"@next/bundle-analyzer": "^12.3.1",
 		"@project-serum/anchor": "0.24.2",
 		"@solana-mobile/wallet-adapter-mobile": "^0.9.1",
 		"@solana/spl-token": "^0.3.5",
