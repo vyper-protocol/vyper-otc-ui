@@ -10,7 +10,6 @@ type ClusterSelectorProps = {
 	className?: string;
 };
 
-// TODO create background overlay
 const ClusterSelector = ({ className }: ClusterSelectorProps) => {
 	const clusterStore = useClusterStore((state) => {
 		return state;
