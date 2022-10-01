@@ -3,10 +3,10 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import cn from 'classnames';
-import { ClaimButton } from 'components/organisms/actionButtons/ClaimButton';
-import { DepositButton } from 'components/organisms/actionButtons/DepositButton';
-import { SettleButton } from 'components/organisms/actionButtons/SettleButton';
-import { WithdrawButton } from 'components/organisms/actionButtons/WithdrawButton';
+import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
+import DepositButton from 'components/organisms/actionButtons/DepositButton';
+import SettleButton from 'components/organisms/actionButtons/SettleButton';
+import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import Layout from 'components/templates/Layout/Layout';
 import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
@@ -79,30 +79,18 @@ const SummaryPageId = () => {
 							<div className={styles.title}>
 								<h5 className={styles.symbol}>{asset}</h5>
 								{id && (
-									<p
-										className={cn(styles.disabled, styles.pubkey)}
-										onClick={handleAddressClick}
-										data-id={id.toString()}
-									>
+									<p className={cn(styles.disabled, styles.pubkey)} onClick={handleAddressClick} data-id={id.toString()}>
 										{abbreviateAddress(id.toString())}
 									</p>
 								)}
 							</div>
 
 							<div className={styles.funded}>
-								<StatusIndicator
-									color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}
-								>
-									{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)
-										? 'Senior Funded'
-										: 'Senior not Funded'}
+								<StatusIndicator color={!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
+									{!rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey) ? 'Senior Funded' : 'Senior not Funded'}
 								</StatusIndicator>
-								<StatusIndicator
-									color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}
-								>
-									{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)
-										? 'Junior Funded'
-										: 'Junior not Funded'}
+								<StatusIndicator color={!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'success' : 'danger'}>
+									{!rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey) ? 'Junior Funded' : 'Junior not Funded'}
 								</StatusIndicator>
 							</div>
 							<hr />
