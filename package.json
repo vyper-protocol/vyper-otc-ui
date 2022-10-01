@@ -3,11 +3,13 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "next dev",
+		"prebuild": "rimraf .next",
+		"dev": "yarn prebuild && next dev",
 		"build": "next build",
 		"export": "next export",
+		"analyze": "ANALYZE=true yarn build",
 		"lint": "next lint",
-		"format": "prettier --write \"components/**/*.tsx\" \"pages/**/*.tsx\"",
+		"format": "prettier --write \"src/**/*.tsx\" \"src/**/*.ts\" ",
 		"commit": "git add . && cz",
 		"first-release": "standard-version -- --first-release",
 		"release": "standard-version",
@@ -19,6 +21,7 @@
 		"cypress": "cypress open"
 	},
 	"dependencies": {
+		"@next/bundle-analyzer": "^12.3.1",
 		"@project-serum/anchor": "0.24.2",
 		"@solana-mobile/wallet-adapter-mobile": "^0.9.1",
 		"@solana/spl-token": "^0.3.5",
@@ -39,6 +42,7 @@
 		"next": "^12.1.5",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0",
+		"react-icons": "^4.4.0",
 		"react-json-view": "^1.21.3",
 		"react-query": "^3.39.2"
 	},
@@ -60,6 +64,7 @@
 		"husky": "^8.0.1",
 		"lint-staged": "^13.0.3",
 		"prettier": "^2.7.1",
+		"rimraf": "^3.0.2",
 		"sass": "^1.54.9",
 		"standard-version": "^9.5.0",
 		"typescript": "4.8.3"

@@ -1,0 +1,34 @@
+{
+  "socialMedias": [
+    {
+      "name": "Website",
+      "icon": "FaGlobe",
+      "link": "https://www.vyperprotocol.io"
+    },
+    {
+      "name": "Docs",
+      "icon": "MdArticle",
+      "link": "https://docs.vyperprotocol.io"
+    },
+    {
+      "name": "GitHub",
+      "icon": "FaGithub",
+      "link": "https://github.com/vyper-protocol"
+    },
+    {
+      "name": "Medium",
+      "icon": "FaMedium",
+      "link": "https://vyperprotocol.medium.com"
+    },
+    {
+      "name": "Twitter",
+      "icon": "FaTwitter",
+      "link": "https://twitter.com/VyperProtocol"
+    },
+    {
+      "name": "Discord",
+      "icon": "FaDiscord",
+      "link": "https://discord.com/invite/DuXVSgjmuW"
+    }
+  ]
+}
