@@ -1767,6 +1767,11 @@
   resolved "https://registry.yarnpkg.com/@vyper-protocol/explorer-link-helper/-/explorer-link-helper-0.1.0.tgz#25577ff28c492e98e2cfad8418ffe84d393f0a51"
   integrity sha512-W38SS/aBIp4zwxYcnaT+JmuAeickAcqeokCfkumxQnRSU9m5HOT2FKi+xbwyqYQA4VgyXKbaVkGkSRfyrYiSGw==
 
+"@vyper-protocol/prettier-config@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@vyper-protocol/prettier-config/-/prettier-config-0.1.0.tgz#b23a6992ecef86a293883e3d2237637037e3d828"
+  integrity sha512-OyY2Jq3Db2xqobRJCKrOzyD2y+uhaOwsb9IIk8NFr6P7CmK7Qu73ErGkn50ZYxWkESm2nToS7ap+y3ZycZmEKg==
+
 "@vyper-protocol/rust-decimal-wrapper@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@vyper-protocol/rust-decimal-wrapper/-/rust-decimal-wrapper-0.1.3.tgz#8c980f8ad594c466c4e2607b99230e810ef9d54b"
