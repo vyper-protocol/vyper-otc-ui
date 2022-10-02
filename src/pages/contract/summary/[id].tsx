@@ -1,7 +1,6 @@
 /* eslint-disable space-before-function-paren */
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import cn from 'classnames';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
@@ -11,7 +10,6 @@ import Layout from 'components/templates/Layout/Layout';
 import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import RateSwitchboardState from 'models/RateSwitchboardState';
 import { useRouter } from 'next/router';
 import { momentDate, momentDuration } from 'utils/momentHelpers';
 import { formatCurrency } from 'utils/numberHelpers';
