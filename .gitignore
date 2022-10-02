@@ -38,3 +38,6 @@ jspm_packages
 .node_repl_history
 .next
 .DS_Store
+
+# env files
+.env.local

@@ -6,6 +6,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+import Script from 'next/script';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
@@ -25,18 +26,29 @@ const Application = ({ Component, pageProps }) => {
 	}, []);
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ConnectionProvider endpoint={endpoint}>
-				<WalletProvider wallets={wallets} autoConnect>
-					<WalletModalProvider>
-						<TxHandlerProvider>
-							<Component {...pageProps} />
-						</TxHandlerProvider>
-					</WalletModalProvider>
-				</WalletProvider>
-			</ConnectionProvider>
-			<ReactQueryDevtools initialIsOpen={false} />
-		</QueryClientProvider>
+		<>
+			<Script strategy='lazyOnload' src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS || 'G-Q7VRSL0DE3'}`} />
+			<Script strategy='lazyOnload' id='ga-tracking-snippet'>
+				{`
+					window.dataLayer = window.dataLayer || [];
+					function gtag(){dataLayer.push(arguments);}
+					gtag('js', new Date());
+					gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS || 'G-Q7VRSL0DE3'}');	
+				`}
+			</Script>
+			<QueryClientProvider client={queryClient}>
+				<ConnectionProvider endpoint={endpoint}>
+					<WalletProvider wallets={wallets} autoConnect>
+						<WalletModalProvider>
+							<TxHandlerProvider>
+								<Component {...pageProps} />
+							</TxHandlerProvider>
+						</WalletModalProvider>
+					</WalletProvider>
+				</ConnectionProvider>
+				<ReactQueryDevtools initialIsOpen={false} />
+			</QueryClientProvider>
+		</>
 	);
 };
 
