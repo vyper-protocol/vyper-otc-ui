@@ -33,6 +33,7 @@ yarn build
 | dev           | Starts the development server                                                                   |
 | build         | Creates an optimized production build                                                           |
 | export        | Export the app to static HTML, which can be run standalone without the need of a Node.js server |
+| analyze       | Visualize and track the production build bundle size                                            |
 | lint          | Lints src files with Eslint                                                                     |
 | format        | Formats src files with prettier                                                                 |
 | commit        | Runs `git add .` and `cz`                                                                       |

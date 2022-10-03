@@ -10,7 +10,7 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
-export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
+const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -38,3 +38,5 @@ export const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => 
 
 	return <ButtonPill mode="info" text="Settle" onClick={onSettleClick} icon={<PlusIcon />} loading={isLoading} />;
 };
+
+export default SettleButton;
