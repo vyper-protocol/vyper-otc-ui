@@ -11,7 +11,7 @@ import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
 
-export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -46,3 +46,5 @@ export const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: str
 
 	return <ButtonPill mode="success" text={isBuyer ? 'Long' : 'Short'} onClick={onDepositClick} icon={<PlusIcon />} loading={isLoading} />;
 };
+
+export default DepositButton;
