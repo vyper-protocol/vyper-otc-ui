@@ -40,7 +40,7 @@ const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; i
 		return <></>;
 	}
 
-	return <ButtonPill mode="error" text="Withdraw" onClick={onWithdrawClick} icon={<MinusIcon />} loading={isLoading} />;
+	return <ButtonPill mode="info" text="Withdraw" onClick={onWithdrawClick} loading={isLoading} />;
 };
 
 export default WithdrawButton;
