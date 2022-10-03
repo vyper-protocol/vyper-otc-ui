@@ -5,8 +5,10 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
+import ApplicationError from 'components/templates/ApplicationError';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import Script from 'next/script';
+import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
@@ -27,8 +29,8 @@ const Application = ({ Component, pageProps }) => {
 
 	return (
 		<>
-			<Script strategy='lazyOnload' src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS || 'G-Q7VRSL0DE3'}`} />
-			<Script strategy='lazyOnload' id='ga-tracking-snippet'>
+			<Script strategy="lazyOnload" src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS || 'G-Q7VRSL0DE3'}`} />
+			<Script strategy="lazyOnload" id="ga-tracking-snippet">
 				{`
 					window.dataLayer = window.dataLayer || [];
 					function gtag(){dataLayer.push(arguments);}
@@ -41,7 +43,9 @@ const Application = ({ Component, pageProps }) => {
 					<WalletProvider wallets={wallets} autoConnect>
 						<WalletModalProvider>
 							<TxHandlerProvider>
-								<Component {...pageProps} />
+								<ErrorBoundary FallbackComponent={ApplicationError}>
+									<Component {...pageProps} />
+								</ErrorBoundary>
 							</TxHandlerProvider>
 						</WalletModalProvider>
 					</WalletProvider>
