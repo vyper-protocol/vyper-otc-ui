@@ -1,7 +1,8 @@
+import { useContext, useEffect, useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
+import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
@@ -10,15 +11,15 @@ import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { SyntheticEvent, useContext, useEffect, useState } from 'react';
 
+// eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(Number(e.target.value))} />
-			<Button onClick={(e) => onChange(100)}>reset</Button>
-			<Button onClick={(e) => onChange(value + 100)}>+ 100</Button>
-			<Button onClick={(e) => onChange(value - 100)}>- 100</Button>
+			<TextInputField label={title} type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {return onChange(Number(e.target.value));}} />
+			<Button onClick={() => {return onChange(100);}}>reset</Button>
+			<Button onClick={() => {return onChange(value + 100);}}>+ 100</Button>
+			<Button onClick={() => {return onChange(value - 100);}}>- 100</Button>
 		</Pane>
 	);
 };
@@ -31,6 +32,7 @@ const StrikePicker = ({
 }: {
 	title: string;
 	value: number;
+	// eslint-disable-next-line no-unused-vars
 	onChange: (val: number) => void;
 	switchboardAggregator: string;
 }) => {
@@ -44,6 +46,7 @@ const StrikePicker = ({
 			onChange(latestResult);
 		} catch (err) {
 			alert(err);
+			// eslint-disable-next-line no-console
 			console.error(err);
 		} finally {
 			setIsLoading(false);
@@ -52,26 +55,28 @@ const StrikePicker = ({
 
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e) => onChange(e.target.value)} />
-			<IconButton isLoading={isLoading} icon={RefreshIcon} onClick={(e) => onRefresh()} intent="success" />
-			<Button onClick={(e) => onChange(value * 2)}>* 2</Button>
-			<Button onClick={(e) => onChange(value / 2)}>/ 2</Button>
+			<TextInputField label={title} type="number" value={value} onChange={(e) => {return onChange(e.target.value);}} />
+			<IconButton isLoading={isLoading} icon={RefreshIcon} onClick={() => {return onRefresh();}} intent="success" />
+			<Button onClick={() => {return onChange(value * 2);}}>* 2</Button>
+			<Button onClick={() => {return onChange(value / 2);}}>/ 2</Button>
 		</Pane>
 	);
 };
 
+// eslint-disable-next-line no-unused-vars
 const DurationPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (val: number) => void }) => {
 	return (
 		<Pane margin={6}>
 			<TextInputField label={title} readOnly value={moment.duration(value, 'milliseconds').humanize()} />
 			<Pane display="flex" alignItems="center">
-				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds())}>+ 5min</Button>
-				<Button onClick={(e) => onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds())}>- 5min</Button>
+				<Button onClick={() => {return onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds());}}>+ 5min</Button>
+				<Button onClick={() => {return onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds());}}>- 5min</Button>
 			</Pane>
 		</Pane>
 	);
 };
 
+// eslint-disable-next-line no-unused-vars
 const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
 	const [aggregatorName, setAggregatorName] = useState('');
 	const { connection } = useConnection();
@@ -82,11 +87,11 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 			setAggregatorName(n);
 		};
 		fetchData();
-	}, [value]);
+	}, [value, connection]);
 
 	return (
 		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField width="100%" label={title + ' ' + aggregatorName} value={value} onChange={(e) => onChange(e.target.value)} />
+			<TextInputField width="100%" label={title + ' ' + aggregatorName} value={value} onChange={(e) => {return onChange(e.target.value);}} />
 			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
 				<IconButton icon={ShareIcon} intent="success" />
 			</a>
@@ -127,9 +132,9 @@ const CreateContractPage = () => {
 
 	useEffect(() => {
 		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator))
-			.then((v) => setStrike(v))
-			.catch((e) => setStrike(0));
-	}, [switchboardAggregator]);
+			.then((v) => {return setStrike(v);})
+			.catch(() => {return setStrike(0);});
+	}, [provider.connection, switchboardAggregator]);
 
 	const createContract = async () => {
 		try {
@@ -153,13 +158,16 @@ const CreateContractPage = () => {
 			};
 
 			// create contract
+			// eslint-disable-next-line no-console
 			console.log('provider: ', provider);
+			// eslint-disable-next-line no-console
 			console.log('initParams: ', initParams);
 
 			const [txs, otcPublicKey] = await create(provider, initParams);
 			await txHandler.handleTxs(...txs);
 			router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
 		} catch (err) {
+			// eslint-disable-next-line no-console
 			console.error(err);
 		} finally {
 			setIsLoading(false);
