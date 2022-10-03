@@ -5,7 +5,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { claim } from 'api/otc-state/claim';
-import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
+import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';

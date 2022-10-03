@@ -2,9 +2,9 @@
 import { useState } from 'react';
 
 import cn from 'classnames';
-import Icon, { AvailableIconNames } from 'components/atoms/Icon/Icon';
-import SearchBar from 'components/molecules/SearchBar/SearchBar';
-import SelectWallet from 'components/organisms/SelectWallet/SelectWallet';
+import Icon, { AvailableIconNames } from 'components/atoms/Icon';
+import SearchBar from 'components/molecules/SearchBar';
+import SelectWallet from 'components/organisms/SelectWallet';
 import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';

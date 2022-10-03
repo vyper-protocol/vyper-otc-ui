@@ -7,7 +7,7 @@ import { ClaimButton } from 'components/organisms/actionButtons/ClaimButton';
 import { DepositButton } from 'components/organisms/actionButtons/DepositButton';
 import { SettleButton } from 'components/organisms/actionButtons/SettleButton';
 import { WithdrawButton } from 'components/organisms/actionButtons/WithdrawButton';
-import Layout from 'components/templates/Layout/Layout';
+import Layout from 'components/templates/Layout';
 import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
