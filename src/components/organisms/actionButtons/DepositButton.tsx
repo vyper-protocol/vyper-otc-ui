@@ -5,7 +5,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { deposit } from 'api/otc-state/deposit';
-import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
+import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
@@ -45,7 +45,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		return <></>;
 	}
 
-	return <ButtonPill mode="success" text={isBuyer ? 'Long' : 'Short'} onClick={onDepositClick} icon={<PlusIcon />} loading={isLoading} />;
+	return <ButtonPill mode={isBuyer ? 'success' : 'error'} text={isBuyer ? 'Long' : 'Short'} onClick={onDepositClick} loading={isLoading} />;
 };
 
 export default DepositButton;

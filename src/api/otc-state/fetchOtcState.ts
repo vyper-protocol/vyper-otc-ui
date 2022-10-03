@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { AnchorProvider, Program } from '@project-serum/anchor';
-import { getAccount } from '@solana/spl-token';
+import { getAccount, getMint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
@@ -22,16 +22,19 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 
 	const res = new OtcState();
 	res.publickey = otcStateAddress;
+	res.reserveMintInfo = await getMint(provider.connection, trancheConfigAccountInfo.reserveMint);
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
 	res.depositExpirationAt = accountInfo.depositEnd.toNumber() * 1000;
 	res.settleAvailableFromAt = accountInfo.settleStart.toNumber() * 1000;
 	res.settleExecuted = accountInfo.settleExecuted;
-	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber();
-	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber();
+	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
+	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
 
-	res.programBuyerTAAmount = Number((await getAccount(provider.connection, accountInfo.otcSeniorReserveTokenAccount)).amount);
-	res.programSellerTAAmount = Number((await getAccount(provider.connection, accountInfo.otcJuniorReserveTokenAccount)).amount);
+	res.programBuyerTAAmount =
+		Number((await getAccount(provider.connection, accountInfo.otcSeniorReserveTokenAccount)).amount) / 10 ** res.reserveMintInfo.decimals;
+	res.programSellerTAAmount =
+		Number((await getAccount(provider.connection, accountInfo.otcJuniorReserveTokenAccount)).amount) / 10 ** res.reserveMintInfo.decimals;
 
 	res.buyerTA = accountInfo.seniorSideBeneficiary;
 	if (res.buyerTA) {
@@ -62,7 +65,7 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 
 		const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 		const isLinear = redeemLogicAccountInfo.isLinear;
-		const notional = redeemLogicAccountInfo.notional.toNumber();
+		const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
 		res.redeemLogicState = new RedeemLogicForwardState(strike, isLinear, notional);
 	} catch (err) {
 		console.error(err);

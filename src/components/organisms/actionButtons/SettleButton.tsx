@@ -5,7 +5,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { settle } from 'api/otc-state/settle';
-import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
+import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
@@ -41,7 +41,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 		return <></>;
 	}
 
-	return <ButtonPill mode="info" text="Settle" onClick={onSettleClick} icon={<PlusIcon />} loading={isLoading} />;
+	return <ButtonPill mode="info" text="Settle" onClick={onSettleClick} loading={isLoading} />;
 };
 
 export default SettleButton;
