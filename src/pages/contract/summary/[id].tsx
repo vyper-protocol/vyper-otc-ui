@@ -11,6 +11,7 @@ import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import Layout from 'components/templates/Layout/Layout';
 import { Pane, toaster, StatusIndicator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
+import { useCluster } from 'hooks/useCluster';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
 import { momentDate, momentDuration } from 'utils/momentHelpers';
@@ -27,30 +28,25 @@ const SummaryPageId = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
-	const { id, cluster } = router.query;
+	const { id } = router.query;
+	const { cluster } = useCluster();
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	// Pass the cluster option as a unique indetifier to the query
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, cluster);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
-	const [loadingSpinner, setLoadingSpinner] = useState(rateStateQuery?.isLoading);
-	const [errorMessage, setErrorMessage] = useState(rateStateQuery?.isError);
-	const [showContent, setShowContent] = useState(rateStateQuery?.isSuccess);
+	// const [loadingSpinner, setLoadingSpinner] = useState(rateStateQuery?.isLoading);
+	// const [errorMessage, setErrorMessage] = useState(rateStateQuery?.isError);
+	// const [showContent, setShowContent] = useState(rateStateQuery?.isSuccess);
 
-	useEffect(() => {
-		rateStateQuery.refetch();
+	console.log(rateStateQuery);
 
-		setLoadingSpinner(rateStateQuery?.isLoading);
-		setErrorMessage(rateStateQuery?.isError);
-		setShowContent(rateStateQuery?.isSuccess);
-	}, [cluster]);
-
-	useEffect(() => {
-		setLoadingSpinner(rateStateQuery?.isLoading);
-		setErrorMessage(rateStateQuery?.isError);
-		setShowContent(rateStateQuery?.isSuccess);
-	}, [rateStateQuery?.isError, rateStateQuery?.isLoading]);
+	// useEffect(() => {
+	// 	setLoadingSpinner(rateStateQuery?.isLoading);
+	// 	setErrorMessage(rateStateQuery?.isError);
+	// 	setShowContent(rateStateQuery?.isSuccess);
+	// }, [cluster]);
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -87,12 +83,16 @@ const SummaryPageId = () => {
 		}
 	];
 
+	const loadingSpinner = rateStateQuery?.isLoading;
+	const errorMessage = rateStateQuery?.isError;
+	const showContent = rateStateQuery?.isSuccess;
+
 	return (
 		<Layout>
 			<Pane clearfix margin={24} maxWidth={400}>
-				{loadingSpinner && <Spinner />}
-
 				{errorMessage && <p>Contract not found</p>}
+
+				{loadingSpinner && <Spinner />}
 
 				{showContent && !errorMessage && !loadingSpinner && (
 					<>

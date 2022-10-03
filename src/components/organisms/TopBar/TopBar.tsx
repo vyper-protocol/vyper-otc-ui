@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 
 import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
+import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 
 const menuItems = [
 	{
@@ -30,16 +31,23 @@ const TopBar = () => {
 
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
-	const { cluster } = router.query;
+	const { cluster } = useCluster();
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (e.altKey) router.push(`/contract/create/?cluster=${cluster}`);
+		if (e.altKey) {
+			// If the selected cluster is the default one, remove query params
+			if (cluster === DEFAULT_CLUSTER) {
+				router.push(`/contract/create/`);
+			} else {
+				router.push(`/contract/create/?cluster=${cluster}`);
+			}
+		}
 	};
 
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href={`/?cluster=${cluster}`}>
+				<Link href={cluster === DEFAULT_CLUSTER ? `/` : `/?cluster=${cluster}`}>
 					<Heading size={600} className={styles.hover}>
 						Vyper OTC
 					</Heading>

@@ -10,6 +10,7 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
+import { useCluster } from 'hooks/useCluster';
 
 const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const { connection } = useConnection();
@@ -17,7 +18,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const txHandler = useContext(TxHandlerContext);
 
 	const router = useRouter();
-	const { cluster } = router.query;
+	const { cluster } = useCluster();
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey, cluster);

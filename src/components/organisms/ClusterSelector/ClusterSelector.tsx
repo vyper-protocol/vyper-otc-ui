@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import cn from 'classnames';
 import { SettingsIcon, Pane, RadioGroup, Popover, toaster } from 'evergreen-ui';
+import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 import { useRouter } from 'next/router';
 
 import styles from './ClusterSelector.module.scss';
@@ -11,26 +12,30 @@ type ClusterSelectorProps = {
 };
 
 const ClusterSelector = ({ className }: ClusterSelectorProps) => {
-	const router = useRouter();
-	const { cluster } = router.query;
-
 	const [clusters] = useState([
 		{ label: 'Devnet', value: 'devnet' },
 		{ label: 'Mainnet-beta', value: 'mainnet-beta' }
 	]);
+
+	const router = useRouter();
+
+	const { cluster } = useCluster();
+
 	const [selectedCluster, setSelectedCluster] = useState(cluster);
 
 	useEffect(() => {
-		if (selectedCluster) {
-			const cleanParams = router.asPath.split('?');
-			const routeWithParams = cleanParams[0].concat('?cluster=', selectedCluster as string);
-
-			router.push(routeWithParams);
-		}
-	}, [selectedCluster]);
+		setSelectedCluster(cluster);
+	}, [cluster]);
 
 	const handleClusterSwitch = (event) => {
 		setSelectedCluster(event.target.value);
+
+		// If the selected cluster is the default one, remove query params
+		if (event.target.value === DEFAULT_CLUSTER) {
+			router.push(router.asPath.split('?')[0]);
+		} else {
+			router.push(router.asPath.split('?')[0] + '?cluster=' + event.target.value);
+		}
 
 		toaster.notify(`Network updated to ${event.target.value}`, {
 			duration: 3

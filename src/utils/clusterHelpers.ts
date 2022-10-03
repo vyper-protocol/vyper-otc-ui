@@ -1,15 +1,3 @@
-import clusters from 'configs/rpc_endpoints.json';
-
-/**
- * Get cluster's RPC url from config json file
- */
-export const getClusterRpc = (cluster: string): any => {
-	const clusterMatch = clusters.find((network) => {
-		return network.cluster === cluster;
-	});
-	return clusterMatch;
-};
-
 /**
  * Constructs a solana explorer link
  */

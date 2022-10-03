@@ -7,6 +7,7 @@ import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 
 import styles from './SearchBar.module.scss';
+import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 
 type SearchBarProps = {
 	searchState: {
@@ -21,13 +22,19 @@ const SearchBar = ({ searchState, className }: SearchBarProps) => {
 
 	const [hasError, setHasError] = useState(false);
 
-	const { cluster } = router.query;
+	const { cluster } = useCluster();
 
 	const handleEnterPress = (event) => {
 		if (event.keyCode === 13) {
 			try {
 				new PublicKey(searchState.value);
-				router.push(`/contract/summary/${searchState.value}?cluster=${cluster}`);
+
+				if (cluster === DEFAULT_CLUSTER) {
+					router.push(`/contract/summary/${searchState.value}`);
+				} else {
+					router.push(`/contract/summary/${searchState.value}?cluster=${cluster}`);
+				}
+
 				setHasError(false);
 				searchState.setValue('');
 			} catch (err) {
