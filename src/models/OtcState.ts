@@ -90,6 +90,7 @@ export class OtcState {
 	}
 
 	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
 			!this.isDepositExpired() &&
 			this.buyerTA === null &&
@@ -98,7 +99,7 @@ export class OtcState {
 	}
 
 	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
-		if (currentUserWallet === undefined) return false;
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
 			!this.isDepositExpired() &&
 			this.sellerTA === null &&
@@ -111,20 +112,17 @@ export class OtcState {
 	}
 
 	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return this.settleExecuted && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0;
 	}
 
 	isClaimJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return this.settleExecuted && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0;
 	}
 
 	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
 			this.isDepositExpired &&
 			this.buyerTA !== null &&
@@ -135,8 +133,7 @@ export class OtcState {
 	}
 
 	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
 			this.isDepositExpired &&
 			this.buyerTA === null &&
