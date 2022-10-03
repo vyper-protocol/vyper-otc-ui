@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import Layout from 'components/templates/Layout/Layout';
+import Layout from 'components/templates/Layout';
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';

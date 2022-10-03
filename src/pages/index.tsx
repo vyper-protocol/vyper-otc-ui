@@ -1,5 +1,5 @@
-import Header from 'components/templates/Header/Header';
-import Layout from 'components/templates/Layout/Layout';
+import Header from 'components/templates/Header';
+import Layout from 'components/templates/Layout';
 
 const Home = () => {
 	return (

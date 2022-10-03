@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 
-import TopBar from 'components/organisms/TopBar/TopBar';
+import TopBar from 'components/organisms/TopBar';
 import { Pane } from 'evergreen-ui';
 import Head from 'next/head';
 
-import Footer from '../Footer/Footer';
+import Footer from '../Footer';
 
 type LayoutProps = {
 	children: ReactNode;
