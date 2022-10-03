@@ -40,15 +40,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		return <></>;
 	}
 
-	return (
-		<ButtonPill
-			mode="success"
-			text={isBuyer ? 'Long' : 'Short'}
-			onClick={onDepositClick}
-			icon={<PlusIcon />}
-			loading={isLoading}
-		/>
-	);
+	return <ButtonPill mode={isBuyer ? 'success' : 'error'} text={isBuyer ? 'Long' : 'Short'} onClick={onDepositClick} loading={isLoading} />;
 };
 
 export default DepositButton;

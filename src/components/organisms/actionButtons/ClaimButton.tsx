@@ -40,15 +40,7 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 		return <></>;
 	}
 
-	return (
-		<ButtonPill
-			mode={isBuyer ? 'success' : 'error'}
-			text={isBuyer ? 'Claim buyer' : 'Claim seller'}
-			onClick={onClaimClick}
-			icon={<PlusIcon />}
-			loading={isLoading}
-		/>
-	);
+	return <ButtonPill mode="info" text="Claim" onClick={onClaimClick} loading={isLoading} />;
 };
 
 export default ClaimButton;

@@ -36,7 +36,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 		return <></>;
 	}
 
-	return <ButtonPill mode="info" text="Settle" onClick={onSettleClick} icon={<PlusIcon />} loading={isLoading} />;
+	return <ButtonPill mode="info" text="Settle" onClick={onSettleClick} loading={isLoading} />;
 };
 
 export default SettleButton;
