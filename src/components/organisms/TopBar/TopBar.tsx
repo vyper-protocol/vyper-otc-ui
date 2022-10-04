@@ -7,12 +7,13 @@ import SearchBar from 'components/molecules/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet';
 import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
+import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
+import { useClusterParam } from 'hooks/useClusterParam';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
-import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 
 export type TopBarProps = {
 	withSearchBar?: boolean;
@@ -37,21 +38,18 @@ const TopBar = ({ withSearchBar = true }: TopBarProps) => {
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
 	const { cluster } = useCluster();
 
+	const createUrl = useClusterParam();
+
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (e.altKey) {
-			// If the selected cluster is the default one, remove query params
-			if (cluster === DEFAULT_CLUSTER) {
-				router.push(`/contract/create/`);
-			} else {
-				router.push(`/contract/create/?cluster=${cluster}`);
-			}
+			router.push('http://' + createUrl.host + '/contract/create/');
 		}
 	};
 
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href={cluster === DEFAULT_CLUSTER ? `/` : `/?cluster=${cluster}`}>
+				<Link href={cluster === DEFAULT_CLUSTER ? '/' : `/?cluster=${cluster}`}>
 					<Heading size={600} className={styles.hover}>
 						Vyper OTC
 					</Heading>

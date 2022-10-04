@@ -23,7 +23,6 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 import styles from './summary.module.scss';
 
 // test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
-// localhost:3000/contract/summary/5sEVKL6WpGjXSnQyvgurys8QbUmho1ia77pyEsXP2Vzk?cluster=mainnet-beta
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -35,7 +34,7 @@ const SummaryPageId = () => {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	// Pass the cluster option as a unique indetifier to the query
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, cluster);
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, provider.connection.rpcEndpoint);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
 	const handleAddressClick = (e) => {
@@ -59,7 +58,7 @@ const SummaryPageId = () => {
 
 				{loadingSpinner && <Spinner />}
 
-				{showContent && !errorMessage && !loadingSpinner && (
+				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
 					<>
 						<div className={styles.box}>
 							{/* + + + + + + + + + + + + +  */}
@@ -120,7 +119,7 @@ const SummaryPageId = () => {
 							<div className={styles.content}>
 								<div className={styles.column}>
 									<p>Current Price</p>
-									<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState.aggregatorLastValue)}</p>
+									<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
 								</div>
 								<div className={styles.column}>
 									<p>Strike</p>

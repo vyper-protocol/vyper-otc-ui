@@ -1,6 +1,8 @@
+/* eslint-disable indent */
 import { useEffect, useState } from 'react';
 
 import cn from 'classnames';
+import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import { SettingsIcon, Pane, RadioGroup, Popover, toaster } from 'evergreen-ui';
 import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 import { useRouter } from 'next/router';
@@ -12,10 +14,9 @@ type ClusterSelectorProps = {
 };
 
 const ClusterSelector = ({ className }: ClusterSelectorProps) => {
-	const [clusters] = useState([
-		{ label: 'Devnet', value: 'devnet' },
-		{ label: 'Mainnet-beta', value: 'mainnet-beta' }
-	]);
+	const clusters = RPC_ENDPOINTS.map((cluster) => {
+		return { label: cluster.cluster, value: cluster.cluster };
+	});
 
 	const router = useRouter();
 
@@ -45,7 +46,15 @@ const ClusterSelector = ({ className }: ClusterSelectorProps) => {
 	const popupContent = (
 		<Pane width={220} height={220} padding={20} display="flex" flexDirection="column">
 			<h6>Settings</h6>
-			<RadioGroup label="Clusters" size={16} value={selectedCluster as string} options={clusters} onChange={handleClusterSwitch} marginTop={20} />
+			<RadioGroup
+				label="Clusters"
+				size={16}
+				value={selectedCluster as string}
+				options={clusters}
+				onChange={handleClusterSwitch}
+				marginTop={20}
+				className={styles.radiogroup}
+			/>
 		</Pane>
 	);
 

@@ -17,11 +17,8 @@ const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; i
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
 
-	const router = useRouter();
-	const { cluster } = useCluster();
-
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey, cluster);
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onWithdrawClick = async () => {

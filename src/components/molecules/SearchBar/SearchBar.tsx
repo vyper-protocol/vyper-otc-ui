@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import cn from 'classnames';
 import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
+import { useClusterParam } from 'hooks/useClusterParam';
 import { useRouter } from 'next/router';
 
 import styles from './SearchBar.module.scss';
-import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 
 type SearchBarProps = {
 	searchState: {
@@ -18,22 +18,20 @@ type SearchBarProps = {
 };
 
 const SearchBar = ({ searchState, className }: SearchBarProps) => {
-	const router = useRouter();
-
 	const [hasError, setHasError] = useState(false);
 
-	const { cluster } = useCluster();
+	const router = useRouter();
+
+	const createUrl = useClusterParam();
 
 	const handleEnterPress = (event) => {
 		if (event.keyCode === 13) {
 			try {
 				new PublicKey(searchState.value);
 
-				if (cluster === DEFAULT_CLUSTER) {
-					router.push(`/contract/summary/${searchState.value}`);
-				} else {
-					router.push(`/contract/summary/${searchState.value}?cluster=${cluster}`);
-				}
+				const path = 'contract/summary/';
+				createUrl.pathname = path + searchState.value;
+				router.push(createUrl.href);
 
 				setHasError(false);
 				searchState.setValue('');

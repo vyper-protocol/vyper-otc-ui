@@ -12,6 +12,7 @@ import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { DEFAULT_CLUSTER, useCluster } from 'hooks/useCluster';
+import { useClusterParam } from 'hooks/useClusterParam';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
@@ -212,6 +213,8 @@ const CreateContractPage = () => {
 			});
 	}, [provider.connection, switchboardAggregator]);
 
+	const createUrl = useClusterParam();
+
 	const createContract = async () => {
 		try {
 			setIsLoading(true);
@@ -241,12 +244,10 @@ const CreateContractPage = () => {
 
 			const [txs, otcPublicKey] = await create(provider, initParams);
 			await txHandler.handleTxs(...txs);
-			// If the selected cluster is the default one, remove query params
-			if (cluster === DEFAULT_CLUSTER) {
-				router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
-			} else {
-				router.push(`/contract/summary/${otcPublicKey.toBase58()}?cluster=${cluster}`);
-			}
+
+			console.log(createUrl.host + '/contract/summary/' + otcPublicKey.toBase58());
+			// Create contract URL
+			router.push('http://' + createUrl.host + '/contract/summary/' + otcPublicKey.toBase58());
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.error(err);
