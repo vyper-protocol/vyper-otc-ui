@@ -1,0 +1,21 @@
+.bg_wrapper {
+	overflow: hidden;
+}
+
+.text_wrapper {
+	padding-top: 30vh;
+	text-align: center;
+	z-index: 1;
+	position: relative;
+
+	h2 {
+		letter-spacing: 10px;
+	}
+
+	.text {
+		margin: 0;
+		font-size: 2rem;
+		line-height: 3rem;
+		text-shadow: 1px 1px 1px #3c5c5e;
+	}
+}

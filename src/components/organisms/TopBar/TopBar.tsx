@@ -9,6 +9,7 @@ import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 import styles from './TopBar.module.scss';
 
@@ -42,9 +43,7 @@ const TopBar = ({ withSearchBar = true }: TopBarProps) => {
 		<>
 			<Pane className={styles.topbar}>
 				<Link href="/">
-					<Heading size={600} className={styles.hover}>
-						Vyper OTC
-					</Heading>
+					<Image alt="vyper-logo" src="/logo.png" quality={100} width={50} height={50} className={styles.hover} />
 				</Link>
 
 				<Pane className={styles.nav}>
