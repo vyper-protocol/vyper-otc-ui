@@ -40,7 +40,7 @@ const Application = ({ Component, pageProps }) => {
 			</Script>
 			<QueryClientProvider client={queryClient}>
 				<ConnectionProvider endpoint={endpoint}>
-					<WalletProvider wallets={wallets} autoConnect>
+					<WalletProvider wallets={wallets}>
 						<WalletModalProvider>
 							<TxHandlerProvider>
 								<ErrorBoundary FallbackComponent={ApplicationError}>
