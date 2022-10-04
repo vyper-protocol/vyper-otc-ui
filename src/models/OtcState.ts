@@ -130,14 +130,18 @@ export class OtcState {
 	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
-			this.isDepositExpired && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
+			this.isDepositExpired() && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
 		);
 	}
 
 	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
-			this.isDepositExpired && this.buyerTA === null && this.sellerTA !== null && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0
+			this.isDepositExpired() &&
+			this.buyerTA === null &&
+			this.sellerTA !== null &&
+			this.sellerWallet.equals(currentUserWallet) &&
+			this.programSellerTAAmount > 0
 		);
 	}
 }

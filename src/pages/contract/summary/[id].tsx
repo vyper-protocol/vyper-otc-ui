@@ -134,6 +134,15 @@ const SummaryPageId = () => {
 									</p>
 								</div>
 
+								{!rateStateQuery?.data.isDepositExpired() && (
+									<div className={styles.column}>
+										<p>Deposit expiry</p>
+										<p>
+											<MomentTooltipSpan datetime={rateStateQuery?.data?.depositExpirationAt} />
+										</p>
+									</div>
+								)}
+
 								{rateStateQuery?.data?.buyerWallet && wallet?.publicKey?.toBase58() === rateStateQuery?.data?.buyerWallet?.toBase58() && (
 									<div className={styles.column}>
 										<p>Your side</p>
@@ -148,15 +157,6 @@ const SummaryPageId = () => {
 										<p>Your side</p>
 										<p>
 											<Badge color="red">SHORT</Badge>
-										</p>
-									</div>
-								)}
-
-								{!rateStateQuery?.data.isDepositExpired() && (
-									<div className={styles.column}>
-										<p>Deposit expiry</p>
-										<p>
-											<MomentTooltipSpan datetime={rateStateQuery?.data?.depositExpirationAt} />
 										</p>
 									</div>
 								)}
