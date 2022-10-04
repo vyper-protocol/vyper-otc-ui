@@ -208,13 +208,13 @@ const SummaryPageId = () => {
 										<Pane margin={6} textAlign="center">
 											Long{' '}
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
-												{rateStateQuery?.data?.getPnlBuyer()} {reserveMintSymbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveMintSymbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
 											Short{' '}
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
-												{rateStateQuery?.data?.getPnlSeller()} {reserveMintSymbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveMintSymbol}
 											</Badge>
 										</Pane>
 									</Pane>
