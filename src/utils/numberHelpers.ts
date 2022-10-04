@@ -14,3 +14,7 @@ export const formatCurrency = (x: number, d: boolean): string | number => {
 		return parts.join('.');
 	}
 };
+
+export const formatWithDecimalDigits = (val: number, precision: number = 4): number => {
+	return parseFloat(val.toPrecision(precision));
+};
