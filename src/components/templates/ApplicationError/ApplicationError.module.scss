@@ -1,0 +1,17 @@
+.container {
+  .title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+
+    svg {
+      margin-right: 16px;
+      margin-top: 1px;
+    }
+  }
+
+  button {
+    margin-top: 16px;
+  }
+}
+

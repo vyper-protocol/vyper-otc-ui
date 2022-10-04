@@ -95,6 +95,10 @@ export class OtcState {
 		return Date.now() > this.depositExpirationAt;
 	}
 
+	areBothSidesFunded(): boolean {
+		return this.buyerWallet != undefined && this.sellerWallet != undefined;
+	}
+
 	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return !this.isDepositExpired() && this.buyerTA === null && currentUserWallet.toBase58() !== this.sellerWallet?.toBase58();
@@ -130,14 +134,39 @@ export class OtcState {
 	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
-			this.isDepositExpired && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
+			this.isDepositExpired() && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
 		);
 	}
 
 	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
-			this.isDepositExpired && this.buyerTA === null && this.sellerTA !== null && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0
+			this.isDepositExpired() &&
+			this.buyerTA === null &&
+			this.sellerTA !== null &&
+			this.sellerWallet.equals(currentUserWallet) &&
+			this.programSellerTAAmount > 0
+		);
+	}
+
+	isPnlAvailable(): boolean {
+		return this.areBothSidesFunded();
+	}
+
+	getPnlBuyer(): number {
+		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
+		return Math.max(
+			Math.min(this.redeemLogicState.notional * (this.rateState.aggregatorLastValue - this.redeemLogicState.strike), this.sellerDepositAmount),
+			-this.buyerDepositAmount
+		);
+	}
+
+	getPnlSeller(): number {
+		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
+
+		return Math.max(
+			-this.sellerDepositAmount,
+			Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - this.rateState.aggregatorLastValue))
 		);
 	}
 }

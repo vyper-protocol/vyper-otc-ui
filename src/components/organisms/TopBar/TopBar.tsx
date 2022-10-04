@@ -14,6 +14,10 @@ import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
 import { useCluster, DEFAULT_CLUSTER } from 'hooks/useCluster';
 
+export type TopBarProps = {
+	withSearchBar?: boolean;
+};
+
 const menuItems = [
 	{
 		name: 'Home',
@@ -24,7 +28,7 @@ const menuItems = [
 	}
 ];
 
-const TopBar = () => {
+const TopBar = ({ withSearchBar = true }: TopBarProps) => {
 	const router = useRouter();
 
 	const [searchValue, setSearchValue] = useState('');
@@ -116,7 +120,8 @@ const TopBar = () => {
 					<SelectWallet />
 				</Pane>
 			</Pane>
-			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+
+			{withSearchBar ? <SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} /> : null}
 		</>
 	);
 };

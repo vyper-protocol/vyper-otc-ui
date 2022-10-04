@@ -7,8 +7,11 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
+import ApplicationError from 'components/templates/ApplicationError';
 import { useCluster } from 'hooks/useCluster';
+import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import Script from 'next/script';
+import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
@@ -37,10 +40,12 @@ const Application = ({ Component, pageProps }) => {
 			</Script>
 			<QueryClientProvider client={queryClient}>
 				<ConnectionProvider endpoint={endpoint}>
-					<WalletProvider wallets={wallets} autoConnect>
+					<WalletProvider wallets={wallets}>
 						<WalletModalProvider>
 							<TxHandlerProvider>
-								<Component {...pageProps} />
+								<ErrorBoundary FallbackComponent={ApplicationError}>
+									<Component {...pageProps} />
+								</ErrorBoundary>
 							</TxHandlerProvider>
 						</WalletModalProvider>
 					</WalletProvider>

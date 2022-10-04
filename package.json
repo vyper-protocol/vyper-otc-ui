@@ -17,8 +17,7 @@
 		"release:patch": "standard-version --release-as patch",
 		"release:major": "standard-version --release-as major",
 		"push-tags": "git push --follow-tags origin master",
-		"prepare": "husky install",
-		"cypress": "cypress open"
+		"prepare": "husky install"
 	},
 	"dependencies": {
 		"@next/bundle-analyzer": "^12.3.1",
@@ -42,6 +41,7 @@
 		"next": "^12.1.5",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0",
+		"react-error-boundary": "^3.1.4",
 		"react-icons": "^4.4.0",
 		"react-json-view": "^1.21.3",
 		"react-query": "^3.39.2"
@@ -52,7 +52,6 @@
 		"@typescript-eslint/eslint-plugin": "^5.37.0",
 		"@typescript-eslint/parser": "^5.37.0",
 		"@vyper-protocol/prettier-config": "^0.1.0",
-		"cypress": "^10.0.3",
 		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "^8.23.1",
 		"eslint-config-standard": "^17.0.0",

@@ -17,7 +17,7 @@ import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { momentDate, momentDuration } from 'utils/momentHelpers';
-import { formatCurrency } from 'utils/numberHelpers';
+import { formatCurrency, formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';
@@ -120,11 +120,11 @@ const SummaryPageId = () => {
 							<div className={styles.content}>
 								<div className={styles.column}>
 									<p>Current Price</p>
-									<p>{formatCurrency(rateStateQuery?.data?.rateState.aggregatorLastValue, true)}</p>
+									<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState.aggregatorLastValue)}</p>
 								</div>
 								<div className={styles.column}>
 									<p>Strike</p>
-									<p>{formatCurrency(rateStateQuery?.data?.redeemLogicState.strike, true)}</p>
+									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
 								</div>
 
 								<div className={styles.column}>
@@ -136,6 +136,15 @@ const SummaryPageId = () => {
 									</p>
 									<p>{rateStateQuery?.data?.redeemLogicState.notional}</p>
 								</div>
+
+								{!rateStateQuery?.data.isDepositExpired() && !rateStateQuery?.data.areBothSidesFunded() && (
+									<div className={styles.column}>
+										<p>Deposit expiry</p>
+										<p>
+											<MomentTooltipSpan datetime={rateStateQuery?.data?.depositExpirationAt} />
+										</p>
+									</div>
+								)}
 
 								<div className={styles.column}>
 									<p>Expiry</p>
@@ -159,15 +168,6 @@ const SummaryPageId = () => {
 										<p>Your side</p>
 										<p>
 											<Badge color="red">SHORT</Badge>
-										</p>
-									</div>
-								)}
-
-								{!rateStateQuery?.data.isDepositExpired() && (
-									<div className={styles.column}>
-										<p>Deposit expiry</p>
-										<p>
-											<MomentTooltipSpan datetime={rateStateQuery?.data?.depositExpirationAt} />
 										</p>
 									</div>
 								)}
@@ -196,6 +196,34 @@ const SummaryPageId = () => {
 									</Badge>
 								</Pane>
 							</Pane>
+
+							<hr />
+
+							{/* + + + + + + + + + + + + +  */}
+							{/* PnL */}
+
+							{rateStateQuery?.data?.isPnlAvailable() && (
+								<>
+									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+										<b>PnL</b>
+									</Pane>
+
+									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+										<Pane margin={6} textAlign="center">
+											Long{' '}
+											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
+												{rateStateQuery?.data?.getPnlBuyer()} {reserveMintSymbol}
+											</Badge>
+										</Pane>
+										<Pane margin={6} textAlign="center">
+											Short{' '}
+											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
+												{rateStateQuery?.data?.getPnlSeller()} {reserveMintSymbol}
+											</Badge>
+										</Pane>
+									</Pane>
+								</>
+							)}
 
 							<div className={styles.buttons}>
 								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
