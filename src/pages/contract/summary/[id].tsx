@@ -126,15 +126,7 @@ const SummaryPageId = () => {
 									<p>{rateStateQuery?.data?.redeemLogicState.notional}</p>
 								</div>
 
-								<div className={styles.column}>
-									<p>Expiry</p>
-
-									<p>
-										<MomentTooltipSpan datetime={rateStateQuery?.data?.settleAvailableFromAt} />
-									</p>
-								</div>
-
-								{!rateStateQuery?.data.isDepositExpired() && (
+								{!rateStateQuery?.data.isDepositExpired() && !rateStateQuery?.data.areBothSidesFunded() && (
 									<div className={styles.column}>
 										<p>Deposit expiry</p>
 										<p>
@@ -142,6 +134,14 @@ const SummaryPageId = () => {
 										</p>
 									</div>
 								)}
+
+								<div className={styles.column}>
+									<p>Expiry</p>
+
+									<p>
+										<MomentTooltipSpan datetime={rateStateQuery?.data?.settleAvailableFromAt} />
+									</p>
+								</div>
 
 								{rateStateQuery?.data?.buyerWallet && wallet?.publicKey?.toBase58() === rateStateQuery?.data?.buyerWallet?.toBase58() && (
 									<div className={styles.column}>
@@ -185,6 +185,34 @@ const SummaryPageId = () => {
 									</Badge>
 								</Pane>
 							</Pane>
+
+							<hr />
+
+							{/* + + + + + + + + + + + + +  */}
+							{/* PnL */}
+
+							{rateStateQuery?.data?.isPnlAvailable() && (
+								<>
+									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+										<b>PnL</b>
+									</Pane>
+
+									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+										<Pane margin={6} textAlign="center">
+											Long{' '}
+											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
+												{rateStateQuery?.data?.getPnlBuyer()} {reserveMintSymbol}
+											</Badge>
+										</Pane>
+										<Pane margin={6} textAlign="center">
+											Short{' '}
+											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
+												{rateStateQuery?.data?.getPnlSeller()} {reserveMintSymbol}
+											</Badge>
+										</Pane>
+									</Pane>
+								</>
+							)}
 
 							<div className={styles.buttons}>
 								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
