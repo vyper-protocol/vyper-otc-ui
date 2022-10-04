@@ -17,8 +17,7 @@
 		"release:patch": "standard-version --release-as patch",
 		"release:major": "standard-version --release-as major",
 		"push-tags": "git push --follow-tags origin master",
-		"prepare": "husky install",
-		"cypress": "cypress open"
+		"prepare": "husky install"
 	},
 	"dependencies": {
 		"@next/bundle-analyzer": "^12.3.1",
@@ -52,7 +51,6 @@
 		"@typescript-eslint/eslint-plugin": "^5.37.0",
 		"@typescript-eslint/parser": "^5.37.0",
 		"@vyper-protocol/prettier-config": "^0.1.0",
-		"cypress": "^10.0.3",
 		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "^8.23.1",
 		"eslint-config-standard": "^17.0.0",
