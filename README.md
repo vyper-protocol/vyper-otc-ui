@@ -44,7 +44,6 @@ yarn build
 | release:major | Bumbs major version & writes changes to changelog                                               |
 | push-tags     | Creates github tag with the current release                                                     |
 | prepare       | Husky install                                                                                   |
-| cypress       | Test with cypress                                                                               |
 
 ### Next.js
 
