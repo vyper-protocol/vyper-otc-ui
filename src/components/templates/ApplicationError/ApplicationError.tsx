@@ -6,7 +6,7 @@ import styles from './ApplicationError.module.scss';
 
 const ApplicationError = ({ resetErrorBoundary }: FallbackProps) => {
 	return (
-		<Layout topBarProps={{ withSearchBar: false }}>
+		<Layout>
 			<Pane className={styles.container}>
 				<div className={styles.title}>
 					<WarningSignIcon size={20} />
