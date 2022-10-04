@@ -12,6 +12,10 @@ import { useRouter } from 'next/router';
 
 import styles from './TopBar.module.scss';
 
+export type TopBarProps = {
+	withSearchBar?: boolean;
+};
+
 const menuItems = [
 	{
 		name: 'Home',
@@ -22,7 +26,7 @@ const menuItems = [
 	}
 ];
 
-const TopBar = () => {
+const TopBar = ({ withSearchBar = true }: TopBarProps) => {
 	const router = useRouter();
 
 	const [searchValue, setSearchValue] = useState('');
@@ -103,7 +107,8 @@ const TopBar = () => {
 
 				<SelectWallet />
 			</Pane>
-			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+
+			{withSearchBar ? <SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} /> : null}
 		</>
 	);
 };
