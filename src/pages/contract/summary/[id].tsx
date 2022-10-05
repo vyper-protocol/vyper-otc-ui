@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import cn from 'classnames';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import SearchBar from 'components/molecules/SearchBar';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
@@ -11,13 +10,11 @@ import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import Layout from 'components/templates/Layout';
-import { Pane, toaster, StatusIndicator, Button, Badge, Tooltip, InfoSignIcon, HelpIcon, Card } from 'evergreen-ui';
+import { Pane, toaster, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import moment from 'moment';
 import { useRouter } from 'next/router';
-import { momentDate, momentDuration } from 'utils/momentHelpers';
-import { formatCurrency, formatWithDecimalDigits } from 'utils/numberHelpers';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';

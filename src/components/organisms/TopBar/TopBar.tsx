@@ -1,9 +1,8 @@
 /* eslint-disable css-modules/no-unused-class */
-import { useState } from 'react';
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
-import SearchBar from 'components/molecules/SearchBar';
+import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
@@ -24,7 +23,6 @@ const menuItems = [
 
 const TopBar = () => {
 	const router = useRouter();
-
 
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
@@ -98,6 +96,10 @@ const TopBar = () => {
 							</Text>
 						</div>
 					</Popover>
+
+					<div className={styles.item}>
+						<AirdropButton />
+					</div>
 				</Pane>
 
 				<SelectWallet />
