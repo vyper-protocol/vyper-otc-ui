@@ -17,6 +17,8 @@ const Layout = ({ children }: LayoutProps) => {
 			<Head>
 				<title>Vyper OTC</title>
 				<link rel="icon" href="/favicon.ico" />
+				{/* Resets body background color for all the routes */}
+				<style>{'body { background-color: var(--color-background); }'}</style>
 			</Head>
 
 			<Pane>
