@@ -28,13 +28,24 @@ export const useClusterParam = (): URL => {
 	if (baseUrl.length !== 0) {
 		const url = new URL(baseUrl + router.asPath);
 
+		console.group('useClusterParams');
+		console.log('cluster: ', cluster);
+
 		switch (cluster) {
 			case 'devnet':
+				console.log('switch devnet');
+				console.log(url);
+				console.groupEnd();
 				return url;
 			case 'mainnet-beta':
-				if (url.search.split('search').length !== 2) {
+				if (url.search.split('cluster').length !== 2) {
 					url.searchParams.append('cluster', cluster);
+					console.log('url has not params yet');
+					console.log(url.search.split('search'));
 				}
+				console.log('switch mainnet-beta');
+				console.log(url);
+				console.groupEnd();
 				return url;
 			default:
 				return url;

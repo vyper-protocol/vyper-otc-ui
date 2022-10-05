@@ -28,7 +28,6 @@ const menuItems = [
 const TopBar = () => {
 	const router = useRouter();
 
-
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
 	const { cluster } = useCluster();
@@ -37,7 +36,8 @@ const TopBar = () => {
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (e.altKey) {
-			router.push('http://' + createUrl.host + '/contract/create/');
+			// TODO this doesnt work for cluster
+			router.push('/contract/create/');
 		}
 	};
 
@@ -57,7 +57,8 @@ const TopBar = () => {
 
 						return (
 							<div key={menuItem.name} className={cn(styles.item, menuItem.wip && styles.disabled, routerCondition === itemPathCondition && styles.active)}>
-								<Link href={`${menuItem.path}?cluster=${cluster}`}>
+								{/* // TODO this doesnt work with cluster */}
+								<Link href={`${menuItem.path}`}>
 									{menuItem.tooltip ? (
 										<Tooltip content={menuItem.tooltip}>
 											<Text>

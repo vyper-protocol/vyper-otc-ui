@@ -33,7 +33,6 @@ const SummaryPageId = () => {
 	const [searchValue, setSearchValue] = useState('');
 
 	const { id } = router.query;
-	const { cluster } = useCluster();
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	// Pass the cluster option as a unique indetifier to the query
