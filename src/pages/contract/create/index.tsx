@@ -4,15 +4,15 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
+import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
+import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField, toaster } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {

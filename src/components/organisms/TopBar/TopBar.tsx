@@ -1,5 +1,7 @@
 /* eslint-disable css-modules/no-unused-class */
 
+import { useContext } from 'react';
+
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import AirdropButton from 'components/molecules/AirdropButton';
