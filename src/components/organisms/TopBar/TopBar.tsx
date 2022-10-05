@@ -1,6 +1,8 @@
 /* eslint-disable css-modules/no-unused-class */
+
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
+import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
@@ -94,6 +96,10 @@ const TopBar = () => {
 							</Text>
 						</div>
 					</Popover>
+
+					<div className={styles.item}>
+						<AirdropButton />
+					</div>
 				</Pane>
 
 				<SelectWallet />
