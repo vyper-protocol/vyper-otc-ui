@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable space-before-function-paren */
 import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
@@ -40,6 +41,11 @@ export class OtcState {
 	 * Flag for the settlement execution
 	 */
 	settleExecuted: boolean;
+
+	/**
+	 * Price at settlement
+	 */
+	priceAtSettlement: number | undefined;
 
 	/**
 	 * Amount of tokens the buyer needs to deposit
@@ -155,18 +161,13 @@ export class OtcState {
 
 	getPnlBuyer(): number {
 		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
-		return Math.max(
-			Math.min(this.redeemLogicState.notional * (this.rateState.aggregatorLastValue - this.redeemLogicState.strike), this.sellerDepositAmount),
-			-this.buyerDepositAmount
-		);
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.aggregatorLastValue;
+		return Math.max(Math.min(this.redeemLogicState.notional * (priceToUse - this.redeemLogicState.strike), this.sellerDepositAmount), -this.buyerDepositAmount);
 	}
 
 	getPnlSeller(): number {
 		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
-
-		return Math.max(
-			-this.sellerDepositAmount,
-			Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - this.rateState.aggregatorLastValue))
-		);
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.aggregatorLastValue;
+		return Math.max(-this.sellerDepositAmount, Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - priceToUse)));
 	}
 }
