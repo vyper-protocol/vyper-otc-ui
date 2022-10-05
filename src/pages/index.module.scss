@@ -1,5 +1,26 @@
+.bg_wrapper {
+	overflow: hidden;
+}
+
+.text_wrapper {
+	padding-top: 30vh;
+	text-align: center;
+	z-index: 1;
+	position: relative;
+
+	h2 {
+		letter-spacing: 10px;
+	}
+
+	.text {
+		margin: 0;
+		font-size: 2rem;
+		line-height: 3rem;
+	}
+}
+
 .searchbar {
 	display: flex;
 	justify-content: center;
-  margin-bottom: 60px; 
+	margin-bottom: 60px;
 }
