@@ -111,10 +111,18 @@ const SummaryPageId = () => {
 							{/* DETAILS */}
 
 							<div className={styles.content}>
-								<div className={styles.column}>
-									<p>Current Price</p>
-									<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState.aggregatorLastValue)}</p>
-								</div>
+								{rateStateQuery?.data?.settleExecuted ? (
+									<div className={styles.column}>
+										<p>Settlement price</p>
+										<p>{formatWithDecimalDigits(rateStateQuery?.data?.priceAtSettlement)}</p>
+									</div>
+								) : (
+									<div className={styles.column}>
+										<p>Current Price</p>
+										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState.aggregatorLastValue)}</p>
+									</div>
+								)}
+
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>

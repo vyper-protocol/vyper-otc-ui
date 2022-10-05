@@ -30,6 +30,12 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 	res.depositExpirationAt = accountInfo.depositEnd.toNumber() * 1000;
 	res.settleAvailableFromAt = accountInfo.settleStart.toNumber() * 1000;
 	res.settleExecuted = accountInfo.settleExecuted;
+
+	if (res.settleExecuted) {
+		// @ts-ignore
+		res.priceAtSettlement = new RustDecimalWrapper(new Uint8Array(trancheConfigAccountInfo.trancheData.reserveFairValue.value[0])).toNumber();
+	}
+
 	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
 	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
 
