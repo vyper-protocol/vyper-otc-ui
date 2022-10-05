@@ -7,10 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 import { withdraw } from 'api/otc-state/withdraw';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { MinusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import { useRouter } from 'next/router';
-import { useCluster } from 'hooks/useCluster';
 
 const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
