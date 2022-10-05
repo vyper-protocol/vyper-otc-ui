@@ -1,4 +1,5 @@
 /* eslint-disable space-before-function-paren */
+import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import RateSwitchboardState from './RateSwitchboardState';
@@ -9,6 +10,11 @@ export class OtcState {
 	 * Current Contract public key
 	 */
 	publickey: PublicKey;
+
+	/**
+	 * Reserve mint info
+	 */
+	reserveMintInfo: Mint;
 
 	/**
 	 * Creation timestamp in ms
@@ -89,21 +95,26 @@ export class OtcState {
 		return Date.now() > this.depositExpirationAt;
 	}
 
+	areBothSidesFunded(): boolean {
+		return this.buyerWallet != undefined && this.sellerWallet != undefined;
+	}
+
 	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
-		return (
-			!this.isDepositExpired() &&
-			this.buyerTA === null &&
-			currentUserWallet.toBase58() !== this.sellerWallet?.toBase58()
-		);
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
+		return !this.isDepositExpired() && this.buyerTA === null && currentUserWallet.toBase58() !== this.sellerWallet?.toBase58();
+	}
+
+	isBuyerFunded(): boolean {
+		return this.buyerTA != null;
 	}
 
 	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
-		if (currentUserWallet === undefined) return false;
-		return (
-			!this.isDepositExpired() &&
-			this.sellerTA === null &&
-			currentUserWallet.toBase58() !== this.buyerWallet?.toBase58()
-		);
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
+		return !this.isDepositExpired() && this.sellerTA === null && currentUserWallet.toBase58() !== this.buyerWallet?.toBase58();
+	}
+
+	isSellerFunded(): boolean {
+		return this.sellerTA != null;
 	}
 
 	isSettlementAvailable(): boolean {
@@ -111,38 +122,51 @@ export class OtcState {
 	}
 
 	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return this.settleExecuted && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0;
 	}
 
 	isClaimJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return this.settleExecuted && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0;
 	}
 
 	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
-			this.isDepositExpired &&
-			this.buyerTA !== null &&
-			this.sellerTA === null &&
-			this.buyerWallet.equals(currentUserWallet) &&
-			this.programBuyerTAAmount > 0
+			this.isDepositExpired() && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
 		);
 	}
 
 	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
-		if (currentUserWallet === undefined) return false;
-
+		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
-			this.isDepositExpired &&
+			this.isDepositExpired() &&
 			this.buyerTA === null &&
 			this.sellerTA !== null &&
 			this.sellerWallet.equals(currentUserWallet) &&
 			this.programSellerTAAmount > 0
+		);
+	}
+
+	isPnlAvailable(): boolean {
+		return this.areBothSidesFunded();
+	}
+
+	getPnlBuyer(): number {
+		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
+		return Math.max(
+			Math.min(this.redeemLogicState.notional * (this.rateState.aggregatorLastValue - this.redeemLogicState.strike), this.sellerDepositAmount),
+			-this.buyerDepositAmount
+		);
+	}
+
+	getPnlSeller(): number {
+		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
+
+		return Math.max(
+			-this.sellerDepositAmount,
+			Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - this.rateState.aggregatorLastValue))
 		);
 	}
 }

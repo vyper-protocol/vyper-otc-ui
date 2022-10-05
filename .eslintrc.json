@@ -3,12 +3,7 @@
 		"browser": true,
 		"es2021": true
 	},
-	"extends": [
-		"plugin:@next/next/recommended",
-		"plugin:react/recommended",
-		"plugin:react-hooks/recommended",
-		"plugin:css-modules/recommended"
-	],
+	"extends": ["plugin:@next/next/recommended", "plugin:react/recommended", "plugin:react-hooks/recommended", "plugin:css-modules/recommended"],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
 		"ecmaFeatures": {
@@ -38,6 +33,7 @@
 		"comma-style": 2,
 		"curly": [2, "multi-line", "consistent"],
 		"dot-location": [2, "property"],
+		"css-modules/no-unused-class": 1,
 		"handle-callback-err": 1,
 		"indent": [2, "tab"],
 		"no-tabs": [0],
@@ -85,7 +81,7 @@
 		"quotes": [1, "single"],
 		"semi": [2, "always"],
 		"space-before-blocks": 2,
-		"space-before-function-paren": [1],
+		"space-before-function-paren": [0],
 		"space-in-parens": 2,
 		"space-infix-ops": 2,
 		"space-unary-ops": 2,

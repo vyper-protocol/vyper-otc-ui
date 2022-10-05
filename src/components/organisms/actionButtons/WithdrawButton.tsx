@@ -5,7 +5,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { withdraw } from 'api/otc-state/withdraw';
-import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
+import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { MinusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
@@ -40,7 +40,7 @@ const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; i
 		return <></>;
 	}
 
-	return <ButtonPill mode="error" text="Withdraw" onClick={onWithdrawClick} icon={<MinusIcon />} loading={isLoading} />;
+	return <ButtonPill mode="info" text="Withdraw" onClick={onWithdrawClick} loading={isLoading} />;
 };
 
 export default WithdrawButton;

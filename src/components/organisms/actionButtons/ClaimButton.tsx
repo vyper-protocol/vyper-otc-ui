@@ -5,7 +5,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { claim } from 'api/otc-state/claim';
-import ButtonPill from 'components/atoms/ButtonPill/ButtonPill';
+import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
@@ -40,15 +40,7 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 		return <></>;
 	}
 
-	return (
-		<ButtonPill
-			mode={isBuyer ? 'success' : 'error'}
-			text={isBuyer ? 'Claim buyer' : 'Claim seller'}
-			onClick={onClaimClick}
-			icon={<PlusIcon />}
-			loading={isLoading}
-		/>
-	);
+	return <ButtonPill mode="info" text="Claim" onClick={onClaimClick} loading={isLoading} />;
 };
 
 export default ClaimButton;

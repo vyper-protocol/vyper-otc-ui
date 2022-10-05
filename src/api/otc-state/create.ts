@@ -1,13 +1,15 @@
 import { AnchorProvider, BN, Program, utils } from '@project-serum/anchor';
+import { getMint } from '@solana/spl-token';
 import { Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
+import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
+import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
-import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import { TxPackage } from 'models/TxPackage';
+
 import PROGRAMS from '../../configs/programs.json';
-import { getAssociatedTokenAddress, getMint } from '@solana/spl-token';
+
 
 export const create = async (
 	provider: AnchorProvider,
@@ -150,7 +152,7 @@ type VyperCoreTrancheConfig = {
 	vyperReserve: PublicKey;
 };
 
-async function createVyperCoreTrancheConfig(
+async function createVyperCoreTrancheConfig (
 	provider: AnchorProvider,
 	vyperCoreProgram: Program<VyperCore>,
 	reserveMint: PublicKey,
