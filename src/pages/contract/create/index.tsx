@@ -11,7 +11,7 @@ import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { UrlProviderContext } from 'components/providers/UrlBuilderProvider';
+import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {

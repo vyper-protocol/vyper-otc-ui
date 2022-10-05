@@ -13,7 +13,7 @@ import Script from 'next/script';
 import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { UrlProviderProvider } from 'components/providers/UrlBuilderProvider';
+import { UrlProviderProvider } from 'components/providers/UrlClusterBuilderProvider';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');

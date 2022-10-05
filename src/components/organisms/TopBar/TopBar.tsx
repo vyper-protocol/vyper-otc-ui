@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import SelectWallet from 'components/organisms/SelectWallet';
-import { UrlProviderContext } from 'components/providers/UrlBuilderProvider';
+import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';

@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import styles from './SearchBar.module.scss';
 import { UrlBuilder } from 'utils/UrlBuilder';
-import { UrlProviderContext } from 'components/providers/UrlBuilderProvider';
+import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 
 type SearchBarProps = {
 	searchState: {
