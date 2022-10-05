@@ -1,8 +1,11 @@
 /* eslint-disable space-before-function-paren */
+import { useState } from 'react';
+
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
+import SearchBar from 'components/molecules/SearchBar';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
@@ -26,6 +29,8 @@ const SummaryPageId = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
+	const [searchValue, setSearchValue] = useState('');
+
 	const { id } = router.query;
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
@@ -45,6 +50,8 @@ const SummaryPageId = () => {
 
 	return (
 		<Layout>
+			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+
 			<Pane clearfix margin={24} maxWidth={400}>
 				{loadingSpinner ? (
 					<Spinner />

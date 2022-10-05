@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import TopBar, { TopBarProps } from 'components/organisms/TopBar';
+import TopBar from 'components/organisms/TopBar';
 import { Pane } from 'evergreen-ui';
 import Head from 'next/head';
 
@@ -9,10 +9,9 @@ import styles from './Layout.module.scss';
 
 type LayoutProps = {
 	children: ReactNode;
-	topBarProps?: TopBarProps;
 };
 
-const Layout = ({ children, topBarProps }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
 	return (
 		<Pane>
 			<Head>
@@ -21,7 +20,7 @@ const Layout = ({ children, topBarProps }: LayoutProps) => {
 			</Head>
 
 			<Pane>
-				<TopBar {...topBarProps} />
+				<TopBar />
 
 				<main className={styles.main}>{children}</main>
 

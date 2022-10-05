@@ -1,21 +1,13 @@
 /* eslint-disable css-modules/no-unused-class */
-import { useState } from 'react';
-
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
-import SearchBar from 'components/molecules/SearchBar';
 import SelectWallet from 'components/organisms/SelectWallet';
 import resources from 'configs/resources.json';
 import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 
 import styles from './TopBar.module.scss';
-
-export type TopBarProps = {
-	withSearchBar?: boolean;
-};
 
 const menuItems = [
 	{
@@ -27,10 +19,8 @@ const menuItems = [
 	}
 ];
 
-const TopBar = ({ withSearchBar = true }: TopBarProps) => {
+const TopBar = () => {
 	const router = useRouter();
-
-	const [searchValue, setSearchValue] = useState('');
 
 	const routerArray = router.asPath.split('/');
 	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
@@ -43,7 +33,9 @@ const TopBar = ({ withSearchBar = true }: TopBarProps) => {
 		<>
 			<Pane className={styles.topbar}>
 				<Link href="/">
-					<Image alt="vyper-logo" src="/logo.png" quality={100} width={50} height={50} className={styles.hover} />
+					<Heading size={600} className={styles.hover}>
+						Vyper OTC
+					</Heading>
 				</Link>
 
 				<Pane className={styles.nav}>
@@ -106,8 +98,6 @@ const TopBar = ({ withSearchBar = true }: TopBarProps) => {
 
 				<SelectWallet />
 			</Pane>
-
-			{withSearchBar ? <SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} /> : null}
 		</>
 	);
 };

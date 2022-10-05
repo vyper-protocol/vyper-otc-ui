@@ -16,6 +16,11 @@
 		margin: 0;
 		font-size: 2rem;
 		line-height: 3rem;
-		text-shadow: 1px 1px 1px #3c5c5e;
 	}
+}
+
+.searchbar {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 60px;
 }
