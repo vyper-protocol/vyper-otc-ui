@@ -16,40 +16,18 @@ import PROGRAMS from '../../configs/programs.json';
  * @param isSeniorSide flag: if true the user will deposit as senior, otherwise as junior
  * @returns transaction package ready to submit
  */
-export const deposit = async (
-	provider: AnchorProvider,
-	otcState: PublicKey,
-	isSeniorSide: boolean
-): Promise<TxPackage> => {
+export const deposit = async (provider: AnchorProvider, otcState: PublicKey, isSeniorSide: boolean): Promise<TxPackage> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
-	const vyperCoreProgram = new Program<VyperCore>(
-		VyperCoreIDL,
-		new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID),
-		provider
-	);
-	const rateSwitchboardProgram = new Program<RateSwitchboard>(
-		RateSwitchboardIDL,
-		new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID),
-		provider
-	);
+	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
+	const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
 
-	const [otcAuthority] = await PublicKey.findProgramAddress(
-		[otcState.toBuffer(), utils.bytes.utf8.encode('authority')],
-		vyperOtcProgram.programId
-	);
+	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
 
 	const otcStateAccountInfo = await vyperOtcProgram.account.otcState.fetch(otcState);
-	const vyperCoreAccountInfo = await vyperCoreProgram.account.trancheConfig.fetch(
-		otcStateAccountInfo.vyperTrancheConfig
-	);
-	const rateSwitchboardAccountInfo = await rateSwitchboardProgram.account.rateState.fetch(
-		vyperCoreAccountInfo.rateProgramState
-	);
+	const vyperCoreAccountInfo = await vyperCoreProgram.account.trancheConfig.fetch(otcStateAccountInfo.vyperTrancheConfig);
+	const rateSwitchboardAccountInfo = await rateSwitchboardProgram.account.rateState.fetch(vyperCoreAccountInfo.rateProgramState);
 
-	const atokenAccount = await getAssociatedTokenAddress(
-		new PublicKey(vyperCoreAccountInfo.reserveMint),
-		provider.wallet.publicKey
-	);
+	const atokenAccount = await getAssociatedTokenAddress(new PublicKey(vyperCoreAccountInfo.reserveMint), provider.wallet.publicKey);
 
 	const vc_ix = await vyperCoreProgram.methods
 		.refreshTrancheFairValue()

@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { AnchorProvider, BN, Program, utils } from '@project-serum/anchor';
 import { getMint } from '@solana/spl-token';
 import { Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
@@ -10,36 +11,17 @@ import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
 
-
-export const create = async (
-	provider: AnchorProvider,
-	params: OtcInitializationParams
-): Promise<[TxPackage[], PublicKey]> => {
+export const create = async (provider: AnchorProvider, params: OtcInitializationParams): Promise<[TxPackage[], PublicKey]> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
-	const vyperCoreProgram = new Program<VyperCore>(
-		VyperCoreIDL,
-		new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID),
-		provider
-	);
+	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
 	const reserveMintInfo = await getMint(provider.connection, params.reserveMint);
 
-	const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
-		RedeemLogicForwardIDL,
-		PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID,
-		provider
-	);
-	const rateSwitchboardProgram = new Program<RateSwitchboard>(
-		RateSwitchboardIDL,
-		new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID),
-		provider
-	);
+	const redeemLogicForwardProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
+	const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
 
 	const otcState = Keypair.generate();
-	const [otcAuthority] = await PublicKey.findProgramAddress(
-		[otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')],
-		vyperOtcProgram.programId
-	);
+	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
 
 	const ratePluginState = Keypair.generate();
 	const rateSwitchboardInitIX = await rateSwitchboardProgram.methods
@@ -57,11 +39,7 @@ export const create = async (
 
 	const redeemLogicPluginState = Keypair.generate();
 	const redeemLogicInixIX = await redeemLogicForwardProgram.methods
-		.initialize(
-			params.redeemLogicOption.strike,
-			new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
-			params.redeemLogicOption.isLinear
-		)
+		.initialize(params.redeemLogicOption.strike, new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals), params.redeemLogicOption.isLinear)
 		.accounts({
 			redeemLogicConfig: redeemLogicPluginState.publicKey,
 			owner: provider.wallet.publicKey,
@@ -123,22 +101,10 @@ export const create = async (
 				vyperTrancheConfig: vyperConfig.trancheConfig,
 				vyperCore: vyperCoreProgram.programId
 			})
-			.signers([
-				otcState,
-				otcSeniorReserveTokenAccount,
-				otcJuniorReserveTokenAccount,
-				otcSeniorTrancheTokenAccount,
-				otcJuniorTrancheTokenAccount
-			])
+			.signers([otcState, otcSeniorReserveTokenAccount, otcJuniorReserveTokenAccount, otcSeniorTrancheTokenAccount, otcJuniorTrancheTokenAccount])
 			.transaction(),
 		description: 'Vyper OTC init',
-		signers: [
-			otcState,
-			otcSeniorReserveTokenAccount,
-			otcJuniorReserveTokenAccount,
-			otcSeniorTrancheTokenAccount,
-			otcJuniorTrancheTokenAccount
-		]
+		signers: [otcState, otcSeniorReserveTokenAccount, otcJuniorReserveTokenAccount, otcSeniorTrancheTokenAccount, otcJuniorTrancheTokenAccount]
 	};
 
 	return [[vyperCoreInitTxPackage, otcInitTx], otcState.publicKey];
@@ -152,7 +118,7 @@ type VyperCoreTrancheConfig = {
 	vyperReserve: PublicKey;
 };
 
-async function createVyperCoreTrancheConfig (
+async function createVyperCoreTrancheConfig(
 	provider: AnchorProvider,
 	vyperCoreProgram: Program<VyperCore>,
 	reserveMint: PublicKey,
@@ -170,10 +136,7 @@ async function createVyperCoreTrancheConfig (
 		[trancheConfig.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')],
 		vyperCoreProgram.programId
 	);
-	const [reserve] = await PublicKey.findProgramAddress(
-		[trancheConfig.publicKey.toBuffer(), reserveMint.toBuffer()],
-		vyperCoreProgram.programId
-	);
+	const [reserve] = await PublicKey.findProgramAddress([trancheConfig.publicKey.toBuffer(), reserveMint.toBuffer()], vyperCoreProgram.programId);
 
 	const TRANCHE_HALT_FLAGS = {
 		NONE: 0,

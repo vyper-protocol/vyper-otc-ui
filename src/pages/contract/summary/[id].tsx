@@ -1,5 +1,5 @@
 /* eslint-disable space-before-function-paren */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -19,7 +19,7 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';
 
-// test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
+// test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -29,7 +29,9 @@ const SummaryPageId = () => {
 	const [searchValue, setSearchValue] = useState('');
 
 	const { id } = router.query;
+
 	const provider = new AnchorProvider(connection, wallet, {});
+	// Pass the cluster option as a unique indetifier to the query
 	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
@@ -43,16 +45,20 @@ const SummaryPageId = () => {
 	// TODO fetch from chain
 	const reserveMintSymbol = 'USDC';
 
-	const loadingSpinner = !rateStateQuery?.data?.depositExpirationAt || !rateStateQuery?.data?.settleAvailableFromAt;
+	const loadingSpinner = rateStateQuery?.isLoading;
+	const errorMessage = rateStateQuery?.isError;
+	const showContent = rateStateQuery?.isSuccess;
 
 	return (
 		<Layout>
 			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
 
 			<Pane clearfix margin={24} maxWidth={400}>
-				{loadingSpinner ? (
-					<Spinner />
-				) : (
+				{errorMessage && <p>Contract not found</p>}
+
+				{loadingSpinner && <Spinner />}
+
+				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
 					<>
 						<div className={styles.box}>
 							{/* + + + + + + + + + + + + +  */}
@@ -111,6 +117,7 @@ const SummaryPageId = () => {
 							{/* DETAILS */}
 
 							<div className={styles.content}>
+              
 								{rateStateQuery?.data?.settleExecuted ? (
 									<div className={styles.column}>
 										<p>Settlement price</p>
@@ -119,10 +126,10 @@ const SummaryPageId = () => {
 								) : (
 									<div className={styles.column}>
 										<p>Current Price</p>
-										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState.aggregatorLastValue)}</p>
+										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
 									</div>
 								)}
-
+                
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>

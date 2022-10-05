@@ -13,7 +13,7 @@ import { defaultOptions } from 'utils/queries/options';
  */
 export const useGetFetchOTCStateQuery = (provider: AnchorProvider, otcState: Address): UseQueryResult<OtcState> => {
 	return useQuery<OtcState>(
-		['otc-state', otcState],
+		['otc-state', otcState, provider.connection.rpcEndpoint],
 		() => {
 			if (otcState !== undefined) return fetchOtcState(provider, new PublicKey(otcState));
 		},

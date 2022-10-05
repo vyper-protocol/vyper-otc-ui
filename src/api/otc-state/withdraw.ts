@@ -15,26 +15,14 @@ import PROGRAMS from '../../configs/programs.json';
  */
 export const withdraw = async (provider: AnchorProvider, otcState: PublicKey): Promise<TxPackage> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
-	const vyperCoreProgram = new Program<VyperCore>(
-		VyperCoreIDL,
-		new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID),
-		provider
-	);
+	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
-	const [otcAuthority] = await PublicKey.findProgramAddress(
-		[otcState.toBuffer(), utils.bytes.utf8.encode('authority')],
-		vyperOtcProgram.programId
-	);
+	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
 
 	const otcStateAccountInfo = await vyperOtcProgram.account.otcState.fetch(otcState);
-	const vyperCoreAccountInfo = await vyperCoreProgram.account.trancheConfig.fetch(
-		otcStateAccountInfo.vyperTrancheConfig
-	);
+	const vyperCoreAccountInfo = await vyperCoreProgram.account.trancheConfig.fetch(otcStateAccountInfo.vyperTrancheConfig);
 
-	const atokenAccount = await getAssociatedTokenAddress(
-		new PublicKey(vyperCoreAccountInfo.reserveMint),
-		provider.wallet.publicKey
-	);
+	const atokenAccount = await getAssociatedTokenAddress(new PublicKey(vyperCoreAccountInfo.reserveMint), provider.wallet.publicKey);
 
 	return {
 		tx: await vyperOtcProgram.methods

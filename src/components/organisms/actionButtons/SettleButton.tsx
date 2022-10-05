@@ -7,7 +7,6 @@ import { PublicKey } from '@solana/web3.js';
 import { settle } from 'api/otc-state/settle';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
 const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
