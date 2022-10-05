@@ -7,19 +7,45 @@ import { create } from 'api/otc-state/create';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
-import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
+import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField, toaster } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {return onChange(Number(e.target.value));}} />
-			<Button onClick={() => {return onChange(100);}}>reset</Button>
-			<Button onClick={() => {return onChange(value + 100);}}>+ 100</Button>
-			<Button onClick={() => {return onChange(value - 100);}}>- 100</Button>
+			<TextInputField
+				label={title}
+				type="number"
+				value={value}
+				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+					return onChange(Number(e.target.value));
+				}}
+			/>
+			<Button
+				onClick={() => {
+					return onChange(100);
+				}}
+			>
+				reset
+			</Button>
+			<Button
+				onClick={() => {
+					return onChange(value + 100);
+				}}
+			>
+				+ 100
+			</Button>
+			<Button
+				onClick={() => {
+					return onChange(value - 100);
+				}}
+			>
+				- 100
+			</Button>
 		</Pane>
 	);
 };
@@ -55,10 +81,36 @@ const StrikePicker = ({
 
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField label={title} type="number" value={value} onChange={(e) => {return onChange(e.target.value);}} />
-			<IconButton isLoading={isLoading} icon={RefreshIcon} onClick={() => {return onRefresh();}} intent="success" />
-			<Button onClick={() => {return onChange(value * 2);}}>* 2</Button>
-			<Button onClick={() => {return onChange(value / 2);}}>/ 2</Button>
+			<TextInputField
+				label={title}
+				type="number"
+				value={value}
+				onChange={(e) => {
+					return onChange(e.target.value);
+				}}
+			/>
+			<IconButton
+				isLoading={isLoading}
+				icon={RefreshIcon}
+				onClick={() => {
+					return onRefresh();
+				}}
+				intent="success"
+			/>
+			<Button
+				onClick={() => {
+					return onChange(value * 2);
+				}}
+			>
+				* 2
+			</Button>
+			<Button
+				onClick={() => {
+					return onChange(value / 2);
+				}}
+			>
+				/ 2
+			</Button>
 		</Pane>
 	);
 };
@@ -69,8 +121,20 @@ const DurationPicker = ({ title, value, onChange }: { title: string; value: numb
 		<Pane margin={6}>
 			<TextInputField label={title} readOnly value={moment.duration(value, 'milliseconds').humanize()} />
 			<Pane display="flex" alignItems="center">
-				<Button onClick={() => {return onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds());}}>+ 5min</Button>
-				<Button onClick={() => {return onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds());}}>- 5min</Button>
+				<Button
+					onClick={() => {
+						return onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds());
+					}}
+				>
+					+ 5min
+				</Button>
+				<Button
+					onClick={() => {
+						return onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds());
+					}}
+				>
+					- 5min
+				</Button>
 			</Pane>
 		</Pane>
 	);
@@ -91,7 +155,14 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 
 	return (
 		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField width="100%" label={title + ' ' + aggregatorName} value={value} onChange={(e) => {return onChange(e.target.value);}} />
+			<TextInputField
+				width="100%"
+				label={title + ' ' + aggregatorName}
+				value={value}
+				onChange={(e) => {
+					return onChange(e.target.value);
+				}}
+			/>
 			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
 				<IconButton icon={ShareIcon} intent="success" />
 			</a>
@@ -132,8 +203,12 @@ const CreateContractPage = () => {
 
 	useEffect(() => {
 		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator))
-			.then((v) => {return setStrike(v);})
-			.catch(() => {return setStrike(0);});
+			.then((v) => {
+				return setStrike(v);
+			})
+			.catch(() => {
+				return setStrike(0);
+			});
 	}, [provider.connection, switchboardAggregator]);
 
 	const createContract = async () => {
@@ -165,6 +240,13 @@ const CreateContractPage = () => {
 
 			const [txs, otcPublicKey] = await create(provider, initParams);
 			await txHandler.handleTxs(...txs);
+
+			try {
+				await supabaseInsertContract(otcPublicKey, wallet.publicKey);
+			} catch (err) {
+				toaster.danger('cannot save contract to database');
+			}
+
 			router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
 		} catch (err) {
 			// eslint-disable-next-line no-console
