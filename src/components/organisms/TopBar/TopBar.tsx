@@ -1,7 +1,8 @@
-import { useContext } from 'react';
+/* eslint-disable css-modules/no-unused-class */
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
+import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import resources from 'configs/resources.json';
@@ -76,6 +77,10 @@ const TopBar = () => {
 							</Text>
 						</div>
 					</Popover>
+
+					<div className={styles.item}>
+						<AirdropButton />
+					</div>
 				</Pane>
 
 				<Pane display="flex" alignItems="center">

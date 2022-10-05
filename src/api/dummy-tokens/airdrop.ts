@@ -1,0 +1,29 @@
+import { createAssociatedTokenAccountInstruction, createMintToInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
+import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
+import { TxPackage } from 'models/TxPackage';
+import { accountExists } from 'utils/solanaHelper';
+
+const MINT_AUTHORITY_KP = [
+	97, 173, 71, 224, 183, 153, 116, 246, 214, 228, 103, 35, 150, 201, 47, 94, 189, 188, 146, 154, 122, 185, 236, 234, 116, 56, 97, 161, 117, 170, 218, 71, 8, 23,
+	208, 253, 42, 86, 175, 160, 169, 41, 79, 58, 62, 182, 52, 28, 17, 230, 248, 89, 141, 182, 93, 198, 192, 164, 68, 171, 156, 88, 150, 28
+];
+const MINT_ADDRESS = new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W');
+const AIRDROP_AMOUNT = 1_000_000_000;
+
+export const airdrop = async (connection: Connection, wallet: PublicKey): Promise<TxPackage> => {
+	const tx = new Transaction();
+
+	const atokenAccount = await getAssociatedTokenAddress(new PublicKey(MINT_ADDRESS), wallet);
+	const exists = await accountExists(connection, atokenAccount);
+	if (!exists) {
+		tx.add(createAssociatedTokenAccountInstruction(wallet, atokenAccount, wallet, MINT_ADDRESS));
+	}
+
+	const mintAuthority = Keypair.fromSecretKey(new Uint8Array(MINT_AUTHORITY_KP));
+	tx.add(createMintToInstruction(new PublicKey(MINT_ADDRESS), atokenAccount, mintAuthority.publicKey, AIRDROP_AMOUNT));
+
+	return {
+		tx,
+		signers: [mintAuthority]
+	};
+};
