@@ -1,13 +1,14 @@
 /* eslint-disable css-modules/no-unused-class */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { PublicKey } from '@solana/web3.js';
-import cn from 'classnames';
 import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
-import { useClusterParam } from 'hooks/useClusterParam';
+import cn from 'classnames';
 import { useRouter } from 'next/router';
 
 import styles from './SearchBar.module.scss';
+import { UrlBuilder } from 'utils/UrlBuilder';
+import { UrlProviderContext } from 'components/providers/UrlBuilderProvider';
 
 type SearchBarProps = {
 	searchState: {
@@ -20,18 +21,16 @@ type SearchBarProps = {
 const SearchBar = ({ searchState, className }: SearchBarProps) => {
 	const [hasError, setHasError] = useState(false);
 
-	const router = useRouter();
+	const urlProvider = useContext(UrlProviderContext);
 
-	const createUrl = useClusterParam();
+	const router = useRouter();
 
 	const handleEnterPress = (event) => {
 		if (event.keyCode === 13) {
 			try {
-				new PublicKey(searchState.value);
+				const pubkey = new PublicKey(searchState.value);
 
-				const path = 'contract/summary/';
-				createUrl.pathname = path + searchState.value;
-				router.push(createUrl.href);
+				router.push(urlProvider.buildContractSummaryUrl(pubkey.toBase58()));
 
 				setHasError(false);
 				searchState.setValue('');

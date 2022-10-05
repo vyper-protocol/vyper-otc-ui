@@ -4,7 +4,6 @@ import { fetchOtcState } from 'api/otc-state/fetchOtcState';
 import { OtcState } from 'models/OtcState';
 import { useQuery, UseQueryResult } from 'react-query';
 import { defaultOptions } from 'utils/queries/options';
-import { Connection } from '@solana/web3.js';
 
 /**
  * Get the query to fetch an OTC state
@@ -12,9 +11,9 @@ import { Connection } from '@solana/web3.js';
  * @param otcState public key for the otc state
  * @returns query for the otc state
  */
-export const useGetFetchOTCStateQuery = (provider: AnchorProvider, otcState: Address, connection?: string): UseQueryResult<OtcState> => {
+export const useGetFetchOTCStateQuery = (provider: AnchorProvider, otcState: Address): UseQueryResult<OtcState> => {
 	return useQuery<OtcState>(
-		['otc-state', otcState, connection],
+		['otc-state', otcState, provider.connection.rpcEndpoint],
 		() => {
 			if (otcState !== undefined) return fetchOtcState(provider, new PublicKey(otcState));
 		},

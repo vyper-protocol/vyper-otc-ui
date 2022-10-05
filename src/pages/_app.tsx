@@ -8,12 +8,12 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
 import ApplicationError from 'components/templates/ApplicationError';
-import { useCluster } from 'hooks/useCluster';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import Script from 'next/script';
 import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { UrlProviderProvider } from 'components/providers/UrlBuilderProvider';
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -21,8 +21,6 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 export const queryClient = new QueryClient();
 
 const Application = ({ Component, pageProps }) => {
-	const { endpoint } = useCluster();
-
 	const wallets = useMemo(() => {
 		return [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new SolletWalletAdapter()];
 	}, []);
@@ -39,7 +37,7 @@ const Application = ({ Component, pageProps }) => {
 				`}
 			</Script>
 			<QueryClientProvider client={queryClient}>
-				<ConnectionProvider endpoint={endpoint}>
+				<UrlProviderProvider>
 					<WalletProvider wallets={wallets}>
 						<WalletModalProvider>
 							<TxHandlerProvider>
@@ -49,7 +47,7 @@ const Application = ({ Component, pageProps }) => {
 							</TxHandlerProvider>
 						</WalletModalProvider>
 					</WalletProvider>
-				</ConnectionProvider>
+				</UrlProviderProvider>
 				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>
 		</>

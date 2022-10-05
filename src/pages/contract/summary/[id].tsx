@@ -13,7 +13,6 @@ import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import Layout from 'components/templates/Layout';
 import { Pane, toaster, StatusIndicator, Button, Badge, Tooltip, InfoSignIcon, HelpIcon, Card } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
-import { useCluster } from 'hooks/useCluster';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import moment from 'moment';
 import { useRouter } from 'next/router';
@@ -36,7 +35,7 @@ const SummaryPageId = () => {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	// Pass the cluster option as a unique indetifier to the query
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string, provider.connection.rpcEndpoint);
+	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
 	const handleAddressClick = (e) => {
