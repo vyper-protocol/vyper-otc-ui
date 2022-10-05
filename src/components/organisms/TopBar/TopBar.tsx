@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import SelectWallet from 'components/organisms/SelectWallet';
@@ -7,7 +9,6 @@ import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, Chevr
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useContext } from 'react';
 import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
 

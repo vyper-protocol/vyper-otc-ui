@@ -11,6 +11,7 @@ export type UrlBuilder = {
 	buildHomeUrl: () => string;
 	buildCreateContractUrl: () => string;
 	buildContractSummaryUrl: (string) => string;
+	buildCurrentUrl: (string) => string;
 };
 
 const CLUSTER_PARAM_KEY = 'cluster';
@@ -20,7 +21,7 @@ const DEFAULT_CLUSTER: Cluster = 'devnet';
 export const UrlProviderContext = createContext<UrlBuilder>(undefined);
 
 export const UrlProviderProvider = ({ children }) => {
-	const { query } = useRouter();
+	const { query, route, asPath } = useRouter();
 	const clusterParam = query[CLUSTER_PARAM_KEY];
 
 	// initialized to the default cluster connection
@@ -40,7 +41,6 @@ export const UrlProviderProvider = ({ children }) => {
 			}
 		}
 
-		console.log('set connection endpoint to: ', newEndpoint);
 		setEndpoint(newEndpoint);
 	}, [clusterParam]);
 
@@ -55,6 +55,25 @@ export const UrlProviderProvider = ({ children }) => {
 		} else {
 			return url;
 		}
+	};
+
+	const injectClusterParam = (url: string, cluster: Cluster) => {
+		if (clusterParam !== cluster && cluster !== DEFAULT_CLUSTER) {
+			return url + '?' + CLUSTER_PARAM_KEY + '=' + cluster;
+		}
+		return url;
+	};
+
+	const buildCurrentUrl = (desiredCluster: Cluster): string => {
+		// Take the current route
+		let url = route;
+		if (query.id) {
+			// or the asPath if there is an id param
+			url = asPath.split('?' + CLUSTER_PARAM_KEY)[0];
+			console.log(url);
+		}
+		url = injectClusterParam(url, desiredCluster);
+		return url;
 	};
 
 	const buildHomeUrl = (): string => {
@@ -78,7 +97,8 @@ export const UrlProviderProvider = ({ children }) => {
 	const urlBuilder: UrlBuilder = {
 		buildHomeUrl,
 		buildContractSummaryUrl,
-		buildCreateContractUrl
+		buildCreateContractUrl,
+		buildCurrentUrl
 	};
 
 	return (

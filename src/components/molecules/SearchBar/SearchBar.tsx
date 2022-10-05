@@ -2,13 +2,12 @@
 import React, { useContext, useState } from 'react';
 
 import { PublicKey } from '@solana/web3.js';
-import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
 import cn from 'classnames';
+import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
+import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 
 import styles from './SearchBar.module.scss';
-import { UrlBuilder } from 'utils/UrlBuilder';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 
 type SearchBarProps = {
 	searchState: {
