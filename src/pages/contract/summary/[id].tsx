@@ -5,6 +5,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
+import SearchBar from 'components/molecules/SearchBar';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
@@ -28,6 +29,8 @@ const SummaryPageId = () => {
 	const router = useRouter();
 	const { connection } = useConnection();
 	const wallet = useWallet();
+
+	const [searchValue, setSearchValue] = useState('');
 
 	const { id } = router.query;
 	const { cluster } = useCluster();
@@ -53,6 +56,8 @@ const SummaryPageId = () => {
 
 	return (
 		<Layout>
+			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+
 			<Pane clearfix margin={24} maxWidth={400}>
 				{errorMessage && <p>Contract not found</p>}
 
