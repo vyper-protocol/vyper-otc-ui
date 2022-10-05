@@ -14,6 +14,8 @@ import PROGRAMS from '../../configs/programs.json';
 import { OtcState } from '../../models/OtcState';
 
 export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<OtcState> => {
+	const promises: Promise<void>[] = [];
+
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
@@ -31,45 +33,73 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
 	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
 
-	res.programBuyerTAAmount =
-		Number((await getAccount(provider.connection, accountInfo.otcSeniorReserveTokenAccount)).amount) / 10 ** res.reserveMintInfo.decimals;
-	res.programSellerTAAmount =
-		Number((await getAccount(provider.connection, accountInfo.otcJuniorReserveTokenAccount)).amount) / 10 ** res.reserveMintInfo.decimals;
+	promises.push(
+		getAccount(provider.connection, accountInfo.otcSeniorReserveTokenAccount).then((c) => {
+			res.programBuyerTAAmount = Number(c.amount) / 10 ** res.reserveMintInfo.decimals;
+		})
+	);
+	promises.push(
+		getAccount(provider.connection, accountInfo.otcJuniorReserveTokenAccount).then((c) => {
+			res.programSellerTAAmount = Number(c.amount) / 10 ** res.reserveMintInfo.decimals;
+		})
+	);
 
 	res.buyerTA = accountInfo.seniorSideBeneficiary;
 	if (res.buyerTA) {
-		res.buyerWallet = (await getAccount(provider.connection, accountInfo.seniorSideBeneficiary)).owner;
+		promises.push(
+			getAccount(provider.connection, accountInfo.seniorSideBeneficiary).then((c) => {
+				res.buyerWallet = c.owner;
+			})
+		);
 	}
 
 	res.sellerTA = accountInfo.juniorSideBeneficiary;
 	if (res.sellerTA) {
-		res.sellerWallet = (await getAccount(provider.connection, accountInfo.juniorSideBeneficiary)).owner;
+		promises.push(
+			getAccount(provider.connection, accountInfo.juniorSideBeneficiary).then((c) => {
+				res.sellerWallet = c.owner;
+			})
+		);
 	}
 
 	// Rate plugin
-
-	try {
-		const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
-		const rateStateAccountInfo = await rateSwitchboardProgram.account.rateState.fetch(trancheConfigAccountInfo.rateProgramState);
-		res.rateState = new RateSwitchboardState(rateStateAccountInfo.switchboardAggregators[0]);
-		await res.rateState.loadAggregatorData(provider);
-	} catch (err) {
-		console.error(err);
-	}
+	promises.push(
+		new Promise(async (resolve) => {
+			try {
+				const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
+				const rateStateAccountInfo = await rateSwitchboardProgram.account.rateState.fetch(trancheConfigAccountInfo.rateProgramState);
+				const rateState = new RateSwitchboardState(rateStateAccountInfo.switchboardAggregators[0]);
+				await rateState.loadAggregatorData(provider);
+				res.rateState = rateState;
+			} catch (err) {
+				console.error(err);
+			} finally {
+				resolve();
+			}
+		})
+	);
 
 	// Redeem logic plugin
+	promises.push(
+		new Promise(async (resolve) => {
+			try {
+				const redeemLogicForwardProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
+				const redeemLogicAccountInfo = await redeemLogicForwardProgram.account.redeemLogicConfig.fetch(trancheConfigAccountInfo.redeemLogicProgramState);
 
-	try {
-		const redeemLogicForwardProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
-		const redeemLogicAccountInfo = await redeemLogicForwardProgram.account.redeemLogicConfig.fetch(trancheConfigAccountInfo.redeemLogicProgramState);
+				const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+				const isLinear = redeemLogicAccountInfo.isLinear;
+				const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+				const redeemLogicState = new RedeemLogicForwardState(strike, isLinear, notional);
+				res.redeemLogicState = redeemLogicState;
+			} catch (err) {
+				console.error(err);
+			} finally {
+				resolve();
+			}
+		})
+	);
 
-		const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
-		const isLinear = redeemLogicAccountInfo.isLinear;
-		const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
-		res.redeemLogicState = new RedeemLogicForwardState(strike, isLinear, notional);
-	} catch (err) {
-		console.error(err);
-	}
+	await Promise.all(promises);
 
 	return res;
 };
