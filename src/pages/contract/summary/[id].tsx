@@ -113,7 +113,7 @@ const SummaryPageId = () => {
 							<div className={styles.content}>
 								{rateStateQuery?.data?.settleExecuted ? (
 									<div className={styles.column}>
-										<p>Price at settlement</p>
+										<p>Settlement price</p>
 										<p>{formatWithDecimalDigits(rateStateQuery?.data?.priceAtSettlement)}</p>
 									</div>
 								) : (
