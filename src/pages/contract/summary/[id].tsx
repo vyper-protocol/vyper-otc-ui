@@ -117,7 +117,6 @@ const SummaryPageId = () => {
 							{/* DETAILS */}
 
 							<div className={styles.content}>
-              
 								{rateStateQuery?.data?.settleExecuted ? (
 									<div className={styles.column}>
 										<p>Settlement price</p>
@@ -129,7 +128,7 @@ const SummaryPageId = () => {
 										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
 									</div>
 								)}
-                
+
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
