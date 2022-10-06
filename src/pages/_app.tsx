@@ -14,6 +14,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { UrlProviderProvider } from 'components/providers/UrlClusterBuilderProvider';
+import { toast, ToastContainer } from 'react-toastify';
+
+// react-toastify css
+require('react-toastify/dist/ReactToastify.min.css');
 
 // Solana wallet adapter default styles
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -48,6 +52,16 @@ const Application = ({ Component, pageProps }) => {
 						</WalletModalProvider>
 					</WalletProvider>
 				</UrlProviderProvider>
+				<ToastContainer
+					position={toast.POSITION.BOTTOM_RIGHT}
+					autoClose={5000}
+					hideProgressBar={false}
+					theme="dark"
+					newestOnTop={false}
+					closeOnClick
+					pauseOnHover
+					pauseOnFocusLoss={false}
+				/>
 				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>
 		</>

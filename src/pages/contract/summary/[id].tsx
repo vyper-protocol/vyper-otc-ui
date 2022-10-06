@@ -10,7 +10,7 @@ import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import Layout from 'components/templates/Layout';
-import { Pane, toaster, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
+import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
@@ -18,6 +18,7 @@ import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';
+import { toast } from 'react-toastify';
 
 // test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
 
@@ -37,8 +38,8 @@ const SummaryPageId = () => {
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
-		toaster.notify('Address copied to clipboard', {
-			duration: 1
+		toast.info('Address copied to clipboard', {
+			autoClose: 2000
 		});
 	};
 
