@@ -9,10 +9,11 @@ import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/swi
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
-import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField, toaster } from 'evergreen-ui';
+import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
@@ -247,7 +248,7 @@ const CreateContractPage = () => {
 			try {
 				await supabaseInsertContract(otcPublicKey, wallet.publicKey);
 			} catch (err) {
-				toaster.danger('cannot save contract to database');
+				toast.error('cannot save contract to database');
 			}
 
 			router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
