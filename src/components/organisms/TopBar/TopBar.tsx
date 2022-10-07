@@ -1,6 +1,6 @@
 /* eslint-disable css-modules/no-unused-class */
 
-import { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
@@ -26,18 +26,22 @@ const TopBar = () => {
 		}
 	};
 
+	const [activeNavItem, setActiveNavItem] = useState(0);
+
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href={urlProvider.buildHomeUrl()}>
-					<Heading size={600} className={styles.hover}>
-						Vyper OTC
-					</Heading>
-				</Link>
+				<div className={styles.navLeftItems}>
+					<Link href={urlProvider.buildHomeUrl()}>
+						<Heading size={600} className={styles.hover}>
+							Vyper OTC
+						</Heading>
+					</Link>
+				</div>
 
 				<Pane className={styles.nav}>
 					{/* HOME LINK */}
-					<div>
+					<div className={activeNavItem === 0 ? cn(styles.item, styles.active) : cn(styles.item)} onClick={()=> setActiveNavItem(0)}>
 						<Link href={urlProvider.buildHomeUrl()}>
 							<Text>
 								<StackedChartIcon /> Home
@@ -46,7 +50,7 @@ const TopBar = () => {
 					</div>
 
 					{/* CREATE CONTRACT LINK */}
-					<div className={cn(styles.item)}>
+					<div className={activeNavItem === 1 ? cn(styles.item, styles.active) : cn(styles.item)} onClick={()=> setActiveNavItem(1)}>
 						<Tooltip content="Coming soon">
 							<Text onClick={onCreateContractClick}>
 								<CubeAddIcon /> Create contract
@@ -85,7 +89,7 @@ const TopBar = () => {
 					</div>
 				</Pane>
 
-				<Pane display="flex" alignItems="center">
+				<Pane className={styles.navRightItems} display="flex" alignItems="center">
 					<ClusterSelector className={styles.cluster} />
 					<SelectWallet />
 				</Pane>
