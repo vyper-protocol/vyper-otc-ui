@@ -6,7 +6,7 @@ import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboar
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { OtcInitializationParams } from 'models/OtcInitializationParams';
+import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
