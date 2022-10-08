@@ -3,8 +3,6 @@ import { useContext, useEffect, useState } from 'react';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { create } from 'api/otc-state/create';
-import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
@@ -15,7 +13,6 @@ import { OtcInitializationParams } from 'controllers/createContract/OtcInitializ
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
