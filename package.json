@@ -20,6 +20,11 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
+		"@date-io/moment": "^2.16.0",
+		"@emotion/react": "^11.10.4",
+		"@emotion/styled": "^11.10.4",
+		"@mui/material": "^5.10.8",
+		"@mui/x-date-pickers": "^5.0.4",
 		"@next/bundle-analyzer": "^12.3.1",
 		"@project-serum/anchor": "0.24.2",
 		"@solana-mobile/wallet-adapter-mobile": "^0.9.1",
