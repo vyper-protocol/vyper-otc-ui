@@ -107,8 +107,8 @@ footer {
 }
 
 footer {
-    flex: 1;
-    align-items: flex-end;
+	flex: 1;
+	align-items: flex-end;
 	width: 100%;
 }
 
@@ -213,7 +213,7 @@ body {
 }
 
 .root {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
