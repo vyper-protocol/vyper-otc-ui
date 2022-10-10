@@ -45,6 +45,7 @@
 		"classnames": "^2.3.2",
 		"coingecko-api": "^1.0.10",
 		"evergreen-ui": "^6.10.3",
+		"lodash": "^4.17.21",
 		"moment": "^2.29.4",
 		"next": "^12.1.5",
 		"react": "^18.0.0",

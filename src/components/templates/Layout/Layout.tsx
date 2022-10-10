@@ -21,7 +21,7 @@ const Layout = ({ children }: LayoutProps) => {
 				<style>{'body { background-color: var(--color-background); }'}</style>
 			</Head>
 
-			<Pane>
+			<Pane className="root">
 				<TopBar />
 
 				<main className={styles.main}>{children}</main>

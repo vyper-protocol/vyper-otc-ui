@@ -12,6 +12,7 @@ export type UrlBuilder = {
 	buildCreateContractUrl: () => string;
 	buildContractSummaryUrl: (string) => string;
 	buildCurrentUrl: (string) => string;
+	buildExplorerUrl: () => string;
 };
 
 const CLUSTER_PARAM_KEY = 'cluster';
@@ -94,11 +95,18 @@ export const UrlProviderProvider = ({ children }) => {
 		return url;
 	};
 
+	const buildExplorerUrl = (): string => {
+		let url = '/explorer';
+		url = checkForClusterParam(url);
+		return url;
+	};
+
 	const urlBuilder: UrlBuilder = {
 		buildHomeUrl,
 		buildContractSummaryUrl,
 		buildCreateContractUrl,
-		buildCurrentUrl
+		buildCurrentUrl,
+		buildExplorerUrl
 	};
 
 	return (

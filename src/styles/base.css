@@ -107,8 +107,8 @@ footer {
 }
 
 footer {
-	position: absolute;
-	bottom: 0;
+	flex: 1;
+	align-items: flex-end;
 	width: 100%;
 }
 
@@ -210,4 +210,10 @@ body::-webkit-scrollbar {
 body {
 	-ms-overflow-style: none;
 	scrollbar-width: none;
+}
+
+.root {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }

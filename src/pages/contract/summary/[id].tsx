@@ -31,9 +31,8 @@ const SummaryPageId = () => {
 
 	const { id } = router.query;
 
-	const provider = new AnchorProvider(connection, wallet, {});
 	// Pass the cluster option as a unique indetifier to the query
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
+	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
 	const handleAddressClick = (e) => {

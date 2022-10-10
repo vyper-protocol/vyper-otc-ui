@@ -3,18 +3,16 @@ import { useContext, useEffect, useState } from 'react';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { create } from 'api/otc-state/create';
-import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
+import createContract from 'controllers/createContract';
+import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
-import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
 
 // eslint-disable-next-line no-unused-vars
 const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
@@ -181,7 +179,7 @@ const CreateContractPage = () => {
 			});
 	}, [provider.connection, switchboardAggregator]);
 
-	const createContract = async () => {
+	const onCreateContractButtonClick = async () => {
 		try {
 			setIsLoading(true);
 
@@ -203,22 +201,10 @@ const CreateContractPage = () => {
 			};
 
 			// create contract
-			// eslint-disable-next-line no-console
-			console.log('provider: ', provider);
-			// eslint-disable-next-line no-console
-			console.log('initParams: ', initParams);
+			const otcPublicKey = await createContract(provider, txHandler, initParams);
 
-			const [txs, otcPublicKey] = await create(provider, initParams);
-			await txHandler.handleTxs(...txs);
 			// Create contract URL
 			router.push(urlProvider.buildContractSummaryUrl(otcPublicKey.toBase58()));
-			try {
-				await supabaseInsertContract(otcPublicKey, wallet.publicKey);
-			} catch (err) {
-				toast.error('cannot save contract to database');
-			}
-
-			router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.error(err);
@@ -246,7 +232,7 @@ const CreateContractPage = () => {
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
 
-				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={createContract}>
+				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract
 				</Button>
 			</Pane>
