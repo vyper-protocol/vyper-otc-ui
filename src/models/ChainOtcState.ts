@@ -1,10 +1,16 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable space-before-function-paren */
+import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
 
 export class ChainOtcState extends AbsOtcState {
+	/**
+	 * Reserve mint info
+	 */
+	reserveMintInfo: Mint;
+
 	/**
 	 * Flag for the settlement execution
 	 */
