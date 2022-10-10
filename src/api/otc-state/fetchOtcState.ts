@@ -12,6 +12,7 @@ import { RedeemLogicForwardState } from 'models/RedeemLogicForwardState';
 
 import PROGRAMS from '../../configs/programs.json';
 import { OtcState } from '../../models/OtcState';
+import { fetchTokenInfo } from './fetchTokenInfo';
 
 export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<OtcState> => {
 	const promises: Promise<void>[] = [];
@@ -25,6 +26,8 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 	const res = new OtcState();
 	res.publickey = otcStateAddress;
 	res.reserveMintInfo = await getMint(provider.connection, trancheConfigAccountInfo.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfo(provider.connection, trancheConfigAccountInfo.reserveMint);
+
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
 	res.depositExpirationAt = accountInfo.depositEnd.toNumber() * 1000;

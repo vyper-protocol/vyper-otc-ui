@@ -5,6 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 
 import RateSwitchboardState from './RateSwitchboardState';
 import { RedeemLogicForwardState } from './RedeemLogicForwardState';
+import { TokenInfo } from './TokenInfo';
 
 export class OtcState {
 	/**
@@ -16,6 +17,11 @@ export class OtcState {
 	 * Reserve mint info
 	 */
 	reserveMintInfo: Mint;
+
+	/**
+	 * Reserve token info
+	 */
+	reserveTokenInfo?: TokenInfo;
 
 	/**
 	 * Creation timestamp in ms

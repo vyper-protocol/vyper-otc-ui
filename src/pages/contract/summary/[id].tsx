@@ -42,8 +42,7 @@ const SummaryPageId = () => {
 		});
 	};
 
-	// TODO fetch from chain
-	const reserveMintSymbol = 'USDC';
+  const reserveTokenInfo = rateStateQuery?.data?.reserveTokenInfo;
 
 	const loadingSpinner = rateStateQuery?.isLoading;
 	const errorMessage = rateStateQuery?.isError;
@@ -117,7 +116,6 @@ const SummaryPageId = () => {
 							{/* DETAILS */}
 
 							<div className={styles.content}>
-              
 								{rateStateQuery?.data?.settleExecuted ? (
 									<div className={styles.column}>
 										<p>Settlement price</p>
@@ -129,7 +127,6 @@ const SummaryPageId = () => {
 										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
 									</div>
 								)}
-                
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
@@ -194,13 +191,13 @@ const SummaryPageId = () => {
 								<Pane margin={6} textAlign="center">
 									Long{' '}
 									<Badge color="neutral">
-										{rateStateQuery?.data?.buyerDepositAmount} {reserveMintSymbol}
+										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo.symbol}
 									</Badge>
 								</Pane>
 								<Pane margin={6} textAlign="center">
 									Short{' '}
 									<Badge color="neutral">
-										{rateStateQuery?.data?.sellerDepositAmount} {reserveMintSymbol}
+										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo.symbol}
 									</Badge>
 								</Pane>
 							</Pane>
@@ -220,13 +217,13 @@ const SummaryPageId = () => {
 										<Pane margin={6} textAlign="center">
 											Long{' '}
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveMintSymbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo.symbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
 											Short{' '}
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveMintSymbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo.symbol}
 											</Badge>
 										</Pane>
 									</Pane>
