@@ -30,6 +30,7 @@ const TopBar = () => {
 	const [navigation, setNavigation] = useState([
 		{ href: ['/', '/contract/summary/[id]'], current: false },
 		{ href: ['/contract/create'], current: false },
+		{ href: ['/explorer'], current: false }
 	  ]);
 
 	  useEffect(() => {
@@ -74,7 +75,7 @@ const TopBar = () => {
 					</div>
 
 					{/* EXPLORER LINK */}
-					<div className={styles.item}>
+					<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={urlProvider.buildExplorerUrl()}>
 							<Text>
 								<PathSearchIcon /> Explorer
