@@ -3,39 +3,19 @@
 import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import RateSwitchboardState from './RateSwitchboardState';
-import { RedeemLogicForwardState } from './RedeemLogicForwardState';
+import { AbsOtcState } from './AbsOtcState';
+import { TokenInfo } from './TokenInfo';
 
-export class OtcState {
-	/**
-	 * Current Contract public key
-	 */
-	publickey: PublicKey;
-
+export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Reserve mint info
 	 */
 	reserveMintInfo: Mint;
 
 	/**
-	 * Creation timestamp in ms
+	 * Reserve token info
 	 */
-	createdAt: number;
-
-	/**
-	 * Deposit available from timestamp in ms
-	 */
-	depositAvailableFrom: number;
-
-	/**
-	 * Deposit expiration timestamp in ms
-	 */
-	depositExpirationAt: number;
-
-	/**
-	 * Settlement available from timestamp in ms
-	 */
-	settleAvailableFromAt: number;
+	reserveTokenInfo?: TokenInfo;
 
 	/**
 	 * Flag for the settlement execution
@@ -46,16 +26,6 @@ export class OtcState {
 	 * Price at settlement
 	 */
 	priceAtSettlement: number | undefined;
-
-	/**
-	 * Amount of tokens the buyer needs to deposit
-	 */
-	buyerDepositAmount: number;
-
-	/**
-	 * Amount of tokens the seller needs to deposit
-	 */
-	sellerDepositAmount: number;
 
 	/**
 	 * OTC program token account for buyer tokens
@@ -86,16 +56,6 @@ export class OtcState {
 	 * Seller token account
 	 */
 	sellerTA: undefined | PublicKey;
-
-	/**
-	 * Redeem logic state
-	 */
-	redeemLogicState: RedeemLogicForwardState;
-
-	/**
-	 * Rate state
-	 */
-	rateState: RateSwitchboardState;
 
 	isDepositExpired(): boolean {
 		return Date.now() > this.depositExpirationAt;

@@ -8,7 +8,7 @@ import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import resources from 'configs/resources.json';
-import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
+import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position, PathSearchIcon } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -71,6 +71,15 @@ const TopBar = () => {
 								<CubeAddIcon /> Create contract
 							</Text>
 						</Tooltip>
+					</div>
+
+					{/* EXPLORER LINK */}
+					<div className={styles.item}>
+						<Link href={urlProvider.buildExplorerUrl()}>
+							<Text>
+								<PathSearchIcon /> Explorer
+							</Text>
+						</Link>
 					</div>
 
 					{/* SOCIALS */}
