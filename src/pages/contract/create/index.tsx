@@ -7,6 +7,7 @@ import { create } from 'api/otc-state/create';
 import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
+import AmountPicker from 'components/molecules/AmountPicker';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
@@ -15,43 +16,6 @@ import { OtcInitializationParams } from 'models/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
-
-// eslint-disable-next-line no-unused-vars
-const AmountPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (_: number) => void }) => {
-	return (
-		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField
-				label={title}
-				type="number"
-				value={value}
-				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-					return onChange(Number(e.target.value));
-				}}
-			/>
-			<Button
-				onClick={() => {
-					return onChange(100);
-				}}
-			>
-				reset
-			</Button>
-			<Button
-				onClick={() => {
-					return onChange(value + 100);
-				}}
-			>
-				+ 100
-			</Button>
-			<Button
-				onClick={() => {
-					return onChange(value - 100);
-				}}
-			>
-				- 100
-			</Button>
-		</Pane>
-	);
-};
 
 const StrikePicker = ({
 	title,
