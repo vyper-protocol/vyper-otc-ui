@@ -1,7 +1,7 @@
+/* eslint-disable css-modules/no-unused-class */
 /* eslint-disable space-before-function-paren */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import SearchBar from 'components/molecules/SearchBar';
@@ -14,11 +14,11 @@ import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';
-import { toast } from 'react-toastify';
 
 // test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
 

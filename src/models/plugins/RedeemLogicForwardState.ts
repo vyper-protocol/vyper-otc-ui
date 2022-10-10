@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
+
 import { AbsPlugin } from './AbsPlugin';
 
 /* eslint-disable space-before-function-paren */
