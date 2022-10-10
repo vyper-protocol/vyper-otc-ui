@@ -3,7 +3,9 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { getAggregatorData, getAggregatorLatestValue } from 'api/switchboard/switchboardHelper';
 
-export default class RateSwitchboardState {
+import { IDbPlugin } from './IDbPlugin';
+
+export default class RateSwitchboardState implements IDbPlugin {
 	aggregatorData: any;
 	aggregatorLastValue: number;
 
@@ -27,5 +29,14 @@ export default class RateSwitchboardState {
 			name = 'Not found';
 		}
 		return name;
+	}
+
+	getPluginDataObj() {
+		return {
+			switchboarAggregator: this.switchboarAggregator.toBase58()
+		};
+	}
+	getTypeId(): string {
+		return 'switchboard';
 	}
 }
