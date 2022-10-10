@@ -1,6 +1,6 @@
 /* eslint-disable css-modules/no-unused-class */
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
@@ -17,6 +17,7 @@ import styles from './TopBar.module.scss';
 
 const TopBar = () => {
 	const router = useRouter();
+	const pathname = router.pathname;
 
 	const urlProvider = useContext(UrlProviderContext);
 
@@ -26,7 +27,21 @@ const TopBar = () => {
 		}
 	};
 
-	const [activeNavItem, setActiveNavItem] = useState(0);
+	const [navigation, setNavigation] = useState([
+		{ href: ['/', '/contract/summary/[id]'], current: false },
+		{ href: ['/contract/create'], current: false },
+	  ]);
+
+	  useEffect(() => {
+		const newNavigation = [...navigation];
+		for (let i = 0; i < newNavigation.length; i++) {
+		  if (newNavigation[i].href.includes(pathname)) newNavigation[i].current = true;
+		  else newNavigation[i].current = false;
+		}
+		setNavigation(newNavigation);
+		//   eslint-disable-next-line react-hooks/exhaustive-deps
+	  }, [pathname, setNavigation]);
+
 
 	return (
 		<>
@@ -41,7 +56,7 @@ const TopBar = () => {
 
 				<Pane className={styles.nav}>
 					{/* HOME LINK */}
-					<div className={activeNavItem === 0 ? cn(styles.item, styles.active) : cn(styles.item)} onClick={()=> setActiveNavItem(0)}>
+					<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={urlProvider.buildHomeUrl()}>
 							<Text>
 								<StackedChartIcon /> Home
@@ -50,7 +65,7 @@ const TopBar = () => {
 					</div>
 
 					{/* CREATE CONTRACT LINK */}
-					<div className={activeNavItem === 1 ? cn(styles.item, styles.active) : cn(styles.item)} onClick={()=> setActiveNavItem(1)}>
+					<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Tooltip content="Coming soon">
 							<Text onClick={onCreateContractClick}>
 								<CubeAddIcon /> Create contract
