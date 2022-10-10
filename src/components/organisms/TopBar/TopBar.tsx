@@ -55,13 +55,13 @@ const TopBar = () => {
 					</div>
 
 					{/* EXPLORER LINK */}
-					{/* <div className={styles.item}>
+					<div className={styles.item}>
 						<Link href={urlProvider.buildExplorerUrl()}>
 							<Text>
 								<PathSearchIcon /> Explorer
 							</Text>
 						</Link>
-					</div> */}
+					</div>
 
 					{/* SOCIALS */}
 					<Popover
