@@ -4,12 +4,18 @@ import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
+import { TokenInfo } from './TokenInfo';
 
 export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Reserve mint info
 	 */
 	reserveMintInfo: Mint;
+
+	/**
+	 * Reserve token info
+	 */
+	reserveTokenInfo?: TokenInfo;
 
 	/**
 	 * Flag for the settlement execution

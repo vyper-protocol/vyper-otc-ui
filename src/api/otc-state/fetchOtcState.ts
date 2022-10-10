@@ -12,6 +12,9 @@ import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState'
 
 import PROGRAMS from '../../configs/programs.json';
 import { ChainOtcState } from '../../models/ChainOtcState';
+import { fetchTokenInfo } from '../tokens/fetchTokenInfo';
+
+const [DUMMY_TOKEN_MINT, USDC_MINT] = ['7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W', 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'];
 
 export const fetchOtcState = async (connection: Connection, otcStateAddress: PublicKey): Promise<ChainOtcState> => {
 	const promises: Promise<void>[] = [];
@@ -24,9 +27,17 @@ export const fetchOtcState = async (connection: Connection, otcStateAddress: Pub
 
 	const res = new ChainOtcState();
 	res.publickey = otcStateAddress;
+
 	res.vyperCoreTrancheConfig = accountInfo.vyperTrancheConfig;
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint);
+
+	if (trancheConfigAccountInfo.reserveMint.toBase58() === DUMMY_TOKEN_MINT) {
+		res.reserveTokenInfo = await fetchTokenInfo(connection, new PublicKey(USDC_MINT));
+	} else {
+		res.reserveTokenInfo = await fetchTokenInfo(connection, trancheConfigAccountInfo.reserveMint);
+	}
+
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
 	res.depositExpirationAt = accountInfo.depositEnd.toNumber() * 1000;
