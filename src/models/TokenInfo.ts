@@ -18,4 +18,4 @@ export type TokenInfo = {
 	 * URI that contains the token's logo
 	 */
 	logoURI: string;
-}
+};

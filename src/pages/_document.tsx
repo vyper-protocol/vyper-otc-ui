@@ -1,8 +1,8 @@
 import { extractStyles } from 'evergreen-ui';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 
-export default class NextDocument extends Document<{css: any, hydrationScript:any}> {
-	static async getInitialProps ({ renderPage }) {
+export default class NextDocument extends Document<{ css: any; hydrationScript: any }> {
+	static async getInitialProps({ renderPage }) {
 		const page = await renderPage();
 		const { css, hydrationScript } = extractStyles();
 
@@ -13,7 +13,7 @@ export default class NextDocument extends Document<{css: any, hydrationScript:an
 		};
 	}
 
-	render () {
+	render() {
 		const { css, hydrationScript } = this.props;
 
 		return (

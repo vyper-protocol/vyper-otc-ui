@@ -43,7 +43,7 @@ const SummaryPageId = () => {
 		});
 	};
 
-  const reserveTokenInfo = rateStateQuery?.data?.reserveTokenInfo;
+	const reserveTokenInfo = rateStateQuery?.data?.reserveTokenInfo;
 
 	const loadingSpinner = rateStateQuery?.isLoading;
 	const errorMessage = rateStateQuery?.isError;
