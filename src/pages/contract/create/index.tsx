@@ -3,14 +3,14 @@ import { useContext, useEffect, useState } from 'react';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { create } from 'api/otc-state/create';
-import { insertContract as supabaseInsertContract } from 'api/supabase/insertContract';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
+import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
-import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField, toaster } from 'evergreen-ui';
-import { OtcInitializationParams } from 'models/OtcInitializationParams';
+import createContract from 'controllers/createContract';
+import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 
@@ -117,31 +117,6 @@ const StrikePicker = ({
 };
 
 // eslint-disable-next-line no-unused-vars
-const DurationPicker = ({ title, value, onChange }: { title: string; value: number; onChange: (val: number) => void }) => {
-	return (
-		<Pane margin={6}>
-			<TextInputField label={title} readOnly value={moment.duration(value, 'milliseconds').humanize()} />
-			<Pane display="flex" alignItems="center">
-				<Button
-					onClick={() => {
-						return onChange(moment.duration(value, 'milliseconds').add(5, 'minutes').asMilliseconds());
-					}}
-				>
-					+ 5min
-				</Button>
-				<Button
-					onClick={() => {
-						return onChange(moment.duration(value, 'milliseconds').subtract(5, 'minutes').asMilliseconds());
-					}}
-				>
-					- 5min
-				</Button>
-			</Pane>
-		</Pane>
-	);
-};
-
-// eslint-disable-next-line no-unused-vars
 const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
 	const [aggregatorName, setAggregatorName] = useState('');
 	const { connection } = useConnection();
@@ -182,18 +157,9 @@ const CreateContractPage = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [depositStart, setDepositStart] = useState(0);
-	useEffect(() => {
-		setDepositStart(moment.duration(0, 'minutes').asMilliseconds());
-	}, []);
-	const [depositEnd, setDepositEnd] = useState(0);
-	useEffect(() => {
-		setDepositEnd(moment.duration(5, 'minutes').asMilliseconds());
-	}, []);
-	const [settleStart, setSettleStart] = useState(moment.duration(0, 'minutes').asMilliseconds());
-	useEffect(() => {
-		setSettleStart(moment.duration(15, 'minutes').asMilliseconds());
-	}, []);
+	const [depositStart, setDepositStart] = useState(moment().add(0, 'minutes').toDate().getTime());
+	const [depositEnd, setDepositEnd] = useState(moment().add(5, 'minutes').toDate().getTime());
+	const [settleStart, setSettleStart] = useState(moment().add(15, 'minutes').toDate().getTime());
 
 	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
@@ -213,15 +179,15 @@ const CreateContractPage = () => {
 			});
 	}, [provider.connection, switchboardAggregator]);
 
-	const createContract = async () => {
+	const onCreateContractButtonClick = async () => {
 		try {
 			setIsLoading(true);
 
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
-				depositStart: Date.now() + depositStart,
-				depositEnd: Date.now() + depositEnd,
-				settleStart: Date.now() + settleStart,
+				depositStart: depositStart,
+				depositEnd: depositEnd,
+				settleStart: settleStart,
 				seniorDepositAmount,
 				juniorDepositAmount,
 				rateOption: {
@@ -235,22 +201,10 @@ const CreateContractPage = () => {
 			};
 
 			// create contract
-			// eslint-disable-next-line no-console
-			console.log('provider: ', provider);
-			// eslint-disable-next-line no-console
-			console.log('initParams: ', initParams);
+			const otcPublicKey = await createContract(provider, txHandler, initParams);
 
-			const [txs, otcPublicKey] = await create(provider, initParams);
-			await txHandler.handleTxs(...txs);
 			// Create contract URL
 			router.push(urlProvider.buildContractSummaryUrl(otcPublicKey.toBase58()));
-			try {
-				await supabaseInsertContract(otcPublicKey, wallet.publicKey);
-			} catch (err) {
-				toaster.danger('cannot save contract to database');
-			}
-
-			router.push(`/contract/summary/${otcPublicKey.toBase58()}`);
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.error(err);
@@ -263,9 +217,9 @@ const CreateContractPage = () => {
 		<Layout>
 			<Pane>
 				<Pane display="flex" alignItems="center">
-					<DurationPicker title="Deposit Start" value={depositStart} onChange={setDepositStart} />
-					<DurationPicker title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
-					<DurationPicker title="Settle Start" value={settleStart} onChange={setSettleStart} />
+					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
+					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
+					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
 				</Pane>
 
 				<Pane display="flex" alignItems="center">
@@ -278,7 +232,7 @@ const CreateContractPage = () => {
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
 
-				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={createContract}>
+				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract
 				</Button>
 			</Pane>

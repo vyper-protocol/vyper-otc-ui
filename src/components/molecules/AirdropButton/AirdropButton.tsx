@@ -3,7 +3,8 @@ import { useContext, useState } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { airdrop } from 'api/dummy-tokens/airdrop';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { Text, CloudDownloadIcon, Spinner, toaster, Tooltip } from 'evergreen-ui';
+import { Text, CloudDownloadIcon, Spinner, Tooltip } from 'evergreen-ui';
+import { toast } from 'react-toastify';
 
 const AirdropButton = () => {
 	const { connection } = useConnection();
@@ -19,7 +20,7 @@ const AirdropButton = () => {
 			const tx = await airdrop(connection, wallet.publicKey);
 			await txHandler.handleTxs(tx);
 
-			toaster.success('Airdrop completed');
+			toast.success('Airdrop completed');
 		} catch (err) {
 			// console.error(err);
 		} finally {

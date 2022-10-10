@@ -11,9 +11,9 @@ import RateSwitchboardState from 'models/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/RedeemLogicForwardState';
 
 import PROGRAMS from '../../configs/programs.json';
-import { OtcState } from '../../models/OtcState';
+import { ChainOtcState } from '../../models/ChainOtcState';
 
-export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<OtcState> => {
+export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: PublicKey): Promise<ChainOtcState> => {
 	const promises: Promise<void>[] = [];
 
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
@@ -22,7 +22,7 @@ export const fetchOtcState = async (provider: AnchorProvider, otcStateAddress: P
 	const accountInfo = await vyperOtcProgram.account.otcState.fetch(otcStateAddress);
 	const trancheConfigAccountInfo = await vyperCoreProgram.account.trancheConfig.fetch(accountInfo.vyperTrancheConfig);
 
-	const res = new OtcState();
+	const res = new ChainOtcState();
 	res.publickey = otcStateAddress;
 	res.reserveMintInfo = await getMint(provider.connection, trancheConfigAccountInfo.reserveMint);
 	res.createdAt = accountInfo.created.toNumber() * 1000;

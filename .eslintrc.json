@@ -21,7 +21,7 @@
 	"rules": {
 		"react/prop-types": 0,
 		"react/react-in-jsx-scope": 0,
-		"arrow-body-style": [1, "always"],
+		"arrow-body-style": 0,
 		"brace-style": [
 			2,
 			"1tbs",

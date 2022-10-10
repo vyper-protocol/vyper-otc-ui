@@ -6,6 +6,7 @@ import Footer from 'components/templates/Footer';
 import { Pane } from 'evergreen-ui';
 import Image from 'next/image';
 
+import backgroundImage from '../../public/background.webp';
 import styles from './index.module.scss';
 
 const Home = () => {
@@ -16,7 +17,11 @@ const Home = () => {
 			<div className={styles.bg_wrapper}>
 				<TopBar />
 				<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
-				<Image alt="abstract-colors" src="/background.jpg" layout="fill" objectFit="cover" quality={100} style={{ zIndex: -1 }} />
+
+				<Image alt="abstract-colors" src={backgroundImage} layout="fill" objectFit="cover" quality={50} priority style={{ zIndex: -1 }} />
+
+
+
 			</div>
 			<div className={styles.text_wrapper}>
 				<h2>VYPER OTC</h2>
