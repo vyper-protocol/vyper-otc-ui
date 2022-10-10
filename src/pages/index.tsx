@@ -17,11 +17,7 @@ const Home = () => {
 			<div className={styles.bg_wrapper}>
 				<TopBar />
 				<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
-
 				<Image alt="abstract-colors" src={backgroundImage} layout="fill" objectFit="cover" quality={50} priority style={{ zIndex: -1 }} />
-
-
-
 			</div>
 			<div className={styles.text_wrapper}>
 				<h2>VYPER OTC</h2>
