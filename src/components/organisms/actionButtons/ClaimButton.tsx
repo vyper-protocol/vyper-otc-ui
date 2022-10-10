@@ -15,7 +15,7 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 	const txHandler = useContext(TxHandlerContext);
 
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
+	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onClaimClick = async () => {

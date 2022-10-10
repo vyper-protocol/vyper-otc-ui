@@ -1,8 +1,8 @@
 import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import RateSwitchboardState from './RateSwitchboardState';
-import { RedeemLogicForwardState } from './RedeemLogicForwardState';
+import RateSwitchboardState from './plugins/RateSwitchboardState';
+import { RedeemLogicForwardState } from './plugins/RedeemLogicForwardState';
 
 export abstract class AbsOtcState {
 	/**
@@ -11,9 +11,14 @@ export abstract class AbsOtcState {
 	publickey: PublicKey;
 
 	/**
+	 * VyperCore account pubkey
+	 */
+	vyperCoreTrancheConfig: PublicKey;
+
+	/**
 	 * Reserve mint info
 	 */
-	reserveMintInfo: Mint;
+	reserveMint: PublicKey;
 
 	/**
 	 * Creation timestamp in ms

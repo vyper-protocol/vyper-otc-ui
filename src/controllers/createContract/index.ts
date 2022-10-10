@@ -20,7 +20,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 	try {
 		await sleep(1000);
 		console.log('saving contract on db');
-		const chianOtcState = await fetchOtcState(provider, otcPublicKey);
+		const chianOtcState = await fetchOtcState(provider.connection, otcPublicKey);
 		await supabaseInsertContract(chianOtcState, provider.wallet.publicKey);
 	} catch (err) {
 		console.error(err);
