@@ -6,6 +6,8 @@
 	display: flex;
 	justify-content: space-between;
 	padding: 15px 25px;
+	z-index: 1;
+	position: relative;
 
 	.nav {
 		display: flex;
@@ -51,58 +53,62 @@
 	}
 }
 
+.cluster {
+	margin-right: 20px;
+}
+
 div[evergreen-portal-container] {
-  div {
-    .popover {
-      min-width: 100px;
+	div {
+		.popover {
+			min-width: 100px;
 
-      .container {
-        padding: 20px 32px 20px 24px;
-        min-width: 100px;
+			.container {
+				padding: 20px 32px 20px 24px;
+				min-width: 100px;
 
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				justify-content: flex-start;
 
-        .item {
-          margin-bottom: 16px;
-          width: 100%;
-          display: flex;
-          align-items: center;
+				.item {
+					margin-bottom: 16px;
+					width: 100%;
+					display: flex;
+					align-items: center;
 
-          svg {
-            margin-bottom: -1px;
-            margin-right: 12px;
-            width: 16px;
-            height: 16px;
-            fill: var(--color-text-disabled);
-          }
+					svg {
+						margin-bottom: -1px;
+						margin-right: 12px;
+						width: 16px;
+						height: 16px;
+						fill: var(--color-text-disabled);
+					}
 
-          span {
-            font-family: var(--font-primary) !important;
-            font-size: 15px;
-            color: var(--color-text-disabled);
-            font-weight: 500;
-          }
+					span {
+						font-family: var(--font-primary) !important;
+						font-size: 15px;
+						color: var(--color-text-disabled);
+						font-weight: 500;
+					}
 
-          &:last-child {
-            margin-bottom: 0px;
-          }
-        }
+					&:last-child {
+						margin-bottom: 0px;
+					}
+				}
 
-        .item:hover {
-          cursor: pointer;
+				.item:hover {
+					cursor: pointer;
 
-          svg {
-            fill: var(--color-black);
-          }
+					svg {
+						fill: var(--color-black);
+					}
 
-          span {
-            color: var(--color-black);
-          }
-        }
-      }
-    }
-  }
+					span {
+						color: var(--color-black);
+					}
+				}
+			}
+		}
+	}
 }

@@ -1,69 +1,51 @@
 /* eslint-disable css-modules/no-unused-class */
 
+import { useContext } from 'react';
+
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
+import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import resources from 'configs/resources.json';
-import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position } from 'evergreen-ui';
+import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position, PathSearchIcon } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
-
-const menuItems = [
-	{
-		name: 'Home',
-		icon: <StackedChartIcon />,
-		path: '/',
-		wip: false,
-		tooltip: false
-	}
-];
 
 const TopBar = () => {
 	const router = useRouter();
 
-	const routerArray = router.asPath.split('/');
-	const routerCondition = `/${routerArray[1]}/${routerArray[2]}`;
+	const urlProvider = useContext(UrlProviderContext);
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (e.altKey) router.push('/contract/create');
+		if (e.altKey) {
+			router.push(urlProvider.buildCreateContractUrl());
+		}
 	};
 
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href="/">
+				<Link href={urlProvider.buildHomeUrl()}>
 					<Heading size={600} className={styles.hover}>
 						Vyper OTC
 					</Heading>
 				</Link>
 
 				<Pane className={styles.nav}>
-					{menuItems.map((menuItem) => {
-						const itemPathArray = menuItem.path.split('/');
-						const itemPathCondition = `/${itemPathArray[1]}/${itemPathArray[2]}`;
+					{/* HOME LINK */}
+					<div className={cn(styles.item)}>
+						<Link href={urlProvider.buildHomeUrl()}>
+							<Text>
+								<StackedChartIcon /> Home
+							</Text>
+						</Link>
+					</div>
 
-						return (
-							<div key={menuItem.name} className={cn(styles.item, menuItem.wip && styles.disabled, routerCondition === itemPathCondition && styles.active)}>
-								<Link href={menuItem.path} as={menuItem.path}>
-									{menuItem.tooltip ? (
-										<Tooltip content={menuItem.tooltip}>
-											<Text>
-												{menuItem.icon} {menuItem.name}
-											</Text>
-										</Tooltip>
-									) : (
-										<Text>
-											{menuItem.icon} {menuItem.name}
-										</Text>
-									)}
-								</Link>
-							</div>
-						);
-					})}
-
+					{/* CREATE CONTRACT LINK */}
 					<div className={cn(styles.item)}>
 						<Tooltip content="Coming soon">
 							<Text onClick={onCreateContractClick}>
@@ -72,6 +54,16 @@ const TopBar = () => {
 						</Tooltip>
 					</div>
 
+					{/* EXPLORER LINK */}
+					{/* <div className={styles.item}>
+						<Link href={urlProvider.buildExplorerUrl()}>
+							<Text>
+								<PathSearchIcon /> Explorer
+							</Text>
+						</Link>
+					</div> */}
+
+					{/* SOCIALS */}
 					<Popover
 						statelessProps={{
 							className: cn(styles.popover)
@@ -102,7 +94,10 @@ const TopBar = () => {
 					</div>
 				</Pane>
 
-				<SelectWallet />
+				<Pane display="flex" alignItems="center">
+					<ClusterSelector className={styles.cluster} />
+					<SelectWallet />
+				</Pane>
 			</Pane>
 		</>
 	);

@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
 import { createContext } from 'react';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { ConfirmOptions, SendOptions } from '@solana/web3.js';
-import { toaster } from 'evergreen-ui';
+import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { TxPackage } from 'models/TxPackage';
+import { Id, toast } from 'react-toastify';
+import { abbreviateAddress } from 'utils/stringHelpers';
 
 export type TxHandler = {
 	handleTxs: (...txs: TxPackage[]) => Promise<void>;
@@ -39,8 +40,10 @@ export const TxHandlerProvider = ({ children }) => {
 		for (let i = 0; i < txs.length; i++) {
 			console.group(`sending tx# ${i + 1} / ${txs.length} `);
 
-			// eslint-disable-next-line prefer-const
-			let { tx, signers, description } = txs[i];
+			let toastID: Id;
+
+			const { signers } = txs[i];
+			let { tx, description } = txs[i];
 			try {
 				if (description) console.log('description: ' + description);
 				description = description ? ' | ' + description : '';
@@ -48,9 +51,11 @@ export const TxHandlerProvider = ({ children }) => {
 				tx.feePayer = wallet.publicKey;
 				tx.recentBlockhash = recentBlockhash;
 
-				toaster.warning(`Signing tx ${i + 1} / ${txs.length} ${description}`, {
-					hasCloseButton: false,
-					id: description
+				toastID = toast.warn(`Signing tx ${i + 1} / ${txs.length} ${description}`, {
+					autoClose: false,
+					// icon: '📝',
+					isLoading: true,
+					closeButton: false
 				});
 				console.log('signing txs...');
 				tx = await wallet.signTransaction(tx);
@@ -63,54 +68,45 @@ export const TxHandlerProvider = ({ children }) => {
 				console.log('signature: ', signature);
 
 				console.log('confirming...');
-				toaster.notify(`Confirming tx ${i + 1} / ${txs.length} ${description}`, {
-					hasCloseButton: false,
-					id: description
-				});
-				// enqueueTempSnackbar(`Confirming tx ${i + 1} / ${txs.length} ${description}`);
-				const signatureResult = await connection.confirmTransaction(signature, confirmOptions.commitment);
 
+				toast.update(toastID, {
+					render: `Confirming tx ${i + 1} / ${txs.length} ${description}`
+				});
+
+				const signatureResult = await connection.confirmTransaction(signature, confirmOptions.commitment);
 				if (signatureResult.value.err) {
 					throw Error('error: ' + signatureResult.value.err);
 				}
 
 				console.log('processed in slot: ', signatureResult.context.slot);
 
-				// TODO add the "open in explorer button"
-				toaster.success(`Transaction sent ${i + 1} / ${txs.length} ${description}`, {
-					hasCloseButton: true,
-					id: description
+				toast.update(toastID, {
+					render: `Transaction sent ${i + 1} / ${txs.length} ${description}. Processed in slot: ${signatureResult.context.slot}. Signature: ${abbreviateAddress(
+						signature
+					)}`,
+					onClick: () => {
+						window.open(getExplorerLink(signature, { explorer: 'solscan', cluster: 'devnet' }));
+					},
+					type: toast.TYPE.SUCCESS,
+					isLoading: false,
+					closeOnClick: false,
+					autoClose: 5000
 				});
-				// enqueueSnackbar(`Transaction sent ${i + 1} / ${txs.length} ${description}`, {
-				// 	variant: 'success',
-				// 	autoHideDuration: 8000,
-				// 	action: (k) => {
-				// 		return (
-				// 			<p
-				// 				onClick={() => {
-				// 					window.open(getExplorerLink('tx', signature, 'devnet'));
-				// 				}}
-				// 				style={{
-				// 					color: 'var(--color-black-300)',
-				// 					cursor: 'pointer',
-				// 					textDecoration: 'underline',
-				// 					marginRight: 'var(--space-10)'
-				// 				}}
-				// 			>
-				// 				{abbreviateAddress(signature)}
-				// 			</p>
-				// 		);
-				// 	}
-				// });
 			} catch (err) {
 				console.error('err: ', JSON.stringify(err));
 				if (err.message) {
-					toaster.danger(err.message, {
-						id: description
+					toast.update(toastID, {
+						render: err.message,
+						icon: '❌',
+						type: 'error',
+						autoClose: 5000
 					});
 				} else {
-					toaster.danger('Error sending transaction', {
-						id: description
+					toast.update(toastID, {
+						render: 'Error sending transaction',
+						type: 'error',
+						icon: '❌',
+						autoClose: 5000
 					});
 				}
 

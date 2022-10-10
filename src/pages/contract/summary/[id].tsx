@@ -1,7 +1,7 @@
+/* eslint-disable css-modules/no-unused-class */
 /* eslint-disable space-before-function-paren */
 import { useState } from 'react';
 
-import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import SearchBar from 'components/molecules/SearchBar';
@@ -10,16 +10,17 @@ import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import Layout from 'components/templates/Layout';
-import { Pane, toaster, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
+import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import styles from './summary.module.scss';
 
-// test : WD2TKRpqhRHMJ92hHndCZx1Y4rp9fPBtAAV3kzMYKu3
+// test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -29,30 +30,34 @@ const SummaryPageId = () => {
 	const [searchValue, setSearchValue] = useState('');
 
 	const { id } = router.query;
-	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, id as string);
+
+	// Pass the cluster option as a unique indetifier to the query
+	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
 	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
-		toaster.notify('Address copied to clipboard', {
-			duration: 1
+		toast.info('Address copied to clipboard', {
+			autoClose: 2000
 		});
 	};
 
-	// TODO fetch from chain
-	const reserveMintSymbol = 'USDC';
+	const reserveTokenInfo = rateStateQuery?.data?.reserveTokenInfo;
 
-	const loadingSpinner = !rateStateQuery?.data?.depositExpirationAt || !rateStateQuery?.data?.settleAvailableFromAt;
+	const loadingSpinner = rateStateQuery?.isLoading;
+	const errorMessage = rateStateQuery?.isError;
+	const showContent = rateStateQuery?.isSuccess;
 
 	return (
 		<Layout>
 			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
 
 			<Pane clearfix margin={24} maxWidth={400}>
-				{loadingSpinner ? (
-					<Spinner />
-				) : (
+				{errorMessage && <p>Contract not found</p>}
+
+				{loadingSpinner && <Spinner />}
+
+				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
 					<>
 						<div className={styles.box}>
 							{/* + + + + + + + + + + + + +  */}
@@ -111,10 +116,17 @@ const SummaryPageId = () => {
 							{/* DETAILS */}
 
 							<div className={styles.content}>
-								<div className={styles.column}>
-									<p>Current Price</p>
-									<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState.aggregatorLastValue)}</p>
-								</div>
+								{rateStateQuery?.data?.settleExecuted ? (
+									<div className={styles.column}>
+										<p>Settlement price</p>
+										<p>{formatWithDecimalDigits(rateStateQuery?.data?.priceAtSettlement)}</p>
+									</div>
+								) : (
+									<div className={styles.column}>
+										<p>Current Price</p>
+										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
+									</div>
+								)}
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
@@ -179,13 +191,13 @@ const SummaryPageId = () => {
 								<Pane margin={6} textAlign="center">
 									Long{' '}
 									<Badge color="neutral">
-										{rateStateQuery?.data?.buyerDepositAmount} {reserveMintSymbol}
+										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo.symbol}
 									</Badge>
 								</Pane>
 								<Pane margin={6} textAlign="center">
 									Short{' '}
 									<Badge color="neutral">
-										{rateStateQuery?.data?.sellerDepositAmount} {reserveMintSymbol}
+										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo.symbol}
 									</Badge>
 								</Pane>
 							</Pane>
@@ -205,13 +217,13 @@ const SummaryPageId = () => {
 										<Pane margin={6} textAlign="center">
 											Long{' '}
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveMintSymbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo.symbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
 											Short{' '}
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveMintSymbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo.symbol}
 											</Badge>
 										</Pane>
 									</Pane>

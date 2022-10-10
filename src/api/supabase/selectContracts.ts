@@ -1,0 +1,31 @@
+/* eslint-disable no-console */
+/* eslint-disable camelcase */
+import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
+import { DbOtcState } from 'models/DbOtcState';
+
+import { supabase } from './client';
+
+const CONTRACTS_TABLE_NAME = 'contracts';
+const CONTRACTS_METADATA_TABLE_NAME = 'contracts_metadata';
+
+export const selectContracts = async (params: FetchContractsParams): Promise<DbOtcState[]> => {
+	const query = supabase.from(CONTRACTS_TABLE_NAME).select(
+		`
+			        *,
+			        ${CONTRACTS_METADATA_TABLE_NAME} (
+			            *
+			        )
+			    `
+	);
+
+	params.lte.forEach((f) => query.lte(f.column, f.value));
+	params.gte.forEach((f) => query.gte(f.column, f.value));
+	params.gt.forEach((f) => query.gt(f.column, f.value));
+	params.lt.forEach((f) => query.lt(f.column, f.value));
+
+	const res = await query;
+
+	if (res.error) throw Error(res.error.message);
+
+	return res.data.map<DbOtcState>((c) => DbOtcState.fromSupabaseSelectRes(c));
+};

@@ -7,7 +7,6 @@ import { PublicKey } from '@solana/web3.js';
 import { withdraw } from 'api/otc-state/withdraw';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { MinusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
 const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
@@ -16,7 +15,7 @@ const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; i
 	const txHandler = useContext(TxHandlerContext);
 
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
+	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onWithdrawClick = async () => {

@@ -7,7 +7,6 @@ import { PublicKey } from '@solana/web3.js';
 import { settle } from 'api/otc-state/settle';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
 const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
@@ -16,7 +15,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const txHandler = useContext(TxHandlerContext);
 
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
+	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onSettleClick = async () => {

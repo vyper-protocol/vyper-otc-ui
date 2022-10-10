@@ -1,4 +1,4 @@
-import { Button, Text, Tooltip } from 'evergreen-ui';
+import { Text, Tooltip } from 'evergreen-ui';
 import moment from 'moment';
 
 type MomentTooltipSpanInput = {
@@ -11,7 +11,7 @@ type MomentTooltipSpanInput = {
 
 const MomentTooltipSpan = ({ datetime, timeFormat }: MomentTooltipSpanInput) => {
 	return (
-		<Tooltip content={moment(datetime).format(timeFormat ?? 'd MMM yyyy hh:mm a')} position="right">
+		<Tooltip content={moment(datetime).format(timeFormat ?? 'D MMM yyyy hh:mm a')} position="right">
 			<Text>{moment(datetime).fromNow()}</Text>
 		</Tooltip>
 	);

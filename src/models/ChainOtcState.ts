@@ -1,40 +1,21 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable space-before-function-paren */
 import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import RateSwitchboardState from './RateSwitchboardState';
-import { RedeemLogicForwardState } from './RedeemLogicForwardState';
+import { AbsOtcState } from './AbsOtcState';
+import { TokenInfo } from './TokenInfo';
 
-export class OtcState {
-	/**
-	 * Current Contract public key
-	 */
-	publickey: PublicKey;
-
+export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Reserve mint info
 	 */
 	reserveMintInfo: Mint;
 
 	/**
-	 * Creation timestamp in ms
+	 * Reserve token info
 	 */
-	createdAt: number;
-
-	/**
-	 * Deposit available from timestamp in ms
-	 */
-	depositAvailableFrom: number;
-
-	/**
-	 * Deposit expiration timestamp in ms
-	 */
-	depositExpirationAt: number;
-
-	/**
-	 * Settlement available from timestamp in ms
-	 */
-	settleAvailableFromAt: number;
+	reserveTokenInfo?: TokenInfo;
 
 	/**
 	 * Flag for the settlement execution
@@ -42,14 +23,9 @@ export class OtcState {
 	settleExecuted: boolean;
 
 	/**
-	 * Amount of tokens the buyer needs to deposit
+	 * Price at settlement
 	 */
-	buyerDepositAmount: number;
-
-	/**
-	 * Amount of tokens the seller needs to deposit
-	 */
-	sellerDepositAmount: number;
+	priceAtSettlement: number | undefined;
 
 	/**
 	 * OTC program token account for buyer tokens
@@ -80,16 +56,6 @@ export class OtcState {
 	 * Seller token account
 	 */
 	sellerTA: undefined | PublicKey;
-
-	/**
-	 * Redeem logic state
-	 */
-	redeemLogicState: RedeemLogicForwardState;
-
-	/**
-	 * Rate state
-	 */
-	rateState: RateSwitchboardState;
 
 	isDepositExpired(): boolean {
 		return Date.now() > this.depositExpirationAt;
@@ -155,18 +121,13 @@ export class OtcState {
 
 	getPnlBuyer(): number {
 		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
-		return Math.max(
-			Math.min(this.redeemLogicState.notional * (this.rateState.aggregatorLastValue - this.redeemLogicState.strike), this.sellerDepositAmount),
-			-this.buyerDepositAmount
-		);
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.aggregatorLastValue;
+		return Math.max(Math.min(this.redeemLogicState.notional * (priceToUse - this.redeemLogicState.strike), this.sellerDepositAmount), -this.buyerDepositAmount);
 	}
 
 	getPnlSeller(): number {
 		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
-
-		return Math.max(
-			-this.sellerDepositAmount,
-			Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - this.rateState.aggregatorLastValue))
-		);
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.aggregatorLastValue;
+		return Math.max(-this.sellerDepositAmount, Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - priceToUse)));
 	}
 }

@@ -7,7 +7,6 @@ import { PublicKey } from '@solana/web3.js';
 import { deposit } from 'api/otc-state/deposit';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { PlusIcon } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
 const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
@@ -16,7 +15,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	const txHandler = useContext(TxHandlerContext);
 
 	const provider = new AnchorProvider(connection, wallet, {});
-	const rateStateQuery = useGetFetchOTCStateQuery(provider, otcStatePubkey);
+	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onDepositClick = async () => {
