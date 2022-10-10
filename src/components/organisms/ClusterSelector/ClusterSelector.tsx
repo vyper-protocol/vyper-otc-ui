@@ -4,10 +4,11 @@ import { useContext, useEffect, useState } from 'react';
 import cn from 'classnames';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
-import { SettingsIcon, Pane, RadioGroup, Popover, toaster } from 'evergreen-ui';
+import { SettingsIcon, Pane, RadioGroup, Popover } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 
 import styles from './ClusterSelector.module.scss';
+import { toast } from 'react-toastify';
 
 type ClusterSelectorProps = {
 	className?: string;
@@ -36,9 +37,7 @@ const ClusterSelector = ({ className }: ClusterSelectorProps) => {
 		const clusterSwitch = urlProvider.buildCurrentUrl(event.target.value);
 		router.push(clusterSwitch);
 
-		toaster.notify(`Network updated to ${event.target.value}`, {
-			duration: 3
-		});
+		toast.info(`Network updated to ${event.target.value}`);
 	};
 
 	const popupContent = (
