@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
+import { PublicKey } from '@solana/web3.js';
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
+import { ChainOtcState } from 'models/ChainOtcState';
 import { DbOtcState } from 'models/DbOtcState';
 
 import { CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
