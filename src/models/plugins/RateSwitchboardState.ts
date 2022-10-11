@@ -39,4 +39,8 @@ export default class RateSwitchboardState extends AbsPlugin {
 	getTypeId(): string {
 		return 'switchboard';
 	}
+
+	clone(): RateSwitchboardState {
+		return new RateSwitchboardState(this.programPubkey, this.statePubkey, this.switchboardAggregator);
+	}
 }

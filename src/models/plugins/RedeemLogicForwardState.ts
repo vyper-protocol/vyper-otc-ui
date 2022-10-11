@@ -19,4 +19,8 @@ export class RedeemLogicForwardState extends AbsPlugin {
 	getTypeId(): string {
 		return 'forward';
 	}
+
+	clone(): RedeemLogicForwardState {
+		return new RedeemLogicForwardState(this.programPubkey, this.statePubkey, this.strike, this.isLinear, this.notional);
+	}
 }
