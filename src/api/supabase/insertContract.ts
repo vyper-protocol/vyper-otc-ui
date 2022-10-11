@@ -2,10 +2,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { ChainOtcState } from 'models/ChainOtcState';
 
-import { supabase } from './client';
-
-const CONTRACTS_TABLE_NAME = 'contracts';
-const CONTRACTS_METADATA_TABLE_NAME = 'contracts_metadata';
+import { CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
 export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy: PublicKey, metadata: any = {}) => {
 	await supabase.from(CONTRACTS_TABLE_NAME).insert([

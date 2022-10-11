@@ -20,8 +20,6 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 import styles from './summary.module.scss';
 import { toast } from 'react-toastify';
 
-// test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
-
 const SummaryPageId = () => {
 	const router = useRouter();
 	const { connection } = useConnection();
@@ -51,7 +49,6 @@ const SummaryPageId = () => {
 	return (
 		<Layout>
 			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
-
 			<Pane clearfix margin={24} maxWidth={400}>
 				{errorMessage && <p>Contract not found</p>}
 
