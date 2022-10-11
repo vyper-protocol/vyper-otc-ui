@@ -49,7 +49,6 @@ const SummaryPageId = () => {
 	return (
 		<Layout>
 			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
-			<Button onClick={() => rateStateQuery.refetch()}>Refetch query</Button>
 			<Pane clearfix margin={24} maxWidth={400}>
 				{errorMessage && <p>Contract not found</p>}
 
