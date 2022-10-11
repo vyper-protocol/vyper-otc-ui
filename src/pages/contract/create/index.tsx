@@ -5,21 +5,19 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
-import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import AmountPicker from 'components/molecules/AmountPicker';
+import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
-import moment from 'moment';
-import { useRouter } from 'next/router';
 import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
-import { PythHttpClient } from '@pythnetwork/client';
-import { getPythClusterApiUrl, getPythProgramKeyForCluster } from '@pythnetwork/client/lib/cluster';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
+import moment from 'moment';
+import { useRouter } from 'next/router';
 
 const StrikePicker = ({
 	title,
@@ -92,7 +90,8 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 	);
 };
 
-const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
+// eslint-disable-next-line no-unused-vars
+const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
 	const [productSymbol, setProductSymbol] = useState('');
 	const { connection } = useConnection();
 
@@ -150,19 +149,20 @@ const CreateContractPage = () => {
 	const [switchboardAggregator, setSwitchboardAggregator] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
 	const [pythPrice, setPythPrice] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
 
-	async function setStrikeToDefaultValue() {
+	const setStrikeToDefaultValue = async () => {
 		if (ratePluginType === 'pyth') {
-			const [_, price] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(pythPrice));
+			const [, price] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(pythPrice));
 			setStrike(price.price);
 		}
 		if (ratePluginType === 'switchboard') {
-			const [_, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(switchboardAggregator));
+			const [, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(switchboardAggregator));
 			setStrike(price);
 		}
-	}
+	};
 
 	useEffect(() => {
 		setStrikeToDefaultValue();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ratePluginType, switchboardAggregator, pythPrice]);
 
 	const [notional, setNotional] = useState(1);

@@ -1,8 +1,8 @@
-import { Cluster, Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { getAggregatorData, getAggregatorLatestValue } from 'api/switchboard/switchboardHelper';
-import { RatePluginTypeIds } from '../AbsPlugin';
 
+import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
 
 export default class RateSwitchboardState extends AbsRatePlugin {

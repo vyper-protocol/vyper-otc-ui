@@ -9,11 +9,10 @@ import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import { Badge } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
+import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 import { useRouter } from 'next/router';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress } from 'utils/stringHelpers';
-import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
-import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {

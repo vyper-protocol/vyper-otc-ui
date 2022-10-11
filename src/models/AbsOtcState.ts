@@ -1,4 +1,3 @@
-import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import { AbsRatePlugin } from './plugins/rate/AbsRatePlugin';

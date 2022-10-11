@@ -9,6 +9,7 @@ import { Id, toast } from 'react-toastify';
 import { abbreviateAddress } from 'utils/stringHelpers';
 
 export type TxHandler = {
+	// eslint-disable-next-line no-unused-vars
 	handleTxs: (...txs: TxPackage[]) => Promise<void>;
 };
 

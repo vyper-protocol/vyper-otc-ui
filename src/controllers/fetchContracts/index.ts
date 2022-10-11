@@ -9,7 +9,6 @@ import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectC
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
-import { AbsOtcState } from 'models/AbsOtcState';
 import { ChainOtcState } from 'models/ChainOtcState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
@@ -58,7 +57,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.seniorSideBeneficiary));
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.juniorSideBeneficiary));
 
-	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c != null)) as PublicKey[];
+	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c !== null)) as PublicKey[];
 	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
 
 	const res: ChainOtcState[] = [];

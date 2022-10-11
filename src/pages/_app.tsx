@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';

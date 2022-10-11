@@ -2,6 +2,7 @@ import { AnchorProvider, Program } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, getSwitchboardPid, loadSwitchboardProgram, SwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+
 import SwitchboardIdlDevnet from './idl_switchboard_devnet.json';
 import SwitchboardIdlMainnet from './idl_switchboard_mainnet.json';
 

@@ -9,6 +9,7 @@ export class RatePythState extends AbsRatePlugin {
 	pythProduct: Product;
 	pythPriceData: PriceData;
 
+	// eslint-disable-next-line no-unused-vars
 	constructor(programPubkey: PublicKey, statePubkey: PublicKey, public pythPrice: PublicKey) {
 		super(programPubkey, statePubkey);
 	}
