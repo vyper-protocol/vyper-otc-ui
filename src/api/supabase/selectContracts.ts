@@ -3,10 +3,7 @@
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
 import { DbOtcState } from 'models/DbOtcState';
 
-import { supabase } from './client';
-
-const CONTRACTS_TABLE_NAME = 'contracts';
-const CONTRACTS_METADATA_TABLE_NAME = 'contracts_metadata';
+import { CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
 export const selectContracts = async (params: FetchContractsParams): Promise<DbOtcState[]> => {
 	const query = supabase.from(CONTRACTS_TABLE_NAME).select(
