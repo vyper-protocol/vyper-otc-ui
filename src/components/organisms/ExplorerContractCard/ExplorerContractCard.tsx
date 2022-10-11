@@ -41,7 +41,7 @@ const ExporerContractCard = ({ otcState, onClick }: ExporerContractCardProps) =>
 				</Typography>
 
 				<Typography width="100%" display="flex" justifyContent="center" alignItems="center">
-					<strong>{otcState.rateState.getAggregatorName()}</strong>
+					<strong>{otcState.rateState.getPluginDescription()}</strong>
 				</Typography>
 
 				<Typography width="100%" display="flex" alignItems="center">

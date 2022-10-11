@@ -12,6 +12,8 @@ import { ChainOtcState } from 'models/ChainOtcState';
 import { useRouter } from 'next/router';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress } from 'utils/stringHelpers';
+import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
+import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -113,9 +115,10 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			filterable: true
 		},
 		{
-			type: 'string',
+			type: 'singleSelect',
 			field: 'rateState.getTypeId()',
 			headerName: 'Rate Type',
+			valueOptions: AVAILABLE_RATE_PLUGINS,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge color="green">{params.value}</Badge>,
 			valueGetter: (params) => {
 				return params.row.rateState.getTypeId();
@@ -127,7 +130,7 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'rateState.getAggregatorName()',
 			headerName: 'Underlying',
 			valueGetter: (params) => {
-				return params.row.rateState.getAggregatorName();
+				return params.row.rateState.getPluginDescription();
 			},
 			width: 150
 		},
@@ -136,7 +139,7 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'rateState.aggregatorLastValue',
 			headerName: 'Current Price',
 			valueGetter: (params) => {
-				return formatWithDecimalDigits(params.row.rateState.aggregatorLastValue);
+				return formatWithDecimalDigits(params.row.rateState.getPluginLastValue());
 			},
 			width: 150
 		},
@@ -145,7 +148,8 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.getTypeId()',
 			headerName: 'RedeemLogic Type',
 			sortable: false,
-			filterable: false,
+			filterable: true,
+			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
 			valueGetter: (params) => {
 				return params.row.redeemLogicState.getTypeId();
