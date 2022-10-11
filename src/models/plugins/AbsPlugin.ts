@@ -1,5 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
+export const AVAILABLE_RATE_PLUGINS = ['switchboard', 'pyth'];
+export const AVAILABLE_REDEEM_LOGIC_PLUGINS = ['forward'];
 export type RatePluginTypeIds = 'switchboard' | 'pyth';
 export type RedeemLogicPluginTypeIds = 'forward';
 
