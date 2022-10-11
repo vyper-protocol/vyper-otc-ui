@@ -31,7 +31,6 @@ const SummaryPageId = () => {
 
 	// Pass the cluster option as a unique indetifier to the query
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
-	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -59,7 +58,6 @@ const SummaryPageId = () => {
 						<div className={styles.box}>
 							{/* + + + + + + + + + + + + +  */}
 							{/* PLUGIN USED */}
-
 							<Pane width="100%" display="flex" alignItems="center">
 								<Badge color="purple" margin={6}>
 									FORWARD
@@ -75,10 +73,8 @@ const SummaryPageId = () => {
 									</Badge>
 								)}
 							</Pane>
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* FUNDED SIDES */}
-
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<Badge color={rateStateQuery?.data?.isBuyerFunded() ? 'green' : 'red'} margin={6}>
 									{rateStateQuery?.data?.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'}
@@ -91,13 +87,11 @@ const SummaryPageId = () => {
 								</Badge>
 							</Pane>
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* TITLE AND SYMBOL */}
-
 							<Pane width="100%" justifyContent="center" alignItems="center">
 								<Pane width="100%" textAlign="center">
-									<h5>{asset}</h5>
+									<h5>{rateStateQuery?.data?.getContractTitle()}</h5>
 								</Pane>
 								<Pane width="100%" textAlign="center">
 									{id && (
@@ -108,10 +102,8 @@ const SummaryPageId = () => {
 								</Pane>
 							</Pane>
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* DETAILS */}
-
 							<div className={styles.content}>
 								{rateStateQuery?.data?.settleExecuted ? (
 									<div className={styles.column}>
@@ -121,7 +113,7 @@ const SummaryPageId = () => {
 								) : (
 									<div className={styles.column}>
 										<p>Current Price</p>
-										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
+										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.getPluginLastValue())}</p>
 									</div>
 								)}
 								<div className={styles.column}>
@@ -174,16 +166,12 @@ const SummaryPageId = () => {
 									</div>
 								)}
 							</div>
-
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* COLLATERAL AMOUNTS */}
-
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<b>Collateral</b>
 							</Pane>
-
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<Pane margin={6} textAlign="center">
 									Long{' '}
@@ -198,12 +186,9 @@ const SummaryPageId = () => {
 									</Badge>
 								</Pane>
 							</Pane>
-
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* PnL */}
-
 							{rateStateQuery?.data?.isPnlAvailable() && (
 								<>
 									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
@@ -226,7 +211,6 @@ const SummaryPageId = () => {
 									</Pane>
 								</>
 							)}
-
 							<div className={styles.buttons}>
 								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
 								<DepositButton otcStatePubkey={id as string} isBuyer={false} />

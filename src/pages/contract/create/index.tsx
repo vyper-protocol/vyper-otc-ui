@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
@@ -11,39 +12,27 @@ import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvid
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { Button, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
+import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
+import { PythHttpClient } from '@pythnetwork/client';
+import { getPythClusterApiUrl, getPythProgramKeyForCluster } from '@pythnetwork/client/lib/cluster';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 
 const StrikePicker = ({
 	title,
 	value,
 	onChange,
-	switchboardAggregator
+	onRefreshClick
 }: {
 	title: string;
 	value: number;
 	// eslint-disable-next-line no-unused-vars
 	onChange: (val: number) => void;
-	switchboardAggregator: string;
+	onRefreshClick: () => void;
 }) => {
-	const [isLoading, setIsLoading] = useState(false);
-	const { connection } = useConnection();
-
-	const onRefresh = async () => {
-		try {
-			setIsLoading(true);
-			const latestResult = await getAggregatorLatestValue(connection, new PublicKey(switchboardAggregator));
-			onChange(latestResult);
-		} catch (err) {
-			alert(err);
-			// eslint-disable-next-line no-console
-			console.error(err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
 	return (
 		<Pane display="flex" alignItems="center" margin={12}>
 			<TextInputField
@@ -54,14 +43,7 @@ const StrikePicker = ({
 					return onChange(e.target.value);
 				}}
 			/>
-			<IconButton
-				isLoading={isLoading}
-				icon={RefreshIcon}
-				onClick={() => {
-					return onRefresh();
-				}}
-				intent="success"
-			/>
+			<IconButton icon={RefreshIcon} onClick={onRefreshClick} intent="success" />
 			<Button
 				onClick={() => {
 					return onChange(value * 2);
@@ -110,6 +92,40 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 	);
 };
 
+const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
+	const [productSymbol, setProductSymbol] = useState('');
+	const { connection } = useConnection();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const [product] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(value));
+				if (product) setProductSymbol(product.symbol);
+				else setProductSymbol('');
+			} catch {
+				setProductSymbol('');
+			}
+		};
+		fetchData();
+	}, [value, connection]);
+
+	return (
+		<Pane display="flex" alignItems="center" margin={6}>
+			<TextInputField
+				width="100%"
+				label={title + ' ' + productSymbol}
+				value={value}
+				onChange={(e) => {
+					return onChange(e.target.value);
+				}}
+			/>
+			<a target="_blank" href="https://pyth.network/price-feeds" rel="noopener noreferrer">
+				<IconButton icon={ShareIcon} intent="success" />
+			</a>
+		</Pane>
+	);
+};
+
 const CreateContractPage = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
@@ -128,7 +144,26 @@ const CreateContractPage = () => {
 	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
 
+	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>('pyth');
+	const availableRatePluginTypes: RatePluginTypeIds[] = ['switchboard', 'pyth'];
+
 	const [switchboardAggregator, setSwitchboardAggregator] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
+	const [pythPrice, setPythPrice] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
+
+	async function setStrikeToDefaultValue() {
+		if (ratePluginType === 'pyth') {
+			const [_, price] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(pythPrice));
+			setStrike(price.price);
+		}
+		if (ratePluginType === 'switchboard') {
+			const [_, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(switchboardAggregator));
+			setStrike(price);
+		}
+	}
+
+	useEffect(() => {
+		setStrikeToDefaultValue();
+	}, [ratePluginType, switchboardAggregator, pythPrice]);
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
@@ -147,6 +182,10 @@ const CreateContractPage = () => {
 		try {
 			setIsLoading(true);
 
+			let rateAccount = PublicKey.unique();
+			if (ratePluginType === 'switchboard') rateAccount = new PublicKey(switchboardAggregator);
+			if (ratePluginType === 'pyth') rateAccount = new PublicKey(pythPrice);
+
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
 				depositStart: depositStart,
@@ -155,7 +194,8 @@ const CreateContractPage = () => {
 				seniorDepositAmount,
 				juniorDepositAmount,
 				rateOption: {
-					switchboardAggregator: new PublicKey(switchboardAggregator)
+					ratePluginType,
+					rateAccount
 				},
 				redeemLogicOption: {
 					isLinear: true,
@@ -190,9 +230,16 @@ const CreateContractPage = () => {
 					<AmountPicker title="Side A amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
 					<AmountPicker title="Side B amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
 				</Pane>
-				<SwitchboardAggregatorPicker title="Switchboard Aggregator" value={switchboardAggregator} onChange={setSwitchboardAggregator} />
+
+				<Combobox initialSelectedItem={ratePluginType} items={availableRatePluginTypes} onChange={setRatePluginType} />
+
+				{ratePluginType === 'switchboard' && (
+					<SwitchboardAggregatorPicker title="Switchboard Aggregator" value={switchboardAggregator} onChange={setSwitchboardAggregator} />
+				)}
+				{ratePluginType === 'pyth' && <PythPricePicker title="Pyth Price" value={pythPrice} onChange={setPythPrice} />}
+
 				<Pane display="flex" alignItems="center">
-					<StrikePicker title="Strike" value={strike} onChange={setStrike} switchboardAggregator={switchboardAggregator} />
+					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
 

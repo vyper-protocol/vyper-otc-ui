@@ -10,7 +10,7 @@ import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import RateSwitchboardState from 'models/plugins/RateSwitchboardState';
+import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
 
 import PROGRAMS from '../../configs/programs.json';
