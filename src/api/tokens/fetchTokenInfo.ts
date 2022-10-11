@@ -47,9 +47,9 @@ const fetchTokenInfoFromSolanaProvider = async (mint: PublicKey): Promise<TokenI
 };
 
 export const fetchTokenInfo = async (connection: Connection, mint: PublicKey): Promise<TokenInfo | undefined> => {
-	const tokenInfoFromMetaplex = await fetchTokenInfoFromMetaplex(connection, mint);
-	if (tokenInfoFromMetaplex) return tokenInfoFromMetaplex;
-
 	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProvider(mint);
-	return tokenInfoFromSolana;
+	if (tokenInfoFromSolana) return tokenInfoFromSolana;
+
+	const tokenInfoFromMetaplex = await fetchTokenInfoFromMetaplex(connection, mint);
+	return tokenInfoFromMetaplex;
 };
