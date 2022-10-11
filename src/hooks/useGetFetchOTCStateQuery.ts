@@ -1,4 +1,4 @@
-import { Address } from '@project-serum/anchor';
+import { Address, AnchorProvider } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { fetchContract } from 'controllers/fetchContract';
 import { ChainOtcState } from 'models/ChainOtcState';

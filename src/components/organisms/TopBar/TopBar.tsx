@@ -1,6 +1,6 @@
 /* eslint-disable css-modules/no-unused-class */
 
-import { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
@@ -17,6 +17,7 @@ import styles from './TopBar.module.scss';
 
 const TopBar = () => {
 	const router = useRouter();
+	const pathname = router.pathname;
 
 	const urlProvider = useContext(UrlProviderContext);
 
@@ -26,18 +27,37 @@ const TopBar = () => {
 		}
 	};
 
+	const [navigation, setNavigation] = useState([
+		{ href: ['/', '/contract/summary/[id]'], current: false },
+		{ href: ['/contract/create'], current: false },
+		{ href: ['/explorer'], current: false }
+	  ]);
+
+	  useEffect(() => {
+		const newNavigation = [...navigation];
+		for (let i = 0; i < newNavigation.length; i++) {
+		  if (newNavigation[i].href.includes(pathname)) newNavigation[i].current = true;
+		  else newNavigation[i].current = false;
+		}
+		setNavigation(newNavigation);
+		//   eslint-disable-next-line react-hooks/exhaustive-deps
+	  }, [pathname, setNavigation]);
+
+
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href={urlProvider.buildHomeUrl()}>
-					<Heading size={600} className={styles.hover}>
-						Vyper OTC
-					</Heading>
-				</Link>
+				<div className={styles.navLeftItems}>
+					<Link href={urlProvider.buildHomeUrl()}>
+						<Heading size={600} className={styles.hover}>
+							Vyper OTC
+						</Heading>
+					</Link>
+				</div>
 
 				<Pane className={styles.nav}>
 					{/* HOME LINK */}
-					<div className={cn(styles.item)}>
+					<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={urlProvider.buildHomeUrl()}>
 							<Text>
 								<StackedChartIcon /> Home
@@ -46,7 +66,7 @@ const TopBar = () => {
 					</div>
 
 					{/* CREATE CONTRACT LINK */}
-					<div className={cn(styles.item)}>
+					<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Tooltip content="Coming soon">
 							<Text onClick={onCreateContractClick}>
 								<CubeAddIcon /> Create contract
@@ -55,7 +75,7 @@ const TopBar = () => {
 					</div>
 
 					{/* EXPLORER LINK */}
-					<div className={styles.item}>
+					<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={urlProvider.buildExplorerUrl()}>
 							<Text>
 								<PathSearchIcon /> Explorer
@@ -94,7 +114,7 @@ const TopBar = () => {
 					</div>
 				</Pane>
 
-				<Pane display="flex" alignItems="center">
+				<Pane className={styles.navRightItems} display="flex" alignItems="center">
 					<ClusterSelector className={styles.cluster} />
 					<SelectWallet />
 				</Pane>
