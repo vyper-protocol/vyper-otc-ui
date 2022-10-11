@@ -81,7 +81,7 @@ const TopBar = () => {
 								<PathSearchIcon /> Explorer
 							</Text>
 						</Link>
-					</div> */}
+					</div>
 
 					{/* SOCIALS */}
 					<Popover

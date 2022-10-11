@@ -9,9 +9,8 @@ import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectC
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
+import { AbsOtcState } from 'models/AbsOtcState';
 import { ChainOtcState } from 'models/ChainOtcState';
-import RateSwitchboardState from 'models/plugins/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
 
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
@@ -57,34 +56,12 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.seniorSideBeneficiary));
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.juniorSideBeneficiary));
 
-	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c !== null)) as PublicKey[];
+	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c != null)) as PublicKey[];
 	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
 
 	const res: ChainOtcState[] = [];
 	for (let i = 0; i < dbEntries.length; i++) {
-		// const r = dbEntries[i] as AbsOtcState as ChainOtcState;
-		const r = new ChainOtcState();
-		r.publickey = dbEntries[i].publickey;
-		r.vyperCoreTrancheConfig = dbEntries[i].vyperCoreTrancheConfig;
-		r.reserveMint = dbEntries[i].reserveMint;
-		r.createdAt = dbEntries[i].createdAt;
-		r.depositAvailableFrom = dbEntries[i].depositAvailableFrom;
-		r.depositExpirationAt = dbEntries[i].depositExpirationAt;
-		r.settleAvailableFromAt = dbEntries[i].settleAvailableFromAt;
-		r.buyerDepositAmount = dbEntries[i].buyerDepositAmount;
-		r.sellerDepositAmount = dbEntries[i].sellerDepositAmount;
-		r.redeemLogicState = new RedeemLogicForwardState(
-			dbEntries[i].redeemLogicState.programPubkey,
-			dbEntries[i].redeemLogicState.statePubkey,
-			dbEntries[i].redeemLogicState.strike,
-			dbEntries[i].redeemLogicState.isLinear,
-			dbEntries[i].redeemLogicState.notional
-		);
-		r.rateState = new RateSwitchboardState(
-			dbEntries[i].rateState.programPubkey,
-			dbEntries[i].rateState.statePubkey,
-			dbEntries[i].rateState.switchboardAggregator
-		);
+		const r = dbEntries[i] as AbsOtcState as ChainOtcState;
 
 		const currentOtcStateAccount = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>(
 			'otcState',

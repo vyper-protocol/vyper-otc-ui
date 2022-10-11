@@ -1,4 +1,4 @@
-import { Text, Tooltip } from 'evergreen-ui';
+import { Button, Text, Tooltip } from 'evergreen-ui';
 import moment from 'moment';
 
 type MomentTooltipSpanInput = {

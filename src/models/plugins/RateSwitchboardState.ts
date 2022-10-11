@@ -2,7 +2,6 @@
 import { AnchorProvider } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { getAggregatorData, getAggregatorLatestValue } from 'api/switchboard/switchboardHelper';
-
 import { AbsPlugin } from './AbsPlugin';
 
 export default class RateSwitchboardState extends AbsPlugin {
