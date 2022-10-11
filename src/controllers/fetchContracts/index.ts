@@ -32,13 +32,13 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	const firstFetch_otcStateChainAccountPubkeys = dbEntries.map((c) => c.publickey);
 	const firstFetch_vyperCoreTrancheConfig = dbEntries.map((c) => c.vyperCoreTrancheConfig);
 	const firstFetch_reserveMintAccountPubkeys = dbEntries.map((c) => c.reserveMint);
-	const firstFetch_switchboardAggregators = dbEntries.map((c) => c.rateState.switchboardAggregator);
+	const firstFetch_rateAccounts = _.flatten(dbEntries.map((c) => c.rateState.getPublicKeysForRefresh()));
 
 	const firstFetch_unionPubkeys = _.uniq([
 		...firstFetch_otcStateChainAccountPubkeys,
 		...firstFetch_vyperCoreTrancheConfig,
 		...firstFetch_reserveMintAccountPubkeys,
-		...firstFetch_switchboardAggregators
+		...firstFetch_rateAccounts
 	]) as PublicKey[];
 	const firstFetch_accountsData = (await connection.getMultipleAccountsInfo(firstFetch_unionPubkeys)).map((c, i) => ({
 		pubkey: firstFetch_unionPubkeys[i],
@@ -80,11 +80,8 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 			dbEntries[i].redeemLogicState.isLinear,
 			dbEntries[i].redeemLogicState.notional
 		);
-		r.rateState = new RateSwitchboardState(
-			dbEntries[i].rateState.programPubkey,
-			dbEntries[i].rateState.statePubkey,
-			dbEntries[i].rateState.switchboardAggregator
-		);
+
+		r.rateState = dbEntries[i].rateState.clone();
 
 		const currentOtcStateAccount = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>(
 			'otcState',
@@ -111,14 +108,22 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.sellerTA = currentOtcStateAccount.juniorSideBeneficiary;
 		if (r.sellerTA) r.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
 
-		// switchboard
-		r.rateState.aggregatorData = AggregatorAccount.decode(
-			switchboardProgram,
-			firstFetch_accountsData.find((c) => c.pubkey.equals(r.rateState.switchboardAggregator)).data
-		);
-		r.rateState.aggregatorLastValue = (
-			await new AggregatorAccount({ program: switchboardProgram, publicKey: r.rateState.switchboardAggregator }).getLatestValue(r.rateState.aggregatorData)
-		).toNumber();
+		if (r.rateState.getTypeId() === 'switchboard') {
+			// switchboard
+			(r.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
+				switchboardProgram,
+				firstFetch_accountsData.find((c) => c.pubkey.equals((r.rateState as RateSwitchboardState).switchboardAggregator)).data
+			);
+			(r.rateState as RateSwitchboardState).aggregatorLastValue = (
+				await new AggregatorAccount({ program: switchboardProgram, publicKey: (r.rateState as RateSwitchboardState).switchboardAggregator }).getLatestValue(
+					(r.rateState as RateSwitchboardState).aggregatorData
+				)
+			).toNumber();
+		}
+
+		if (r.rateState.getTypeId() === 'pyth') {
+			await r.rateState.loadData(connection);
+		}
 
 		res.push(r);
 	}
