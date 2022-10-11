@@ -2,6 +2,7 @@ import { AnchorProvider, Program } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, getSwitchboardPid, loadSwitchboardProgram, SwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+
 import SwitchboardIdlDevnet from './idl_switchboard_devnet.json';
 import SwitchboardIdlMainnet from './idl_switchboard_mainnet.json';
 
@@ -52,7 +53,7 @@ export const getAggregatorName = async (connection: Connection, aggregator: Publ
 	});
 
 	const data = await aggregatorAccount.loadData();
-	return String.fromCharCode.apply(null, data.name).split('\u0000')[0];
+	return AggregatorAccount.getName(data);
 };
 
 export const loadSwitchboardProgramOffline = (cluster: 'devnet' | 'mainnet-beta', connection: Connection): SwitchboardProgram => {

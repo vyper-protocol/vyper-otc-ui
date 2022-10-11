@@ -6,9 +6,9 @@ import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvid
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import { SettingsIcon, Pane, RadioGroup, Popover } from 'evergreen-ui';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import styles from './ClusterSelector.module.scss';
-import { toast } from 'react-toastify';
 
 type ClusterSelectorProps = {
 	className?: string;

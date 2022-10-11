@@ -9,8 +9,9 @@ import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectC
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
-import { AbsOtcState } from 'models/AbsOtcState';
 import { ChainOtcState } from 'models/ChainOtcState';
+import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
+import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
 
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
@@ -31,13 +32,13 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	const firstFetch_otcStateChainAccountPubkeys = dbEntries.map((c) => c.publickey);
 	const firstFetch_vyperCoreTrancheConfig = dbEntries.map((c) => c.vyperCoreTrancheConfig);
 	const firstFetch_reserveMintAccountPubkeys = dbEntries.map((c) => c.reserveMint);
-	const firstFetch_switchboardAggregators = dbEntries.map((c) => c.rateState.switchboardAggregator);
+	const firstFetch_rateAccounts = _.flatten(dbEntries.map((c) => c.rateState.getPublicKeysForRefresh()));
 
 	const firstFetch_unionPubkeys = _.uniq([
 		...firstFetch_otcStateChainAccountPubkeys,
 		...firstFetch_vyperCoreTrancheConfig,
 		...firstFetch_reserveMintAccountPubkeys,
-		...firstFetch_switchboardAggregators
+		...firstFetch_rateAccounts
 	]) as PublicKey[];
 	const firstFetch_accountsData = (await connection.getMultipleAccountsInfo(firstFetch_unionPubkeys)).map((c, i) => ({
 		pubkey: firstFetch_unionPubkeys[i],
@@ -56,12 +57,31 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.seniorSideBeneficiary));
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.juniorSideBeneficiary));
 
-	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c != null)) as PublicKey[];
+	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c !== null)) as PublicKey[];
 	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
 
 	const res: ChainOtcState[] = [];
 	for (let i = 0; i < dbEntries.length; i++) {
-		const r = dbEntries[i] as AbsOtcState as ChainOtcState;
+		// const r = dbEntries[i] as AbsOtcState as ChainOtcState;
+		const r = new ChainOtcState();
+		r.publickey = dbEntries[i].publickey;
+		r.vyperCoreTrancheConfig = dbEntries[i].vyperCoreTrancheConfig;
+		r.reserveMint = dbEntries[i].reserveMint;
+		r.createdAt = dbEntries[i].createdAt;
+		r.depositAvailableFrom = dbEntries[i].depositAvailableFrom;
+		r.depositExpirationAt = dbEntries[i].depositExpirationAt;
+		r.settleAvailableFromAt = dbEntries[i].settleAvailableFromAt;
+		r.buyerDepositAmount = dbEntries[i].buyerDepositAmount;
+		r.sellerDepositAmount = dbEntries[i].sellerDepositAmount;
+		r.redeemLogicState = new RedeemLogicForwardState(
+			dbEntries[i].redeemLogicState.programPubkey,
+			dbEntries[i].redeemLogicState.statePubkey,
+			dbEntries[i].redeemLogicState.strike,
+			dbEntries[i].redeemLogicState.isLinear,
+			dbEntries[i].redeemLogicState.notional
+		);
+
+		r.rateState = dbEntries[i].rateState.clone();
 
 		const currentOtcStateAccount = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>(
 			'otcState',
@@ -88,14 +108,22 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.sellerTA = currentOtcStateAccount.juniorSideBeneficiary;
 		if (r.sellerTA) r.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
 
-		// switchboard
-		r.rateState.aggregatorData = AggregatorAccount.decode(
-			switchboardProgram,
-			firstFetch_accountsData.find((c) => c.pubkey.equals(r.rateState.switchboardAggregator)).data
-		);
-		r.rateState.aggregatorLastValue = (
-			await new AggregatorAccount({ program: switchboardProgram, publicKey: r.rateState.switchboardAggregator }).getLatestValue(r.rateState.aggregatorData)
-		).toNumber();
+		if (r.rateState.getTypeId() === 'switchboard') {
+			// switchboard
+			(r.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
+				switchboardProgram,
+				firstFetch_accountsData.find((c) => c.pubkey.equals((r.rateState as RateSwitchboardState).switchboardAggregator)).data
+			);
+			(r.rateState as RateSwitchboardState).aggregatorLastValue = (
+				await new AggregatorAccount({ program: switchboardProgram, publicKey: (r.rateState as RateSwitchboardState).switchboardAggregator }).getLatestValue(
+					(r.rateState as RateSwitchboardState).aggregatorData
+				)
+			).toNumber();
+		}
+
+		if (r.rateState.getTypeId() === 'pyth') {
+			await r.rateState.loadData(connection);
+		}
 
 		res.push(r);
 	}

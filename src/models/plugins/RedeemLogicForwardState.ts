@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
-import { AbsPlugin } from './AbsPlugin';
+
+import { AbsPlugin, RedeemLogicPluginTypeIds } from './AbsPlugin';
 
 /* eslint-disable space-before-function-paren */
 export class RedeemLogicForwardState extends AbsPlugin {
@@ -15,7 +16,7 @@ export class RedeemLogicForwardState extends AbsPlugin {
 			notional: this.notional
 		};
 	}
-	getTypeId(): string {
+	getTypeId(): RedeemLogicPluginTypeIds {
 		return 'forward';
 	}
 
