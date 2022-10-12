@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box } from '@mui/material';
 import { DataGrid, GridColumns, GridRowParams, GridValueFormatterParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
@@ -11,6 +12,7 @@ import { Badge } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 import { useRouter } from 'next/router';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress } from 'utils/stringHelpers';
 
@@ -25,6 +27,7 @@ export type ExplorerContractDataGridProps = {
 
 const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) => {
 	const urlProvider = useContext(UrlProviderContext);
+	const { connection } = useConnection();
 	const router = useRouter();
 
 	const columns: GridColumns<ChainOtcState> = [
@@ -36,14 +39,18 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 				<GridActionsCellItem
 					key="open_in_explorer"
 					icon={<OpenInNewIcon />}
-					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: 'devnet' }))}
+					onClick={() =>
+						window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: getClusterFromRpcEndpoint(connection.rpcEndpoint) }))
+					}
 					label="Open in Explorer"
 					showInMenu
 				/>,
 				<GridActionsCellItem
 					key="open_in_solscan"
 					icon={<OpenInNewIcon />}
-					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: 'devnet' }))}
+					onClick={() =>
+						window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: getClusterFromRpcEndpoint(connection.rpcEndpoint) }))
+					}
 					label="Open in Solscan"
 					showInMenu
 				/>

@@ -18,6 +18,7 @@ import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 const StrikePicker = ({
 	title,
@@ -90,6 +91,48 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 	);
 };
 
+const PublicKeyPicker = ({
+	title,
+	value,
+	onChange,
+	hints
+}: {
+	title: string;
+	value: string;
+	onChange: (val: string) => void;
+	hints: { pubkey: string; label: string }[];
+}) => {
+	return (
+		<Pane display="flex" width="100%" alignItems="center" margin={6}>
+			<TextInputField
+				width="100%"
+				label={title}
+				value={value}
+				onChange={(e) => {
+					return onChange(e.target.value);
+				}}
+			/>
+			<Combobox
+				items={hints}
+				itemToString={(item) => (item ? item.label : '')}
+				initialSelectedItem={hints.find((c) => c.pubkey)?.label}
+				onChange={(selected) => onChange(selected.pubkey)}
+			/>
+
+			{/* {hints.map((c) => (
+				<Button
+					key={c.pubkey}
+					onClick={() => {
+						return onChange(c.pubkey);
+					}}
+				>
+					{c.label}
+				</Button>
+			))} */}
+		</Pane>
+	);
+};
+
 // eslint-disable-next-line no-unused-vars
 const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
 	const [productSymbol, setProductSymbol] = useState('');
@@ -98,8 +141,8 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [product] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(value));
-				if (product) setProductSymbol(product.symbol);
+				const [product] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), new PublicKey(value));
+				if (product) setProductSymbol(product?.symbol ?? '');
 				else setProductSymbol('');
 			} catch {
 				setProductSymbol('');
@@ -136,6 +179,18 @@ const CreateContractPage = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
+	const reserveMintHints = [
+		{
+			pubkey: 'F12Jiu1sp6J1TCQsdy5kWaQkfbaxWvp6YvCJvtoYLXEo',
+			label: 'mainnet test tokens'
+		},
+		{
+			pubkey: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
+			label: 'devnet test tokens'
+		}
+	];
+	const [reserveMint, setReserveMint] = useState(reserveMintHints[0].pubkey);
+
 	const [depositStart, setDepositStart] = useState(moment().add(0, 'minutes').toDate().getTime());
 	const [depositEnd, setDepositEnd] = useState(moment().add(5, 'minutes').toDate().getTime());
 	const [settleStart, setSettleStart] = useState(moment().add(15, 'minutes').toDate().getTime());
@@ -151,12 +206,12 @@ const CreateContractPage = () => {
 
 	const setStrikeToDefaultValue = async () => {
 		if (ratePluginType === 'pyth') {
-			const [, price] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(pythPrice));
-			setStrike(price.price);
+			const [, price] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), new PublicKey(pythPrice));
+			setStrike(price?.price ?? 0);
 		}
 		if (ratePluginType === 'switchboard') {
 			const [, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(switchboardAggregator));
-			setStrike(price);
+			setStrike(price ?? 0);
 		}
 	};
 
@@ -187,7 +242,7 @@ const CreateContractPage = () => {
 			if (ratePluginType === 'pyth') rateAccount = new PublicKey(pythPrice);
 
 			const initParams: OtcInitializationParams = {
-				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
+				reserveMint: new PublicKey(reserveMint),
 				depositStart: depositStart,
 				depositEnd: depositEnd,
 				settleStart: settleStart,
@@ -220,6 +275,9 @@ const CreateContractPage = () => {
 	return (
 		<Layout>
 			<Pane>
+				<Pane display="flex" alignItems="center">
+					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
+				</Pane>
 				<Pane display="flex" alignItems="center">
 					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
 					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />

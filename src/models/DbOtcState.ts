@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js';
+import { Cluster, PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
@@ -7,11 +7,12 @@ import RateSwitchboardState from './plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from './plugins/RedeemLogicForwardState';
 
 export class DbOtcState extends AbsOtcState {
+	cluster: Cluster;
 	metadata: DbOtcStateMetadata;
 
 	static fromSupabaseSelectRes(data: any): DbOtcState {
 		const res = new DbOtcState();
-
+		res.cluster = data.cluster as Cluster;
 		res.publickey = new PublicKey(data.pubkey);
 		res.vyperCoreTrancheConfig = new PublicKey(data.tranche_config_pubkey);
 		res.reserveMint = new PublicKey(data.reserve_mint);
