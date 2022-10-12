@@ -24,8 +24,6 @@ import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 import PROGRAMS from '../../configs/programs.json';
 import { ChainOtcState } from '../../models/ChainOtcState';
 
-const [DUMMY_TOKEN_MINT, USDC_MINT] = ['7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W', 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'];
-
 export const fetchContract = async (connection: Connection, otcStateAddress: PublicKey, skipDbCheck: boolean = false): Promise<ChainOtcState> => {
 	console.group('CONTROLLER: fetchContract');
 	const controllerStartMark = performance.mark('controller_start');
@@ -71,12 +69,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.vyperCoreTrancheConfig = accountInfo.vyperTrancheConfig;
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint);
-
-	if (trancheConfigAccountInfo.reserveMint.toBase58() === DUMMY_TOKEN_MINT) {
-		res.reserveTokenInfo = await fetchTokenInfo(connection, new PublicKey(USDC_MINT));
-	} else {
-		res.reserveTokenInfo = await fetchTokenInfo(connection, trancheConfigAccountInfo.reserveMint);
-	}
+	res.reserveTokenInfo = await fetchTokenInfo(connection, trancheConfigAccountInfo.reserveMint);
 
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
@@ -225,12 +218,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	res.redeemLogicState = data.redeemLogicState.clone();
 	res.rateState = data.rateState.clone();
-
-	if (res.reserveMint.toBase58() === DUMMY_TOKEN_MINT) {
-		res.reserveTokenInfo = await fetchTokenInfo(connection, new PublicKey(USDC_MINT));
-	} else {
-		res.reserveTokenInfo = await fetchTokenInfo(connection, res.reserveMint);
-	}
+	res.reserveTokenInfo = await fetchTokenInfo(connection, res.reserveMint);
 
 	// first fetch
 

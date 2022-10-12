@@ -176,13 +176,13 @@ const SummaryPageId = () => {
 								<Pane margin={6} textAlign="center">
 									Long{' '}
 									<Badge color="neutral">
-										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo.symbol}
+										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
 								</Pane>
 								<Pane margin={6} textAlign="center">
 									Short{' '}
 									<Badge color="neutral">
-										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo.symbol}
+										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
 								</Pane>
 							</Pane>
@@ -199,13 +199,13 @@ const SummaryPageId = () => {
 										<Pane margin={6} textAlign="center">
 											Long{' '}
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo.symbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo?.symbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
 											Short{' '}
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo.symbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo?.symbol}
 											</Badge>
 										</Pane>
 									</Pane>
