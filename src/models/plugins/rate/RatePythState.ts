@@ -29,11 +29,15 @@ export class RatePythState extends AbsRatePlugin {
 
 		const pythProduct = pythData.products.find((c) => c.price_account === pythPrice.toBase58());
 		console.log('pythProduct: ', pythProduct);
+		if (pythProduct) {
+			const pythPriceData = pythData.productPrice.get(pythProduct.symbol);
+			console.log('pythPriceData: ', pythPriceData);
+			console.log('pythPriceData.price: ', pythPriceData.price);
 
-		const pythPriceData = pythData.productPrice.get(pythProduct.symbol);
-		console.log('pythPriceData: ', pythPriceData);
-
-		return [pythProduct, pythPriceData];
+			return [pythProduct, pythPriceData];
+		} else {
+			return [undefined, undefined];
+		}
 	}
 
 	getPluginDescription(): string {
