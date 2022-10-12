@@ -124,7 +124,7 @@ const SummaryPageId = () => {
 								<div className={styles.column}>
 									<p>
 										Size
-										<Tooltip content="TBD help-text-notional" position="right">
+										<Tooltip content="PnL moves by this much for every unit movement in the underlying price" position="right">
 											<HelpIcon size={12} marginX={3} />
 										</Tooltip>
 									</p>
