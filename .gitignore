@@ -49,3 +49,6 @@ jspm_packages
 out
 # Sentry
 .sentryclirc
+
+# Sentry
+.sentryclirc
