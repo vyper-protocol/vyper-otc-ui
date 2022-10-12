@@ -17,7 +17,7 @@ export type UrlBuilder = {
 
 const CLUSTER_PARAM_KEY = 'cluster';
 const SUPPORTED_CLUSTERS: Cluster[] = ['devnet', 'mainnet-beta'];
-const DEFAULT_CLUSTER: Cluster = 'mainnet-beta';
+export const DEFAULT_CLUSTER: Cluster = 'mainnet-beta';
 
 export const UrlProviderContext = createContext<UrlBuilder>(undefined);
 
