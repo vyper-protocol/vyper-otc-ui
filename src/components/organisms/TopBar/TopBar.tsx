@@ -31,18 +31,17 @@ const TopBar = () => {
 		{ href: ['/', '/contract/summary/[id]'], current: false },
 		{ href: ['/contract/create'], current: false },
 		{ href: ['/explorer'], current: false }
-	  ]);
+	]);
 
-	  useEffect(() => {
+	useEffect(() => {
 		const newNavigation = [...navigation];
 		for (let i = 0; i < newNavigation.length; i++) {
-		  if (newNavigation[i].href.includes(pathname)) newNavigation[i].current = true;
-		  else newNavigation[i].current = false;
+			if (newNavigation[i].href.includes(pathname)) newNavigation[i].current = true;
+			else newNavigation[i].current = false;
 		}
 		setNavigation(newNavigation);
 		//   eslint-disable-next-line react-hooks/exhaustive-deps
-	  }, [pathname, setNavigation]);
-
+	}, [pathname, setNavigation]);
 
 	return (
 		<>
@@ -75,13 +74,13 @@ const TopBar = () => {
 					</div>
 
 					{/* EXPLORER LINK */}
-					<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+					{/* <div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={urlProvider.buildExplorerUrl()}>
 							<Text>
 								<PathSearchIcon /> Explorer
 							</Text>
 						</Link>
-					</div>
+					</div> */}
 
 					{/* SOCIALS */}
 					<Popover
