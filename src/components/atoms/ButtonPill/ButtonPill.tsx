@@ -9,7 +9,7 @@ type ButtonPillProps = {
 	mode: 'success' | 'error' | 'info';
 	icon?: any;
 	loading?: boolean;
-	disabled: boolean
+	disabled?: boolean
 } & React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
 
 const ButtonPill = ({ text, onClick, mode = 'info', icon, loading, disabled }: ButtonPillProps) => {
