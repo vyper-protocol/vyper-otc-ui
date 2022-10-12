@@ -11,6 +11,7 @@ type DateTimePickerCompInput = {
 	value: number;
 
 	// on change callback, will return the provided datetime expressed in ms
+	// eslint-disable-next-line no-unused-vars
 	onChange: (val: number) => void;
 };
 

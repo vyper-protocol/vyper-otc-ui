@@ -1,18 +1,15 @@
 /* eslint-disable camelcase */
-import { PublicKey } from '@solana/web3.js';
+import { Cluster, PublicKey } from '@solana/web3.js';
 import { ChainOtcState } from 'models/ChainOtcState';
 
-import { supabase } from './client';
+import { CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
-const CONTRACTS_TABLE_NAME = 'contracts';
-const CONTRACTS_METADATA_TABLE_NAME = 'contracts_metadata';
-
-export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy: PublicKey, metadata: any = {}) => {
+export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy: PublicKey, cluster: Cluster, metadata: any = {}) => {
 	await supabase.from(CONTRACTS_TABLE_NAME).insert([
 		{
+			cluster: cluster,
 			pubkey: otcState.publickey.toBase58(),
 			tranche_config_pubkey: otcState.vyperCoreTrancheConfig.toBase58(),
-
 			reserve_mint: otcState.reserveMintInfo.address.toBase58(),
 			created_at: new Date(otcState.createdAt),
 			deposit_available_from: new Date(otcState.depositAvailableFrom),

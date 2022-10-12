@@ -4,18 +4,30 @@
 
 .topbar {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	padding: 15px 25px;
 	z-index: 1;
 	position: relative;
 
+	.navLeftItems{
+		position: absolute;
+		left: 50px;
+		top:20px;
+	}
+
+	.navRightItems{
+		position: absolute;
+		right: 50px;
+	}
+
 	.nav {
 		display: flex;
-		justify-content: center;
+		justify-content: space-evenly;
 		margin-top: 10px;
 
 		.item {
-			margin-left: 50px;
+			margin-left: 25px;
+			margin-right: 25px;
 
 			span {
 				font-family: var(--font-primary) !important;

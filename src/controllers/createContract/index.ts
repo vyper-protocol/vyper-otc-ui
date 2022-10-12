@@ -2,9 +2,10 @@
 import { AnchorProvider } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
-import { fetchOtcState } from 'api/otc-state/fetchOtcState';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
+import { fetchContract } from 'controllers/fetchContract';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import { OtcInitializationParams } from './OtcInitializationParams';
 
@@ -20,8 +21,8 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 	try {
 		await sleep(1000);
 		console.log('saving contract on db');
-		const chianOtcState = await fetchOtcState(provider.connection, otcPublicKey);
-		await supabaseInsertContract(chianOtcState, provider.wallet.publicKey);
+		const chianOtcState = await fetchContract(provider.connection, otcPublicKey, true);
+		await supabaseInsertContract(chianOtcState, provider.wallet.publicKey, getClusterFromRpcEndpoint(provider.connection.rpcEndpoint));
 	} catch (err) {
 		console.error(err);
 	}

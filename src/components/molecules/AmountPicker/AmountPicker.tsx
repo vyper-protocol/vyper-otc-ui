@@ -8,6 +8,7 @@ type AmountPickerInput = {
 	value: number;
 
 	// on change callback, will return the provided number
+	// eslint-disable-next-line no-unused-vars
 	onChange: (_: number) => void;
 
 	// reset value
@@ -52,14 +53,14 @@ const AmountPicker = ({ title, value, onChange, resetValue, incrementValues }: A
 					return onChange(value + incrementValues[0]);
 				}}
 			>
-				{ getDisplayString(incrementValues[0]) }
+				{getDisplayString(incrementValues[0])}
 			</Button>
 			<Button
 				onClick={() => {
 					return onChange(value + incrementValues[1]);
 				}}
 			>
-				{ getDisplayString(incrementValues[1]) }
+				{getDisplayString(incrementValues[1])}
 			</Button>
 		</Pane>
 	);

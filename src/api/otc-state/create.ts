@@ -3,6 +3,7 @@ import { AnchorProvider, BN, Program, utils } from '@project-serum/anchor';
 import { getMint } from '@solana/spl-token';
 import { Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
@@ -18,24 +19,51 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const reserveMintInfo = await getMint(provider.connection, params.reserveMint);
 
 	const redeemLogicForwardProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
-	const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
 
 	const otcState = Keypair.generate();
 	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
 
+	//  rate plugin init
+	let rateProgramPublicKey: PublicKey = undefined;
 	const ratePluginState = Keypair.generate();
-	const rateSwitchboardInitIX = await rateSwitchboardProgram.methods
-		.initialize()
-		.accounts({
-			rateData: ratePluginState.publicKey
-		})
-		.remainingAccounts(
-			[params.rateOption.switchboardAggregator].map((c) => {
-				return { pubkey: c, isSigner: false, isWritable: false };
+	const vyperCoreInitTx = new Transaction();
+
+	if (params.rateOption.ratePluginType === 'switchboard') {
+		const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
+		const rateSwitchboardInitIX = await rateSwitchboardProgram.methods
+			.initialize()
+			.accounts({
+				rateData: ratePluginState.publicKey
 			})
-		)
-		.signers([ratePluginState])
-		.instruction();
+			.remainingAccounts(
+				[params.rateOption.rateAccount].map((c) => {
+					return { pubkey: c, isSigner: false, isWritable: false };
+				})
+			)
+			.signers([ratePluginState])
+			.instruction();
+		vyperCoreInitTx.add(rateSwitchboardInitIX);
+		rateProgramPublicKey = rateSwitchboardProgram.programId;
+	}
+
+	if (params.rateOption.ratePluginType === 'pyth') {
+		const ratePythProgram = new Program<RatePyth>(RatePythIDL, new PublicKey(PROGRAMS.RATE_PYTH_PROGRAM_ID), provider);
+
+		const ratePythInitIX = await ratePythProgram.methods
+			.initialize()
+			.accounts({
+				rateData: ratePluginState.publicKey
+			})
+			.remainingAccounts(
+				[params.rateOption.rateAccount].map((c) => {
+					return { pubkey: c, isSigner: false, isWritable: false };
+				})
+			)
+			.signers([ratePluginState])
+			.instruction();
+		vyperCoreInitTx.add(ratePythInitIX);
+		rateProgramPublicKey = ratePythProgram.programId;
+	}
 
 	const redeemLogicPluginState = Keypair.generate();
 	const redeemLogicInixIX = await redeemLogicForwardProgram.methods
@@ -48,15 +76,13 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		.signers([redeemLogicPluginState])
 		.instruction();
 
-	const vyperCoreInitTx = new Transaction();
-	vyperCoreInitTx.add(rateSwitchboardInitIX);
 	vyperCoreInitTx.add(redeemLogicInixIX);
 
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(
 		provider,
 		vyperCoreProgram,
 		params.reserveMint,
-		rateSwitchboardProgram.programId,
+		rateProgramPublicKey,
 		ratePluginState.publicKey,
 		redeemLogicForwardProgram.programId,
 		redeemLogicPluginState.publicKey,

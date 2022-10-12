@@ -1,10 +1,10 @@
 [
 	{
 		"cluster": "devnet",
-		"endpoints": ["https://api.devnet.solana.com"]
+		"endpoints": ["https://responsive-few-shard.solana-devnet.quiknode.pro/df16ce666799f93981533706a246e5f76e27db04/"]
 	},
 	{
 		"cluster": "mainnet-beta",
-		"endpoints": ["https://api.mainnet-beta.solana.com"]
+		"endpoints": ["https://solemn-muddy-bush.solana-mainnet.quiknode.pro/4d07d7f6f3bc511eafb722636ab3fddc320c4e9d/"]
 	}
 ]

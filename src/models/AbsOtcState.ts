@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
-import RateSwitchboardState from './plugins/RateSwitchboardState';
+import { AbsRatePlugin } from './plugins/rate/AbsRatePlugin';
 import { RedeemLogicForwardState } from './plugins/RedeemLogicForwardState';
 
 export abstract class AbsOtcState {
@@ -57,5 +57,5 @@ export abstract class AbsOtcState {
 	/**
 	 * Rate state
 	 */
-	rateState: RateSwitchboardState;
+	rateState: AbsRatePlugin;
 }
