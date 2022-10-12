@@ -36,7 +36,7 @@ export class RatePythState extends AbsRatePlugin {
 	}
 
 	getPluginDescription(): string {
-		return this.pythProduct.description;
+		return this.pythProduct.symbol;
 	}
 
 	getPluginLastValue(): number {
