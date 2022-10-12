@@ -17,6 +17,7 @@ export const selectContracts = async (params: FetchContractsParams): Promise<DbO
 	params.gte.forEach((f) => query.gte(f.column, f.value));
 	params.gt.forEach((f) => query.gt(f.column, f.value));
 	params.lt.forEach((f) => query.lt(f.column, f.value));
+	params.eq.forEach((f) => query.eq(f.column, f.value));
 
 	const res = await query;
 

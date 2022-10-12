@@ -14,6 +14,7 @@ import { ChainOtcState } from 'models/ChainOtcState';
 import { useRouter } from 'next/router';
 
 import styles from './explorer.module.scss';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 const ExplorerPage = () => {
 	const [searchValue, setSearchValue] = useState('');
@@ -27,7 +28,7 @@ const ExplorerPage = () => {
 	useEffect(() => {
 		setContractsLoading(true);
 		setContracts([]);
-		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery())
+		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getClusterFromRpcEndpoint(connection.rpcEndpoint)))
 			.then((c) => setContracts(c))
 			.finally(() => setContractsLoading(false));
 	}, [connection]);

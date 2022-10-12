@@ -6,12 +6,14 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectContracts';
+import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
@@ -23,7 +25,6 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	const dbEntries = await supabaseSelectContracts(params);
 	console.log('fetched: ', dbEntries);
 
-	const switchboardProgram = await loadSwitchboardProgram('devnet', connection);
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), new AnchorProvider(connection, undefined, {}));
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), new AnchorProvider(connection, undefined, {}));
 
@@ -110,6 +111,11 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 
 		if (r.rateState.getTypeId() === 'switchboard') {
 			// switchboard
+			const switchboardProgram = await loadSwitchboardProgramOffline(
+				getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'mainnet-beta' | 'devnet',
+				connection
+			);
+
 			(r.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
 				switchboardProgram,
 				firstFetch_accountsData.find((c) => c.pubkey.equals((r.rateState as RateSwitchboardState).switchboardAggregator)).data
