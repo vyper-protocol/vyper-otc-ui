@@ -1,7 +1,7 @@
 import { AnchorProvider, Program } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount, getSwitchboardPid, loadSwitchboardProgram, SwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
-import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import SwitchboardIdlDevnet from './idl_switchboard_devnet.json';
 import SwitchboardIdlMainnet from './idl_switchboard_mainnet.json';
@@ -12,7 +12,7 @@ import SwitchboardIdlMainnet from './idl_switchboard_mainnet.json';
  * @returns Aggregator's latest value
  */
 export const getAggregatorLatestValue = async (connection: Connection, aggregator: PublicKey): Promise<number> => {
-	const program = await loadSwitchboardProgram('devnet', connection);
+	const program = await loadSwitchboardProgram(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'devnet' | 'mainnet-beta', connection);
 
 	const aggregatorAccount = new AggregatorAccount({
 		program,
@@ -24,12 +24,7 @@ export const getAggregatorLatestValue = async (connection: Connection, aggregato
 };
 
 export const getAggregatorData = async (connection: Connection, aggregator: PublicKey): Promise<any> => {
-	const program = await loadSwitchboardProgram(
-		RPC_ENDPOINTS.find((c) => {
-			return c.endpoints.includes(connection.rpcEndpoint);
-		}).cluster as 'devnet' | 'mainnet-beta',
-		connection
-	);
+	const program = await loadSwitchboardProgram(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'devnet' | 'mainnet-beta', connection);
 
 	const aggregatorAccount = new AggregatorAccount({
 		program,
@@ -40,12 +35,7 @@ export const getAggregatorData = async (connection: Connection, aggregator: Publ
 };
 
 export const getAggregatorName = async (connection: Connection, aggregator: PublicKey): Promise<any> => {
-	const program = await loadSwitchboardProgram(
-		RPC_ENDPOINTS.find((c) => {
-			return c.endpoints.includes(connection.rpcEndpoint);
-		}).cluster as 'devnet' | 'mainnet-beta',
-		connection
-	);
+	const program = await loadSwitchboardProgram(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'devnet' | 'mainnet-beta', connection);
 
 	const aggregatorAccount = new AggregatorAccount({
 		program,

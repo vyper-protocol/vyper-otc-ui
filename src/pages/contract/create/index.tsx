@@ -18,6 +18,7 @@ import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 const StrikePicker = ({
 	title,
@@ -98,7 +99,7 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [product] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(value));
+				const [product] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), new PublicKey(value));
 				if (product) setProductSymbol(product.symbol);
 				else setProductSymbol('');
 			} catch {
@@ -151,7 +152,7 @@ const CreateContractPage = () => {
 
 	const setStrikeToDefaultValue = async () => {
 		if (ratePluginType === 'pyth') {
-			const [, price] = await RatePythState.GetProductPrice(connection, 'devnet', new PublicKey(pythPrice));
+			const [, price] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), new PublicKey(pythPrice));
 			setStrike(price.price);
 		}
 		if (ratePluginType === 'switchboard') {

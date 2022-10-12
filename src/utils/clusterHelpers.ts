@@ -1,11 +1,6 @@
-/**
- * Constructs a solana explorer link
- */
-export const getExplorerLink = (type: 'tx' | 'address', publicKey: string, cluster: 'devnet'): string => {
-	let res = `https://explorer.solana.com/${type}/${publicKey}`;
+import { Cluster } from '@solana/web3.js';
+import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 
-	// @ts-ignore
-	if (cluster !== 'mainet-beta') res += `?cluster=${cluster}`;
-
-	return res;
+export const getClusterFromRpcEndpoint = (rpcEndpoint: string): Cluster => {
+	return RPC_ENDPOINTS.find((c) => c.endpoints.includes(rpcEndpoint)).cluster as Cluster;
 };

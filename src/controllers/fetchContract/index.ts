@@ -18,6 +18,7 @@ import { DbOtcState } from 'models/DbOtcState';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -282,8 +283,8 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	// switchboard
 	if (res.rateState.getTypeId() === 'switchboard') {
-		// const switchboardProgram = await loadSwitchboardProgram('devnet', connection);
-		const switchboardProgram = loadSwitchboardProgramOffline('devnet', connection);
+		// const switchboardProgram = await loadSwitchboardProgram(getClusterFromRpcEndpoint(connection.rpcEndpoint) as "devnet" | "mainnet-beta", connection);
+		const switchboardProgram = loadSwitchboardProgramOffline(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'devnet' | 'mainnet-beta', connection);
 
 		(res.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
 			switchboardProgram,
