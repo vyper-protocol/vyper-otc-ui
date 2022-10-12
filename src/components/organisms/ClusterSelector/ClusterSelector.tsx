@@ -1,12 +1,14 @@
 /* eslint-disable indent */
 import { useContext, useEffect, useState } from 'react';
 
+import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
 import { SettingsIcon, Pane, RadioGroup, Popover } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import styles from './ClusterSelector.module.scss';
 
@@ -20,16 +22,15 @@ const ClusterSelector = ({ className }: ClusterSelectorProps) => {
 	});
 
 	const urlProvider = useContext(UrlProviderContext);
+	const { connection } = useConnection();
 
 	const router = useRouter();
 
-	const { cluster } = router.query;
-
-	const [selectedCluster, setSelectedCluster] = useState(cluster);
+	const [selectedCluster, setSelectedCluster] = useState(getClusterFromRpcEndpoint(connection.rpcEndpoint));
 
 	useEffect(() => {
-		setSelectedCluster(cluster);
-	}, [cluster]);
+		setSelectedCluster(getClusterFromRpcEndpoint(connection.rpcEndpoint));
+	}, [connection.rpcEndpoint]);
 
 	const handleClusterSwitch = (event) => {
 		setSelectedCluster(event.target.value);
