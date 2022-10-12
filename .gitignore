@@ -47,3 +47,5 @@ jspm_packages
 
 # Export Output
 out
+# Sentry
+.sentryclirc
