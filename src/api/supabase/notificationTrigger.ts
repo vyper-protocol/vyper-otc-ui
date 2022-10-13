@@ -18,7 +18,7 @@ export const buildMessage = (
 Underlying: ${underlying}
 Strike: ${strike.toPrecision(4)}
 Size: ${notional}
-Expiry: ${moment(expiry).format('D MMM yyyy hh:mm a')}
+Expiry: ${moment(expiry).utc().format('D MMM yyyy hh:mm a [UTC]')}
 
 Trade now👇
 ${url}`;
