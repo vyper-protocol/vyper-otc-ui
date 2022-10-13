@@ -19,6 +19,7 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 // eslint-disable-next-line css-modules/no-unused-class
 import styles from './summary.module.scss';
+import OracleLivePrice from 'components/organisms/OracleLivePrice';
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -116,6 +117,15 @@ const SummaryPageId = () => {
 										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.getPluginLastValue())}</p>
 									</div>
 								)}
+
+								<div className={styles.column}>
+									<p>Current Price</p>
+									<OracleLivePrice
+										oracleType={rateStateQuery?.data?.rateState.getTypeId()}
+										pubkey={rateStateQuery?.data?.rateState.getPubkeyForLivePrice().toBase58()}
+									/>
+								</div>
+
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>

@@ -8,6 +8,7 @@ export abstract class AbsRatePlugin extends AbsPlugin {
 	abstract getPluginDescription(): string;
 	abstract getPluginLastValue(): number;
 	abstract getPublicKeysForRefresh(): PublicKey[];
+	abstract getPubkeyForLivePrice(): PublicKey;
 	abstract clone(): AbsRatePlugin;
 
 	abstract getTypeId(): RatePluginTypeIds;

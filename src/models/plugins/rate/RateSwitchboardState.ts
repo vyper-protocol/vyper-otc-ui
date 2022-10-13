@@ -40,6 +40,10 @@ export default class RateSwitchboardState extends AbsRatePlugin {
 		};
 	}
 
+	getPubkeyForLivePrice(): PublicKey {
+		return this.switchboardAggregator;
+	}
+
 	getTypeId(): RatePluginTypeIds {
 		return 'switchboard';
 	}

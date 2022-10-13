@@ -63,6 +63,10 @@ export class RatePythState extends AbsRatePlugin {
 		return [this.pythPrice];
 	}
 
+	getPubkeyForLivePrice(): PublicKey {
+		return this.pythPrice;
+	}
+
 	clone(): AbsRatePlugin {
 		return new RatePythState(this.programPubkey, this.statePubkey, this.pythPrice);
 	}
