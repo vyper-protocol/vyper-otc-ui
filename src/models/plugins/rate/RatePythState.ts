@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHttpClient } from '@pythnetwork/client';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
@@ -16,24 +15,16 @@ export class RatePythState extends AbsRatePlugin {
 	}
 
 	async loadData(connection: Connection) {
-		console.log('RatePythState.loadData()');
 		[this.pythProduct, this.pythPriceData] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), this.pythPrice);
 	}
 
 	static async GetProductPrice(connection: Connection, cluster: Cluster, pythPrice: PublicKey): Promise<[Product, PriceData]> {
-		console.log('RatePythState.GetProductPrice, with pubkey: ' + pythPrice);
 		const pythClient = new PythHttpClient(connection, getPythProgramKeyForCluster(cluster));
 		const pythData = await pythClient.getData();
 
-		console.log('pythData: ', pythData);
-
 		const pythProduct = pythData.products.find((c) => c.price_account === pythPrice.toBase58());
-		console.log('pythProduct: ', pythProduct);
 		if (pythProduct) {
 			const pythPriceData = pythData.productPrice.get(pythProduct.symbol);
-			console.log('pythPriceData: ', pythPriceData);
-			console.log('pythPriceData.price: ', pythPriceData.price);
-
 			return [pythProduct, pythPriceData];
 		} else {
 			return [undefined, undefined];
