@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
-import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+import ENDPOINTS from 'configs/endpoints.json';
 import { SettingsIcon, Pane, RadioGroup, Popover } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
@@ -17,7 +17,7 @@ type ClusterSelectorProps = {
 };
 
 const ClusterSelector = ({ className }: ClusterSelectorProps) => {
-	const clusters = RPC_ENDPOINTS.map((cluster) => {
+	const clusters = ENDPOINTS.map((cluster) => {
 		return { label: cluster.cluster, value: cluster.cluster };
 	});
 

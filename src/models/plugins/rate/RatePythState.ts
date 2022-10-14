@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { getPythProgramKeyForCluster, PriceData, Product, PythHttpClient } from '@pythnetwork/client';
-import { Cluster, Connection, PublicKey } from '@solana/web3.js';
+import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHttpClient } from '@pythnetwork/client';
+import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
@@ -63,8 +63,12 @@ export class RatePythState extends AbsRatePlugin {
 		return [this.pythPrice];
 	}
 
-	getPubkeyForLivePrice(): PublicKey {
+	get pubkeyForLivePrice(): PublicKey {
 		return this.pythPrice;
+	}
+
+	static DecodePriceFromAccountInfo(accountInfo: AccountInfo<Buffer>): number {
+		return parsePriceData(accountInfo.data)?.price ?? 0;
 	}
 
 	clone(): AbsRatePlugin {

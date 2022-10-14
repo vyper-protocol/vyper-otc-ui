@@ -16,6 +16,7 @@ import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress } from 'utils/stringHelpers';
 import { MdCheckCircleOutline } from 'react-icons/md';
+import OracleLivePrice from '../OracleLivePrice';
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -79,6 +80,9 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			valueGetter: (params) => {
 				return formatWithDecimalDigits(params.row.rateState.getPluginLastValue());
 			},
+			renderCell: (params: GridRenderCellParams<any>) => (
+				<OracleLivePrice oracleType={params.row.rateState.getTypeId()} pubkey={params.row.rateState.pubkeyForLivePrice.toBase58()} />
+			),
 			width: 150
 		},
 		{
