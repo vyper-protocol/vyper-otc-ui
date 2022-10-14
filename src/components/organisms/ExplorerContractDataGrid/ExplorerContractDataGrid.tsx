@@ -146,7 +146,7 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 	];
 
 	return (
-		<Box sx={{ height: 600, maxWidth: 1600, width: '90%' }}>
+		<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
 			<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
 		</Box>
 	);
