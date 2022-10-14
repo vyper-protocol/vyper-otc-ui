@@ -1,4 +1,4 @@
-import { getAssociatedTokenAddress, getAccount, getMint } from '@solana/spl-token';
+import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 
 export async function accountExists(c: Connection, a: PublicKey): Promise<boolean> {
@@ -10,15 +10,13 @@ export async function accountExists(c: Connection, a: PublicKey): Promise<boolea
 	}
 }
 
-export async function checkTokenAmount(connection: Connection, payerPubKey: PublicKey, mintPubKey: PublicKey, requiredAmount: number):Promise<boolean> {
+export async function getTokenAmount(connection: Connection, accountPubKey: PublicKey, mintPubKey: PublicKey):Promise<bigint> {
 	try {
-		const atoken = await getAssociatedTokenAddress(mintPubKey, payerPubKey);
+		const atoken = await getAssociatedTokenAddress(mintPubKey, accountPubKey);
 		const accountInfo = await getAccount(connection, atoken);
-		const mintInfo = await getMint(connection, mintPubKey);
-		if(accountInfo.amount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) return true;
-		else return false;
+		return accountInfo.amount;
 	} catch (err) {
 		// token account not found
-		return false;
+		return BigInt(0);
 	}
 }

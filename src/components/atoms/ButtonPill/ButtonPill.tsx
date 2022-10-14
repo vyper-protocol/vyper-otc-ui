@@ -1,6 +1,6 @@
 /* eslint-disable css-modules/no-unused-class */
 import cn from 'classnames';
-import { Button, Tooltip } from 'evergreen-ui';
+import { Button } from 'evergreen-ui';
 
 import styles from './ButtonPill.module.scss';
 
@@ -14,18 +14,16 @@ type ButtonPillProps = {
 
 const ButtonPill = ({ text, onClick, mode = 'info', icon, loading, disabled }: ButtonPillProps) => {
 	return (
-		<Tooltip isShown={!disabled ? false : undefined} content="Not enough tokens">
-			<Button
-				className={cn(styles.button, styles[mode], loading && styles.disabled)}
-				onClick={onClick}
-				appearance="primary"
-				iconBefore={icon}
-				isLoading={loading}
-				disabled={disabled}
-			>
-				{text}
-			</Button>
-		</Tooltip>
+		<Button
+			className={cn(styles.button, styles[mode], loading && styles.disabled)}
+			onClick={onClick}
+			appearance="primary"
+			iconBefore={icon}
+			isLoading={loading}
+			disabled={disabled}
+		>
+			{text}
+		</Button>
 	);
 };
 
