@@ -22,6 +22,6 @@ export type OtcInitializationParams = {
 		rateAccount: PublicKey;
 	};
 
-	// depositIsSeniorSide: boolean;
-	// beneficiaryTokenAccount: PublicKey;
+	saveOnDatabase: boolean;
+	sendNotification: boolean;
 };
