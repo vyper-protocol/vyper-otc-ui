@@ -1,6 +1,7 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
-import { getAggregatorData, getAggregatorLatestValue } from 'api/switchboard/switchboardHelper';
+import { getAggregatorData, getAggregatorLatestValue, loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
+import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
@@ -22,8 +23,17 @@ export default class RateSwitchboardState extends AbsRatePlugin {
 		[this.aggregatorData, this.aggregatorLastValue] = await RateSwitchboardState.LoadAggregatorData(connection, this.switchboardAggregator);
 	}
 
-	static LoadAggregatorData(connection: Connection, switchboardAggregator: PublicKey): Promise<[any, number]> {
-		return Promise.all([getAggregatorData(connection, switchboardAggregator), getAggregatorLatestValue(connection, switchboardAggregator)]);
+	static async LoadAggregatorData(connection: Connection, switchboardAggregator: PublicKey): Promise<[any, number]> {
+		const switchboardProgram = loadSwitchboardProgramOffline(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'mainnet-beta' | 'devnet', connection);
+		const aggregatorAccount = new AggregatorAccount({
+			program: switchboardProgram,
+			publicKey: switchboardAggregator
+		});
+		const data = await aggregatorAccount.loadData();
+		const lastValue = (await aggregatorAccount.getLatestValue(data)).toNumber();
+		console.log('data: ', data);
+		console.log('lastValue: ', lastValue);
+		return [data, lastValue];
 	}
 
 	getPluginDescription(): string {
@@ -38,6 +48,21 @@ export default class RateSwitchboardState extends AbsRatePlugin {
 		return {
 			switchboardAggregator: this.switchboardAggregator.toBase58()
 		};
+	}
+
+	static async DecodePriceFromAccountInfo(connection: Connection, accountInfo: AccountInfo<Buffer>): Promise<number> {
+		const switchboardProgram = loadSwitchboardProgramOffline(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'mainnet-beta' | 'devnet', connection);
+		const aggregatorAccount = new AggregatorAccount({
+			program: switchboardProgram,
+			publicKey: PublicKey.unique()
+		});
+
+		const data = AggregatorAccount.decode(switchboardProgram, accountInfo);
+		return (await aggregatorAccount.getLatestValue(data)).toNumber();
+	}
+
+	get pubkeyForLivePrice(): PublicKey {
+		return this.switchboardAggregator;
 	}
 
 	getTypeId(): RatePluginTypeIds {

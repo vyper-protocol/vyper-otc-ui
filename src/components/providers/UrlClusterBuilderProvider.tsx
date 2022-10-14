@@ -4,7 +4,7 @@ import { createContext, useEffect, useState } from 'react';
 
 import { ConnectionProvider } from '@solana/wallet-adapter-react';
 import { Cluster } from '@solana/web3.js';
-import RPC_ENDPOINTS from 'configs/rpc_endpoints.json';
+import ENDPOINTS from 'configs/endpoints.json';
 import { useRouter } from 'next/router';
 
 export type UrlBuilder = {
@@ -27,22 +27,26 @@ export const UrlProviderProvider = ({ children }) => {
 
 	// initialized to the default cluster connection
 	const [endpoint, setEndpoint] = useState(getClusterEndpoint(DEFAULT_CLUSTER));
+	const [wssEndpoint, setWssEndpoint] = useState(getWssClusterEndpoint(DEFAULT_CLUSTER));
 
 	// change the connection endpoint everytime the cluster query param changes
 	useEffect(() => {
 		let newEndpoint = getClusterEndpoint(DEFAULT_CLUSTER);
+		let newWssEndpoint = getWssClusterEndpoint(DEFAULT_CLUSTER);
 
 		clusterParam as Cluster;
 
 		if (clusterParam) {
 			if (SUPPORTED_CLUSTERS.includes(clusterParam as Cluster)) {
 				newEndpoint = getClusterEndpoint(clusterParam as Cluster);
+				newWssEndpoint = getWssClusterEndpoint(clusterParam as Cluster);
 			} else {
 				console.warn('cluster selected not supported, fallback to the default');
 			}
 		}
 
 		setEndpoint(newEndpoint);
+		setWssEndpoint(newWssEndpoint);
 	}, [clusterParam]);
 
 	const checkForClusterParam = (url: string): string => {
@@ -111,15 +115,21 @@ export const UrlProviderProvider = ({ children }) => {
 
 	return (
 		<UrlProviderContext.Provider value={urlBuilder}>
-			<ConnectionProvider endpoint={endpoint}>{children}</ConnectionProvider>{' '}
+			<ConnectionProvider endpoint={endpoint} config={{ wsEndpoint: wssEndpoint }}>
+				{children}
+			</ConnectionProvider>{' '}
 		</UrlProviderContext.Provider>
 	);
 };
 
-function getClusterEndpoint(cluster: Cluster): any {
-	const endpoint = RPC_ENDPOINTS.find((c) => {
+function getClusterEndpoint(cluster: Cluster): string {
+	return ENDPOINTS.find((c) => {
 		return c.cluster === cluster;
-	}).endpoints[0];
+	}).rpcEndpoint;
+}
 
-	return endpoint;
+function getWssClusterEndpoint(cluster: Cluster): string {
+	return ENDPOINTS.find((c) => {
+		return c.cluster === cluster;
+	}).wssEndpoint;
 }

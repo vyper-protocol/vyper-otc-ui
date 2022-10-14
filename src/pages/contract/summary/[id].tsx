@@ -8,8 +8,9 @@ import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
+import OracleLivePrice from 'components/organisms/OracleLivePrice';
 import Layout from 'components/templates/Layout';
-import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
+import { Pane, Button, Badge, Tooltip, HelpIcon, Text } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
@@ -113,9 +114,13 @@ const SummaryPageId = () => {
 								) : (
 									<div className={styles.column}>
 										<p>Current Price</p>
-										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.getPluginLastValue())}</p>
+										<OracleLivePrice
+											oracleType={rateStateQuery?.data?.rateState.getTypeId()}
+											pubkey={rateStateQuery?.data?.rateState.pubkeyForLivePrice.toBase58()}
+										/>
 									</div>
 								)}
+
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
