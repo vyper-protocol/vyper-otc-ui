@@ -188,6 +188,18 @@ const CreateContractPage = () => {
 			label: 'mainnet test tokens'
 		},
 		{
+			pubkey: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+			label: 'mainnet USDC'
+		},
+		{
+			pubkey: '11111111111111111111111111111111',
+			label: 'mainnet SOL'
+		},
+		{
+			pubkey: 'So11111111111111111111111111111111111111112',
+			label: 'mainnet wSOL'
+		},
+		{
 			pubkey: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
 			label: 'devnet test tokens'
 		}
