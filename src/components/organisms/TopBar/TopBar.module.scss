@@ -9,13 +9,13 @@
 	z-index: 1;
 	position: relative;
 
-	.navLeftItems{
+	.navLeftItems {
 		position: absolute;
 		left: 50px;
-		top:20px;
+		top: 20px;
 	}
 
-	.navRightItems{
+	.navRightItems {
 		position: absolute;
 		right: 50px;
 	}
@@ -123,4 +123,8 @@ div[evergreen-portal-container] {
 			}
 		}
 	}
+}
+
+.hidden {
+	display: none;
 }
