@@ -172,15 +172,17 @@ const SummaryPageId = () => {
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<b>Collateral</b>
 							</Pane>
-							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+							<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 								<Pane margin={6} textAlign="center">
-									Long{' '}
+									Long
+									<br />
 									<Badge color="neutral">
 										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
 								</Pane>
 								<Pane margin={6} textAlign="center">
-									Short{' '}
+									Short
+									<br />
 									<Badge color="neutral">
 										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
@@ -195,15 +197,17 @@ const SummaryPageId = () => {
 										<b>PnL</b>
 									</Pane>
 
-									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+									<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 										<Pane margin={6} textAlign="center">
-											Long{' '}
+											Long
+											<br />
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
 												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo?.symbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
-											Short{' '}
+											Short
+											<br />
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
 												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo?.symbol}
 											</Badge>
