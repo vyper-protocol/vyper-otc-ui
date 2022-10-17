@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 
+import { Skeleton } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
@@ -46,7 +47,7 @@ const OracleLivePrice = ({ oracleType, pubkey }: OracleLivePriceInput) => {
 		};
 	});
 
-	return <p>{formatWithDecimalDigits(priceValue, 5)}</p>;
+	return priceValue === 0 ? <Skeleton variant="rectangular" width={80} height={20} animation="wave" /> : <p>{formatWithDecimalDigits(priceValue, 5)}</p>;
 };
 
 export default OracleLivePrice;
