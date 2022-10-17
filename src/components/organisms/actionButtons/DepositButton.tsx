@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -18,6 +18,14 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
 
+	useEffect(() => {
+		if (rateStateQuery?.data?.buyerTA === null && rateStateQuery?.data?.sellerTA === null) {
+			rateStateQuery.refetch();
+		} else {
+			setIsLoading(false);
+		}
+	}, [rateStateQuery]);
+
 	const onDepositClick = async () => {
 		try {
 			setIsLoading(true);
@@ -26,7 +34,6 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		} catch (err) {
 			console.log(err);
 		} finally {
-			setIsLoading(false);
 			rateStateQuery.refetch();
 		}
 	};
