@@ -3,16 +3,29 @@
 }
 
 .text_wrapper {
-	padding-top: 30vh;
 	text-align: center;
 	z-index: 1;
 	position: relative;
+}
+
+.subtext {
+	padding-top: 10vh;
+
+	p,
+	a {
+		font-size: 1.9rem;
+		line-height: 2rem;
+	}
+}
+
+.title {
+	padding-top: 20vh;
 
 	h2 {
 		letter-spacing: 10px;
 	}
 
-	.text {
+	p {
 		margin: 0;
 		font-size: 2rem;
 		line-height: 3rem;
