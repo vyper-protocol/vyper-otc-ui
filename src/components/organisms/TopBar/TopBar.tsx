@@ -18,6 +18,7 @@ import styles from './TopBar.module.scss';
 const TopBar = () => {
 	const router = useRouter();
 	const pathname = router.pathname;
+	const { cluster } = router.query;
 
 	const urlProvider = useContext(UrlProviderContext);
 
@@ -108,7 +109,7 @@ const TopBar = () => {
 						</div>
 					</Popover>
 
-					<div className={styles.item}>
+					<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
 						<AirdropButton />
 					</div>
 				</Pane>
