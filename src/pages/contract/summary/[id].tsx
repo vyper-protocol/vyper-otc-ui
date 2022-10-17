@@ -64,7 +64,7 @@ const SummaryPageId = () => {
 									FORWARD
 								</Badge>
 								<div style={{ flex: 1 }} />
-								{Date.now() > rateStateQuery?.data?.settleAvailableFromAt ? (
+								{(Date.now() > rateStateQuery?.data?.settleAvailableFromAt || (Date.now() > rateStateQuery?.data?.depositExpirationAt && !(rateStateQuery?.data?.isBuyerFunded() && rateStateQuery?.data?.isSellerFunded()))) ? (
 									<Badge color="red" margin={6}>
 										Expired
 									</Badge>
