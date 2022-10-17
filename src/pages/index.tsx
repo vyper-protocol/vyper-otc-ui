@@ -33,13 +33,15 @@ const Home = () => {
 				<div className={cn(styles.text_wrapper, styles.subtext)}>
 					<p>Wanna trade?</p>
 					<p>
-						Join our{' '}
+						Click{' '}
 						<b>
 							<a target="_blank" href={telegram.link} rel="noopener noreferrer">
-								Telegram
+								here
 							</a>
 						</b>{' '}
-						group and request your trade
+						to join our Telegram group 📨
+						<br />
+						and request for a quote on any asset
 					</p>
 				</div>
 				<div className={cn(styles.text_wrapper, styles.title)}>
