@@ -17,6 +17,7 @@ type OracleLivePriceInput = {
 
 const OracleLivePrice = ({ oracleType, pubkey }: OracleLivePriceInput) => {
 	const [priceValue, setPriceValue] = useState(0);
+	const [isInitialized, setIsInitialized] = useState(false);
 	const { connection } = useConnection();
 
 	useEffect(() => {
@@ -37,6 +38,7 @@ const OracleLivePrice = ({ oracleType, pubkey }: OracleLivePriceInput) => {
 				if (newPriceValue !== priceValue) {
 					console.log(`${oracleType} price changed for ${abbreviateAddress(pubkey)} from ${priceValue} to ${newPriceValue}`);
 					setPriceValue(newPriceValue);
+					setIsInitialized(true);
 				}
 			},
 			'confirmed'
@@ -47,7 +49,7 @@ const OracleLivePrice = ({ oracleType, pubkey }: OracleLivePriceInput) => {
 		};
 	});
 
-	return priceValue === 0 ? <Skeleton variant="rectangular" width={80} height={20} animation="wave" /> : <p>{formatWithDecimalDigits(priceValue, 5)}</p>;
+	return !isInitialized ? <Skeleton variant="rectangular" width={80} height={20} animation="wave" /> : <p>{formatWithDecimalDigits(priceValue, 5)}</p>;
 };
 
 export default OracleLivePrice;
