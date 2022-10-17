@@ -1,13 +1,19 @@
 /* eslint-disable no-console */
 import { AnchorProvider } from '@project-serum/anchor';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
+import { buildMessage as buildCreateContractMessage, sendSnsPublish } from 'api/supabase/notificationTrigger';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
+import { DEFAULT_CLUSTER } from 'components/providers/UrlClusterBuilderProvider';
 import { fetchContract } from 'controllers/fetchContract';
+import { ChainOtcState } from 'models/ChainOtcState';
 import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import { OtcInitializationParams } from './OtcInitializationParams';
+
+const MAX_RETRIES = 30;
+const RETRY_TIMEOUT = 1000;
 
 const createContract = async (provider: AnchorProvider, txHandler: TxHandler, initParams: OtcInitializationParams): Promise<PublicKey> => {
 	console.group('CONTROLLER: create contract');
@@ -19,10 +25,50 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 	await txHandler.handleTxs(...txs);
 
 	try {
-		await sleep(1000);
-		console.log('saving contract on db');
-		const chianOtcState = await fetchContract(provider.connection, otcPublicKey, true);
-		await supabaseInsertContract(chianOtcState, provider.wallet.publicKey, getClusterFromRpcEndpoint(provider.connection.rpcEndpoint));
+		const cluster = getClusterFromRpcEndpoint(provider.connection.rpcEndpoint);
+		let chainOtcState: ChainOtcState = undefined;
+
+		if (initParams.saveOnDatabase) {
+			for (let i = 0; i < MAX_RETRIES; i++) {
+				try {
+					chainOtcState = await fetchContract(provider.connection, otcPublicKey, true);
+				} catch {}
+
+				if (chainOtcState === undefined) {
+					console.warn(`chain data not fetched, sleep ${RETRY_TIMEOUT}ms and retry. ${i + 1}/${MAX_RETRIES}`);
+					await sleep(RETRY_TIMEOUT);
+				} else {
+					break;
+				}
+			}
+
+			if (chainOtcState === undefined) {
+				console.error('cannot fetch chain data yet');
+				throw Error('cannot fetch chain data yet');
+			} else {
+				console.log('saving contract on db');
+				await supabaseInsertContract(chainOtcState, provider.wallet.publicKey, cluster);
+			}
+		}
+
+		if (initParams.sendNotification) {
+			if (!chainOtcState) {
+				chainOtcState = await fetchContract(provider.connection, otcPublicKey, true);
+			}
+
+			// send sns publish
+			sendSnsPublish(
+				cluster,
+				buildCreateContractMessage(
+					chainOtcState.redeemLogicState.getTypeId(),
+					chainOtcState.rateState.getPluginDescription(),
+					chainOtcState.redeemLogicState.strike,
+					chainOtcState.redeemLogicState.notional,
+					chainOtcState.settleAvailableFromAt,
+					`https://otc.vyperprotocol.io/contract/summary/${otcPublicKey}${cluster !== DEFAULT_CLUSTER ? '?cluster=' + cluster : ''}`
+				)
+			);
+		}
 	} catch (err) {
 		console.error(err);
 	}

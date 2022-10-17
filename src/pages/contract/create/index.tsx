@@ -19,6 +19,7 @@ import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
+import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
 const StrikePicker = ({
 	title,
@@ -178,11 +179,25 @@ const CreateContractPage = () => {
 	const urlProvider = useContext(UrlProviderContext);
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
+	const [sendNotification, setSendNotification] = useState(false);
 
 	const reserveMintHints = [
 		{
 			pubkey: 'F12Jiu1sp6J1TCQsdy5kWaQkfbaxWvp6YvCJvtoYLXEo',
 			label: 'mainnet test tokens'
+		},
+		{
+			pubkey: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+			label: 'mainnet USDC'
+		},
+		{
+			pubkey: '11111111111111111111111111111111',
+			label: 'mainnet SOL'
+		},
+		{
+			pubkey: 'So11111111111111111111111111111111111111112',
+			label: 'mainnet wSOL'
 		},
 		{
 			pubkey: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
@@ -256,7 +271,9 @@ const CreateContractPage = () => {
 					isLinear: true,
 					notional,
 					strike
-				}
+				},
+				saveOnDatabase: saveOnDatabase,
+				sendNotification: sendNotification
 			};
 
 			// create contract
@@ -300,6 +317,17 @@ const CreateContractPage = () => {
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
+
+				<FormGroup>
+					<FormControlLabel
+						control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
+						label="Save on database"
+					/>
+					<FormControlLabel
+						control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
+						label="Send notification"
+					/>
+				</FormGroup>
 
 				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract
