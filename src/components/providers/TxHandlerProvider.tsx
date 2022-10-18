@@ -6,8 +6,9 @@ import { ConfirmOptions, SendOptions } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { TxPackage } from 'models/TxPackage';
 import { Id, toast } from 'react-toastify';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { abbreviateAddress } from 'utils/stringHelpers';
+
+import { getCurrentCluster } from './OtcConnectionProvider';
 
 export type TxHandler = {
 	// eslint-disable-next-line no-unused-vars
@@ -87,7 +88,7 @@ export const TxHandlerProvider = ({ children }) => {
 						signature
 					)}`,
 					onClick: () => {
-						window.open(getExplorerLink(signature, { explorer: 'solscan', cluster: getClusterFromRpcEndpoint(connection.rpcEndpoint) }));
+						window.open(getExplorerLink(signature, { explorer: 'solscan', cluster: getCurrentCluster() }));
 					},
 					type: toast.TYPE.SUCCESS,
 					isLoading: false,
