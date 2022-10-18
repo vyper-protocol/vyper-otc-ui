@@ -1,44 +1,75 @@
 /* eslint-disable css-modules/no-unused-class */
 
-import { useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import resources from 'configs/resources.json';
-import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position, PathSearchIcon } from 'evergreen-ui';
+import {
+	Text,
+	Pane,
+	Heading,
+	StackedChartIcon,
+	CubeAddIcon,
+	GridViewIcon,
+	ChevronDownIcon,
+	Tooltip,
+	Popover,
+	Position,
+	PathSearchIcon,
+	Badge
+} from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import * as UrlBuilder from 'utils/urlBuilder';
 
-import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
 
 const TopBar = () => {
 	const router = useRouter();
-
-	const urlProvider = useContext(UrlProviderContext);
+	const pathname = router.pathname;
+	const cluster = getCurrentCluster();
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (e.altKey) {
-			router.push(urlProvider.buildCreateContractUrl());
+			router.push(UrlBuilder.buildCreateContractUrl());
 		}
 	};
+
+	const [navigation, setNavigation] = useState([
+		{ href: ['/', '/contract/summary/[id]'], current: false },
+		{ href: ['/contract/create'], current: false },
+		{ href: ['/explorer'], current: false }
+	]);
+
+	useEffect(() => {
+		const newNavigation = [...navigation];
+		for (let i = 0; i < newNavigation.length; i++) {
+			if (newNavigation[i].href.includes(pathname)) newNavigation[i].current = true;
+			else newNavigation[i].current = false;
+		}
+		setNavigation(newNavigation);
+		//   eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [pathname, setNavigation]);
 
 	return (
 		<>
 			<Pane className={styles.topbar}>
-				<Link href={urlProvider.buildHomeUrl()}>
-					<Heading size={600} className={styles.hover}>
-						Vyper OTC
-					</Heading>
-				</Link>
+				<div className={styles.navLeftItems}>
+					<Link href={UrlBuilder.buildHomeUrl()}>
+						<Heading size={600} className={styles.hover}>
+							Vyper OTC
+						</Heading>
+					</Link>
+				</div>
 
 				<Pane className={styles.nav}>
 					{/* HOME LINK */}
-					<div className={cn(styles.item)}>
-						<Link href={urlProvider.buildHomeUrl()}>
+					<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+						<Link href={UrlBuilder.buildHomeUrl()}>
 							<Text>
 								<StackedChartIcon /> Home
 							</Text>
@@ -46,7 +77,7 @@ const TopBar = () => {
 					</div>
 
 					{/* CREATE CONTRACT LINK */}
-					<div className={cn(styles.item)}>
+					<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Tooltip content="Coming soon">
 							<Text onClick={onCreateContractClick}>
 								<CubeAddIcon /> Create contract
@@ -55,8 +86,8 @@ const TopBar = () => {
 					</div>
 
 					{/* EXPLORER LINK */}
-					<div className={styles.item}>
-						<Link href={urlProvider.buildExplorerUrl()}>
+					<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+						<Link href={UrlBuilder.buildExplorerUrl()}>
 							<Text>
 								<PathSearchIcon /> Explorer
 							</Text>
@@ -89,13 +120,17 @@ const TopBar = () => {
 						</div>
 					</Popover>
 
-					<div className={styles.item}>
+					<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
 						<AirdropButton />
 					</div>
 				</Pane>
 
-				<Pane display="flex" alignItems="center">
-					<ClusterSelector className={styles.cluster} />
+				<Pane className={styles.navRightItems} display="flex" alignItems="center">
+					{cluster !== 'mainnet-beta' && (
+						<Badge color="orange" marginRight={10}>
+							{cluster}
+						</Badge>
+					)}
 					<SelectWallet />
 				</Pane>
 			</Pane>

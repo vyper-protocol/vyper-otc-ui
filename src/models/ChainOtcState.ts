@@ -57,6 +57,10 @@ export class ChainOtcState extends AbsOtcState {
 	 */
 	sellerTA: undefined | PublicKey;
 
+	getContractTitle(): string {
+		return this.rateState.getPluginDescription();
+	}
+
 	isDepositExpired(): boolean {
 		return Date.now() > this.depositExpirationAt;
 	}
@@ -115,19 +119,25 @@ export class ChainOtcState extends AbsOtcState {
 		);
 	}
 
+	getContractStatus(): 'active' | 'expired' {
+		if (Date.now() > this.settleAvailableFromAt) return 'expired';
+
+		return 'active';
+	}
+
 	isPnlAvailable(): boolean {
 		return this.areBothSidesFunded();
 	}
 
 	getPnlBuyer(): number {
 		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.aggregatorLastValue;
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
 		return Math.max(Math.min(this.redeemLogicState.notional * (priceToUse - this.redeemLogicState.strike), this.sellerDepositAmount), -this.buyerDepositAmount);
 	}
 
 	getPnlSeller(): number {
 		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.aggregatorLastValue;
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
 		return Math.max(-this.sellerDepositAmount, Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - priceToUse)));
 	}
 }

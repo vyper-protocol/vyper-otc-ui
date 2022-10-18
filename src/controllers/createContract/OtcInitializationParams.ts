@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
+import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
 
 export type OtcInitializationParams = {
 	reserveMint: PublicKey;
@@ -17,9 +18,10 @@ export type OtcInitializationParams = {
 	};
 
 	rateOption: {
-		switchboardAggregator: PublicKey;
+		ratePluginType: RatePluginTypeIds;
+		rateAccount: PublicKey;
 	};
 
-	// depositIsSeniorSide: boolean;
-	// beneficiaryTokenAccount: PublicKey;
+	saveOnDatabase: boolean;
+	sendNotification: boolean;
 };

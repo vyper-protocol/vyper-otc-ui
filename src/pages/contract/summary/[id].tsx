@@ -1,7 +1,6 @@
 /* eslint-disable space-before-function-paren */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import SearchBar from 'components/molecules/SearchBar';
@@ -9,18 +8,18 @@ import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
+import OracleLivePrice from 'components/organisms/OracleLivePrice';
 import Layout from 'components/templates/Layout';
 import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
+// eslint-disable-next-line css-modules/no-unused-class
 import styles from './summary.module.scss';
-import { toast } from 'react-toastify';
-
-// test : 8wNw4iT7xpsUrrwtCC3aEa9TcP3rgoLfry2kvK86JAE5
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -33,7 +32,6 @@ const SummaryPageId = () => {
 
 	// Pass the cluster option as a unique indetifier to the query
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
-	const asset = rateStateQuery?.data?.rateState?.getAggregatorName();
 
 	const handleAddressClick = (e) => {
 		copyToClipboard(e.target.getAttribute('data-id'));
@@ -51,7 +49,6 @@ const SummaryPageId = () => {
 	return (
 		<Layout>
 			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
-
 			<Pane clearfix margin={24} maxWidth={400}>
 				{errorMessage && <p>Contract not found</p>}
 
@@ -62,7 +59,6 @@ const SummaryPageId = () => {
 						<div className={styles.box}>
 							{/* + + + + + + + + + + + + +  */}
 							{/* PLUGIN USED */}
-
 							<Pane width="100%" display="flex" alignItems="center">
 								<Badge color="purple" margin={6}>
 									FORWARD
@@ -78,10 +74,8 @@ const SummaryPageId = () => {
 									</Badge>
 								)}
 							</Pane>
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* FUNDED SIDES */}
-
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<Badge color={rateStateQuery?.data?.isBuyerFunded() ? 'green' : 'red'} margin={6}>
 									{rateStateQuery?.data?.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'}
@@ -94,13 +88,11 @@ const SummaryPageId = () => {
 								</Badge>
 							</Pane>
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* TITLE AND SYMBOL */}
-
 							<Pane width="100%" justifyContent="center" alignItems="center">
 								<Pane width="100%" textAlign="center">
-									<h5>{asset}</h5>
+									<h5>{rateStateQuery?.data?.getContractTitle()}</h5>
 								</Pane>
 								<Pane width="100%" textAlign="center">
 									{id && (
@@ -111,10 +103,8 @@ const SummaryPageId = () => {
 								</Pane>
 							</Pane>
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* DETAILS */}
-
 							<div className={styles.content}>
 								{rateStateQuery?.data?.settleExecuted ? (
 									<div className={styles.column}>
@@ -124,9 +114,13 @@ const SummaryPageId = () => {
 								) : (
 									<div className={styles.column}>
 										<p>Current Price</p>
-										<p>{formatWithDecimalDigits(rateStateQuery?.data?.rateState?.aggregatorLastValue)}</p>
+										<OracleLivePrice
+											oracleType={rateStateQuery?.data?.rateState.getTypeId()}
+											pubkey={rateStateQuery?.data?.rateState.pubkeyForLivePrice.toBase58()}
+										/>
 									</div>
 								)}
+
 								<div className={styles.column}>
 									<p>Strike</p>
 									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
@@ -135,7 +129,7 @@ const SummaryPageId = () => {
 								<div className={styles.column}>
 									<p>
 										Size
-										<Tooltip content="TBD help-text-notional" position="right">
+										<Tooltip content="PnL moves by this much for every unit movement in the underlying price" position="right">
 											<HelpIcon size={12} marginX={3} />
 										</Tooltip>
 									</p>
@@ -177,59 +171,55 @@ const SummaryPageId = () => {
 									</div>
 								)}
 							</div>
-
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* COLLATERAL AMOUNTS */}
-
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<b>Collateral</b>
 							</Pane>
-
-							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+							<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 								<Pane margin={6} textAlign="center">
-									Long{' '}
+									Long
+									<br />
 									<Badge color="neutral">
-										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo.symbol}
+										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
 								</Pane>
 								<Pane margin={6} textAlign="center">
-									Short{' '}
+									Short
+									<br />
 									<Badge color="neutral">
-										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo.symbol}
+										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
 								</Pane>
 							</Pane>
-
 							<hr />
-
 							{/* + + + + + + + + + + + + +  */}
 							{/* PnL */}
-
 							{rateStateQuery?.data?.isPnlAvailable() && (
 								<>
 									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 										<b>PnL</b>
 									</Pane>
 
-									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+									<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 										<Pane margin={6} textAlign="center">
-											Long{' '}
+											Long
+											<br />
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo.symbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo?.symbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
-											Short{' '}
+											Short
+											<br />
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
-												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo.symbol}
+												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo?.symbol}
 											</Badge>
 										</Pane>
 									</Pane>
 								</>
 							)}
-
 							<div className={styles.buttons}>
 								<DepositButton otcStatePubkey={id as string} isBuyer={true} />
 								<DepositButton otcStatePubkey={id as string} isBuyer={false} />
