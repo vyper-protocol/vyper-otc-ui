@@ -1,7 +1,7 @@
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
-import { getAggregatorData, getAggregatorLatestValue, loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
+import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
@@ -24,15 +24,13 @@ export default class RateSwitchboardState extends AbsRatePlugin {
 	}
 
 	static async LoadAggregatorData(connection: Connection, switchboardAggregator: PublicKey): Promise<[any, number]> {
-		const switchboardProgram = loadSwitchboardProgramOffline(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'mainnet-beta' | 'devnet', connection);
+		const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
 		const aggregatorAccount = new AggregatorAccount({
 			program: switchboardProgram,
 			publicKey: switchboardAggregator
 		});
 		const data = await aggregatorAccount.loadData();
 		const lastValue = (await aggregatorAccount.getLatestValue(data)).toNumber();
-		console.log('data: ', data);
-		console.log('lastValue: ', lastValue);
 		return [data, lastValue];
 	}
 
@@ -51,7 +49,7 @@ export default class RateSwitchboardState extends AbsRatePlugin {
 	}
 
 	static async DecodePriceFromAccountInfo(connection: Connection, accountInfo: AccountInfo<Buffer>): Promise<number> {
-		const switchboardProgram = loadSwitchboardProgramOffline(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'mainnet-beta' | 'devnet', connection);
+		const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
 		const aggregatorAccount = new AggregatorAccount({
 			program: switchboardProgram,
 			publicKey: PublicKey.unique()

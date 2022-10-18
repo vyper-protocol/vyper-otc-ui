@@ -8,8 +8,8 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { OtcConnectionProvider } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
-import { UrlProviderProvider } from 'components/providers/UrlClusterBuilderProvider';
 import ApplicationError from 'components/templates/ApplicationError';
 import Script from 'next/script';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -43,7 +43,7 @@ const Application = ({ Component, pageProps }) => {
 			</Script>
 			<LocalizationProvider dateAdapter={AdapterMoment}>
 				<QueryClientProvider client={queryClient}>
-					<UrlProviderProvider>
+					<OtcConnectionProvider>
 						<WalletProvider wallets={wallets}>
 							<WalletModalProvider>
 								<TxHandlerProvider>
@@ -53,7 +53,7 @@ const Application = ({ Component, pageProps }) => {
 								</TxHandlerProvider>
 							</WalletModalProvider>
 						</WalletProvider>
-					</UrlProviderProvider>
+					</OtcConnectionProvider>
 					<ToastContainer
 						position={toast.POSITION.BOTTOM_RIGHT}
 						autoClose={5000}

@@ -1,14 +1,15 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
+import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import AmountPicker from 'components/molecules/AmountPicker';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -18,8 +19,7 @@ import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
+import * as UrlBuilder from 'utils/urlBuilder';
 
 const StrikePicker = ({
 	title,
@@ -142,7 +142,7 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [product] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), new PublicKey(value));
+				const [product] = await RatePythState.GetProductPrice(connection, getCurrentCluster(), new PublicKey(value));
 				if (product) setProductSymbol(product?.symbol ?? '');
 				else setProductSymbol('');
 			} catch {
@@ -176,7 +176,6 @@ const CreateContractPage = () => {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const txHandler = useContext(TxHandlerContext);
-	const urlProvider = useContext(UrlProviderContext);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
@@ -221,7 +220,7 @@ const CreateContractPage = () => {
 
 	const setStrikeToDefaultValue = async () => {
 		if (ratePluginType === 'pyth') {
-			const [, price] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), new PublicKey(pythPrice));
+			const [, price] = await RatePythState.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice));
 			setStrike(price?.price ?? 0);
 		}
 		if (ratePluginType === 'switchboard') {
@@ -280,7 +279,7 @@ const CreateContractPage = () => {
 			const otcPublicKey = await createContract(provider, txHandler, initParams);
 
 			// Create contract URL
-			router.push(urlProvider.buildContractSummaryUrl(otcPublicKey.toBase58()));
+			router.push(UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.error(err);

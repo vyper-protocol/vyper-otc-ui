@@ -1,18 +1,16 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
 import SearchBar from 'components/molecules/SearchBar';
 import ExplorerContractDataGrid from 'components/organisms/ExplorerContractDataGrid';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import Layout from 'components/templates/Layout';
 import fetchContracts from 'controllers/fetchContracts';
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
 import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { useRouter } from 'next/router';
 
 import styles from './explorer.module.scss';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 const ExplorerPage = () => {
 	const [searchValue, setSearchValue] = useState('');
@@ -24,7 +22,7 @@ const ExplorerPage = () => {
 	useEffect(() => {
 		setContractsLoading(true);
 		setContracts([]);
-		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getClusterFromRpcEndpoint(connection.rpcEndpoint)))
+		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster()))
 			.then((c) => setContracts(c))
 			.finally(() => setContractsLoading(false));
 	}, [connection]);
