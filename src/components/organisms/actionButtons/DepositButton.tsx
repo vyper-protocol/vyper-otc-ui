@@ -49,7 +49,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 					}
 				}
 
-				if (otcStateUpdate.juniorSideBeneficiary !== null && isSeller) {
+				if (otcStateUpdate.juniorSideBeneficiary !== null) {
 					if (isSeller) {
 						// seller already take
 						setIsAvailable(false);
