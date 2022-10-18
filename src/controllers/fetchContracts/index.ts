@@ -107,7 +107,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.buyerTA = currentOtcStateAccount.seniorSideBeneficiary;
 		if (r.buyerTA) r.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.buyerTA)).owner;
 		r.sellerTA = currentOtcStateAccount.juniorSideBeneficiary;
-		if (r.sellerTA) r.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
+		if (r.sellerTA) r.sellerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
 
 		if (r.rateState.getTypeId() === 'switchboard') {
 			// switchboard
