@@ -8,7 +8,7 @@
 
 ## Live environments
 
-|                |                                                                                                                                                                             |                    |                                                                        |
+|                |                                                                                                                                                               Netlify Build |        Description |                                                                   Link |
 | -------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -----------------: | ---------------------------------------------------------------------: |
 | `mainnet-prod` | [![Netlify Status](https://api.netlify.com/api/v1/badges/96cddd0a-032d-41b1-94fb-4af04ec79674/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-prod/deploys) | Mainnet Production |                           [otc.vyperprotocol.io](otc.vyperprotocol.io) |
 |  `devnet-prod` |  [![Netlify Status](https://api.netlify.com/api/v1/badges/0f77a7ed-6f5d-4929-b79e-76867ba9da11/deploy-status)](https://app.netlify.com/sites/vyper-otc-devnet-prod/deploys) |  Devnet Production |                 [demo.otc.vyperprotocol.io](demo.otc.vyperprotocol.io) |
