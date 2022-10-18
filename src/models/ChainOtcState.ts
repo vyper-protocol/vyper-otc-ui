@@ -119,6 +119,12 @@ export class ChainOtcState extends AbsOtcState {
 		);
 	}
 
+	getContractStatus(): 'active' | 'expired' {
+		if (Date.now() > this.settleAvailableFromAt) return 'expired';
+
+		return 'active';
+	}
+
 	isPnlAvailable(): boolean {
 		return this.areBothSidesFunded();
 	}
