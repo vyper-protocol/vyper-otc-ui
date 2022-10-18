@@ -4,7 +4,16 @@
 
 > 🌿 Vyper OTC UI. Application built on Vyper Core protocol
 
-![node v16.17.0](https://img.shields.io/badge/node-v16.17.0-blue.svg) ![GitHub package.json version](https://img.shields.io/github/package-json/v/vyper-protocol/vyper-otc-ui?color=blue) ![GitHub issues](https://img.shields.io/github/issues/vyper-protocol/vyper-otc-ui?color=yellow) [![Netlify Status](https://api.netlify.com/api/v1/badges/a25c5020-b1bf-4d8b-b4d0-b033ac85da72/deploy-status)](https://app.netlify.com/sites/vyper-otc/deploys)
+![node v16.17.0](https://img.shields.io/badge/node-v16.17.0-blue.svg) ![GitHub issues](https://img.shields.io/github/issues/vyper-protocol/vyper-otc-ui?color=yellow)
+
+## Live environments
+
+|                |                                                                                                                                                                             |                    |                                                                        |
+| -------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -----------------: | ---------------------------------------------------------------------: |
+| `mainnet-prod` | [![Netlify Status](https://api.netlify.com/api/v1/badges/96cddd0a-032d-41b1-94fb-4af04ec79674/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-prod/deploys) | Mainnet Production |                           [otc.vyperprotocol.io](otc.vyperprotocol.io) |
+|  `devnet-prod` |  [![Netlify Status](https://api.netlify.com/api/v1/badges/0f77a7ed-6f5d-4929-b79e-76867ba9da11/deploy-status)](https://app.netlify.com/sites/vyper-otc-devnet-prod/deploys) |  Devnet Production |                 [demo.otc.vyperprotocol.io](demo.otc.vyperprotocol.io) |
+| `mainnet-stag` | [![Netlify Status](https://api.netlify.com/api/v1/badges/f85433c2-526f-4d89-aa5b-528c5aaf7ba8/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-stag/deploys) |    Mainnet Staging |           [staging.otc.vyperprotocol.io](staging.otc.vyperprotocol.io) |
+|  `devnet-stag` | [![Netlify Status](https://api.netlify.com/api/v1/badges/96cddd0a-032d-41b1-94fb-4af04ec79674/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-prod/deploys) |     Devnet Staging | [staging.demo.otc.vyperprotocol.io](staging.demo.otc.vyperprotocol.io) |
 
 ### Getting Started
 
