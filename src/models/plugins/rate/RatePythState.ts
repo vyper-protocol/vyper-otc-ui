@@ -1,6 +1,6 @@
 import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHttpClient } from '@pythnetwork/client';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
@@ -15,7 +15,7 @@ export class RatePythState extends AbsRatePlugin {
 	}
 
 	async loadData(connection: Connection) {
-		[this.pythProduct, this.pythPriceData] = await RatePythState.GetProductPrice(connection, getClusterFromRpcEndpoint(connection.rpcEndpoint), this.pythPrice);
+		[this.pythProduct, this.pythPriceData] = await RatePythState.GetProductPrice(connection, getCurrentCluster(), this.pythPrice);
 	}
 
 	static async GetProductPrice(connection: Connection, cluster: Cluster, pythPrice: PublicKey): Promise<[Product, PriceData]> {

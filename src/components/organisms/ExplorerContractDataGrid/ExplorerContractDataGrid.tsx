@@ -1,21 +1,16 @@
-import { useContext } from 'react';
-
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box } from '@mui/material';
-import { DataGrid, GridColumns, GridRowParams, GridValueFormatterParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
-import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
+import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { Badge } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
+import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 import { useRouter } from 'next/router';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { abbreviateAddress } from 'utils/stringHelpers';
-import { MdCheckCircleOutline } from 'react-icons/md';
+import * as UrlBuilder from 'utils/urlBuilder';
+
 import OracleLivePrice from '../OracleLivePrice';
 
 // @ts-ignore
@@ -28,8 +23,6 @@ export type ExplorerContractDataGridProps = {
 };
 
 const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) => {
-	const urlProvider = useContext(UrlProviderContext);
-	const { connection } = useConnection();
 	const router = useRouter();
 
 	const columns: GridColumns<ChainOtcState> = [
@@ -122,22 +115,23 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			headerName: 'Show details',
 			width: 150,
 			getActions: (params: GridRowParams) => [
-				<GridActionsCellItem key="open" icon={<OpenInNewIcon />} onClick={() => router.push(urlProvider.buildContractSummaryUrl(params.id))} label="Open" />,
+				<GridActionsCellItem
+					key="open"
+					icon={<OpenInNewIcon />}
+					onClick={() => router.push(UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
+					label="Open"
+				/>,
 				<GridActionsCellItem
 					key="open_in_explorer"
 					icon={<OpenInNewIcon />}
-					onClick={() =>
-						window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: getClusterFromRpcEndpoint(connection.rpcEndpoint) }))
-					}
+					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: getCurrentCluster() }))}
 					label="Open in Explorer"
 					showInMenu
 				/>,
 				<GridActionsCellItem
 					key="open_in_solscan"
 					icon={<OpenInNewIcon />}
-					onClick={() =>
-						window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: getClusterFromRpcEndpoint(connection.rpcEndpoint) }))
-					}
+					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: getCurrentCluster() }))}
 					label="Open in Solscan"
 					showInMenu
 				/>
