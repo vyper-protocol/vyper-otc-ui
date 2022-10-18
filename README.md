@@ -28,22 +28,24 @@ yarn build
 
 ### NPM Scripts
 
-| Script        | Use                                                                                             |
-| ------------- | ----------------------------------------------------------------------------------------------- |
-| dev           | Starts the development server                                                                   |
-| build         | Creates an optimized production build                                                           |
-| export        | Export the app to static HTML, which can be run standalone without the need of a Node.js server |
-| analyze       | Visualize and track the production build bundle size                                            |
-| lint          | Lints src files with Eslint                                                                     |
-| format        | Formats src files with prettier                                                                 |
-| commit        | Runs `git add .` and `cz`                                                                       |
-| first-release | Creates the first version for the auto-changelog generator. _(This should run only once)_       |
-| release       | Bumbs version & writes changes to changelog                                                     |
-| release:minor | Bumbs minor version & writes changes to changelog                                               |
-| release:patch | Bumbs patch version & writes changes to changelog                                               |
-| release:major | Bumbs major version & writes changes to changelog                                               |
-| push-tags     | Creates github tag with the current release                                                     |
-| prepare       | Husky install                                                                                   |
+| Script          | Use                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| dev             | Starts the development server                                                                   |
+| build           | Creates an optimized production build                                                           |
+| export          | Export the app to static HTML, which can be run standalone without the need of a Node.js server |
+| analyze         | Visualize and track the production build bundle size                                            |
+| lint            | Lints src files with Eslint                                                                     |
+| format          | Formats src files with prettier                                                                 |
+| storybook       | Starts the storybook development server                                                         |
+| build-storybook | Creates the storybook production build                                                          |
+| commit          | Runs `git add .` and `cz`                                                                       |
+| first-release   | Creates the first version for the auto-changelog generator. _(This should run only once)_         |
+| release         | Bumbs version & writes changes to changelog                                                     |
+| release:minor   | Bumbs minor version & writes changes to changelog                                               |
+| release:patch   | Bumbs patch version & writes changes to changelog                                               |
+| release:major   | Bumbs major version & writes changes to changelog                                               |
+| push-tags       | Creates github tag with the current release                                                     |
+| prepare         | Husky install                                                                                   |
 
 ### Next.js
 
@@ -72,6 +74,17 @@ There are a couple of points to take into consideration when working with CSS he
 3. Sizes for fonts are following the _"divided-by-2"_ scale
 4. Sizes for spacing are following the _"multiplex-of-4"_ scale
 5. There are some predefined mixins in `styles/variables.scss`
+
+### Storybook
+
+Storybook is a visual documentation of the components that are available in the project. So, it's encouraged that for each component that you create or modify, it's better if you also create/update the component's story.
+
+The guideline for creating a component's story is:
+
+1. The component's story filename should follow this pattern: `*.stories.tsx`, otherwise it won't be detected by Storybook
+2. The title of the component metadata should follow the path under `src`, for example `<ButtonPill />` is located at `src/components/atoms/ButtonPill`, then it should be `components/atoms/ButonPill`
+3. It's encouraged that developers to give a comment above each props of the actual component, the comments will act as the description of the props in Storybook
+4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options. 
 
 ### Tests
 
