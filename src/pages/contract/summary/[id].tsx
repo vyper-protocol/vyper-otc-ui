@@ -20,6 +20,7 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 // eslint-disable-next-line css-modules/no-unused-class
 import styles from './summary.module.scss';
+import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -64,15 +65,7 @@ const SummaryPageId = () => {
 									FORWARD
 								</Badge>
 								<div style={{ flex: 1 }} />
-								{ rateStateQuery.data.getStatus() === 'expired' ? (
-									<Badge color="red" margin={6}>
-										Expired
-									</Badge>
-								) : (
-									<Badge color="green" margin={6}>
-										Active
-									</Badge>
-								)}
+								<ContractStatusBadge status={rateStateQuery.data.getContractStatus()} />
 							</Pane>
 							{/* + + + + + + + + + + + + +  */}
 							{/* FUNDED SIDES */}
