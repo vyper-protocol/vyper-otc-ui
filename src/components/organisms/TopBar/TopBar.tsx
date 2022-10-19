@@ -33,7 +33,7 @@ const TopBar = () => {
 	const pathname = router.pathname;
 	const cluster = getCurrentCluster();
 
-	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const onCreateContractClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
 		if (e.altKey) {
 			router.push(UrlBuilder.buildCreateContractUrl());
 		}
@@ -70,27 +70,27 @@ const TopBar = () => {
 					{/* HOME LINK */}
 					<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={UrlBuilder.buildHomeUrl()}>
-							<Text>
+							<a>
 								<StackedChartIcon /> Home
-							</Text>
+							</a>
 						</Link>
 					</div>
 
 					{/* CREATE CONTRACT LINK */}
 					<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Tooltip content="Coming soon">
-							<Text onClick={onCreateContractClick}>
+							<a onClick={onCreateContractClick}>
 								<CubeAddIcon /> Create contract
-							</Text>
+							</a>
 						</Tooltip>
 					</div>
 
 					{/* EXPLORER LINK */}
 					<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 						<Link href={UrlBuilder.buildExplorerUrl()}>
-							<Text>
+							<a>
 								<PathSearchIcon /> Explorer
-							</Text>
+							</a>
 						</Link>
 					</div>
 
