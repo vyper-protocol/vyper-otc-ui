@@ -114,20 +114,19 @@ const SummaryPageId = () => {
 									</div>
 								)}
 
-								<div className={styles.column}>
-									<p>Strike</p>
-									<p>{formatWithDecimalDigits(rateStateQuery?.data?.redeemLogicState.strike)}</p>
-								</div>
-
-								<div className={styles.column}>
-									<p>
-										Size
-										<Tooltip content="PnL moves by this much for every unit movement in the underlying price" position="right">
-											<HelpIcon size={12} marginX={3} />
-										</Tooltip>
-									</p>
-									<p>{rateStateQuery?.data?.redeemLogicState.notional}</p>
-								</div>
+								{rateStateQuery?.data?.redeemLogicState.getPluginDetails().map((c) => (
+									<div key={c.label} className={styles.column}>
+										<p>
+											{c.label}
+											{c.tooltip && (
+												<Tooltip content={c.tooltip} position="right">
+													<HelpIcon size={12} marginX={3} />
+												</Tooltip>
+											)}
+										</p>
+										<p>{formatWithDecimalDigits(c.value)}</p>
+									</div>
+								))}
 
 								{!rateStateQuery?.data.isDepositExpired() && !rateStateQuery?.data.areBothSidesFunded() && (
 									<div className={styles.column}>

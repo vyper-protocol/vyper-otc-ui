@@ -4,7 +4,7 @@ import { AbsOtcState } from './AbsOtcState';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
 import { RatePythState } from './plugins/rate/RatePythState';
 import RateSwitchboardState from './plugins/rate/RateSwitchboardState';
-import { RedeemLogicForwardState } from './plugins/RedeemLogicForwardState';
+import { RedeemLogicForwardState } from './plugins/redeemLogic/RedeemLogicForwardState';
 
 export class DbOtcState extends AbsOtcState {
 	cluster: Cluster;
