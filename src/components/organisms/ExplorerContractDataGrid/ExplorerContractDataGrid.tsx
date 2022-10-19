@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
+import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { Badge } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
@@ -107,6 +108,40 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			width: 150,
 			valueGetter: (params) => {
 				return params.row.isSellerFunded();
+			}
+		},
+		{
+			field: 'buyerWallet',
+			headerName: 'Buyer wallet',
+			sortable: true,
+			filterable: true,
+			width: 120,
+			renderCell: (params) => {
+				if (!params.row.buyerWallet) return <></>;
+				return <PublicKeyLink address={params.row.buyerWallet?.toBase58()} />;
+			}
+		},
+		{
+			field: 'sellerWallet',
+			headerName: 'Seller wallet',
+			sortable: true,
+			filterable: true,
+			width: 120,
+			renderCell: (params) => {
+				if (!params.row.sellerWallet) return <></>;
+				return <PublicKeyLink address={params.row.sellerWallet?.toBase58()} />;
+			}
+		},
+		{
+			field: 'contractStatus',
+			headerName: 'Status',
+			sortable: true,
+			filterable: true,
+			width: 100,
+			renderCell: (params) => {
+				const status = params.row.getContractStatus();
+				const color = status === 'active' ? 'green' : 'red';
+				return <Badge color={color}>{status}</Badge>;
 			}
 		},
 		{

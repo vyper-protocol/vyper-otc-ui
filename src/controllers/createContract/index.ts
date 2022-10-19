@@ -67,7 +67,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 					chainOtcState.redeemLogicState.strike,
 					chainOtcState.redeemLogicState.notional,
 					chainOtcState.settleAvailableFromAt,
-					`https://otc.vyperprotocol.io/${contractURL}`
+					`https://otc.vyperprotocol.io${contractURL}`
 				)
 			);
 		}
