@@ -1,4 +1,5 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
+import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 
 import ButtonPill from './ButtonPill';
 
@@ -25,4 +26,11 @@ export const Info = Template.bind({});
 Info.args = {
 	text: 'Create Contract',
 	mode: 'info'
+};
+
+export const ButtonWithIcon = Template.bind({});
+ButtonWithIcon.args = {
+	text: 'Create Contract',
+	mode: 'success',
+	icon: <Icon name={'FaGithub' as AvailableIconNames} />
 };
