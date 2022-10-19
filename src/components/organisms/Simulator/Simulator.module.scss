@@ -1,7 +1,30 @@
 .wrapper {
 	background-color: var(--color-white);
-	width: 200px;
-	height: 230px;
+	width: 250px;
+	height: 300px;
 	border-left: 1px solid var(--color-black-300);
 	padding: 20px;
+
+	.title {
+		font-weight: 600;
+		font-size: var(--space-18);
+		text-align: center;
+	}
+
+	.flex {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.row {
+		background-color: var(--color-black-200);
+	}
+
+	.margin {
+		margin-top: var(--space-20);
+	}
+
+	.center {
+		text-align: center;
+	}
 }
