@@ -26,7 +26,7 @@ const Home = () => {
 				<title>Vyper OTC</title>
 			</Head>
 			<Pane className="root">
-				<div className={styles.bg_wrapper}>
+				<div>
 					<TopBar />
 					<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
 					<Image alt="abstract-colors" src={backgroundImage} layout="fill" objectFit="cover" quality={50} priority style={{ zIndex: -1 }} />
