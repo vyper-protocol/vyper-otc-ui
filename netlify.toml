@@ -1,3 +1,10 @@
 [build]
   command = "npm run build"
   publish = ".next"
+
+[[plugins]]
+  package = "@sentry/netlify-build-plugin"
+
+  [plugins.inputs]
+    sentryOrg = "vyper-labs"
+    sentryProject = "vyper-otc-ui"
