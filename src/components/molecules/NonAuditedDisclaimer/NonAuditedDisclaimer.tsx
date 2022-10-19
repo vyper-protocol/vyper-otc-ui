@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, AlertTitle, Box, IconButton } from '@mui/material';
+import { Alert, AlertTitle, IconButton } from '@mui/material';
 import cn from 'classnames';
 
 import styles from './NonAuditedDisclaimer.module.scss';
