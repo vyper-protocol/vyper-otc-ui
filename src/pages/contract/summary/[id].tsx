@@ -1,5 +1,8 @@
 /* eslint-disable space-before-function-paren */
+import { useState, useRef } from 'react';
+
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import cn from 'classnames';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
@@ -7,8 +10,9 @@ import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import OracleLivePrice from 'components/organisms/OracleLivePrice';
+import Simulator from 'components/organisms/Simulator/Simulator';
 import Layout from 'components/templates/Layout';
-import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
+import { Pane, Button, Badge, Tooltip, HelpIcon, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
@@ -24,6 +28,9 @@ const SummaryPageId = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
+	const [searchValue, setSearchValue] = useState('');
+	const [showSimulator, setShowSimulator] = useState(false);
+
 	const { id } = router.query;
 
 	// Pass the cluster option as a unique indetifier to the query
@@ -36,6 +43,10 @@ const SummaryPageId = () => {
 		});
 	};
 
+	const handleToggle = () => {
+		setShowSimulator(!showSimulator);
+	};
+
 	const reserveTokenInfo = rateStateQuery?.data?.reserveTokenInfo;
 
 	const loadingSpinner = rateStateQuery?.isLoading;
@@ -44,14 +55,15 @@ const SummaryPageId = () => {
 
 	return (
 		<Layout withSearch>
-			<Pane clearfix margin={24} maxWidth={400}>
+			<Pane clearfix margin={24} maxWidth={620}>
 				{errorMessage && <p>Contract not found</p>}
 
 				{loadingSpinner && <Spinner />}
 
 				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
-					<>
-						<div className={styles.box}>
+					<div className={styles.cards}>
+						<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
+							<ToggleSimulator className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }} />
 							{/* + + + + + + + + + + + + +  */}
 							{/* PLUGIN USED */}
 							<Pane width="100%" display="flex" alignItems="center">
@@ -216,7 +228,8 @@ const SummaryPageId = () => {
 								<ClaimButton otcStatePubkey={id as string} isBuyer={false} />
 							</div>
 						</div>
-					</>
+						<Simulator className={cn(styles.simulator, showSimulator ? styles.show : styles.hide)} />
+					</div>
 				)}
 			</Pane>
 		</Layout>
