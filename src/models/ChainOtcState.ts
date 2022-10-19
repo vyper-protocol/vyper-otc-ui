@@ -6,6 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import { AbsOtcState } from './AbsOtcState';
 import { TokenInfo } from './TokenInfo';
 
+export type OtcStatusIds = 'active' | 'expired';
 export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Reserve mint info
@@ -133,5 +134,13 @@ export class ChainOtcState extends AbsOtcState {
 		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
 		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
 		return Math.max(-this.sellerDepositAmount, Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - priceToUse)));
+	}
+
+	getStatus():OtcStatusIds {
+		const currentTime = Date.now();
+		if(currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
+			return 'expired';
+		}
+		return 'active';
 	}
 }
