@@ -12,5 +12,10 @@ export const fetchTokenInfo = async (mint: PublicKey): Promise<TokenInfo | undef
 		}
 	});
 
-	return axiosRes.data;
+	if (axiosRes.status === 200) {
+		return axiosRes.data;
+	} else {
+		console.warn(axiosRes);
+		return undefined;
+	}
 };
