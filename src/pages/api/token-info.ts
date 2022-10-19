@@ -1,8 +1,29 @@
 import { findMetadataPda } from '@metaplex-foundation/js';
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import { TokenListProvider } from '@solana/spl-token-registry';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Cluster, Connection, PublicKey } from '@solana/web3.js';
+import { getClusterEndpoint } from 'components/providers/OtcConnectionProvider';
 import { TokenInfo } from 'models/TokenInfo';
+import { NextApiRequest, NextApiResponse } from 'next';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+	if (req.method !== 'GET') {
+		res.status(404);
+		return;
+	}
+
+	try {
+		const mint = new PublicKey(req.query.mint as string);
+		const cluster = process.env.NEXT_PUBLIC_CLUSTER;
+		const connection = new Connection(getClusterEndpoint(cluster as Cluster));
+		const tokenInfo = await fetchTokenInfo(connection, mint);
+		// console.log(tokenInfo);
+
+		res.status(200).json(tokenInfo);
+	} catch (err) {
+		res.status(500).json({ err });
+	}
+}
 
 const fetchTokenInfoFromMetaplex = async (connection: Connection, mint: PublicKey): Promise<TokenInfo | undefined> => {
 	try {
