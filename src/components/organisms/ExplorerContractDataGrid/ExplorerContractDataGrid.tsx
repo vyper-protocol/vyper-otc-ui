@@ -152,7 +152,7 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 				<GridActionsCellItem
 					key="open"
 					icon={<OpenInNewIcon />}
-					onClick={() => router.push(UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
+					onClick={() => window.open(window.location.origin + UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
 					label="Open"
 				/>,
 				<GridActionsCellItem
@@ -172,6 +172,8 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			]
 		}
 	];
+
+	console.log(window.location.origin);
 
 	return (
 		<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
