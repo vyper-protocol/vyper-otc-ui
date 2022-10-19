@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
-import SearchBar from 'components/molecules/SearchBar';
 import ExplorerContractDataGrid from 'components/organisms/ExplorerContractDataGrid';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import Layout from 'components/templates/Layout';
@@ -10,10 +9,7 @@ import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsP
 import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 
-import styles from './explorer.module.scss';
-
 const ExplorerPage = () => {
-	const [searchValue, setSearchValue] = useState('');
 	const { connection } = useConnection();
 
 	const [contractsLoading, setContractsLoading] = useState(false);
@@ -28,9 +24,7 @@ const ExplorerPage = () => {
 	}, [connection]);
 
 	return (
-		<Layout>
-			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
-
+		<Layout withSearch>
 			{contractsLoading && <Spinner />}
 
 			{contracts.length > 0 && <ExplorerContractDataGrid contracts={contracts} />}

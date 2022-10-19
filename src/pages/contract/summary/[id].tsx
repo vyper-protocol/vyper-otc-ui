@@ -1,9 +1,7 @@
 /* eslint-disable space-before-function-paren */
-import { useState } from 'react';
-
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import SearchBar from 'components/molecules/SearchBar';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
@@ -20,14 +18,11 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 // eslint-disable-next-line css-modules/no-unused-class
 import styles from './summary.module.scss';
-import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 
 const SummaryPageId = () => {
 	const router = useRouter();
 	const { connection } = useConnection();
 	const wallet = useWallet();
-
-	const [searchValue, setSearchValue] = useState('');
 
 	const { id } = router.query;
 
@@ -48,8 +43,7 @@ const SummaryPageId = () => {
 	const showContent = rateStateQuery?.isSuccess;
 
 	return (
-		<Layout>
-			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+		<Layout withSearch>
 			<Pane clearfix margin={24} maxWidth={400}>
 				{errorMessage && <p>Contract not found</p>}
 
