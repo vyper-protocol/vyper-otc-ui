@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import cn from 'classnames';
+import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
 import SearchBar from 'components/molecules/SearchBar';
 import TopBar from 'components/organisms/TopBar';
 import Footer from 'components/templates/Footer';
@@ -29,6 +30,9 @@ const Home = () => {
 					<TopBar />
 					<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
 					<Image alt="abstract-colors" src={backgroundImage} layout="fill" objectFit="cover" quality={50} priority style={{ zIndex: -1 }} />
+				</div>
+				<div className={styles.disclaimer_alert}>
+					<NonAuditedDisclaimer />
 				</div>
 				<div className={cn(styles.text_wrapper, styles.subtext)}>
 					<p>Wanna trade?</p>
