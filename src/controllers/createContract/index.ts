@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import { AnchorProvider } from '@project-serum/anchor';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
 import { buildMessage as buildCreateContractMessage, sendSnsPublish } from 'api/supabase/notificationTrigger';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
-import { DEFAULT_CLUSTER } from 'components/providers/UrlClusterBuilderProvider';
 import { fetchContract } from 'controllers/fetchContract';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
+import * as UrlBuilder from 'utils/urlBuilder';
 
 import { OtcInitializationParams } from './OtcInitializationParams';
 
@@ -25,7 +25,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 	await txHandler.handleTxs(...txs);
 
 	try {
-		const cluster = getClusterFromRpcEndpoint(provider.connection.rpcEndpoint);
+		const cluster = getCurrentCluster();
 		let chainOtcState: ChainOtcState = undefined;
 
 		if (initParams.saveOnDatabase) {
@@ -56,6 +56,8 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 				chainOtcState = await fetchContract(provider.connection, otcPublicKey, true);
 			}
 
+			const contractURL = UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58());
+
 			// send sns publish
 			sendSnsPublish(
 				cluster,
@@ -65,7 +67,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 					chainOtcState.redeemLogicState.strike,
 					chainOtcState.redeemLogicState.notional,
 					chainOtcState.settleAvailableFromAt,
-					`https://otc.vyperprotocol.io/contract/summary/${otcPublicKey}${cluster !== DEFAULT_CLUSTER ? '?cluster=' + cluster : ''}`
+					`https://otc.vyperprotocol.io/${contractURL}`
 				)
 			);
 		}
