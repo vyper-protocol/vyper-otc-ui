@@ -2,6 +2,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box } from '@mui/material';
 import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
+import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -139,9 +140,7 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			filterable: true,
 			width: 100,
 			renderCell: (params) => {
-				const status = params.row.getContractStatus();
-				const color = status === 'active' ? 'green' : 'red';
-				return <Badge color={color}>{status}</Badge>;
+				return <ContractStatusBadge status={params.row.getContractStatus()} />;
 			}
 		},
 		{
@@ -153,7 +152,7 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 				<GridActionsCellItem
 					key="open"
 					icon={<OpenInNewIcon />}
-					onClick={() => router.push(UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
+					onClick={() => window.open(window.location.origin + UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
 					label="Open"
 				/>,
 				<GridActionsCellItem
@@ -173,6 +172,8 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			]
 		}
 	];
+
+	console.log(window.location.origin);
 
 	return (
 		<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>

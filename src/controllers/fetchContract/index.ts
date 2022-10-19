@@ -5,9 +5,9 @@ import { getMint, getMultipleAccounts, unpackAccount, unpackMint } from '@solana
 import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
+import { fetchTokenInfo } from 'api/next-api/fetchTokenInfo';
 import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
-import { fetchTokenInfo } from 'api/tokens/fetchTokenInfo';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
@@ -70,7 +70,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.vyperCoreTrancheConfig = accountInfo.vyperTrancheConfig;
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
-	res.reserveTokenInfo = await fetchTokenInfo(connection, trancheConfigAccountInfo.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfo(trancheConfigAccountInfo.reserveMint);
 
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
@@ -208,7 +208,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	res.redeemLogicState = data.redeemLogicState.clone();
 	res.rateState = data.rateState.clone();
-	res.reserveTokenInfo = await fetchTokenInfo(connection, res.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfo(res.reserveMint);
 
 	// first fetch
 

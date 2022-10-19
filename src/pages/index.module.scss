@@ -1,11 +1,5 @@
-.bg_wrapper {
-	overflow: hidden;
-}
-
 .text_wrapper {
 	text-align: center;
-	z-index: 1;
-	position: relative;
 }
 
 .subtext {
@@ -19,7 +13,7 @@
 }
 
 .title {
-	padding-top: 20vh;
+	padding: 15vh 0;
 
 	h2 {
 		letter-spacing: 10px;
@@ -30,10 +24,4 @@
 		font-size: 2rem;
 		line-height: 3rem;
 	}
-}
-
-.searchbar {
-	display: flex;
-	justify-content: center;
-	margin-bottom: 60px;
 }

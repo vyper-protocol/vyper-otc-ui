@@ -183,10 +183,6 @@ const CreateContractPage = () => {
 
 	const reserveMintHints = [
 		{
-			pubkey: 'F12Jiu1sp6J1TCQsdy5kWaQkfbaxWvp6YvCJvtoYLXEo',
-			label: 'mainnet test tokens'
-		},
-		{
 			pubkey: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
 			label: 'mainnet USDC'
 		},

@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
-import { getMultipleAccounts, unpackMint } from '@solana/spl-token';
+import { unpackAccount, unpackMint } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
@@ -14,6 +14,7 @@ import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
@@ -41,10 +42,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		...firstFetch_reserveMintAccountPubkeys,
 		...firstFetch_rateAccounts
 	]) as PublicKey[];
-	const firstFetch_accountsData = (await connection.getMultipleAccountsInfo(firstFetch_unionPubkeys)).map((c, i) => ({
-		pubkey: firstFetch_unionPubkeys[i],
-		data: c
-	}));
+	const firstFetch_accountsData = await getMultipleAccountsInfo(connection, firstFetch_unionPubkeys);
 
 	const firstFetch_otcStateAccountInfos = firstFetch_accountsData
 		.filter((c) => firstFetch_otcStateChainAccountPubkeys.map((f) => f.toBase58()).includes(c.pubkey.toBase58()))
@@ -59,7 +57,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.juniorSideBeneficiary));
 
 	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c !== null)) as PublicKey[];
-	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
+	const secondFetch_accountsData = (await getMultipleAccountsInfo(connection, secondFetch_unionPubkeys)).map((c) => unpackAccount(c.pubkey, c.data));
 
 	const res: ChainOtcState[] = [];
 	for (let i = 0; i < dbEntries.length; i++) {

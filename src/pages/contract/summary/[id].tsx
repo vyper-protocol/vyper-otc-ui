@@ -1,9 +1,7 @@
 /* eslint-disable space-before-function-paren */
-import { useState } from 'react';
-
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import SearchBar from 'components/molecules/SearchBar';
 import ClaimButton from 'components/organisms/actionButtons/ClaimButton';
 import DepositButton from 'components/organisms/actionButtons/DepositButton';
 import SettleButton from 'components/organisms/actionButtons/SettleButton';
@@ -26,8 +24,6 @@ const SummaryPageId = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
-	const [searchValue, setSearchValue] = useState('');
-
 	const { id } = router.query;
 
 	// Pass the cluster option as a unique indetifier to the query
@@ -47,8 +43,7 @@ const SummaryPageId = () => {
 	const showContent = rateStateQuery?.isSuccess;
 
 	return (
-		<Layout>
-			<SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />
+		<Layout withSearch>
 			<Pane clearfix margin={24} maxWidth={400}>
 				{errorMessage && <p>Contract not found</p>}
 
@@ -64,15 +59,7 @@ const SummaryPageId = () => {
 									FORWARD
 								</Badge>
 								<div style={{ flex: 1 }} />
-								{Date.now() > rateStateQuery?.data?.settleAvailableFromAt ? (
-									<Badge color="red" margin={6}>
-										Expired
-									</Badge>
-								) : (
-									<Badge color="green" margin={6}>
-										Active
-									</Badge>
-								)}
+								<ContractStatusBadge status={rateStateQuery.data.getContractStatus()} />
 							</Pane>
 							{/* + + + + + + + + + + + + +  */}
 							{/* FUNDED SIDES */}
