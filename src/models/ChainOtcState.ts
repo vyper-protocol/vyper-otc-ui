@@ -6,6 +6,8 @@ import { PublicKey } from '@solana/web3.js';
 import { AbsOtcState } from './AbsOtcState';
 import { TokenInfo } from './TokenInfo';
 
+export type ContractStatusIds = 'active' | 'expired';
+
 export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Reserve mint info
@@ -117,6 +119,14 @@ export class ChainOtcState extends AbsOtcState {
 			this.sellerWallet.equals(currentUserWallet) &&
 			this.programSellerTAAmount > 0
 		);
+	}
+
+	getContractStatus(): ContractStatusIds {
+		const currentTime = Date.now();
+		if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
+			return 'expired';
+		}
+		return 'active';
 	}
 
 	isPnlAvailable(): boolean {

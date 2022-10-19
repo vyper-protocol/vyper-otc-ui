@@ -8,6 +8,7 @@ import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
 import { fetchTokenInfo } from 'api/tokens/fetchTokenInfo';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
@@ -18,7 +19,6 @@ import { DbOtcState } from 'models/DbOtcState';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -259,8 +259,8 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	// switchboard
 	if (res.rateState.getTypeId() === 'switchboard') {
-		// const switchboardProgram = await loadSwitchboardProgram(getClusterFromRpcEndpoint(connection.rpcEndpoint) as "devnet" | "mainnet-beta", connection);
-		const switchboardProgram = loadSwitchboardProgramOffline(getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'devnet' | 'mainnet-beta', connection);
+		// const switchboardProgram = await loadSwitchboardProgram(getCurrentCluster() as "devnet" | "mainnet-beta", connection);
+		const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'devnet' | 'mainnet-beta', connection);
 
 		(res.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
 			switchboardProgram,

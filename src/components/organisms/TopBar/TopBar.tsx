@@ -1,29 +1,41 @@
 /* eslint-disable css-modules/no-unused-class */
 
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
-import { UrlProviderContext } from 'components/providers/UrlClusterBuilderProvider';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import resources from 'configs/resources.json';
-import { Text, Pane, Heading, StackedChartIcon, CubeAddIcon, GridViewIcon, ChevronDownIcon, Tooltip, Popover, Position, PathSearchIcon } from 'evergreen-ui';
+import {
+	Text,
+	Pane,
+	Heading,
+	StackedChartIcon,
+	CubeAddIcon,
+	GridViewIcon,
+	ChevronDownIcon,
+	Tooltip,
+	Popover,
+	Position,
+	PathSearchIcon,
+	Badge
+} from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import * as UrlBuilder from 'utils/urlBuilder';
 
-import ClusterSelector from '../ClusterSelector/ClusterSelector';
 import styles from './TopBar.module.scss';
 
 const TopBar = () => {
 	const router = useRouter();
 	const pathname = router.pathname;
-
-	const urlProvider = useContext(UrlProviderContext);
+	const cluster = getCurrentCluster();
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (e.altKey) {
-			router.push(urlProvider.buildCreateContractUrl());
+			router.push(UrlBuilder.buildCreateContractUrl());
 		}
 	};
 
@@ -47,7 +59,7 @@ const TopBar = () => {
 		<>
 			<Pane className={styles.topbar}>
 				<div className={styles.navLeftItems}>
-					<Link href={urlProvider.buildHomeUrl()}>
+					<Link href={UrlBuilder.buildHomeUrl()}>
 						<Heading size={600} className={styles.hover}>
 							Vyper OTC
 						</Heading>
@@ -57,7 +69,7 @@ const TopBar = () => {
 				<Pane className={styles.nav}>
 					{/* HOME LINK */}
 					<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-						<Link href={urlProvider.buildHomeUrl()}>
+						<Link href={UrlBuilder.buildHomeUrl()}>
 							<Text>
 								<StackedChartIcon /> Home
 							</Text>
@@ -75,7 +87,7 @@ const TopBar = () => {
 
 					{/* EXPLORER LINK */}
 					<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-						<Link href={urlProvider.buildExplorerUrl()}>
+						<Link href={UrlBuilder.buildExplorerUrl()}>
 							<Text>
 								<PathSearchIcon /> Explorer
 							</Text>
@@ -108,13 +120,17 @@ const TopBar = () => {
 						</div>
 					</Popover>
 
-					<div className={styles.item}>
+					<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
 						<AirdropButton />
 					</div>
 				</Pane>
 
 				<Pane className={styles.navRightItems} display="flex" alignItems="center">
-					<ClusterSelector className={styles.cluster} />
+					{cluster !== 'mainnet-beta' && (
+						<Badge color="orange" marginRight={10}>
+							{cluster}
+						</Badge>
+					)}
 					<SelectWallet />
 				</Pane>
 			</Pane>

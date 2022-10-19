@@ -1,7 +1,6 @@
 import { createAssociatedTokenAccountInstruction, createMintToInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
 import { TxPackage } from 'models/TxPackage';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 import { accountExists } from 'utils/solanaHelper';
 
 const MINT_AUTHORITY_KP = [
@@ -9,14 +8,13 @@ const MINT_AUTHORITY_KP = [
 	208, 253, 42, 86, 175, 160, 169, 41, 79, 58, 62, 182, 52, 28, 17, 230, 248, 89, 141, 182, 93, 198, 192, 164, 68, 171, 156, 88, 150, 28
 ];
 
-const MINT_ADDRESS_MAINNET = new PublicKey('F12Jiu1sp6J1TCQsdy5kWaQkfbaxWvp6YvCJvtoYLXEo');
 const MINT_ADDRESS_DEVNET = new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W');
 const AIRDROP_AMOUNT = 1_000_000_000;
 
 export const airdrop = async (connection: Connection, wallet: PublicKey): Promise<TxPackage> => {
 	const tx = new Transaction();
 
-	const mintAddress = getClusterFromRpcEndpoint(connection.rpcEndpoint) === 'mainnet-beta' ? MINT_ADDRESS_MAINNET : MINT_ADDRESS_DEVNET;
+	const mintAddress = MINT_ADDRESS_DEVNET;
 
 	const atokenAccount = await getAssociatedTokenAddress(new PublicKey(mintAddress), wallet);
 	const exists = await accountExists(connection, atokenAccount);

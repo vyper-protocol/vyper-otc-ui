@@ -10,7 +10,7 @@ import SettleButton from 'components/organisms/actionButtons/SettleButton';
 import WithdrawButton from 'components/organisms/actionButtons/WithdrawButton';
 import OracleLivePrice from 'components/organisms/OracleLivePrice';
 import Layout from 'components/templates/Layout';
-import { Pane, Button, Badge, Tooltip, HelpIcon, Text } from 'evergreen-ui';
+import { Pane, Button, Badge, Tooltip, HelpIcon } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
@@ -20,6 +20,7 @@ import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 // eslint-disable-next-line css-modules/no-unused-class
 import styles from './summary.module.scss';
+import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -64,15 +65,7 @@ const SummaryPageId = () => {
 									FORWARD
 								</Badge>
 								<div style={{ flex: 1 }} />
-								{Date.now() > rateStateQuery?.data?.settleAvailableFromAt ? (
-									<Badge color="red" margin={6}>
-										Expired
-									</Badge>
-								) : (
-									<Badge color="green" margin={6}>
-										Active
-									</Badge>
-								)}
+								<ContractStatusBadge status={rateStateQuery.data.getContractStatus()} />
 							</Pane>
 							{/* + + + + + + + + + + + + +  */}
 							{/* FUNDED SIDES */}
@@ -177,15 +170,17 @@ const SummaryPageId = () => {
 							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 								<b>Collateral</b>
 							</Pane>
-							<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+							<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 								<Pane margin={6} textAlign="center">
-									Long{' '}
+									Long
+									<br />
 									<Badge color="neutral">
 										{rateStateQuery?.data?.buyerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
 								</Pane>
 								<Pane margin={6} textAlign="center">
-									Short{' '}
+									Short
+									<br />
 									<Badge color="neutral">
 										{rateStateQuery?.data?.sellerDepositAmount} {reserveTokenInfo?.symbol}
 									</Badge>
@@ -200,15 +195,17 @@ const SummaryPageId = () => {
 										<b>PnL</b>
 									</Pane>
 
-									<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+									<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 										<Pane margin={6} textAlign="center">
-											Long{' '}
+											Long
+											<br />
 											<Badge color={rateStateQuery?.data?.getPnlBuyer() > 0 ? 'green' : 'red'}>
 												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlBuyer())} {reserveTokenInfo?.symbol}
 											</Badge>
 										</Pane>
 										<Pane margin={6} textAlign="center">
-											Short{' '}
+											Short
+											<br />
 											<Badge color={rateStateQuery?.data?.getPnlSeller() > 0 ? 'green' : 'red'}>
 												{formatWithDecimalDigits(rateStateQuery?.data?.getPnlSeller())} {reserveTokenInfo?.symbol}
 											</Badge>

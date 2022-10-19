@@ -3,17 +3,17 @@
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getMultipleAccounts, unpackMint } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { AggregatorAccount, loadSwitchboardProgram } from '@switchboard-xyz/switchboard-v2';
+import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectContracts';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
 import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
-import { getClusterFromRpcEndpoint } from 'utils/clusterHelpers';
 
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
@@ -107,14 +107,11 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.buyerTA = currentOtcStateAccount.seniorSideBeneficiary;
 		if (r.buyerTA) r.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.buyerTA)).owner;
 		r.sellerTA = currentOtcStateAccount.juniorSideBeneficiary;
-		if (r.sellerTA) r.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
+		if (r.sellerTA) r.sellerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
 
 		if (r.rateState.getTypeId() === 'switchboard') {
 			// switchboard
-			const switchboardProgram = await loadSwitchboardProgramOffline(
-				getClusterFromRpcEndpoint(connection.rpcEndpoint) as 'mainnet-beta' | 'devnet',
-				connection
-			);
+			const switchboardProgram = await loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
 
 			(r.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
 				switchboardProgram,
