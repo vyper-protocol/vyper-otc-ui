@@ -113,7 +113,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.sellerTA = accountInfo.juniorSideBeneficiary;
 	if (res.sellerTA) {
 		const taInfo = multipleAccountInfos.find((c) => c.pubkey.equals(accountInfo.juniorSideBeneficiary));
-		res.sellerTA = unpackAccount(taInfo.pubkey, taInfo.data).owner;
+		res.sellerWallet = unpackAccount(taInfo.pubkey, taInfo.data).owner;
 	}
 
 	// Rate plugin
