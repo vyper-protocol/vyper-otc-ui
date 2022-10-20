@@ -1,10 +1,7 @@
 import { useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, AlertTitle, Box, IconButton } from '@mui/material';
-import cn from 'classnames';
-
-import styles from './NonAuditedDisclaimer.module.scss';
+import { Alert, AlertTitle, IconButton } from '@mui/material';
 
 const NonAuditedDisclaimer = () => {
 	const [isVisible, setIsVisible] = useState(true);
@@ -13,10 +10,11 @@ const NonAuditedDisclaimer = () => {
 		setIsVisible(false);
 	};
 
+	if (!isVisible) return <></>;
+
 	return (
 		<Alert
 			sx={{ maxWidth: '800px' }}
-			className={cn(!isVisible && styles.hidden)}
 			severity="warning"
 			action={
 				<IconButton
