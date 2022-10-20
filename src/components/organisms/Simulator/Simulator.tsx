@@ -34,7 +34,8 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	const sellerColor = sellerPnl > 0 ? 'green' : 'red';
 
 	const handleOnChange = (e) => {
-		if (e.target.value >= 0) {
+		// Restrict input to 10 chars
+		if (e.target.value >= 0 && e.target.value.length <= 10) {
 			setPrice(e.target.value);
 		} else {
 			setPrice(0);
