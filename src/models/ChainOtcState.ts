@@ -134,14 +134,12 @@ export class ChainOtcState extends AbsOtcState {
 	}
 
 	getPnlBuyer(): number {
-		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
 		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
-		return Math.max(Math.min(this.redeemLogicState.notional * (priceToUse - this.redeemLogicState.strike), this.sellerDepositAmount), -this.buyerDepositAmount);
+		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
 	}
 
 	getPnlSeller(): number {
-		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
 		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
-		return Math.max(-this.sellerDepositAmount, Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - priceToUse)));
+		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
 	}
 }

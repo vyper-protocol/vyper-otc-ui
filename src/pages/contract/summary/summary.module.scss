@@ -6,9 +6,62 @@
 	margin-bottom: 60px;
 }
 
-.buttons {
+.cards {
 	display: flex;
-	margin-top: 20px;
+
+	.box {
+		max-width: 620px;
+		width: 310px;
+		background-color: var(--color-white);
+		border-radius: 10px;
+		padding: 20px;
+
+		.toggle {
+			float: right;
+			margin-bottom: 8px;
+			color: var(--color-text-disabled);
+			font-size: 14px;
+
+			svg {
+				margin-bottom: -4px;
+				margin-left: var(--space-4);
+			}
+		}
+		.toggle:hover {
+			cursor: pointer;
+			color: var(--color-primary);
+		}
+
+		.content {
+			p {
+				font-weight: 600;
+			}
+			.column {
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+	}
+
+	/* Simulator */
+	.simulator {
+		border-top-right-radius: 10px;
+		border-bottom-right-radius: 10px;
+	}
+
+	.changeEdge {
+		border-top-right-radius: 0;
+	}
+
+	.hide {
+		display: none;
+	}
+
+	.show {
+		display: block;
+	}
+
+	/* ------------------ */
 }
 
 .title {
@@ -38,26 +91,13 @@
 	}
 }
 
-.disabled {
-	color: var(--color-text-disabled);
+.buttons {
+	display: flex;
+	margin-top: 20px;
 }
 
-.box {
-	max-width: 450px;
-	width: 310px;
-	background-color: var(--color-white);
-	border-radius: 10px;
-	padding: 20px;
-
-	.content {
-		p {
-			font-weight: 600;
-		}
-		.column {
-			display: flex;
-			justify-content: space-between;
-		}
-	}
+.disabled {
+	color: var(--color-text-disabled);
 }
 
 .expirations {

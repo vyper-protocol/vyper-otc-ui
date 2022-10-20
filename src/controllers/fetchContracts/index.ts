@@ -13,7 +13,7 @@ import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { RedeemLogicForwardState } from 'models/plugins/redeemLogic/RedeemLogicForwardState';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -72,15 +72,9 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.settleAvailableFromAt = dbEntries[i].settleAvailableFromAt;
 		r.buyerDepositAmount = dbEntries[i].buyerDepositAmount;
 		r.sellerDepositAmount = dbEntries[i].sellerDepositAmount;
-		r.redeemLogicState = new RedeemLogicForwardState(
-			dbEntries[i].redeemLogicState.programPubkey,
-			dbEntries[i].redeemLogicState.statePubkey,
-			dbEntries[i].redeemLogicState.strike,
-			dbEntries[i].redeemLogicState.isLinear,
-			dbEntries[i].redeemLogicState.notional
-		);
 
 		r.rateState = dbEntries[i].rateState.clone();
+		r.redeemLogicState = dbEntries[i].redeemLogicState.clone();
 
 		const currentOtcStateAccount = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>(
 			'otcState',

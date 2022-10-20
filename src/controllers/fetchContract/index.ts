@@ -18,7 +18,7 @@ import _ from 'lodash';
 import { DbOtcState } from 'models/DbOtcState';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { RedeemLogicForwardState } from 'models/plugins/redeemLogic/RedeemLogicForwardState';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -159,33 +159,35 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	}
 
 	// Redeem logic plugin
-	try {
-		const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
-			RedeemLogicForwardIDL,
-			PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID,
-			new AnchorProvider(connection, undefined, {})
-		);
+	if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID))) {
+		try {
+			const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
+				RedeemLogicForwardIDL,
+				PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID,
+				new AnchorProvider(connection, undefined, {})
+			);
 
-		const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
 
-		const redeemLogicAccountInfo = redeemLogicForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicForward>['redeemLogicConfig']>(
-			'redeemLogicConfig',
-			c.data.data
-		);
+			const redeemLogicAccountInfo = redeemLogicForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicForward>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
 
-		const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
-		const isLinear = redeemLogicAccountInfo.isLinear;
-		const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
-		const redeemLogicState = new RedeemLogicForwardState(
-			trancheConfigAccountInfo.redeemLogicProgram,
-			trancheConfigAccountInfo.redeemLogicProgramState,
-			strike,
-			isLinear,
-			notional
-		);
-		res.redeemLogicState = redeemLogicState;
-	} catch (err) {
-		console.error(err);
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const isLinear = redeemLogicAccountInfo.isLinear;
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const redeemLogicState = new RedeemLogicForwardState(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				isLinear,
+				notional
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
 	}
 
 	return res;

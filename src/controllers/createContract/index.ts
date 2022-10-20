@@ -64,8 +64,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 				buildCreateContractMessage(
 					chainOtcState.redeemLogicState.getTypeId(),
 					chainOtcState.rateState.getPluginDescription(),
-					chainOtcState.redeemLogicState.strike,
-					chainOtcState.redeemLogicState.notional,
+					chainOtcState.redeemLogicState,
 					chainOtcState.settleAvailableFromAt,
 					`https://otc.vyperprotocol.io${contractURL}`
 				)
