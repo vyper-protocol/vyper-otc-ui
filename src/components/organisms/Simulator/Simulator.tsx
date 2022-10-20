@@ -11,7 +11,7 @@ import styles from './Simulator.module.scss';
 
 type SimulatorProps = {} & React.HTMLProps<HTMLDivElement>;
 
-const Simulator = ({ className }: SimulatorProps) => {
+const Simulator = ({ className, ref }: SimulatorProps) => {
 	const router = useRouter();
 	const { connection } = useConnection();
 	const [price, setPrice] = useState(0);
@@ -42,7 +42,7 @@ const Simulator = ({ className }: SimulatorProps) => {
 	};
 
 	return (
-		<div className={cn(styles.wrapper, className)}>
+		<div className={cn(styles.wrapper, className)} ref={ref}>
 			<p className={styles.title}>Simulate your P/L</p>
 			<div className={cn(styles.flex, styles.margin)}>
 				<p>Price: </p>

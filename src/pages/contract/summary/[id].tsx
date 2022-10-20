@@ -1,5 +1,5 @@
 /* eslint-disable space-before-function-paren */
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -62,7 +62,11 @@ const SummaryPageId = () => {
 				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
 					<div className={styles.cards}>
 						<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
-							<ToggleSimulator className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }} />
+							<span className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }}>
+								Simulator
+								<ToggleSimulator />
+							</span>
+
 							{/* + + + + + + + + + + + + +  */}
 							{/* PLUGIN USED */}
 							<Pane width="100%" display="flex" alignItems="center">

@@ -20,6 +20,12 @@
 			float: right;
 			margin-bottom: 8px;
 			color: var(--color-text-disabled);
+			font-size: 14px;
+
+			svg {
+				margin-bottom: -4px;
+				margin-left: var(--space-4);
+			}
 		}
 		.toggle:hover {
 			cursor: pointer;
@@ -37,27 +43,28 @@
 		}
 	}
 
-	/* Simulator animation */
+	/* Simulator */
+	.simulator {
+		border-top-right-radius: 10px;
+		border-bottom-right-radius: 10px;
+	}
+
 	.changeEdge {
 		border-top-right-radius: 0;
 	}
 
-	.simulator {
-		border-top-right-radius: 10px;
-		border-bottom-right-radius: 10px;
-		// todo review
-		z-index: -1;
-	}
-
 	.hide {
-		transition: transform 0.4s cubic-bezier(0, 0.52, 0, 1);
-		transform: translate3d(-20vw, 0, 0);
+		display: none;
+		// transition: transform 0.4s cubic-bezier(0, 0.52, 0, 1);
+		// transform: translate3d(-20vw, 0, 0);
 	}
 
 	.show {
-		transition: transform 0.4s cubic-bezier(0, 0.52, 0, 1);
-		transform: translate3d(0vw, 0, 0);
+		display: block;
+		// transition: transform 0.4s cubic-bezier(0, 0.52, 0, 1);
+		// transform: translate3d(0vw, 0, 0);
 	}
+
 	/* ------------------ */
 }
 
