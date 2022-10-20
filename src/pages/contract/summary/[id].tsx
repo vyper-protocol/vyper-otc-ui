@@ -28,7 +28,6 @@ const SummaryPageId = () => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 
-	const [searchValue, setSearchValue] = useState('');
 	const [showSimulator, setShowSimulator] = useState(false);
 
 	const { id } = router.query;
