@@ -71,7 +71,7 @@ const SummaryPageId = () => {
 							{/* PLUGIN USED */}
 							<Pane width="100%" display="flex" alignItems="center">
 								<Badge color="purple" margin={6}>
-									FORWARD
+									{rateStateQuery?.data?.redeemLogicState.getTypeId()}
 								</Badge>
 								<div style={{ flex: 1 }} />
 								<ContractStatusBadge status={rateStateQuery.data.getContractStatus()} />
