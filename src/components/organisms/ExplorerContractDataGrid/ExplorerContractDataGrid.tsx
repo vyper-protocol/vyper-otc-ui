@@ -9,6 +9,7 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { Badge } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
+import { RedeemLogicForwardState } from 'models/plugins/redeemLogic/RedeemLogicForwardState';
 import { useRouter } from 'next/router';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import * as UrlBuilder from 'utils/urlBuilder';
@@ -55,7 +56,11 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.notional',
 			headerName: 'Size',
 			valueGetter: (params) => {
-				return params.row.redeemLogicState.notional;
+				if (params.row.redeemLogicState.getTypeId() === 'forward') {
+					return (params.row.redeemLogicState as RedeemLogicForwardState).notional;
+				}
+
+				return '-';
 			},
 			width: 80
 		},
@@ -64,7 +69,11 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.strike',
 			headerName: 'Strike',
 			valueGetter: (params) => {
-				return formatWithDecimalDigits(params.row.redeemLogicState.strike);
+				if (params.row.redeemLogicState.getTypeId() === 'forward') {
+					return formatWithDecimalDigits((params.row.redeemLogicState as RedeemLogicForwardState).strike);
+				}
+
+				return '-';
 			},
 			width: 150
 		},
