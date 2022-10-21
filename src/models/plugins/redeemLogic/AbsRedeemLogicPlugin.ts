@@ -14,4 +14,6 @@ export abstract class AbsRedeemLogicPlugin extends AbsPlugin {
 	abstract getPluginDetails(): RedeemLogicPluginDetail[];
 
 	abstract getPnl(price: number, buyerDepositAmount: number, sellerDepositAmount: number): [number, number];
+
+	abstract getNotionLink(): string;
 }
