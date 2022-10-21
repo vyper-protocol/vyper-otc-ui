@@ -133,13 +133,13 @@ export class ChainOtcState extends AbsOtcState {
 		return this.areBothSidesFunded();
 	}
 
-	getPnlBuyer(): number {
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
+	getPnlBuyer(price: number): number {
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : price;
 		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
 	}
 
-	getPnlSeller(): number {
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
+	getPnlSeller(price: number): number {
+		const priceToUse = this.settleExecuted ? this.priceAtSettlement : price;
 		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
 	}
 }
