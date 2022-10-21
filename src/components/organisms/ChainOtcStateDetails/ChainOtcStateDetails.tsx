@@ -16,7 +16,6 @@ import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
 import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
-
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
 
@@ -34,6 +33,10 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		toast.info('Address copied to clipboard', {
 			autoClose: 2000
 		});
+	};
+
+	const handleNotionClick = () => {
+		window.open('https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76');
 	};
 
 	const handleToggle = () => {
@@ -61,6 +64,9 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					<Badge color="purple" margin={6}>
 						FORWARD
 					</Badge>
+					<Tooltip content="Contract Payoff - Forward" position="right">
+						<HelpIcon size={12} marginX={3} color="#6e62b6" onClick={handleNotionClick} className={styles.notionHelp} />
+					</Tooltip>
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.getContractStatus()} />
 				</Pane>

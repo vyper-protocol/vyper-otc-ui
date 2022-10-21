@@ -58,30 +58,11 @@
 	/* ------------------ */
 }
 
-.funded {
-	display: flex;
-	justify-content: center;
-
-	:first-child {
-		margin-right: 10px;
-	}
-
-	svg {
-		margin-top: -4px;
-	}
-}
-
 .buttons {
 	display: flex;
 	margin-top: 20px;
 }
 
-.disabled {
-	color: var(--color-text-disabled);
-}
-
-.expirations {
-	display: flex;
-	justify-content: space-between;
-	color: var(--color-text-disabled);
+.notionHelp:hover {
+	cursor: pointer;
 }
