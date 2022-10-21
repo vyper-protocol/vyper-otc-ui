@@ -27,13 +27,13 @@ const Layout = ({ children, withSearch, withBackgroundImage }: LayoutProps) => {
 				<style>{'body { background-color: var(--color-background); }'}</style>
 			</Head>
 
-			<Pane>
+			<div className={styles.layout}>
 				<TopBar />
 				{withSearch && <SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />}
 				{withBackgroundImage && <Image alt="abstract-colors" src={withBackgroundImage} layout="fill" objectFit="cover" quality={50} priority />}
 				<main className={styles.main}>{children}</main>
 				<Footer />
-			</Pane>
+			</div>
 		</Pane>
 	);
 };
