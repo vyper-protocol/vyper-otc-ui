@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
+import resources from 'configs/resources.json';
 
 import { RedeemLogicPluginTypeIds } from '../AbsPlugin';
 import { AbsRedeemLogicPlugin, RedeemLogicPluginDetail } from './AbsRedeemLogicPlugin';
@@ -47,5 +48,12 @@ export class RedeemLogicForwardState extends AbsRedeemLogicPlugin {
 		const buyerPnl = Math.max(Math.min(notional * (price - strike), sellerDepositAmount), -buyerDepositAmount);
 		const sellerPnl = -1 * buyerPnl;
 		return [buyerPnl, sellerPnl];
+	}
+
+	getNotionLink(): string {
+		const notion = resources.others.find((r) => {
+			return r.name === 'Notion';
+		});
+		return notion.link;
 	}
 }

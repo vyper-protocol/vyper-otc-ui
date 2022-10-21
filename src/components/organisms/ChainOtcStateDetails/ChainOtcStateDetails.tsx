@@ -36,7 +36,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	};
 
 	const handleNotionClick = () => {
-		window.open('https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76');
+		window.open(otcState.redeemLogicState.getNotionLink());
 	};
 
 	const handleToggle = () => {
