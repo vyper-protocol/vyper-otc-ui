@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js';
-import resources from 'configs/resources.json';
 
 import { RedeemLogicPluginTypeIds } from '../AbsPlugin';
 import { AbsRedeemLogicPlugin, RedeemLogicPluginDetail } from './AbsRedeemLogicPlugin';
@@ -51,9 +50,6 @@ export class RedeemLogicForwardState extends AbsRedeemLogicPlugin {
 	}
 
 	getNotionLink(): string {
-		const notion = resources.others.find((r) => {
-			return r.name === 'Notion';
-		});
-		return notion.link;
+		return 'https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76';
 	}
 }
