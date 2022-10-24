@@ -1,19 +1,37 @@
+import { ListItemDetail } from 'models/ListItemDetail';
+
 import { AbsPlugin, RedeemLogicPluginTypeIds } from '../AbsPlugin';
 
-export type RedeemLogicPluginDetail = {
-	label: string;
-	value: number;
-	tooltip?: string;
-};
-
 export abstract class AbsRedeemLogicPlugin extends AbsPlugin {
-	// eslint-disable-next-line no-unused-vars
+	/**
+	 * Returns the plugin item details.
+	 * eg. forward will have strike and size
+	 */
+	abstract get pluginDetails(): ListItemDetail[];
+
+	get requiredRateFeeds(): number {
+		return this.rateFeedsDescription.length;
+	}
+
+	abstract get rateFeedsDescription(): string[];
+	abstract get settlementPricesDescription(): string[];
+
+	/**
+	 * Returns the documentation link
+	 */
+	abstract get documentationLink(): string;
+
+	/**
+	 * Compute the redeem logic PnL
+	 * @param prices prices to use
+	 * @param buyerDepositAmount deposit amount for buyer side
+	 * @param sellerDepositAmount deposit amount for buyer side
+	 * @return array of 2 items: first is buyer PnL, second is the seller PnL
+	 */
+	abstract getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number];
+
+	abstract get typeId(): RedeemLogicPluginTypeIds;
 	abstract clone(): AbsRedeemLogicPlugin;
-	abstract getTypeId(): RedeemLogicPluginTypeIds;
 
-	abstract getPluginDetails(): RedeemLogicPluginDetail[];
-
-	abstract getPnl(price: number, buyerDepositAmount: number, sellerDepositAmount: number): [number, number];
-
-	abstract getNotionLink(): string;
+	// abstract getSettlementPriceLabels(): string[];
 }

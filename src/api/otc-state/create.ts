@@ -6,6 +6,7 @@ import { OtcInitializationParams } from 'controllers/createContract/OtcInitializ
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
+import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { TxPackage } from 'models/TxPackage';
@@ -18,15 +19,14 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 	const reserveMintInfo = await getMint(provider.connection, params.reserveMint);
 
-	const redeemLogicForwardProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
-
 	const otcState = Keypair.generate();
 	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
+
+	const vyperCoreInitTx = new Transaction();
 
 	//  rate plugin init
 	let rateProgramPublicKey: PublicKey = undefined;
 	const ratePluginState = Keypair.generate();
-	const vyperCoreInitTx = new Transaction();
 
 	if (params.rateOption.ratePluginType === 'switchboard') {
 		const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
@@ -36,7 +36,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 				rateData: ratePluginState.publicKey
 			})
 			.remainingAccounts(
-				[params.rateOption.rateAccount].map((c) => {
+				params.rateOption.rateAccounts.map((c) => {
 					return { pubkey: c, isSigner: false, isWritable: false };
 				})
 			)
@@ -55,7 +55,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 				rateData: ratePluginState.publicKey
 			})
 			.remainingAccounts(
-				[params.rateOption.rateAccount].map((c) => {
+				params.rateOption.rateAccounts.map((c) => {
 					return { pubkey: c, isSigner: false, isWritable: false };
 				})
 			)
@@ -65,18 +65,51 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		rateProgramPublicKey = ratePythProgram.programId;
 	}
 
+	//  rate plugin init
+	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicInixIX = await redeemLogicForwardProgram.methods
-		.initialize(params.redeemLogicOption.strike, new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals), params.redeemLogicOption.isLinear)
-		.accounts({
-			redeemLogicConfig: redeemLogicPluginState.publicKey,
-			owner: provider.wallet.publicKey,
-			payer: provider.wallet.publicKey
-		})
-		.signers([redeemLogicPluginState])
-		.instruction();
 
-	vyperCoreInitTx.add(redeemLogicInixIX);
+	if (params.redeemLogicOption.redeemLogicPluginType === 'forward') {
+		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
+
+		const redeemLogicInixIX = await redeemLogicProgram.methods
+			.initialize(
+				params.redeemLogicOption.strike,
+				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
+				params.redeemLogicOption.isLinear
+			)
+			.accounts({
+				redeemLogicConfig: redeemLogicPluginState.publicKey,
+				owner: provider.wallet.publicKey,
+				payer: provider.wallet.publicKey
+			})
+			.signers([redeemLogicPluginState])
+			.instruction();
+
+		vyperCoreInitTx.add(redeemLogicInixIX);
+		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
+	}
+
+	if (params.redeemLogicOption.redeemLogicPluginType === 'settled_forward') {
+		const redeemLogicProgram = new Program<RedeemLogicSettledForward>(RedeemLogicSettledForwardIDL, PROGRAMS.REDEEM_LOGIC_SETTLED_FORWARD_PROGRAM_ID, provider);
+
+		const redeemLogicInixIX = await redeemLogicProgram.methods
+			.initialize(
+				params.redeemLogicOption.strike,
+				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
+				params.redeemLogicOption.isLinear
+			)
+			.accounts({
+				redeemLogicConfig: redeemLogicPluginState.publicKey,
+				owner: provider.wallet.publicKey,
+				payer: provider.wallet.publicKey
+			})
+			.signers([redeemLogicPluginState])
+			.instruction();
+
+		vyperCoreInitTx.add(redeemLogicInixIX);
+		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
+	}
 
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(
 		provider,
@@ -84,7 +117,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		params.reserveMint,
 		rateProgramPublicKey,
 		ratePluginState.publicKey,
-		redeemLogicForwardProgram.programId,
+		redeemLogicProgramPublicKey,
 		redeemLogicPluginState.publicKey,
 		otcAuthority
 	);

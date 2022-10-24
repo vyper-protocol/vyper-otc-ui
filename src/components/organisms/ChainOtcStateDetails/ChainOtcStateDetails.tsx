@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { Skeleton } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
@@ -35,8 +34,8 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		});
 	};
 
-	const handleNotionClick = () => {
-		window.open(otcState.redeemLogicState.getNotionLink());
+	const handleDocumentationClick = () => {
+		window.open(otcState.redeemLogicState.documentationLink);
 	};
 
 	const handleToggle = () => {
@@ -45,9 +44,9 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const reserveTokenInfo = otcState.reserveTokenInfo;
 
-	const { priceValue: livePriceValue, isInitialized: livePriceIsInitialized } = useOracleLivePrice(
-		otcState.rateState.getTypeId(),
-		otcState.rateState.pubkeyForLivePrice.toBase58()
+	const { pricesValue: livePricesValue, isInitialized: livePriceIsInitialized } = useOracleLivePrice(
+		otcState.rateState.typeId,
+		otcState.rateState.livePriceAccounts.map((c) => c.toBase58())
 	);
 
 	return (
@@ -62,14 +61,16 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* PLUGIN USED */}
 				<Pane width="100%" display="flex" alignItems="center">
 					<Badge color="purple" margin={6}>
-						FORWARD
+						{otcState.redeemLogicState.typeId}
 					</Badge>
+
 					<Tooltip content="Contract Payoff - Forward" position="right">
-						<HelpIcon size={12} marginX={3} color="#6e62b6" onClick={handleNotionClick} className={styles.notionHelp} />
+						<HelpIcon size={12} marginX={3} color="#6e62b6" onClick={handleDocumentationClick} className={styles.notionHelp} />
 					</Tooltip>
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.getContractStatus()} />
 				</Pane>
+
 				{/* + + + + + + + + + + + + +  */}
 				{/* FUNDED SIDES */}
 				<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
@@ -84,6 +85,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					</Badge>
 				</Pane>
 				<hr />
+
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
 				<Pane width="100%" justifyContent="center" alignItems="center">
@@ -97,26 +99,28 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					</Pane>
 				</Pane>
 				<hr />
+
 				{/* + + + + + + + + + + + + +  */}
 				{/* DETAILS */}
 				<div className={styles.content}>
-					{otcState.settleExecuted ? (
-						<div className={styles.column}>
-							<p>Settlement price</p>
-							<p>{formatWithDecimalDigits(otcState.priceAtSettlement)}</p>
-						</div>
-					) : (
-						<div className={styles.column}>
-							<p>Current Price</p>
-							{!livePriceIsInitialized ? (
-								<Skeleton variant="rectangular" width={80} height={20} animation="wave" />
-							) : (
-								<p>{formatWithDecimalDigits(livePriceValue, 5)}</p>
-							)}
-						</div>
-					)}
+					{otcState.settleExecuted &&
+						otcState.redeemLogicState.settlementPricesDescription.map((priceAtSet, i) => (
+							<div key={i} className={styles.column}>
+								<p>{priceAtSet}</p>
+								<p>{formatWithDecimalDigits(otcState.pricesAtSettlement[i])}</p>
+							</div>
+						))}
 
-					{otcState.redeemLogicState.getPluginDetails().map((c) => (
+					{!otcState.settleExecuted &&
+						livePriceIsInitialized &&
+						otcState.redeemLogicState.rateFeedsDescription.map((rateFeedDescr, i) => (
+							<div key={i} className={styles.column}>
+								<p>{rateFeedDescr}</p>
+								<p>{formatWithDecimalDigits(livePricesValue[i])}</p>
+							</div>
+						))}
+
+					{otcState.redeemLogicState.pluginDetails.map((c) => (
 						<div key={c.label} className={styles.column}>
 							<p>
 								{c.label}
@@ -200,15 +204,15 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 							<Pane margin={6} textAlign="center">
 								Long
 								<br />
-								<Badge color={otcState.getPnlBuyer(livePriceValue) > 0 ? 'green' : 'red'}>
-									{formatWithDecimalDigits(otcState.getPnlBuyer(livePriceValue))} {reserveTokenInfo?.symbol}
+								<Badge color={otcState.getPnlBuyer(livePricesValue) > 0 ? 'green' : 'red'}>
+									{formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} {reserveTokenInfo?.symbol}
 								</Badge>
 							</Pane>
 							<Pane margin={6} textAlign="center">
 								Short
 								<br />
-								<Badge color={otcState.getPnlSeller(livePriceValue) > 0 ? 'green' : 'red'}>
-									{formatWithDecimalDigits(otcState.getPnlSeller(livePriceValue))} {reserveTokenInfo?.symbol}
+								<Badge color={otcState.getPnlSeller(livePricesValue) > 0 ? 'green' : 'red'}>
+									{formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} {reserveTokenInfo?.symbol}
 								</Badge>
 							</Pane>
 						</Pane>
