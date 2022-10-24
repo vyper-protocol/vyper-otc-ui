@@ -39,7 +39,7 @@ const SearchBar = ({ searchState, className }: SearchBarProps) => {
 	};
 
 	return (
-		<Pane className={cn(styles.wrapper, className)}>
+		<div className={cn(styles.wrapper, className)}>
 			<Pane>
 				<div className={cn(hasError && styles.error_border, styles.input_outter)}>
 					<SearchIcon className={styles.adorsement} />
@@ -60,7 +60,7 @@ const SearchBar = ({ searchState, className }: SearchBarProps) => {
 					Invalid Public Key
 				</Text>
 			</Pane>
-		</Pane>
+		</div>
 	);
 };
 

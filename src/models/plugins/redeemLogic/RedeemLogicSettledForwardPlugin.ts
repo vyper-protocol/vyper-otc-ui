@@ -28,11 +28,11 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 	}
 
 	get rateFeedsDescription(): string[] {
-		return ['Current price', 'Current price 2nd'];
+		return ['Current price', 'Settlement rate'];
 	}
 
 	get settlementPricesDescription(): string[] {
-		return ['Price at settlement', 'Price at settlement 2nd'];
+		return ['Settlement price', 'Settlement rate'];
 	}
 
 	get pluginDetails(): ListItemDetail[] {
@@ -50,7 +50,7 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 	}
 
 	get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76';
+		return 'https://vyperprotocol.notion.site/Contract-Payoff-Settled-Forward-aa0f295f291545c281be6fa6363ca79a';
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
