@@ -30,7 +30,7 @@ export class RedeemLogicForwardPlugin extends AbsRedeemLogicPlugin {
 	}
 
 	get settlementPricesDescription(): string[] {
-		return ['Price at settlement'];
+		return ['Settlement price'];
 	}
 
 	get pluginDetails(): ListItemDetail[] {

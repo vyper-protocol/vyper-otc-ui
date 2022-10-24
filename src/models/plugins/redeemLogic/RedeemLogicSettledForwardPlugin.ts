@@ -28,11 +28,11 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 	}
 
 	get rateFeedsDescription(): string[] {
-		return ['Current price', 'Current price 2nd'];
+		return ['Current price', 'Settlement rate'];
 	}
 
 	get settlementPricesDescription(): string[] {
-		return ['Price at settlement', 'Price at settlement 2nd'];
+		return ['Settlement price', 'Settlement rate'];
 	}
 
 	get pluginDetails(): ListItemDetail[] {
