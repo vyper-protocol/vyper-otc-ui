@@ -3,24 +3,29 @@ import { useEffect, useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
+import { Mutex } from 'async-mutex';
+import _ from 'lodash';
 import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RatePythState } from 'models/plugins/rate/RatePythState';
-import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
+import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
+import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
-export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkey: string): { priceValue: number; isInitialized: boolean } => {
-	const [priceValue, setPriceValue] = useState(0);
+export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: string[]): { pricesValue: number[]; isInitialized: boolean } => {
+	const [pricesValue, setPricesValue] = useState<number[]>([]);
 	const [isInitialized, setIsInitialized] = useState(false);
 	const { connection } = useConnection();
 
-	const accountToWatch = new PublicKey(pubkey);
+	const mutex = new Mutex();
+
+	const accountsToWatch = pubkeys.map((c) => new PublicKey(c));
 
 	const decodeAccountInfo = async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
 		let newPriceValue = 0;
 		if (oracleType === 'switchboard') {
-			newPriceValue = await RateSwitchboardState.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
+			newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
 		}
 		if (oracleType === 'pyth') {
-			newPriceValue = RatePythState.DecodePriceFromAccountInfo(updatedAccountInfo);
+			newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
 		}
 		return newPriceValue;
 	};
@@ -28,10 +33,10 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkey: string
 	// first fetch
 	useEffect(() => {
 		const fetchData = async () => {
-			const accountData = await connection.getAccountInfo(accountToWatch);
-			const newPriceValue = await decodeAccountInfo(accountData);
-			console.log('set new price value: ', newPriceValue);
-			setPriceValue(newPriceValue);
+			const accountsData = await getMultipleAccountsInfo(connection, accountsToWatch);
+			const newPricesValue = await Promise.all(accountsData.map((c) => decodeAccountInfo(c.data)));
+			// console.log('set new prices value: ', newPricesValue);
+			setPricesValue(newPricesValue);
 			setIsInitialized(true);
 		};
 
@@ -41,25 +46,31 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkey: string
 
 	// listen for account changes
 	useEffect(() => {
-		const subscriptionId = connection.onAccountChange(
-			accountToWatch,
-			async (updatedAccountInfo) => {
-				const newPriceValue = await decodeAccountInfo(updatedAccountInfo);
+		const subscriptionsId = accountsToWatch.map((pubkey, i) =>
+			connection.onAccountChange(
+				pubkey,
+				async (updatedAccountInfo) => {
+					const newPriceValue = await decodeAccountInfo(updatedAccountInfo);
 
-				// if price changed we update it
-				if (newPriceValue !== priceValue || !isInitialized) {
-					// console.log(`${oracleType} price changed for ${abbreviateAddress(pubkey)} from ${priceValue} to ${newPriceValue}`);
-					setPriceValue(newPriceValue);
-					setIsInitialized(true);
-				}
-			},
-			'confirmed'
+					// if price changed we update it
+					if (newPriceValue !== pricesValue[i] && isInitialized) {
+						await mutex.runExclusive(async () => {
+							const pricesValueClone = _.clone(pricesValue);
+							pricesValueClone[i] = newPriceValue;
+
+							// console.log(`${oracleType} price changed for ${abbreviateAddress(pubkey.toBase58())} from ${pricesValue[i]} to ${newPriceValue}`);
+							setPricesValue(pricesValueClone);
+						});
+					}
+				},
+				'confirmed'
+			)
 		);
 
 		return () => {
-			connection.removeAccountChangeListener(subscriptionId);
+			subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
 		};
 	});
 
-	return { priceValue, isInitialized };
+	return { pricesValue, isInitialized };
 };

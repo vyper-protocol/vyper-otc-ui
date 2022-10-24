@@ -2,6 +2,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
+import { getAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { deposit } from 'api/otc-state/deposit';
@@ -9,8 +10,8 @@ import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
+
 import PROGRAMS from '../../../configs/programs.json';
-import { getAccount } from '@solana/spl-token';
 
 const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();

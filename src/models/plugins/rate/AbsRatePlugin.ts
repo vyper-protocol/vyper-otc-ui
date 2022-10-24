@@ -1,15 +1,19 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 
 import { AbsPlugin, RatePluginTypeIds } from '../AbsPlugin';
 
 export abstract class AbsRatePlugin extends AbsPlugin {
-	// eslint-disable-next-line no-unused-vars
-	abstract loadData(connection: Connection): Promise<void>;
-	abstract getPluginDescription(): string;
-	abstract getPluginLastValue(): number;
-	abstract getPublicKeysForRefresh(): PublicKey[];
-	abstract get pubkeyForLivePrice(): PublicKey;
+	abstract get title(): string;
+	abstract get description(): string;
+
+	abstract get accountsRequiredForRefresh(): PublicKey[];
+	abstract get livePriceAccounts(): PublicKey[];
+
+	abstract get typeId(): RatePluginTypeIds;
 	abstract clone(): AbsRatePlugin;
 
-	abstract getTypeId(): RatePluginTypeIds;
+	// // eslint-disable-next-line no-unused-vars
+	// abstract loadData(connection: Connection): Promise<void>;
+	// abstract getPublicKeysForRefresh(): PublicKey[];
+	// abstract getPluginDescription(): string;
 }
