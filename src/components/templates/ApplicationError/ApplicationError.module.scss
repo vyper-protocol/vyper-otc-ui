@@ -1,17 +1,16 @@
 .container {
-  .title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
+	.title {
+		display: flex;
+		align-items: center;
+		margin-bottom: var(--space-12);
 
-    svg {
-      margin-right: 16px;
-      margin-top: 1px;
-    }
-  }
+		svg {
+			margin-right: var(--space-16);
+			margin-top: 1px;
+		}
+	}
 
-  button {
-    margin-top: 16px;
-  }
+	button {
+		margin-top: var(--space-16);
+	}
 }
-

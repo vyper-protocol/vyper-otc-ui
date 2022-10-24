@@ -1,5 +1,5 @@
 .button {
 	background-color: var(--color-primary) !important;
-	height: 40px;
-	border-radius: 12px;
+	height: var(--space-40);
+	border-radius: var(--space-12);
 }
