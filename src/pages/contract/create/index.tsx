@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
@@ -14,9 +15,9 @@ import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
-import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RatePythState } from 'models/plugins/rate/RatePythState';
-import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
+import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
+import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
@@ -142,7 +143,7 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [product] = await RatePythState.GetProductPrice(connection, getCurrentCluster(), new PublicKey(value));
+				const [product] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(value));
 				if (product) setProductSymbol(product?.symbol ?? '');
 				else setProductSymbol('');
 			} catch {
@@ -211,16 +212,21 @@ const CreateContractPage = () => {
 	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>('pyth');
 	const availableRatePluginTypes: RatePluginTypeIds[] = ['switchboard', 'pyth'];
 
-	const [switchboardAggregator, setSwitchboardAggregator] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
-	const [pythPrice, setPythPrice] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
+	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
+	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward'];
+
+	const [switchboardAggregator_1, setSwitchboardAggregator_1] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
+	const [switchboardAggregator_2, setSwitchboardAggregator_2] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
+	const [pythPrice_1, setPythPrice_1] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
+	const [pythPrice_2, setPythPrice_2] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
 
 	const setStrikeToDefaultValue = async () => {
 		if (ratePluginType === 'pyth') {
-			const [, price] = await RatePythState.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice));
+			const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
 			setStrike(price?.price ?? 0);
 		}
 		if (ratePluginType === 'switchboard') {
-			const [, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(switchboardAggregator));
+			const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
 			setStrike(price ?? 0);
 		}
 	};
@@ -228,28 +234,34 @@ const CreateContractPage = () => {
 	useEffect(() => {
 		setStrikeToDefaultValue();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ratePluginType, switchboardAggregator, pythPrice]);
+	}, [ratePluginType, switchboardAggregator_1, pythPrice_1]);
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
 
 	useEffect(() => {
-		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator))
+		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator_1))
 			.then((v) => {
 				return setStrike(v);
 			})
 			.catch(() => {
 				return setStrike(0);
 			});
-	}, [provider.connection, switchboardAggregator]);
+	}, [provider.connection, switchboardAggregator_1]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
 			setIsLoading(true);
 
-			let rateAccount = PublicKey.unique();
-			if (ratePluginType === 'switchboard') rateAccount = new PublicKey(switchboardAggregator);
-			if (ratePluginType === 'pyth') rateAccount = new PublicKey(pythPrice);
+			const rateAccounts: PublicKey[] = [];
+			if (ratePluginType === 'switchboard') {
+				rateAccounts.push(new PublicKey(switchboardAggregator_1));
+				rateAccounts.push(new PublicKey(switchboardAggregator_2));
+			}
+			if (ratePluginType === 'pyth') {
+				rateAccounts.push(new PublicKey(pythPrice_1));
+				rateAccounts.push(new PublicKey(pythPrice_2));
+			}
 
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey(reserveMint),
@@ -260,9 +272,10 @@ const CreateContractPage = () => {
 				juniorDepositAmount,
 				rateOption: {
 					ratePluginType,
-					rateAccount
+					rateAccounts
 				},
 				redeemLogicOption: {
+					redeemLogicPluginType,
 					isLinear: true,
 					notional,
 					strike
@@ -301,17 +314,38 @@ const CreateContractPage = () => {
 					<AmountPicker title="Side B amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
 				</Pane>
 
-				<Combobox initialSelectedItem={ratePluginType} items={availableRatePluginTypes} onChange={setRatePluginType} />
+				<hr />
+				<b>Rate Plugin</b>
+
+				<Combobox width="100%" initialSelectedItem={ratePluginType} items={availableRatePluginTypes} onChange={setRatePluginType} margin={12} />
 
 				{ratePluginType === 'switchboard' && (
-					<SwitchboardAggregatorPicker title="Switchboard Aggregator" value={switchboardAggregator} onChange={setSwitchboardAggregator} />
+					<>
+						<SwitchboardAggregatorPicker title="Switchboard Aggregator #1" value={switchboardAggregator_1} onChange={setSwitchboardAggregator_1} />
+						{redeemLogicPluginType === 'settled_forward' && (
+							<SwitchboardAggregatorPicker title="Switchboard Aggregator #2" value={switchboardAggregator_2} onChange={setSwitchboardAggregator_2} />
+						)}
+					</>
 				)}
-				{ratePluginType === 'pyth' && <PythPricePicker title="Pyth Price" value={pythPrice} onChange={setPythPrice} />}
+				{ratePluginType === 'pyth' && (
+					<>
+						<PythPricePicker title="Pyth Price #1" value={pythPrice_1} onChange={setPythPrice_1} />
+						{redeemLogicPluginType === 'settled_forward' && <PythPricePicker title="Pyth Price #2" value={pythPrice_2} onChange={setPythPrice_2} />}
+					</>
+				)}
+
+				<hr />
+
+				<b>Redeem Logic</b>
+
+				<Combobox width="100%" initialSelectedItem={redeemLogicPluginType} items={availableRedeemPluginTypes} onChange={setRedeemLogicPluginType} margin={12} />
 
 				<Pane display="flex" alignItems="center">
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
 					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 				</Pane>
+
+				<hr />
 
 				<FormGroup>
 					<FormControlLabel

@@ -1,5 +1,3 @@
-import { Tooltip, Typography } from '@mui/material';
-import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { abbreviateAddress } from 'utils/stringHelpers';

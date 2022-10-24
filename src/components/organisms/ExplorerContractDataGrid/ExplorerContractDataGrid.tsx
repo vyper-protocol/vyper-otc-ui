@@ -9,9 +9,9 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { Badge } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
-import { RedeemLogicForwardState } from 'models/plugins/redeemLogic/RedeemLogicForwardState';
-import { useRouter } from 'next/router';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
+import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
+import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -26,28 +26,26 @@ export type ExplorerContractDataGridProps = {
 };
 
 const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) => {
-	const router = useRouter();
-
 	const columns: GridColumns<ChainOtcState> = [
 		{
 			type: 'singleSelect',
-			field: 'redeemLogicState.getTypeId()',
+			field: 'redeemLogicState.typeId',
 			headerName: 'Instrument',
 			sortable: false,
 			filterable: true,
 			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
 			valueGetter: (params) => {
-				return params.row.redeemLogicState.getTypeId();
+				return params.row.redeemLogicState.typeId;
 			},
 			width: 150
 		},
 		{
 			type: 'string',
-			field: 'rateState.getAggregatorName()',
+			field: 'rateState.title',
 			headerName: 'Underlying',
 			valueGetter: (params) => {
-				return params.row.rateState.getPluginDescription();
+				return params.row.rateState.title;
 			},
 			width: 280
 		},
@@ -56,11 +54,13 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.notional',
 			headerName: 'Size',
 			valueGetter: (params) => {
-				if (params.row.redeemLogicState.getTypeId() === 'forward') {
-					return (params.row.redeemLogicState as RedeemLogicForwardState).notional;
+				if (params.row.redeemLogicState.typeId === 'forward') {
+					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
+				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
+					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
+				} else {
+					return '-';
 				}
-
-				return '-';
 			},
 			width: 80
 		},
@@ -69,11 +69,13 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.strike',
 			headerName: 'Strike',
 			valueGetter: (params) => {
-				if (params.row.redeemLogicState.getTypeId() === 'forward') {
-					return formatWithDecimalDigits((params.row.redeemLogicState as RedeemLogicForwardState).strike);
+				if (params.row.redeemLogicState.typeId === 'forward') {
+					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
+				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
+					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
+				} else {
+					return '-';
 				}
-
-				return '-';
 			},
 			width: 150
 		},
@@ -81,11 +83,8 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			type: 'number',
 			field: 'rateState.aggregatorLastValue',
 			headerName: 'Current Price',
-			valueGetter: (params) => {
-				return formatWithDecimalDigits(params.row.rateState.getPluginLastValue());
-			},
 			renderCell: (params: GridRenderCellParams<any>) => (
-				<OracleLivePrice oracleType={params.row.rateState.getTypeId()} pubkey={params.row.rateState.pubkeyForLivePrice.toBase58()} />
+				<OracleLivePrice oracleType={params.row.rateState.typeId} pubkey={(params.row.rateState as AbsRatePlugin).livePriceAccounts[0].toBase58()} />
 			),
 			width: 150
 		},
@@ -181,8 +180,6 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			]
 		}
 	];
-
-	console.log(window.location.origin);
 
 	return (
 		<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>

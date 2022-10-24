@@ -27,7 +27,7 @@ export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Price at settlement
 	 */
-	priceAtSettlement: number | undefined;
+	pricesAtSettlement: number[] | undefined;
 
 	/**
 	 * OTC program token account for buyer tokens
@@ -60,7 +60,7 @@ export class ChainOtcState extends AbsOtcState {
 	sellerTA: undefined | PublicKey;
 
 	getContractTitle(): string {
-		return this.rateState.getPluginDescription();
+		return this.rateState.title;
 	}
 
 	isDepositExpired(): boolean {
@@ -133,13 +133,13 @@ export class ChainOtcState extends AbsOtcState {
 		return this.areBothSidesFunded();
 	}
 
-	getPnlBuyer(price: number): number {
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : price;
+	getPnlBuyer(prices: number[]): number {
+		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
 		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
 	}
 
-	getPnlSeller(price: number): number {
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : price;
+	getPnlSeller(prices: number[]): number {
+		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
 		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
 	}
 }
