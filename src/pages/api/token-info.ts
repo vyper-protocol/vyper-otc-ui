@@ -6,34 +6,6 @@ import { getClusterEndpoint } from 'components/providers/OtcConnectionProvider';
 import { TokenInfo } from 'models/TokenInfo';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-type QueryObject = {
-	type: 'address' | 'symbol',
-	address?: string,
-	symbol?: string
-	mint?: PublicKey
-}
-
-function getQuery(req: NextApiRequest): QueryObject {
-	if(req.query.mint) {
-		const mint = new PublicKey(req.query.mint as string);
-		const address = mint.toBase58();
-
-		return {
-			type: 'address',
-			address: address,
-			mint: mint
-		};
-	}
-	if(req.query.symbol) {
-		const symbol = req.query.symbol as string;
-		return {
-			type: 'symbol',
-			symbol: symbol,
-		};
-	}
-	return;
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method !== 'GET') {
 		res.status(404);
@@ -41,11 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	}
 
 	try {
-		const query = getQuery(req);
-		if(!query) return res.status(400).json({ err:'Invalid Query' });
-		const cluster = process.env.NEXT_PUBLIC_CLUSTER;
-		const connection = new Connection(getClusterEndpoint(cluster as Cluster));
-		const tokenInfo = await fetchTokenInfo(connection, query);
+		const tokenInfo = await getTokenInfoFromRequest(req);
 		// console.log(tokenInfo);
 		res.status(200).json(tokenInfo);
 	} catch (err) {
@@ -75,13 +43,13 @@ const fetchTokenInfoFromMetaplex = async (connection: Connection, mint: PublicKe
 	}
 };
 
-const fetchTokenInfoFromSolanaProvider = async (query: QueryObject): Promise<TokenInfo | undefined> => {
+const fetchTokenInfoFromSolanaProviderUsingMint = async (mint: PublicKey): Promise<TokenInfo | undefined> => {
 	try {
 		const tokenListProvider = new TokenListProvider();
 		const tokenListContainer = await tokenListProvider.resolve();
 		const tokenInfoList = tokenListContainer.getList();
 		const res = tokenInfoList.find((c) => {
-			return (c[query.type] === query[query.type]);
+			return c.address === mint.toBase58();
 		});
 
 		return {
@@ -95,13 +63,50 @@ const fetchTokenInfoFromSolanaProvider = async (query: QueryObject): Promise<Tok
 	}
 };
 
-export const fetchTokenInfo = async (connection: Connection, query: QueryObject): Promise<TokenInfo | undefined> => {
-	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProvider(query);
+const fetchTokenInfoFromSolanaProviderUsingSymbol = async (symbol: string): Promise<TokenInfo | undefined> => {
+	try {
+		const tokenListProvider = new TokenListProvider();
+		const tokenListContainer = await tokenListProvider.resolve();
+		const tokenInfoList = tokenListContainer.getList();
+		const res = tokenInfoList.find((c) => {
+			return c.symbol === symbol;
+		});
+
+		return {
+			address: res.address,
+			symbol: res.symbol,
+			name: res.name,
+			logoURI: res.logoURI
+		};
+	} catch {
+		return null;
+	}
+};
+
+export const fetchTokenInfoUsingMint = async (connection: Connection, mint: PublicKey): Promise<TokenInfo | undefined> => {
+	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProviderUsingMint(mint);
 	if (tokenInfoFromSolana) return tokenInfoFromSolana;
 
-	if(query.type === 'address') {
-		const tokenInfoFromMetaplex = await fetchTokenInfoFromMetaplex(connection, query.mint);
-		return tokenInfoFromMetaplex;
+	const tokenInfoFromMetaplex = await fetchTokenInfoFromMetaplex(connection, mint);
+	return tokenInfoFromMetaplex;
+};
+
+export const fetchTokenInfoUsingSymbol = async (symbol: string): Promise<TokenInfo | undefined> => {
+	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProviderUsingSymbol(symbol);
+	return tokenInfoFromSolana;
+};
+
+const getTokenInfoFromRequest = async (req: NextApiRequest): Promise<TokenInfo | undefined> => {
+	const cluster = process.env.NEXT_PUBLIC_CLUSTER;
+	const connection = new Connection(getClusterEndpoint(cluster as Cluster));
+
+	if(req.query.mint) {
+		const mint = new PublicKey(req.query.mint as string);
+		return await fetchTokenInfoUsingMint(connection, mint);
 	}
-	return null;
+	if(req.query.symbol) {
+		const symbol = req.query.symbol as string;
+		return await fetchTokenInfoUsingSymbol(symbol);
+	}
+	return;
 };
