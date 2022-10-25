@@ -1,12 +1,18 @@
+import { useState, useEffect } from 'react';
+
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box } from '@mui/material';
 import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import fetchContracts from 'controllers/fetchContracts';
+import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
 import { Badge } from 'evergreen-ui';
+import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
@@ -21,11 +27,20 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
-export type ExplorerContractDataGridProps = {
-	contracts: ChainOtcState[];
-};
+const ExplorerContractDataGrid = () => {
+	const { connection } = useConnection();
 
-const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) => {
+	const [contractsLoading, setContractsLoading] = useState(false);
+	const [contracts, setContracts] = useState<ChainOtcState[]>([]);
+
+	useEffect(() => {
+		setContractsLoading(true);
+		setContracts([]);
+		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster()))
+			.then((c) => setContracts(c))
+			.finally(() => setContractsLoading(false));
+	}, [connection]);
+
 	const columns: GridColumns<ChainOtcState> = [
 		{
 			type: 'singleSelect',
@@ -182,9 +197,15 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 	];
 
 	return (
-		<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
-			<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
-		</Box>
+		<>
+			{contractsLoading && <Spinner />}
+
+			{contracts.length > 0 && (
+				<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
+					<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
+				</Box>
+			)}
+		</>
 	);
 };
 
