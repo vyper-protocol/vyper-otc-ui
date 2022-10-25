@@ -30,7 +30,9 @@ const Layout = ({ children, withSearch, withBackgroundImage }: LayoutProps) => {
 			<div className={styles.layout}>
 				<TopBar />
 				{withSearch && <SearchBar searchState={{ value: searchValue, setValue: setSearchValue }} className={styles.searchbar} />}
-				{withBackgroundImage && <Image alt="abstract-colors" src={withBackgroundImage} layout="fill" objectFit="cover" quality={50} priority />}
+				{withBackgroundImage && (
+					<Image alt="abstract-colors" src={withBackgroundImage} layout="fill" objectFit="cover" quality={50} priority className={styles.background} />
+				)}
 				<main className={styles.main}>{children}</main>
 				<Footer />
 			</div>

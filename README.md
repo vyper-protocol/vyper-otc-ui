@@ -70,7 +70,36 @@ In our case the section **pages**, has being moved outside of the `components` f
 
 ### Folder Structure
 
-WIP
+├── public
+└── src
+├── api
+│   ├── dummy-tokens
+│   ├── next-api
+│   ├── otc-state
+│   ├── supabase
+│   └── switchboard
+├── components
+│   ├── atoms
+│   ├── molecules
+│   ├── organisms
+│   ├── providers
+│   └── templates
+├── configs
+├── controllers
+│   ├── createContract
+│   ├── fetchContract
+│   └── fetchContracts
+├── hooks
+├── idls
+├── models
+│   └── plugins
+├── pages
+│   ├── api
+│   ├── contract
+│   └── explorer
+├── styles
+└── utils
+└── queries
 
 ### Styles & CSS
 
@@ -94,10 +123,6 @@ The guideline for creating a component's story is:
 2. The title of the component metadata should follow the path under `src`, for example `<ButtonPill />` is located at `src/components/atoms/ButtonPill`, then it should be `components/atoms/ButonPill`
 3. It's encouraged that developers to give a comment above each props of the actual component, the comments will act as the description of the props in Storybook
 4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options.
-
-### Tests
-
-WIP
 
 ### Commits with Commitizens & Releases
 
