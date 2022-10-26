@@ -13,7 +13,7 @@
 | `mainnet-prod` | [![Netlify Status](https://api.netlify.com/api/v1/badges/96cddd0a-032d-41b1-94fb-4af04ec79674/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-prod/deploys) | Mainnet Production |                           [otc.vyperprotocol.io](https://otc.vyperprotocol.io) |
 |  `devnet-prod` |  [![Netlify Status](https://api.netlify.com/api/v1/badges/0f77a7ed-6f5d-4929-b79e-76867ba9da11/deploy-status)](https://app.netlify.com/sites/vyper-otc-devnet-prod/deploys) |  Devnet Production |                 [demo.otc.vyperprotocol.io](https://demo.otc.vyperprotocol.io) |
 | `mainnet-stag` | [![Netlify Status](https://api.netlify.com/api/v1/badges/f85433c2-526f-4d89-aa5b-528c5aaf7ba8/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-stag/deploys) |    Mainnet Staging |           [staging.otc.vyperprotocol.io](https://staging.otc.vyperprotocol.io) |
-|  `devnet-stag` | [![Netlify Status](https://api.netlify.com/api/v1/badges/96cddd0a-032d-41b1-94fb-4af04ec79674/deploy-status)](https://app.netlify.com/sites/vyper-otc-mainnet-prod/deploys) |     Devnet Staging | [staging.demo.otc.vyperprotocol.io](https://staging.demo.otc.vyperprotocol.io) |
+|  `devnet-stag` |  [![Netlify Status](https://api.netlify.com/api/v1/badges/ef8c8363-94c6-47b5-a993-8c81fe4657ca/deploy-status)](https://app.netlify.com/sites/vyper-otc-devnet-stag/deploys) |     Devnet Staging | [staging.demo.otc.vyperprotocol.io](https://staging.demo.otc.vyperprotocol.io) |
 
 ### Getting Started
 
@@ -48,7 +48,7 @@ yarn build
 | storybook       | Starts the storybook development server                                                         |
 | build-storybook | Creates the storybook production build                                                          |
 | commit          | Runs `git add .` and `cz`                                                                       |
-| first-release   | Creates the first version for the auto-changelog generator. _(This should run only once)_         |
+| first-release   | Creates the first version for the auto-changelog generator. _(This should run only once)_       |
 | release         | Bumbs version & writes changes to changelog                                                     |
 | release:minor   | Bumbs minor version & writes changes to changelog                                               |
 | release:patch   | Bumbs patch version & writes changes to changelog                                               |
@@ -70,7 +70,36 @@ In our case the section **pages**, has being moved outside of the `components` f
 
 ### Folder Structure
 
-WIP
+├── public
+└── src
+├── api
+│   ├── dummy-tokens
+│   ├── next-api
+│   ├── otc-state
+│   ├── supabase
+│   └── switchboard
+├── components
+│   ├── atoms
+│   ├── molecules
+│   ├── organisms
+│   ├── providers
+│   └── templates
+├── configs
+├── controllers
+│   ├── createContract
+│   ├── fetchContract
+│   └── fetchContracts
+├── hooks
+├── idls
+├── models
+│   └── plugins
+├── pages
+│   ├── api
+│   ├── contract
+│   └── explorer
+├── styles
+└── utils
+└── queries
 
 ### Styles & CSS
 
@@ -93,11 +122,7 @@ The guideline for creating a component's story is:
 1. The component's story filename should follow this pattern: `*.stories.tsx`, otherwise it won't be detected by Storybook
 2. The title of the component metadata should follow the path under `src`, for example `<ButtonPill />` is located at `src/components/atoms/ButtonPill`, then it should be `components/atoms/ButonPill`
 3. It's encouraged that developers to give a comment above each props of the actual component, the comments will act as the description of the props in Storybook
-4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options. 
-
-### Tests
-
-WIP
+4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options.
 
 ### Commits with Commitizens & Releases
 

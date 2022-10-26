@@ -1,10 +1,25 @@
-.main {
+.layout {
 	display: flex;
+	flex: 1;
 	flex-direction: column;
-	align-items: center;
-	margin-top: 0;
-	z-index: 1;
-	position: relative;
+	// Lets the layout stretch across the whole window y axis
+	// pushing the footer at the bottom of the screen
+	height: 100vh;
+	width: 100%;
+
+	.background {
+		position: relative;
+		z-index: -2;
+	}
+
+	.main {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		align-items: center;
+		margin-top: 0;
+		position: relative;
+	}
 }
 
 .searchbar {

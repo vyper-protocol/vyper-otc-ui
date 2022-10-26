@@ -1,16 +1,23 @@
+import { useState, useEffect } from 'react';
+
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box } from '@mui/material';
 import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import fetchContracts from 'controllers/fetchContracts';
+import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
 import { Badge } from 'evergreen-ui';
+import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
-import { useRouter } from 'next/router';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
+import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
+import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -20,33 +27,40 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
-export type ExplorerContractDataGridProps = {
-	contracts: ChainOtcState[];
-};
+const ExplorerContractDataGrid = () => {
+	const { connection } = useConnection();
 
-const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) => {
-	const router = useRouter();
+	const [contractsLoading, setContractsLoading] = useState(false);
+	const [contracts, setContracts] = useState<ChainOtcState[]>([]);
+
+	useEffect(() => {
+		setContractsLoading(true);
+		setContracts([]);
+		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster()))
+			.then((c) => setContracts(c))
+			.finally(() => setContractsLoading(false));
+	}, [connection]);
 
 	const columns: GridColumns<ChainOtcState> = [
 		{
 			type: 'singleSelect',
-			field: 'redeemLogicState.getTypeId()',
+			field: 'redeemLogicState.typeId',
 			headerName: 'Instrument',
 			sortable: false,
 			filterable: true,
 			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
 			valueGetter: (params) => {
-				return params.row.redeemLogicState.getTypeId();
+				return params.row.redeemLogicState.typeId;
 			},
 			width: 150
 		},
 		{
 			type: 'string',
-			field: 'rateState.getAggregatorName()',
+			field: 'rateState.title',
 			headerName: 'Underlying',
 			valueGetter: (params) => {
-				return params.row.rateState.getPluginDescription();
+				return params.row.rateState.title;
 			},
 			width: 280
 		},
@@ -55,7 +69,13 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.notional',
 			headerName: 'Size',
 			valueGetter: (params) => {
-				return params.row.redeemLogicState.notional;
+				if (params.row.redeemLogicState.typeId === 'forward') {
+					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
+				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
+					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
+				} else {
+					return '-';
+				}
 			},
 			width: 80
 		},
@@ -64,7 +84,13 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			field: 'redeemLogicState.strike',
 			headerName: 'Strike',
 			valueGetter: (params) => {
-				return formatWithDecimalDigits(params.row.redeemLogicState.strike);
+				if (params.row.redeemLogicState.typeId === 'forward') {
+					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
+				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
+					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
+				} else {
+					return '-';
+				}
 			},
 			width: 150
 		},
@@ -72,11 +98,8 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 			type: 'number',
 			field: 'rateState.aggregatorLastValue',
 			headerName: 'Current Price',
-			valueGetter: (params) => {
-				return formatWithDecimalDigits(params.row.rateState.getPluginLastValue());
-			},
 			renderCell: (params: GridRenderCellParams<any>) => (
-				<OracleLivePrice oracleType={params.row.rateState.getTypeId()} pubkey={params.row.rateState.pubkeyForLivePrice.toBase58()} />
+				<OracleLivePrice oracleType={params.row.rateState.typeId} pubkey={(params.row.rateState as AbsRatePlugin).livePriceAccounts[0].toBase58()} />
 			),
 			width: 150
 		},
@@ -173,12 +196,16 @@ const ExplorerContractDataGrid = ({ contracts }: ExplorerContractDataGridProps) 
 		}
 	];
 
-	console.log(window.location.origin);
-
 	return (
-		<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
-			<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
-		</Box>
+		<>
+			{contractsLoading && <Spinner />}
+
+			{contracts.length > 0 && (
+				<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
+					<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
+				</Box>
+			)}
+		</>
 	);
 };
 

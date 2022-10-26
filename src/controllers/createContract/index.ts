@@ -62,10 +62,9 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 			sendSnsPublish(
 				cluster,
 				buildCreateContractMessage(
-					chainOtcState.redeemLogicState.getTypeId(),
-					chainOtcState.rateState.getPluginDescription(),
-					chainOtcState.redeemLogicState.strike,
-					chainOtcState.redeemLogicState.notional,
+					chainOtcState.redeemLogicState.typeId,
+					chainOtcState.rateState.title,
+					chainOtcState.redeemLogicState,
 					chainOtcState.settleAvailableFromAt,
 					`https://otc.vyperprotocol.io${contractURL}`
 				)

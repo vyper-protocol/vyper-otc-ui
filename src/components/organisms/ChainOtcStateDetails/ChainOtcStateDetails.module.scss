@@ -1,0 +1,66 @@
+.cards {
+	display: flex;
+
+	.box {
+		max-width: 620px;
+		width: 310px;
+		background-color: var(--color-white);
+		border-radius: var(--border-radius-extend);
+		padding: var(--space-20);
+
+		.toggle {
+			float: right;
+			margin-bottom: var(--space-8);
+			color: var(--color-text-disabled);
+			font-size: 14px;
+
+			svg {
+				margin-bottom: -4px;
+				margin-left: var(--space-4);
+			}
+		}
+		.toggle:hover {
+			cursor: pointer;
+			color: var(--color-primary);
+		}
+
+		.content {
+			p {
+				font-weight: 600;
+			}
+			.column {
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+	}
+
+	/* Simulator */
+	.simulator {
+		border-top-right-radius: var(--space-10);
+		border-bottom-right-radius: var(--space-10);
+	}
+
+	.changeEdge {
+		border-top-right-radius: 0;
+	}
+
+	.hide {
+		display: none;
+	}
+
+	.show {
+		display: block;
+	}
+
+	/* ------------------ */
+}
+
+.buttons {
+	display: flex;
+	margin-top: 20px;
+}
+
+.notionHelp:hover {
+	cursor: pointer;
+}

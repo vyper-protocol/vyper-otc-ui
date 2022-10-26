@@ -20,12 +20,12 @@ export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy:
 
 			redeem_logic_plugin_program_pubkey: otcState.redeemLogicState.programPubkey.toBase58(),
 			redeem_logic_plugin_state_pubkey: otcState.redeemLogicState.statePubkey.toBase58(),
-			redeem_logic_plugin_type: otcState.redeemLogicState.getTypeId(),
+			redeem_logic_plugin_type: otcState.redeemLogicState.typeId,
 			redeem_logic_plugin_data: otcState.redeemLogicState.getPluginDataObj(),
 
 			rate_plugin_program_pubkey: otcState.rateState.programPubkey.toBase58(),
 			rate_plugin_state_pubkey: otcState.rateState.statePubkey.toBase58(),
-			rate_plugin_type: otcState.rateState.getTypeId(),
+			rate_plugin_type: otcState.rateState.typeId,
 			rate_plugin_data: otcState.rateState.getPluginDataObj()
 		}
 	]);
