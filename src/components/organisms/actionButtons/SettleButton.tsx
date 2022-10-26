@@ -32,12 +32,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 		}
 	};
 
-	if (
-		rateStateQuery?.data === undefined &&
-		!rateStateQuery?.data?.isSettlementAvailable() &&
-		!rateStateQuery?.data?.buyerWallet !== undefined &&
-		!rateStateQuery?.data?.sellerWallet !== undefined
-	) {
+	if (rateStateQuery?.data === undefined && !rateStateQuery?.data?.isSettlementAvailable()) {
 		return <></>;
 	}
 
