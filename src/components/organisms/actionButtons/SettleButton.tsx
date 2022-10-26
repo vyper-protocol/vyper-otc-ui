@@ -16,6 +16,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
+	console.log(rateStateQuery);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onSettleClick = async () => {
@@ -31,7 +32,12 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 		}
 	};
 
-	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
+	if (
+		rateStateQuery?.data === undefined &&
+		!rateStateQuery?.data?.isSettlementAvailable() &&
+		!rateStateQuery?.data?.buyerWallet !== undefined &&
+		!rateStateQuery?.data?.sellerWallet !== undefined
+	) {
 		return <></>;
 	}
 
