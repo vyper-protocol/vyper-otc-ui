@@ -31,7 +31,7 @@ const get = async (request: NextApiRequest, response: NextApiResponse) => {
 			label = 'Vyper OTC - airdrop tokens';
 			break;
 		case 'deposit':
-			if (request.query?.isBuyer) {
+			if (request.query?.isBuyer === 'true') {
 				label = 'Vyper OTC - long contract ' + abbreviateAddress(request.query?.contract.toString());
 			} else {
 				label = 'Vyper OTC - short contract ' + abbreviateAddress(request.query?.contract.toString());
@@ -71,7 +71,7 @@ const postDeposit = async (request, response) => {
 	const sender = new PublicKey(accountField);
 
 	const otcState = new PublicKey(request.query?.contract);
-	const isSeniorSide = request.query?.isBuyer;
+	const isSeniorSide = request.query?.isBuyer === 'true';
 
 	const provider = new AnchorProvider(connection, undefined, {});
 
