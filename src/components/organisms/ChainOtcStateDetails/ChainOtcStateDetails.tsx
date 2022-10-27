@@ -1,11 +1,13 @@
 import { useState } from 'react';
 
+import { Tooltip } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator, Tooltip } from 'evergreen-ui';
+import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
@@ -64,7 +66,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						{otcState.redeemLogicState.typeId}
 					</Badge>
 
-					<Tooltip content="Contract Payoff - Forward" position="right">
+					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
 						<HelpIcon size={12} marginX={3} color="#6e62b6" onClick={handleDocumentationClick} className={styles.notionHelp} />
 					</Tooltip>
 					<div style={{ flex: 1 }} />
