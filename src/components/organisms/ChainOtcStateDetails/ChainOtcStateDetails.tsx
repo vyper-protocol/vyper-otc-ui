@@ -127,7 +127,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 							<p>
 								{c.label}
 								{c.tooltip && (
-									<Tooltip content={c.tooltip} position="right">
+									<Tooltip title={c.tooltip} placement="right">
 										<HelpIcon size={12} marginX={3} />
 									</Tooltip>
 								)}
