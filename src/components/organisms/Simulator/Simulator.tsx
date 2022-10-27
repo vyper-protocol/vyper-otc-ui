@@ -78,7 +78,11 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				</div>
 			)}
 
-			<p className={styles.note}>*That is your simulated P/L for both sides, if the price gets to {prices[0]}</p>
+			<p className={styles.note}>
+				{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.length === 1
+					? `*This is the simulated PnL if Current price gets to ${prices[0]}`
+					: `*This is the simulated PnL if Current price gets to ${prices[0]} and Settlement rate gets to ${prices[1]}`}
+			</p>
 		</div>
 	);
 };
