@@ -113,10 +113,16 @@ export const TxHandlerProvider = ({ children }) => {
 						console.warn('error origin: ', anchorError.error.origin);
 					}
 
-					toast.update(toastID, {
-						render: `Transaction error (${anchorError.error.errorCode.number} ${anchorError.error.errorCode.code}): ${_.capitalize(
+					let toastMessage = `Transaction error: ${_.capitalize(anchorError.error.errorMessage)}`;
+
+					if (process.env.NODE_ENV === 'development') {
+						toastMessage = `Transaction error (${anchorError.error.errorCode.number} ${anchorError.error.errorCode.code}): ${_.capitalize(
 							anchorError.error.errorMessage
-						)}`,
+						)}`;
+					}
+
+					toast.update(toastID, {
+						render: toastMessage,
 						icon: '❌',
 						type: 'error',
 						autoClose: 5000
