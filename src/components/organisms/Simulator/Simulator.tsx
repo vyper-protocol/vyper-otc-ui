@@ -78,7 +78,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				</div>
 			)}
 
-			<p className={styles.note}>*That is your simulated P/L for both sides, if the price gets to {prices}</p>
+			<p className={styles.note}>*That is your simulated P/L for both sides, if the price gets to {prices[0]}</p>
 		</div>
 	);
 };
