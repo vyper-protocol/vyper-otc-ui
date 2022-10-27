@@ -5,9 +5,9 @@ import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { deposit } from 'api/otc-state/deposit';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
+import { fundContract } from 'controllers/fundContract';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { useRouter } from 'next/router';
@@ -80,8 +80,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		} else {
 			try {
 				setIsLoading(true);
-				const tx = await deposit(provider, new PublicKey(otcStatePubkey), isBuyer);
-				await txHandler.handleTxs(tx);
+				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), isBuyer);
 			} catch (err) {
 				console.log(err);
 			} finally {
