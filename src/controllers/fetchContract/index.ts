@@ -225,12 +225,14 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 			const isLinear = redeemLogicAccountInfo.isLinear;
 			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const isStandard = redeemLogicAccountInfo.isStandard;
 			const redeemLogicState = new RedeemLogicSettledForwardPlugin(
 				trancheConfigAccountInfo.redeemLogicProgram,
 				trancheConfigAccountInfo.redeemLogicProgramState,
 				strike,
 				isLinear,
-				notional
+				notional,
+				isStandard
 			);
 			res.redeemLogicState = redeemLogicState;
 		} catch (err) {
