@@ -1,5 +1,5 @@
 export type RedeemLogicSettledForward = {
-	version: '0.1.0';
+	version: '0.1.1';
 	name: 'redeem_logic_settled_forward';
 	instructions: [
 		{
@@ -38,6 +38,10 @@ export type RedeemLogicSettledForward = {
 				{
 					name: 'isLinear';
 					type: 'bool';
+				},
+				{
+					name: 'isStandard';
+					type: 'bool';
 				}
 			];
 		},
@@ -66,6 +70,10 @@ export type RedeemLogicSettledForward = {
 				},
 				{
 					name: 'isLinear';
+					type: 'bool';
+				},
+				{
+					name: 'isStandard';
 					type: 'bool';
 				}
 			];
@@ -101,6 +109,10 @@ export type RedeemLogicSettledForward = {
 					},
 					{
 						name: 'isLinear';
+						type: 'bool';
+					},
+					{
+						name: 'isStandard';
 						type: 'bool';
 					},
 					{
@@ -176,7 +188,7 @@ export type RedeemLogicSettledForward = {
 };
 
 export const IDL: RedeemLogicSettledForward = {
-	version: '0.1.0',
+	version: '0.1.1',
 	name: 'redeem_logic_settled_forward',
 	instructions: [
 		{
@@ -215,6 +227,10 @@ export const IDL: RedeemLogicSettledForward = {
 				{
 					name: 'isLinear',
 					type: 'bool'
+				},
+				{
+					name: 'isStandard',
+					type: 'bool'
 				}
 			]
 		},
@@ -243,6 +259,10 @@ export const IDL: RedeemLogicSettledForward = {
 				},
 				{
 					name: 'isLinear',
+					type: 'bool'
+				},
+				{
+					name: 'isStandard',
 					type: 'bool'
 				}
 			]
@@ -278,6 +298,10 @@ export const IDL: RedeemLogicSettledForward = {
 					},
 					{
 						name: 'isLinear',
+						type: 'bool'
+					},
+					{
+						name: 'isStandard',
 						type: 'bool'
 					},
 					{
