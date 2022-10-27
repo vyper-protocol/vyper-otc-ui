@@ -221,13 +221,17 @@ const CreateContractPage = () => {
 	const [pythPrice_2, setPythPrice_2] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
 
 	const setStrikeToDefaultValue = async () => {
-		if (ratePluginType === 'pyth') {
-			const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
-			setStrike(price?.price ?? 0);
-		}
-		if (ratePluginType === 'switchboard') {
-			const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
-			setStrike(price ?? 0);
+		try {
+			if (ratePluginType === 'pyth') {
+				const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
+				setStrike(price?.price ?? 0);
+			}
+			if (ratePluginType === 'switchboard') {
+				const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
+				setStrike(price ?? 0);
+			}
+		} catch {
+			setStrike(0);
 		}
 	};
 
