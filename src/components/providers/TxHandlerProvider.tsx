@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
 
+import { AnchorError } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { ConfirmOptions, SendOptions } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
+import _ from 'lodash';
 import { TxPackage } from 'models/TxPackage';
 import { Id, toast } from 'react-toastify';
 import { abbreviateAddress } from 'utils/stringHelpers';
@@ -97,9 +99,30 @@ export const TxHandlerProvider = ({ children }) => {
 				});
 			} catch (err) {
 				console.error('err: ', JSON.stringify(err));
-				if (err.message) {
+
+				// print tx error logs
+				if (err.logs) {
+					console.groupCollapsed('TX ERROR LOGS');
+					err.logs.forEach((errLog) => console.error(errLog));
+					console.groupEnd();
+				}
+
+				const anchorError = AnchorError.parse(err.logs);
+				if (anchorError) {
+					if (process.env.NODE_ENV === 'development') {
+						console.warn('error origin: ', anchorError.error.origin);
+					}
+
+					let toastMessage = `Transaction error: ${_.capitalize(anchorError.error.errorMessage)}`;
+
+					if (process.env.NODE_ENV === 'development') {
+						toastMessage = `Transaction error (${anchorError.error.errorCode.number} ${anchorError.error.errorCode.code}): ${_.capitalize(
+							anchorError.error.errorMessage
+						)}`;
+					}
+
 					toast.update(toastID, {
-						render: err.message,
+						render: toastMessage,
 						icon: '❌',
 						type: 'error',
 						autoClose: 5000

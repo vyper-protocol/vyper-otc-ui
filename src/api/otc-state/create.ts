@@ -97,7 +97,8 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			.initialize(
 				params.redeemLogicOption.strike,
 				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
-				params.redeemLogicOption.isLinear
+				params.redeemLogicOption.isLinear,
+				false
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,

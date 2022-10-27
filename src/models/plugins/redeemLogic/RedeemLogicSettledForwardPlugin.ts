@@ -7,7 +7,14 @@ import { AbsRedeemLogicPlugin } from './AbsRedeemLogicPlugin';
 /* eslint-disable space-before-function-paren */
 export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 	// eslint-disable-next-line no-unused-vars
-	constructor(programPubkey: PublicKey, statePubkey: PublicKey, public strike: number, public isLinear: boolean, public notional: number) {
+	constructor(
+		programPubkey: PublicKey,
+		statePubkey: PublicKey,
+		public strike: number,
+		public isLinear: boolean,
+		public notional: number,
+		public isStandard: boolean
+	) {
 		super(programPubkey, statePubkey);
 	}
 
@@ -19,12 +26,13 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 		return {
 			strike: this.strike,
 			isLinear: this.isLinear,
-			notional: this.notional
+			notional: this.notional,
+			isStandard: this.isStandard
 		};
 	}
 
 	clone(): RedeemLogicSettledForwardPlugin {
-		return new RedeemLogicSettledForwardPlugin(this.programPubkey, this.statePubkey, this.strike, this.isLinear, this.notional);
+		return new RedeemLogicSettledForwardPlugin(this.programPubkey, this.statePubkey, this.strike, this.isLinear, this.notional, this.isStandard);
 	}
 
 	get rateFeedsDescription(): string[] {

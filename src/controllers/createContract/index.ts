@@ -3,7 +3,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
-import { buildMessage as buildCreateContractMessage, sendSnsPublish } from 'api/supabase/notificationTrigger';
+import { buildCreateContractMessage as buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
 import { fetchContract } from 'controllers/fetchContract';
@@ -59,7 +59,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 			const contractURL = UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58());
 
 			// send sns publish
-			sendSnsPublish(
+			sendSnsPublisherNotification(
 				cluster,
 				buildCreateContractMessage(
 					chainOtcState.redeemLogicState.typeId,
