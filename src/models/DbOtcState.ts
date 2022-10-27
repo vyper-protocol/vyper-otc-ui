@@ -36,7 +36,8 @@ export class DbOtcState extends AbsOtcState {
 				new PublicKey(data.redeem_logic_plugin_state_pubkey),
 				data.redeem_logic_plugin_data.strike,
 				data.redeem_logic_plugin_data.isLinear,
-				data.redeem_logic_plugin_data.notional
+				data.redeem_logic_plugin_data.notional,
+				data.redeem_logic_plugin_data.isStandard
 			);
 		}
 
