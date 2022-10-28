@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
-import { AnchorProvider, Program } from '@project-serum/anchor';
+import { AnchorProvider } from '@project-serum/anchor';
 import { unpackAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -9,9 +9,6 @@ import { claim } from 'api/otc-state/claim';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
-import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-
-import PROGRAMS from '../../../configs/programs.json';
 
 const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
 	const { connection } = useConnection();
@@ -23,18 +20,8 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDeposited, setIsDeposited] = useState(false);
 
-	const getProgramTokenAccount = useCallback(async ()=>{
-		const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), new AnchorProvider(connection, undefined, {}));
-		const accountInfo = await vyperOtcProgram.account.otcState.fetch(otcStatePubkey);
-		if(isBuyer) {
-			return accountInfo.otcSeniorReserveTokenAccount;
-		}else{
-			return accountInfo.otcJuniorReserveTokenAccount;
-		}
-	}, [connection, isBuyer, otcStatePubkey]);
-
-	const tokenAccountListener = useCallback(async ()=>{
-		const programTokenAccount = await getProgramTokenAccount();
+	useEffect(()=>{
+		const programTokenAccount = isBuyer ? rateStateQuery.data.programBuyerTA : rateStateQuery.data.programSellerTA;
 		const subscriptionId = connection.onAccountChange(
 			programTokenAccount,
 			async (updatedAccountInfo) => {
@@ -43,16 +30,10 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 			},
 			'confirmed'
 		);
-		return subscriptionId;
-	}, [connection, getProgramTokenAccount]);
-
-	useEffect(()=>{
-		let subscriptionId;
-		tokenAccountListener().then((id)=>{subscriptionId = id;});
 		return () => {
 			connection.removeAccountChangeListener(subscriptionId);
 		};
-	}, [connection, tokenAccountListener]);
+	}, [connection, isBuyer, rateStateQuery.data.programBuyerTA, rateStateQuery.data.programSellerTA]);
 
 	const onClaimClick = async () => {
 		try {
