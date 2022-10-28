@@ -49,25 +49,28 @@ const ExplorerContractDataGrid = () => {
 			sortable: false,
 			filterable: true,
 			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS,
+			flex: 1,
+			minWidth: 150,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
 			valueGetter: (params) => {
 				return params.row.redeemLogicState.typeId;
-			},
-			width: 150
+			}
 		},
 		{
 			type: 'string',
 			field: 'rateState.title',
 			headerName: 'Underlying',
+			flex: 1,
+			minWidth: 150,
 			valueGetter: (params) => {
 				return params.row.rateState.title;
-			},
-			width: 280
+			}
 		},
 		{
 			type: 'number',
 			field: 'redeemLogicState.notional',
 			headerName: 'Size',
+			flex: 1,
 			valueGetter: (params) => {
 				if (params.row.redeemLogicState.typeId === 'forward') {
 					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
@@ -76,13 +79,13 @@ const ExplorerContractDataGrid = () => {
 				} else {
 					return '-';
 				}
-			},
-			width: 80
+			}
 		},
 		{
 			type: 'number',
 			field: 'redeemLogicState.strike',
 			headerName: 'Strike',
+			flex: 1,
 			valueGetter: (params) => {
 				if (params.row.redeemLogicState.typeId === 'forward') {
 					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
@@ -91,8 +94,7 @@ const ExplorerContractDataGrid = () => {
 				} else {
 					return '-';
 				}
-			},
-			width: 150
+			}
 		},
 		{
 			type: 'number',
@@ -101,7 +103,8 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<any>) => (
 				<OracleLivePrice oracleType={params.row.rateState.typeId} pubkey={(params.row.rateState as AbsRatePlugin).livePriceAccounts[0].toBase58()} />
 			),
-			width: 150
+			flex: 1,
+			minWidth: 125
 		},
 		{
 			field: 'settleAvailableFromAt',
@@ -110,7 +113,7 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			sortable: true,
 			filterable: true,
-			width: 150
+			flex: 1
 		},
 		{
 			type: 'boolean',
@@ -118,7 +121,7 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Long funded',
 			sortable: true,
 			filterable: true,
-			width: 150,
+			flex: 1,
 			valueGetter: (params) => {
 				return params.row.isBuyerFunded();
 			}
@@ -129,7 +132,7 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Short funded',
 			sortable: true,
 			filterable: true,
-			width: 150,
+			flex: 1,
 			valueGetter: (params) => {
 				return params.row.isSellerFunded();
 			}
@@ -139,7 +142,7 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Buyer wallet',
 			sortable: true,
 			filterable: true,
-			width: 120,
+			flex: 1,
 			renderCell: (params) => {
 				if (!params.row.buyerWallet) return <></>;
 				return <PublicKeyLink address={params.row.buyerWallet?.toBase58()} />;
@@ -150,7 +153,7 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Seller wallet',
 			sortable: true,
 			filterable: true,
-			width: 120,
+			flex: 1,
 			renderCell: (params) => {
 				if (!params.row.sellerWallet) return <></>;
 				return <PublicKeyLink address={params.row.sellerWallet?.toBase58()} />;
@@ -161,7 +164,7 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Status',
 			sortable: true,
 			filterable: true,
-			width: 100,
+			flex: 1,
 			renderCell: (params) => {
 				return <ContractStatusBadge status={params.row.getContractStatus()} />;
 			}
@@ -170,7 +173,7 @@ const ExplorerContractDataGrid = () => {
 			field: 'actions',
 			type: 'actions',
 			headerName: 'Show details',
-			width: 150,
+			flex: 1,
 			getActions: (params: GridRowParams) => [
 				<GridActionsCellItem
 					key="open"
@@ -201,8 +204,8 @@ const ExplorerContractDataGrid = () => {
 			{contractsLoading && <Spinner />}
 
 			{contracts.length > 0 && (
-				<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
-					<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
+				<Box sx={{ maxWidth: 1600, width: '90%' }}>
+					<DataGrid autoHeight getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
 				</Box>
 			)}
 		</>
