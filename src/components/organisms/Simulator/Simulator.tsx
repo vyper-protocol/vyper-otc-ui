@@ -59,29 +59,31 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				))}
 			</div>
 
-			{rateStateQuery?.data?.isPnlAvailable() && (
-				<div className={cn(styles.flex, styles.margin)}>
-					<div className={styles.center}>
-						Long
-						<br />
-						<Badge color={buyerColor}>
-							{buyerPnl} {tokenSymbol}
-						</Badge>
-					</div>
-					<div className={styles.center}>
-						Short
-						<br />
-						<Badge color={sellerColor}>
-							{sellerPnl} {tokenSymbol}
-						</Badge>
-					</div>
+			<div className={cn(styles.flex, styles.margin)}>
+				<div className={styles.center}>
+					Long
+					<br />
+					<Badge color={buyerColor}>
+						{buyerPnl} {tokenSymbol}
+					</Badge>
 				</div>
-			)}
+				<div className={styles.center}>
+					Short
+					<br />
+					<Badge color={sellerColor}>
+						{sellerPnl} {tokenSymbol}
+					</Badge>
+				</div>
+			</div>
 
 			<p className={styles.note}>
-				{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.length === 1
-					? `*This is the simulated PnL if Current price gets to ${prices[0]}`
-					: `*This is the simulated PnL if Current price gets to ${prices[0]} and Settlement rate gets to ${prices[1]}`}
+				This is the simulated PnL if{' '}
+				{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.map((c, i) => (
+					<span key={i}>
+						{c.toLowerCase()} gets to {prices[i]}
+						{i === rateStateQuery?.data.redeemLogicState.settlementPricesDescription.length - 1 ? '' : ', '}
+					</span>
+				))}
 			</p>
 		</div>
 	);
