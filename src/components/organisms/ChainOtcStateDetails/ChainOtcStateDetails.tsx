@@ -132,7 +132,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 									</Tooltip>
 								)}
 							</p>
-							<p>{formatWithDecimalDigits(c.value)}</p>
+							<p>{typeof c.value === 'number' ? formatWithDecimalDigits(c.value) : c.value}</p>
 						</div>
 					))}
 

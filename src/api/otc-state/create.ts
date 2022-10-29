@@ -99,7 +99,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 				params.redeemLogicOption.strike,
 				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
 				params.redeemLogicOption.isLinear,
-				false
+				params.redeemLogicOption.isStandard
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -117,11 +117,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicProgram = new Program<RedeemLogicDigital>(RedeemLogicDigitalIDL, PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(
-				params.redeemLogicOption.strike,
-				// TODO: check with LogicOption
-				params.redeemLogicOption.isCall
-			)
+			.initialize(params.redeemLogicOption.strike, params.redeemLogicOption.isCall)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				owner: provider.wallet.publicKey,

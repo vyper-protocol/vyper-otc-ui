@@ -14,9 +14,10 @@ export type OtcInitializationParams = {
 	// TODO: extend to other redeem logic
 	redeemLogicOption: {
 		redeemLogicPluginType: RedeemLogicPluginTypeIds;
-		strike: number;
-		notional: number;
-		isLinear: boolean;
+		strike?: number;
+		notional?: number;
+		isLinear?: boolean;
+		isStandard?: boolean;
 		isCall?: boolean;
 	};
 
