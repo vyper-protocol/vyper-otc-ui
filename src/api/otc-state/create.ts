@@ -7,6 +7,7 @@ import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
+import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { TxPackage } from 'models/TxPackage';
@@ -65,7 +66,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		rateProgramPublicKey = ratePythProgram.programId;
 	}
 
-	//  rate plugin init
+	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
 
@@ -99,6 +100,27 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
 				params.redeemLogicOption.isLinear,
 				false
+			)
+			.accounts({
+				redeemLogicConfig: redeemLogicPluginState.publicKey,
+				owner: provider.wallet.publicKey,
+				payer: provider.wallet.publicKey
+			})
+			.signers([redeemLogicPluginState])
+			.instruction();
+
+		vyperCoreInitTx.add(redeemLogicInixIX);
+		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
+	}
+
+	if (params.redeemLogicOption.redeemLogicPluginType === 'digital') {
+		const redeemLogicProgram = new Program<RedeemLogicDigital>(RedeemLogicDigitalIDL, PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID, provider);
+
+		const redeemLogicInixIX = await redeemLogicProgram.methods
+			.initialize(
+				params.redeemLogicOption.strike,
+				// TODO: check with LogicOption
+				params.redeemLogicOption.isCall
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,

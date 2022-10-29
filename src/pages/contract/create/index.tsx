@@ -213,7 +213,7 @@ const CreateContractPage = () => {
 	const availableRatePluginTypes: RatePluginTypeIds[] = ['switchboard', 'pyth'];
 
 	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
-	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward'];
+	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward', 'digital'];
 
 	const [switchboardAggregator_1, setSwitchboardAggregator_1] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
 	const [switchboardAggregator_2, setSwitchboardAggregator_2] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
