@@ -54,7 +54,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				{rateStateQuery?.data?.redeemLogicState.pluginDetails.map((detail, index) => (
 					<div key={detail.label} className={cn(styles.flex, index % 2 && styles.row)}>
 						<p className={styles.bold}>{detail.label}</p>
-						<p className={styles.bold}>{formatWithDecimalDigits(detail.value)}</p>
+						<p className={styles.bold}>{typeof detail.value === 'number' ? formatWithDecimalDigits(detail.value) : detail.value}</p>
 					</div>
 				))}
 			</div>
