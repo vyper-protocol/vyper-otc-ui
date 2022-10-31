@@ -11,6 +11,7 @@ import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboar
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
 import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
+import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
@@ -20,6 +21,7 @@ import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
+import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -266,6 +268,40 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 				trancheConfigAccountInfo.redeemLogicProgramState,
 				strike,
 				isCall
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
+	} else if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_VANILLA_OPTION_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// VANILLA OPTION
+
+		try {
+			const redeemLogicVanillaOptionProgram = new Program<RedeemLogicVanillaOption>(
+				RedeemLogicVanillaOptionIDL,
+				trancheConfigAccountInfo.redeemLogicProgram,
+				new AnchorProvider(connection, undefined, {})
+			);
+
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+
+			const redeemLogicAccountInfo = redeemLogicVanillaOptionProgram.coder.accounts.decode<IdlAccounts<RedeemLogicVanillaOption>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
+
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const isCall = redeemLogicAccountInfo.isCall;
+			const isLinear = redeemLogicAccountInfo.isLinear;
+			const redeemLogicState = new RedeemLogicVanillaOptionPlugin(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				notional,
+				isCall,
+				isLinear
 			);
 			res.redeemLogicState = redeemLogicState;
 		} catch (err) {

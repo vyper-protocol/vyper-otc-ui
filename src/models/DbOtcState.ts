@@ -7,6 +7,7 @@ import RateSwitchboardPlugin from './plugins/rate/RateSwitchboardPlugin';
 import { RedeemLogicForwardPlugin } from './plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from './plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicDigitalPlugin } from './plugins/redeemLogic/RedeemLogicDigitalPlugin';
+import { RedeemLogicVanillaOptionPlugin } from './plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from './plugins/AbsPlugin';
 
 export class DbOtcState extends AbsOtcState {
@@ -47,6 +48,15 @@ export class DbOtcState extends AbsOtcState {
 				new PublicKey(data.redeem_logic_plugin_state_pubkey),
 				data.redeem_logic_plugin_data.strike,
 				data.redeem_logic_plugin_data.isCall
+			);
+		} else if (redeemLogicPluginType === 'vanilla_option') {
+			res.redeemLogicState = new RedeemLogicVanillaOptionPlugin(
+				new PublicKey(data.redeem_logic_plugin_program_pubkey),
+				new PublicKey(data.redeem_logic_plugin_state_pubkey),
+				data.redeem_logic_plugin_data.strike,
+				data.redeem_logic_plugin_data.notional,
+				data.redeem_logic_plugin_data.isCall,
+				data.redeem_logic_plugin_data.isLinear
 			);
 		} else {
 			throw Error('reedem logic plugin not supported: ' + redeemLogicPluginType);

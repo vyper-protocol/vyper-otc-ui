@@ -289,7 +289,16 @@ const CreateContractPage = () => {
 					strike,
 					isCall
 				};
+			} else if (redeemLogicPluginType === 'vanilla_option') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					strike,
+					notional,
+					isCall,
+					isLinear: true
+				};
 			} else {
+				throw Error('redeem logic plugin not supported: ' + redeemLogicPluginType);
 			}
 
 			const initParams: OtcInitializationParams = {
@@ -341,7 +350,7 @@ const CreateContractPage = () => {
 				<hr />
 				<b>Rate Plugin</b>
 
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS} onChange={setRatePluginType} margin={12} />
+				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
 
 				{ratePluginType === 'switchboard' && (
 					<>
@@ -365,17 +374,17 @@ const CreateContractPage = () => {
 				<Combobox
 					width="100%"
 					initialSelectedItem={redeemLogicPluginType}
-					items={AVAILABLE_REDEEM_LOGIC_PLUGINS}
+					items={AVAILABLE_REDEEM_LOGIC_PLUGINS as any}
 					onChange={setRedeemLogicPluginType}
 					margin={12}
 				/>
 
 				<Pane display="flex" alignItems="center">
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
-					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward') && (
+					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward' || redeemLogicPluginType === 'vanilla_option') && (
 						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 					)}
-					{redeemLogicPluginType === 'digital' && (
+					{(redeemLogicPluginType === 'digital' || redeemLogicPluginType === 'vanilla_option') && (
 						<FormGroup>
 							<FormControlLabel
 								control={<Switch defaultChecked checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />}
