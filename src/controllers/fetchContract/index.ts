@@ -10,6 +10,7 @@ import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
+import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
@@ -18,6 +19,7 @@ import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
+import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -208,8 +210,9 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	} else if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_SETTLED_FORWARD_PROGRAM_ID))) {
 		// * * * * * * * * * * * * * * * * * * * * * * *
 		// FORWARD SETTLED
+
 		try {
-			const redeemLogicForwardProgram = new Program<RedeemLogicSettledForward>(
+			const redeemLogicSettledForwardProgram = new Program<RedeemLogicSettledForward>(
 				RedeemLogicSettledForwardIDL,
 				trancheConfigAccountInfo.redeemLogicProgram,
 				new AnchorProvider(connection, undefined, {})
@@ -217,7 +220,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
 
-			const redeemLogicAccountInfo = redeemLogicForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicSettledForward>['redeemLogicConfig']>(
+			const redeemLogicAccountInfo = redeemLogicSettledForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicSettledForward>['redeemLogicConfig']>(
 				'redeemLogicConfig',
 				c.data.data
 			);
@@ -233,6 +236,36 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 				isLinear,
 				notional,
 				isStandard
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
+	} else if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// DIGITAL
+
+		try {
+			const redeemLogicDigitalProgram = new Program<RedeemLogicDigital>(
+				RedeemLogicDigitalIDL,
+				trancheConfigAccountInfo.redeemLogicProgram,
+				new AnchorProvider(connection, undefined, {})
+			);
+
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+
+			const redeemLogicAccountInfo = redeemLogicDigitalProgram.coder.accounts.decode<IdlAccounts<RedeemLogicDigital>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
+
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const isCall = redeemLogicAccountInfo.isCall;
+			const redeemLogicState = new RedeemLogicDigitalPlugin(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				isCall
 			);
 			res.redeemLogicState = redeemLogicState;
 		} catch (err) {

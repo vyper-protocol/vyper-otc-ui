@@ -18,6 +18,7 @@ import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
+import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -76,6 +77,9 @@ const ExplorerContractDataGrid = () => {
 					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
 				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
 					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
+				} else if (params.row.redeemLogicState.typeId === 'digital') {
+					// TODO: find common columns
+					return '-';
 				} else {
 					return '-';
 				}
@@ -91,6 +95,8 @@ const ExplorerContractDataGrid = () => {
 					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
 				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
 					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
+				} else if (params.row.redeemLogicState.typeId === 'digital') {
+					return (params.row.redeemLogicState as RedeemLogicDigitalPlugin).strike;
 				} else {
 					return '-';
 				}

@@ -6,6 +6,7 @@ import { RatePythPlugin } from './plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from './plugins/rate/RateSwitchboardPlugin';
 import { RedeemLogicForwardPlugin } from './plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from './plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
+import { RedeemLogicDigitalPlugin } from './plugins/redeemLogic/RedeemLogicDigitalPlugin';
 
 export class DbOtcState extends AbsOtcState {
 	cluster: Cluster;
@@ -28,9 +29,7 @@ export class DbOtcState extends AbsOtcState {
 				data.redeem_logic_plugin_data.isLinear,
 				data.redeem_logic_plugin_data.notional
 			);
-		}
-
-		if (data.redeem_logic_plugin_type === 'settled_forward') {
+		} else if (data.redeem_logic_plugin_type === 'settled_forward') {
 			res.redeemLogicState = new RedeemLogicSettledForwardPlugin(
 				new PublicKey(data.redeem_logic_plugin_program_pubkey),
 				new PublicKey(data.redeem_logic_plugin_state_pubkey),
@@ -39,6 +38,15 @@ export class DbOtcState extends AbsOtcState {
 				data.redeem_logic_plugin_data.notional,
 				data.redeem_logic_plugin_data.isStandard
 			);
+		} else if (data.redeem_logic_plugin_type === 'digital') {
+			res.redeemLogicState = new RedeemLogicDigitalPlugin(
+				new PublicKey(data.redeem_logic_plugin_program_pubkey),
+				new PublicKey(data.redeem_logic_plugin_state_pubkey),
+				data.redeem_logic_plugin_data.strike,
+				data.redeem_logic_plugin_data.isCall
+			);
+		} else {
+			throw Error('reedem logic plugin not supported: ' + data.redeem_logic_plugin_type);
 		}
 
 		if (data.rate_plugin_type === 'switchboard') {

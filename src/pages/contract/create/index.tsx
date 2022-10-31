@@ -213,7 +213,7 @@ const CreateContractPage = () => {
 	const availableRatePluginTypes: RatePluginTypeIds[] = ['switchboard', 'pyth'];
 
 	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
-	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward'];
+	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward', 'digital'];
 
 	const [switchboardAggregator_1, setSwitchboardAggregator_1] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
 	const [switchboardAggregator_2, setSwitchboardAggregator_2] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
@@ -242,6 +242,7 @@ const CreateContractPage = () => {
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
+	const [isCall, setIsCall] = useState(true);
 
 	useEffect(() => {
 		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator_1))
@@ -267,25 +268,46 @@ const CreateContractPage = () => {
 				rateAccounts.push(new PublicKey(pythPrice_2));
 			}
 
+			let redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
+
+			if (redeemLogicPluginType === 'forward') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					isLinear: true,
+					notional,
+					strike
+				};
+			} else if (redeemLogicPluginType === 'settled_forward') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					isLinear: true,
+					notional,
+					strike,
+					isStandard: false
+				};
+			} else if (redeemLogicPluginType === 'digital') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					strike,
+					isCall
+				};
+			} else {
+			}
+
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey(reserveMint),
-				depositStart: depositStart,
-				depositEnd: depositEnd,
-				settleStart: settleStart,
+				depositStart,
+				depositEnd,
+				settleStart,
 				seniorDepositAmount,
 				juniorDepositAmount,
 				rateOption: {
 					ratePluginType,
 					rateAccounts
 				},
-				redeemLogicOption: {
-					redeemLogicPluginType,
-					isLinear: true,
-					notional,
-					strike
-				},
-				saveOnDatabase: saveOnDatabase,
-				sendNotification: sendNotification
+				redeemLogicOption,
+				saveOnDatabase,
+				sendNotification
 			};
 
 			// create contract
@@ -346,7 +368,17 @@ const CreateContractPage = () => {
 
 				<Pane display="flex" alignItems="center">
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
-					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
+					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward') && (
+						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
+					)}
+					{redeemLogicPluginType === 'digital' && (
+						<FormGroup>
+							<FormControlLabel
+								control={<Switch defaultChecked checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />}
+								label={isCall ? 'Call' : 'Put'}
+							/>
+						</FormGroup>
+					)}
 				</Pane>
 
 				<hr />

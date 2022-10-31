@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 /* eslint-disable camelcase */
 /* eslint-disable indent */
 import { AnchorProvider, Program, utils } from '@project-serum/anchor';
 import { createAssociatedTokenAccountInstruction, createMintToInstruction, getAssociatedTokenAddress, getMint } from '@solana/spl-token';
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getClusterEndpoint, getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
@@ -188,45 +189,72 @@ const postDeposit = async (request, response) => {
 };
 
 const postAirdrop = async (request, response) => {
-	const connection = new Connection(getClusterEndpoint(getCurrentCluster()), {});
+	try {
+		const connection = new Connection(clusterApiUrl('devnet'), {
+			commitment: 'processed'
+		});
+		const latestBlockhash = await connection.getLatestBlockhash();
 
-	// Account provided in the transaction request body by the wallet.
-	const accountField = request.body?.account;
-	if (!accountField) throw new Error('missing account');
-	const sender = new PublicKey(accountField);
+		// Account provided in the transaction request body by the wallet.
+		const accountField = request.body?.account;
+		if (!accountField) throw new Error('missing account');
+		const sender = new PublicKey(accountField);
 
-	const parsedTokenAmount = parseInt(request.query?.amount ?? '1000');
+		const senderAccountInfo = await connection.getAccountInfo(sender);
+		if (!senderAccountInfo || senderAccountInfo.lamports === 0) {
+			// * * * * * * * * * * * * * * * * * * *
+			// SOL airdrop
 
-	const authorityKP = [
-		97, 173, 71, 224, 183, 153, 116, 246, 214, 228, 103, 35, 150, 201, 47, 94, 189, 188, 146, 154, 122, 185, 236, 234, 116, 56, 97, 161, 117, 170, 218, 71, 8,
-		23, 208, 253, 42, 86, 175, 160, 169, 41, 79, 58, 62, 182, 52, 28, 17, 230, 248, 89, 141, 182, 93, 198, 192, 164, 68, 171, 156, 88, 150, 28
-	];
-	const mintAddress = new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W');
-	const mintInfo = await getMint(connection, mintAddress);
-	const airdropAmount = parsedTokenAmount * 10 ** mintInfo.decimals;
+			const solAirdropAmount = LAMPORTS_PER_SOL;
+			console.log(`requesting airdrop for ${sender} for ${solAirdropAmount / LAMPORTS_PER_SOL} SOL`);
+			const solAirdropSig = await connection.requestAirdrop(sender, solAirdropAmount);
+			console.log('sol airdrop sig: ', solAirdropSig);
+			await connection.confirmTransaction({
+				signature: solAirdropSig,
+				blockhash: latestBlockhash.blockhash,
+				lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+			});
+		}
 
-	const tx = new Transaction();
-	tx.recentBlockhash = (await connection.getLatestBlockhash('single')).blockhash;
-	tx.feePayer = sender;
+		// * * * * * * * * * * * * * * * * * * *
+		// Tokens airdrop
 
-	const atokenAccount = await getAssociatedTokenAddress(new PublicKey(mintAddress), sender);
-	const exists = await accountExists(connection, atokenAccount);
-	if (!exists) {
-		tx.add(createAssociatedTokenAccountInstruction(sender, atokenAccount, sender, mintAddress));
+		const parsedTokenAmount = parseInt(request.query?.amount ?? '1000');
+
+		const authorityKP = [
+			97, 173, 71, 224, 183, 153, 116, 246, 214, 228, 103, 35, 150, 201, 47, 94, 189, 188, 146, 154, 122, 185, 236, 234, 116, 56, 97, 161, 117, 170, 218, 71, 8,
+			23, 208, 253, 42, 86, 175, 160, 169, 41, 79, 58, 62, 182, 52, 28, 17, 230, 248, 89, 141, 182, 93, 198, 192, 164, 68, 171, 156, 88, 150, 28
+		];
+		const mintAddress = new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W');
+		const mintInfo = await getMint(connection, mintAddress);
+		const airdropAmount = parsedTokenAmount * 10 ** mintInfo.decimals;
+
+		const tx = new Transaction();
+		tx.recentBlockhash = latestBlockhash.blockhash;
+		tx.feePayer = sender;
+
+		const atokenAccount = await getAssociatedTokenAddress(new PublicKey(mintAddress), sender);
+		const exists = await accountExists(connection, atokenAccount);
+		if (!exists) {
+			tx.add(createAssociatedTokenAccountInstruction(sender, atokenAccount, sender, mintAddress));
+		}
+
+		const mintAuthority = Keypair.fromSecretKey(new Uint8Array(authorityKP));
+		tx.add(createMintToInstruction(new PublicKey(mintAddress), atokenAccount, mintAuthority.publicKey, airdropAmount));
+		tx.partialSign(mintAuthority);
+
+		// Serialize and return the unsigned transaction.
+		const serializedTransaction = tx.serialize({
+			verifySignatures: false,
+			requireAllSignatures: false
+		});
+
+		const base64Transaction = serializedTransaction.toString('base64');
+		const message = 'Thank you for using Vyper OTC';
+
+		response.status(200).send({ transaction: base64Transaction, message });
+	} catch (err) {
+		console.error(err);
+		response.status(500).send(err);
 	}
-
-	const mintAuthority = Keypair.fromSecretKey(new Uint8Array(authorityKP));
-	tx.add(createMintToInstruction(new PublicKey(mintAddress), atokenAccount, mintAuthority.publicKey, airdropAmount));
-	tx.partialSign(mintAuthority);
-
-	// Serialize and return the unsigned transaction.
-	const serializedTransaction = tx.serialize({
-		verifySignatures: false,
-		requireAllSignatures: false
-	});
-
-	const base64Transaction = serializedTransaction.toString('base64');
-	const message = 'Thank you for using Vyper OTC';
-
-	response.status(200).send({ transaction: base64Transaction, message });
 };
