@@ -4,7 +4,7 @@
 import { AnchorProvider, Program, utils } from '@project-serum/anchor';
 import { createAssociatedTokenAccountInstruction, createMintToInstruction, getAssociatedTokenAddress, getMint } from '@solana/spl-token';
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-import { getClusterEndpoint, getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
@@ -64,7 +64,7 @@ const post = async (request, response) => {
 };
 
 const postDeposit = async (request, response) => {
-	const connection = new Connection(getClusterEndpoint(getCurrentCluster()), {});
+	const connection = new Connection(clusterApiUrl(getCurrentCluster()), {});
 
 	// Account provided in the transaction request body by the wallet.
 	const accountField = request.body?.account;

@@ -15,7 +15,7 @@ import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
@@ -210,10 +210,8 @@ const CreateContractPage = () => {
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
 
 	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>('pyth');
-	const availableRatePluginTypes: RatePluginTypeIds[] = ['switchboard', 'pyth'];
 
 	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
-	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward', 'digital'];
 
 	const [switchboardAggregator_1, setSwitchboardAggregator_1] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
 	const [switchboardAggregator_2, setSwitchboardAggregator_2] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
@@ -291,7 +289,16 @@ const CreateContractPage = () => {
 					strike,
 					isCall
 				};
+			} else if (redeemLogicPluginType === 'vanilla_option') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					strike,
+					notional,
+					isCall,
+					isLinear: true
+				};
 			} else {
+				throw Error('redeem logic plugin not supported: ' + redeemLogicPluginType);
 			}
 
 			const initParams: OtcInitializationParams = {
@@ -343,7 +350,7 @@ const CreateContractPage = () => {
 				<hr />
 				<b>Rate Plugin</b>
 
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={availableRatePluginTypes} onChange={setRatePluginType} margin={12} />
+				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
 
 				{ratePluginType === 'switchboard' && (
 					<>
@@ -364,14 +371,20 @@ const CreateContractPage = () => {
 
 				<b>Redeem Logic</b>
 
-				<Combobox width="100%" initialSelectedItem={redeemLogicPluginType} items={availableRedeemPluginTypes} onChange={setRedeemLogicPluginType} margin={12} />
+				<Combobox
+					width="100%"
+					initialSelectedItem={redeemLogicPluginType}
+					items={AVAILABLE_REDEEM_LOGIC_PLUGINS as any}
+					onChange={setRedeemLogicPluginType}
+					margin={12}
+				/>
 
 				<Pane display="flex" alignItems="center">
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
-					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward') && (
+					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward' || redeemLogicPluginType === 'vanilla_option') && (
 						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
 					)}
-					{redeemLogicPluginType === 'digital' && (
+					{(redeemLogicPluginType === 'digital' || redeemLogicPluginType === 'vanilla_option') && (
 						<FormGroup>
 							<FormControlLabel
 								control={<Switch defaultChecked checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />}

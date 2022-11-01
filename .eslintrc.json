@@ -35,7 +35,7 @@
 		"dot-location": [2, "property"],
 		"css-modules/no-unused-class": 1,
 		"handle-callback-err": 1,
-		"indent": [2, "tab"],
+		"indent": [1, "tab"],
 		"no-tabs": [0],
 		"no-lone-blocks": ["warn"],
 		"max-nested-callbacks": [

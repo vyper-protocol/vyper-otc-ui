@@ -14,11 +14,12 @@ import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsP
 import { Badge } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
+import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
+import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -49,9 +50,9 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Instrument',
 			sortable: false,
 			filterable: true,
-			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS,
 			flex: 1,
 			minWidth: 150,
+			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS as any,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
 			valueGetter: (params) => {
 				return params.row.redeemLogicState.typeId;
@@ -74,15 +75,18 @@ const ExplorerContractDataGrid = () => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				if (params.row.redeemLogicState.typeId === 'forward') {
-					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
-				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
-					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
-				} else if (params.row.redeemLogicState.typeId === 'digital') {
-					// TODO: find common columns
-					return '-';
-				} else {
-					return '-';
+				switch (params.row.redeemLogicState.typeId as RedeemLogicPluginTypeIds) {
+					case 'forward':
+						return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
+					case 'settled_forward':
+						return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
+					case 'digital':
+						// TODO: find common columns
+						return '-';
+					case 'vanilla_option':
+						return (params.row.redeemLogicState as RedeemLogicVanillaOptionPlugin).notional;
+					default:
+						return '-';
 				}
 			}
 		},
@@ -93,14 +97,17 @@ const ExplorerContractDataGrid = () => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				if (params.row.redeemLogicState.typeId === 'forward') {
-					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
-				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
-					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
-				} else if (params.row.redeemLogicState.typeId === 'digital') {
-					return (params.row.redeemLogicState as RedeemLogicDigitalPlugin).strike;
-				} else {
-					return '-';
+				switch (params.row.redeemLogicState.typeId as RedeemLogicPluginTypeIds) {
+					case 'forward':
+						return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
+					case 'settled_forward':
+						return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
+					case 'digital':
+						return (params.row.redeemLogicState as RedeemLogicDigitalPlugin).strike;
+					case 'vanilla_option':
+						return (params.row.redeemLogicState as RedeemLogicVanillaOptionPlugin).strike;
+					default:
+						return '-';
 				}
 			}
 		},
