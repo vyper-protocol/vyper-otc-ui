@@ -21,8 +21,8 @@ export const selectContracts = async (params: FetchContractsParams): Promise<DbO
 	params.eq.forEach((f) => query.eq(f.column, f.value));
 
 	// filter for fetching only supported plugins in the UI
-	query.in('redeem_logic_plugin_type', AVAILABLE_REDEEM_LOGIC_PLUGINS);
-	query.in('rate_plugin_type', AVAILABLE_RATE_PLUGINS);
+	query.in('redeem_logic_plugin_type', AVAILABLE_REDEEM_LOGIC_PLUGINS as any);
+	query.in('rate_plugin_type', AVAILABLE_RATE_PLUGINS as any);
 
 	const res = await query;
 

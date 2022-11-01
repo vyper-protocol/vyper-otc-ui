@@ -7,6 +7,8 @@ import RateSwitchboardPlugin from './plugins/rate/RateSwitchboardPlugin';
 import { RedeemLogicForwardPlugin } from './plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from './plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicDigitalPlugin } from './plugins/redeemLogic/RedeemLogicDigitalPlugin';
+import { RedeemLogicVanillaOptionPlugin } from './plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
+import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from './plugins/AbsPlugin';
 
 export class DbOtcState extends AbsOtcState {
 	cluster: Cluster;
@@ -21,7 +23,9 @@ export class DbOtcState extends AbsOtcState {
 		res.buyerDepositAmount = data.buyer_deposit_amount;
 		res.sellerDepositAmount = data.seller_deposit_amount;
 
-		if (data.redeem_logic_plugin_type === 'forward') {
+		const redeemLogicPluginType: RedeemLogicPluginTypeIds = data.redeem_logic_plugin_type;
+
+		if (redeemLogicPluginType === 'forward') {
 			res.redeemLogicState = new RedeemLogicForwardPlugin(
 				new PublicKey(data.redeem_logic_plugin_program_pubkey),
 				new PublicKey(data.redeem_logic_plugin_state_pubkey),
@@ -29,7 +33,7 @@ export class DbOtcState extends AbsOtcState {
 				data.redeem_logic_plugin_data.isLinear,
 				data.redeem_logic_plugin_data.notional
 			);
-		} else if (data.redeem_logic_plugin_type === 'settled_forward') {
+		} else if (redeemLogicPluginType === 'settled_forward') {
 			res.redeemLogicState = new RedeemLogicSettledForwardPlugin(
 				new PublicKey(data.redeem_logic_plugin_program_pubkey),
 				new PublicKey(data.redeem_logic_plugin_state_pubkey),
@@ -38,18 +42,29 @@ export class DbOtcState extends AbsOtcState {
 				data.redeem_logic_plugin_data.notional,
 				data.redeem_logic_plugin_data.isStandard
 			);
-		} else if (data.redeem_logic_plugin_type === 'digital') {
+		} else if (redeemLogicPluginType === 'digital') {
 			res.redeemLogicState = new RedeemLogicDigitalPlugin(
 				new PublicKey(data.redeem_logic_plugin_program_pubkey),
 				new PublicKey(data.redeem_logic_plugin_state_pubkey),
 				data.redeem_logic_plugin_data.strike,
 				data.redeem_logic_plugin_data.isCall
 			);
+		} else if (redeemLogicPluginType === 'vanilla_option') {
+			res.redeemLogicState = new RedeemLogicVanillaOptionPlugin(
+				new PublicKey(data.redeem_logic_plugin_program_pubkey),
+				new PublicKey(data.redeem_logic_plugin_state_pubkey),
+				data.redeem_logic_plugin_data.strike,
+				data.redeem_logic_plugin_data.notional,
+				data.redeem_logic_plugin_data.isCall,
+				data.redeem_logic_plugin_data.isLinear
+			);
 		} else {
-			throw Error('reedem logic plugin not supported: ' + data.redeem_logic_plugin_type);
+			throw Error('reedem logic plugin not supported: ' + redeemLogicPluginType);
 		}
 
-		if (data.rate_plugin_type === 'switchboard') {
+		const ratePluginType: RatePluginTypeIds = data.rate_plugin_type;
+
+		if (ratePluginType === 'switchboard') {
 			if (data.rate_plugin_data.switchboardAggregator) {
 				res.rateState = new RateSwitchboardPlugin(new PublicKey(data.rate_plugin_program_pubkey), new PublicKey(data.rate_plugin_state_pubkey), [
 					new PublicKey(data.rate_plugin_data.switchboardAggregator)
@@ -61,7 +76,7 @@ export class DbOtcState extends AbsOtcState {
 					data.rate_plugin_data.oracles.map((c) => new PublicKey(c))
 				);
 			}
-		} else if (data.rate_plugin_type === 'pyth') {
+		} else if (ratePluginType === 'pyth') {
 			if (data.rate_plugin_data.pythProduct) {
 				res.rateState = new RatePythPlugin(new PublicKey(data.rate_plugin_program_pubkey), new PublicKey(data.rate_plugin_state_pubkey), [
 					new PublicKey(data.rate_plugin_data.pythProduct)
@@ -74,7 +89,7 @@ export class DbOtcState extends AbsOtcState {
 				);
 			}
 		} else {
-			throw Error('rate plugin not supported: ' + data.rate_plugin_type);
+			throw Error('rate plugin not supported: ' + ratePluginType);
 		}
 
 		res.createdAt = new Date(data.create_at).getTime();
