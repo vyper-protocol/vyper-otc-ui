@@ -1,7 +1,7 @@
 [
 	{
 		"cluster": "devnet",
-		"rpcEndpoint": "https://responsive-few-shard.solana-devnet.quiknode.pro/df16ce666799f93981533706a246e5f76e27db04/",
+		"rpcEndpoint": "https://api.devnet.solana.com",
 		"wssEndpoint": "wss://responsive-few-shard.solana-devnet.quiknode.pro/df16ce666799f93981533706a246e5f76e27db04/"
 	},
 	{

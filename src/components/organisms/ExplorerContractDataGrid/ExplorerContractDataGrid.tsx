@@ -72,6 +72,7 @@ const ExplorerContractDataGrid = () => {
 			field: 'redeemLogicState.notional',
 			headerName: 'Size',
 			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
 				if (params.row.redeemLogicState.typeId === 'forward') {
 					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
@@ -90,6 +91,7 @@ const ExplorerContractDataGrid = () => {
 			field: 'redeemLogicState.strike',
 			headerName: 'Strike',
 			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
 				if (params.row.redeemLogicState.typeId === 'forward') {
 					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
@@ -119,7 +121,8 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			sortable: true,
 			filterable: true,
-			flex: 1
+			flex: 1,
+			minWidth: 100
 		},
 		{
 			type: 'boolean',
@@ -128,6 +131,7 @@ const ExplorerContractDataGrid = () => {
 			sortable: true,
 			filterable: true,
 			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
 				return params.row.isBuyerFunded();
 			}
@@ -139,6 +143,7 @@ const ExplorerContractDataGrid = () => {
 			sortable: true,
 			filterable: true,
 			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
 				return params.row.isSellerFunded();
 			}
@@ -149,6 +154,7 @@ const ExplorerContractDataGrid = () => {
 			sortable: true,
 			filterable: true,
 			flex: 1,
+			minWidth: 50,
 			renderCell: (params) => {
 				if (!params.row.buyerWallet) return <></>;
 				return <PublicKeyLink address={params.row.buyerWallet?.toBase58()} />;
@@ -160,6 +166,7 @@ const ExplorerContractDataGrid = () => {
 			sortable: true,
 			filterable: true,
 			flex: 1,
+			minWidth: 50,
 			renderCell: (params) => {
 				if (!params.row.sellerWallet) return <></>;
 				return <PublicKeyLink address={params.row.sellerWallet?.toBase58()} />;
@@ -171,6 +178,7 @@ const ExplorerContractDataGrid = () => {
 			sortable: true,
 			filterable: true,
 			flex: 1,
+			minWidth: 100,
 			renderCell: (params) => {
 				return <ContractStatusBadge status={params.row.getContractStatus()} />;
 			}
