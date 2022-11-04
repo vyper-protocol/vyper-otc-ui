@@ -72,7 +72,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		return () => {
 			connection.removeAccountChangeListener(subscriptionId);
 		};
-	});
+	}, []);
 
 	const onDepositClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		if (e.altKey) {

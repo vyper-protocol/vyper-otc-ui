@@ -70,7 +70,7 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 		return () => {
 			subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
 		};
-	});
+	}, []);
 
 	return { pricesValue, isInitialized };
 };
