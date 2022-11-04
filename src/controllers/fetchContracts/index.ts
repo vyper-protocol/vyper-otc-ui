@@ -5,6 +5,8 @@ import { unpackAccount, unpackMint } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectContracts';
+import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
@@ -106,7 +108,10 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 			// * * * * * * * * * * * * * * * * * * * * * * *
 			// SWITCHBOARD
 
-			await (r.rateState as RateSwitchboardPlugin).loadData(connection);
+			const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
+			(r.rateState as RateSwitchboardPlugin).aggregatorsData = (r.rateState as RateSwitchboardPlugin).oracles.map((c) =>
+				switchboardProgram.coder.accounts.decode('AggregatorAccountData', firstFetch_accountsData.find((cc) => c.equals(cc.pubkey)).data.data)
+			);
 		} else if (r.rateState.typeId === 'pyth') {
 			// * * * * * * * * * * * * * * * * * * * * * * *
 			// PYTH

@@ -1,4 +1,5 @@
 import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHttpClient } from '@pythnetwork/client';
+import { PythHttpClientResult } from '@pythnetwork/client/lib/PythHttpClient';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 
@@ -6,6 +7,7 @@ import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
 
 export class RatePythPlugin extends AbsRatePlugin {
+	static pythData: PythHttpClientResult = undefined;
 	pythProducts: Product[];
 	pythPricesData: PriceData[];
 
@@ -51,12 +53,14 @@ export class RatePythPlugin extends AbsRatePlugin {
 	}
 
 	static async GetProductPrice(connection: Connection, cluster: Cluster, pythPrice: PublicKey): Promise<[Product, PriceData]> {
-		const pythClient = new PythHttpClient(connection, getPythProgramKeyForCluster(cluster));
-		const pythData = await pythClient.getData();
+		if (!RatePythPlugin.pythData) {
+			const pythClient = new PythHttpClient(connection, getPythProgramKeyForCluster(cluster));
+			RatePythPlugin.pythData = await pythClient.getData();
+		}
 
-		const pythProduct = pythData.products.find((c) => c.price_account === pythPrice.toBase58());
+		const pythProduct = RatePythPlugin.pythData.products.find((c) => c.price_account === pythPrice.toBase58());
 		if (pythProduct) {
-			const pythPriceData = pythData.productPrice.get(pythProduct.symbol);
+			const pythPriceData = RatePythPlugin.pythData.productPrice.get(pythProduct.symbol);
 			return [pythProduct, pythPriceData];
 		} else {
 			return [undefined, undefined];
