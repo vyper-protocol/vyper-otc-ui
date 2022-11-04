@@ -15,6 +15,9 @@ const ICONS_MAP = {
 export type AvailableIconNames = keyof typeof ICONS_MAP;
 
 type Props = {
+	/**
+	 * Name of the icon
+	 */
 	name: AvailableIconNames;
 } & IconBaseProps;
 
