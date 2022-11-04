@@ -3,6 +3,7 @@
 import 'styles/base.css';
 import { useMemo } from 'react';
 
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { WalletProvider } from '@solana/wallet-adapter-react';
@@ -16,7 +17,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { toast, ToastContainer } from 'react-toastify';
-import { createTheme, ThemeProvider } from '@mui/system';
 
 // react-toastify css
 require('react-toastify/dist/ReactToastify.min.css');
@@ -28,24 +28,7 @@ export const queryClient = new QueryClient();
 
 const theme = createTheme({
 	typography: {
-		fontFamily: [
-			'ui-sans-serif',
-			'system-ui',
-			'-apple-system',
-			'BlinkMacSystemFont',
-			'Segoe UI',
-			'Roboto',
-			'Helvetica Neue',
-			'Arial',
-			'Noto Sans',
-			'sans-serif'
-		]
-	},
-	palette: {
-		neutral: {
-			main: '#64748B',
-			contrastText: '#fff'
-		}
+		fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif'
 	}
 });
 
