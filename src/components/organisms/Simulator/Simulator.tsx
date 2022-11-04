@@ -54,31 +54,37 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				{rateStateQuery?.data?.redeemLogicState.pluginDetails.map((detail, index) => (
 					<div key={detail.label} className={cn(styles.flex, index % 2 && styles.row)}>
 						<p className={styles.bold}>{detail.label}</p>
-						<p className={styles.bold}>{formatWithDecimalDigits(detail.value)}</p>
+						<p className={styles.bold}>{typeof detail.value === 'number' ? formatWithDecimalDigits(detail.value) : detail.value}</p>
 					</div>
 				))}
 			</div>
 
-			{rateStateQuery?.data?.isPnlAvailable() && (
-				<div className={cn(styles.flex, styles.margin)}>
-					<div className={styles.center}>
-						Long
-						<br />
-						<Badge color={buyerColor}>
-							{buyerPnl} {tokenSymbol}
-						</Badge>
-					</div>
-					<div className={styles.center}>
-						Short
-						<br />
-						<Badge color={sellerColor}>
-							{sellerPnl} {tokenSymbol}
-						</Badge>
-					</div>
+			<div className={cn(styles.flex, styles.margin)}>
+				<div className={styles.center}>
+					Long
+					<br />
+					<Badge color={buyerColor}>
+						{buyerPnl} {tokenSymbol}
+					</Badge>
 				</div>
-			)}
+				<div className={styles.center}>
+					Short
+					<br />
+					<Badge color={sellerColor}>
+						{sellerPnl} {tokenSymbol}
+					</Badge>
+				</div>
+			</div>
 
-			<p className={styles.note}>*That is your simulated P/L for both sides, if the price gets to {prices}</p>
+			<p className={styles.note}>
+				This is the simulated PnL if{' '}
+				{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.map((c, i) => (
+					<span key={i}>
+						{c.toLowerCase()} gets to {prices[i]}
+						{i === rateStateQuery?.data.redeemLogicState.settlementPricesDescription.length - 1 ? '' : ', '}
+					</span>
+				))}
+			</p>
 		</div>
 	);
 };

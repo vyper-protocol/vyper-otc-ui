@@ -7,9 +7,12 @@ import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
+import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
+import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { TxPackage } from 'models/TxPackage';
+import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 
 import PROGRAMS from '../../configs/programs.json';
 
@@ -27,8 +30,9 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  rate plugin init
 	let rateProgramPublicKey: PublicKey = undefined;
 	const ratePluginState = Keypair.generate();
+	const ratePluginType = params.rateOption.ratePluginType as RatePluginTypeIds;
 
-	if (params.rateOption.ratePluginType === 'switchboard') {
+	if (ratePluginType === 'switchboard') {
 		const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
 		const rateSwitchboardInitIX = await rateSwitchboardProgram.methods
 			.initialize()
@@ -44,9 +48,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			.instruction();
 		vyperCoreInitTx.add(rateSwitchboardInitIX);
 		rateProgramPublicKey = rateSwitchboardProgram.programId;
-	}
-
-	if (params.rateOption.ratePluginType === 'pyth') {
+	} else if (ratePluginType === 'pyth') {
 		const ratePythProgram = new Program<RatePyth>(RatePythIDL, new PublicKey(PROGRAMS.RATE_PYTH_PROGRAM_ID), provider);
 
 		const ratePythInitIX = await ratePythProgram.methods
@@ -63,13 +65,16 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			.instruction();
 		vyperCoreInitTx.add(ratePythInitIX);
 		rateProgramPublicKey = ratePythProgram.programId;
+	} else {
+		throw Error('rate plugin not supported: ' + ratePluginType);
 	}
 
-	//  rate plugin init
+	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
+	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RedeemLogicPluginTypeIds;
 
-	if (params.redeemLogicOption.redeemLogicPluginType === 'forward') {
+	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
@@ -88,9 +93,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		vyperCoreInitTx.add(redeemLogicInixIX);
 		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
-	}
-
-	if (params.redeemLogicOption.redeemLogicPluginType === 'settled_forward') {
+	} else if (redeemLogicPluginType === 'settled_forward') {
 		const redeemLogicProgram = new Program<RedeemLogicSettledForward>(RedeemLogicSettledForwardIDL, PROGRAMS.REDEEM_LOGIC_SETTLED_FORWARD_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
@@ -98,7 +101,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 				params.redeemLogicOption.strike,
 				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
 				params.redeemLogicOption.isLinear,
-				false
+				params.redeemLogicOption.isStandard
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -110,6 +113,42 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		vyperCoreInitTx.add(redeemLogicInixIX);
 		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
+	} else if (redeemLogicPluginType === 'digital') {
+		const redeemLogicProgram = new Program<RedeemLogicDigital>(RedeemLogicDigitalIDL, PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID, provider);
+
+		const redeemLogicInixIX = await redeemLogicProgram.methods
+			.initialize(params.redeemLogicOption.strike, params.redeemLogicOption.isCall)
+			.accounts({
+				redeemLogicConfig: redeemLogicPluginState.publicKey,
+				owner: provider.wallet.publicKey,
+				payer: provider.wallet.publicKey
+			})
+			.signers([redeemLogicPluginState])
+			.instruction();
+
+		vyperCoreInitTx.add(redeemLogicInixIX);
+		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
+	} else if (redeemLogicPluginType === 'vanilla_option') {
+		const redeemLogicProgram = new Program<RedeemLogicVanillaOption>(RedeemLogicVanillaOptionIDL, PROGRAMS.REDEEM_LOGIC_VANILLA_OPTION_PROGRAM_ID, provider);
+
+		const redeemLogicInixIX = await redeemLogicProgram.methods
+			.initialize(
+				params.redeemLogicOption.strike,
+				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
+				params.redeemLogicOption.isCall,
+				params.redeemLogicOption.isLinear
+			)
+			.accounts({
+				redeemLogicConfig: redeemLogicPluginState.publicKey,
+				payer: provider.wallet.publicKey
+			})
+			.signers([redeemLogicPluginState])
+			.instruction();
+
+		vyperCoreInitTx.add(redeemLogicInixIX);
+		redeemLogicProgramPublicKey = redeemLogicProgram.programId;
+	} else {
+		throw Error('redeem logic plugin not supported: ' + redeemLogicPluginType);
 	}
 
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(

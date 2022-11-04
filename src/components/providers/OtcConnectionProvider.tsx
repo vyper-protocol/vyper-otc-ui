@@ -2,16 +2,25 @@ import { ConnectionProvider } from '@solana/wallet-adapter-react';
 import { Cluster } from '@solana/web3.js';
 import ENDPOINTS from 'configs/endpoints.json';
 
-export function getClusterEndpoint(cluster: Cluster): string {
+type ConfiguredEndpoint = {
+	cluster: string;
+	env: string;
+	rpcEndpoint: string;
+	wssEndpoint: string;
+};
+
+function getConfiguredEndpoint(cluster: Cluster): ConfiguredEndpoint {
 	return ENDPOINTS.find((c) => {
-		return c.cluster === cluster;
-	}).rpcEndpoint;
+		return c.cluster === cluster && c.env === process.env.NODE_ENV;
+	});
+}
+
+export function getClusterEndpoint(cluster: Cluster): string {
+	return getConfiguredEndpoint(cluster).rpcEndpoint;
 }
 
 export function getWssClusterEndpoint(cluster: Cluster): string {
-	return ENDPOINTS.find((c) => {
-		return c.cluster === cluster;
-	}).wssEndpoint;
+	return getConfiguredEndpoint(cluster).wssEndpoint;
 }
 
 export function getCurrentCluster(): Cluster {

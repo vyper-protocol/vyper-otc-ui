@@ -36,7 +36,7 @@ const Home = () => {
 				</div>
 				<div className={cn(styles.text_wrapper, styles.title)}>
 					<h2>VYPER OTC</h2>
-					<p>Trade the untradable with permissionless derivatives</p>
+					<p>Permissionless derivatives</p>
 				</div>
 			</Layout>
 		</>
