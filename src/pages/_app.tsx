@@ -16,6 +16,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { toast, ToastContainer } from 'react-toastify';
+import { createTheme, ThemeProvider } from '@mui/system';
 
 // react-toastify css
 require('react-toastify/dist/ReactToastify.min.css');
@@ -24,6 +25,29 @@ require('react-toastify/dist/ReactToastify.min.css');
 require('@solana/wallet-adapter-react-ui/styles.css');
 
 export const queryClient = new QueryClient();
+
+const theme = createTheme({
+	typography: {
+		fontFamily: [
+			'ui-sans-serif',
+			'system-ui',
+			'-apple-system',
+			'BlinkMacSystemFont',
+			'Segoe UI',
+			'Roboto',
+			'Helvetica Neue',
+			'Arial',
+			'Noto Sans',
+			'sans-serif'
+		]
+	},
+	palette: {
+		neutral: {
+			main: '#64748B',
+			contrastText: '#fff'
+		}
+	}
+});
 
 const Application = ({ Component, pageProps }) => {
 	const wallets = useMemo(() => {
@@ -48,7 +72,9 @@ const Application = ({ Component, pageProps }) => {
 							<WalletModalProvider>
 								<TxHandlerProvider>
 									<ErrorBoundary FallbackComponent={ApplicationError}>
-										<Component {...pageProps} />
+										<ThemeProvider theme={theme}>
+											<Component {...pageProps} />
+										</ThemeProvider>
 									</ErrorBoundary>
 								</TxHandlerProvider>
 							</WalletModalProvider>
