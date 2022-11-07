@@ -1,4 +1,4 @@
-import { Badge } from 'evergreen-ui';
+import { Badge } from '@mui/material';
 import { ContractStatusIds } from 'models/ChainOtcState';
 
 type ContractStatusBadgeInput = {
@@ -7,10 +7,10 @@ type ContractStatusBadgeInput = {
 
 const ContractStatusBadge = ({ status }: ContractStatusBadgeInput) => {
 	const getColorFromStatus = (s: ContractStatusIds) => {
-		if (s === 'active') return 'green';
-		if (s === 'expired') return 'red';
+		if (s === 'active') return 'success';
+		if (s === 'expired') return 'error';
 
-		return 'red';
+		return 'error';
 	};
 
 	const getLabelFromStatus = (s: ContractStatusIds) => {
@@ -21,9 +21,7 @@ const ContractStatusBadge = ({ status }: ContractStatusBadgeInput) => {
 	};
 
 	return (
-		<Badge color={getColorFromStatus(status)} margin={6}>
-			{getLabelFromStatus(status)}
-		</Badge>
+		<Badge badgeContent={getLabelFromStatus(status)} color={getColorFromStatus(status)} />
 	);
 };
 
