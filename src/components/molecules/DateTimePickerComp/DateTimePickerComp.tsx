@@ -32,7 +32,7 @@ const DateTimePickerComp = ({ title, value, onChange }: DateTimePickerCompInput)
 	];
 
 	return (
-		<Box sx={{ marginY:6, marginX:1}}>
+		<Box sx={{ marginY:6, marginX:1 }}>
 			<DateTimePicker
 				renderInput={(props) => <TextField {...props} helperText={moment(value).fromNow()} />}
 				label={title}
