@@ -13,3 +13,7 @@ export const buildCreateContractUrl = (): string => {
 export const buildExplorerUrl = (): string => {
 	return '/explorer';
 };
+
+export function buildDepositQRCodeUrl(contract: string, isBuyer: boolean): string {
+	return `/qr?op=deposit&contract=${contract}&isBuyer=${isBuyer}`;
+}

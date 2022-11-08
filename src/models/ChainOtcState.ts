@@ -6,6 +6,8 @@ import { PublicKey } from '@solana/web3.js';
 import { AbsOtcState } from './AbsOtcState';
 import { TokenInfo } from './TokenInfo';
 
+export type ContractStatusIds = 'active' | 'expired';
+
 export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Reserve mint info
@@ -25,17 +27,27 @@ export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Price at settlement
 	 */
-	priceAtSettlement: number | undefined;
+	pricesAtSettlement: number[] | undefined;
 
 	/**
-	 * OTC program token account for buyer tokens
+	 * OTC program token amount for buyer tokens
 	 */
 	programBuyerTAAmount: number;
 
 	/**
-	 * OTC program token account for seller tokens
+	 * OTC program token account for buyer tokens
+	 */
+	programBuyerTA: PublicKey;
+
+	/**
+	 * OTC program token amount for seller tokens
 	 */
 	programSellerTAAmount: number;
+
+	/**
+	 * OTC program token account for seller tokens
+	 */
+	programSellerTA: PublicKey;
 
 	/**
 	 * Buyer wallet
@@ -58,7 +70,7 @@ export class ChainOtcState extends AbsOtcState {
 	sellerTA: undefined | PublicKey;
 
 	getContractTitle(): string {
-		return this.rateState.getPluginDescription();
+		return this.rateState.title;
 	}
 
 	isDepositExpired(): boolean {
@@ -88,7 +100,7 @@ export class ChainOtcState extends AbsOtcState {
 	}
 
 	isSettlementAvailable(): boolean {
-		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted;
+		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted && this.buyerWallet !== undefined && this.sellerWallet !== undefined;
 	}
 
 	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
@@ -119,9 +131,11 @@ export class ChainOtcState extends AbsOtcState {
 		);
 	}
 
-	getContractStatus(): 'active' | 'expired' {
-		if (Date.now() > this.settleAvailableFromAt) return 'expired';
-
+	getContractStatus(): ContractStatusIds {
+		const currentTime = Date.now();
+		if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
+			return 'expired';
+		}
 		return 'active';
 	}
 
@@ -129,15 +143,13 @@ export class ChainOtcState extends AbsOtcState {
 		return this.areBothSidesFunded();
 	}
 
-	getPnlBuyer(): number {
-		// Long Profit = max(min(leverage*(aggregator_value - strike), collateral_short), - collateral_long)
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
-		return Math.max(Math.min(this.redeemLogicState.notional * (priceToUse - this.redeemLogicState.strike), this.sellerDepositAmount), -this.buyerDepositAmount);
+	getPnlBuyer(prices: number[]): number {
+		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
+		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
 	}
 
-	getPnlSeller(): number {
-		// Short Profit = max(-collateral_short, min(collateral_long, leverage*(strike - aggregator_value)))
-		const priceToUse = this.settleExecuted ? this.priceAtSettlement : this.rateState.getPluginLastValue();
-		return Math.max(-this.sellerDepositAmount, Math.min(this.buyerDepositAmount, this.redeemLogicState.notional * (this.redeemLogicState.strike - priceToUse)));
+	getPnlSeller(prices: number[]): number {
+		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
+		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
 	}
 }

@@ -3,22 +3,25 @@
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getMint, getMultipleAccounts, unpackAccount, unpackMint } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
+import { fetchTokenInfo } from 'api/next-api/fetchTokenInfo';
 import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
-import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
-import { fetchTokenInfo } from 'api/tokens/fetchTokenInfo';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
+import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
+import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
+import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { DbOtcState } from 'models/DbOtcState';
-import { RatePythState } from 'models/plugins/rate/RatePythState';
-import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
+import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
+import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
+import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
+import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -70,7 +73,9 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.vyperCoreTrancheConfig = accountInfo.vyperTrancheConfig;
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
-	res.reserveTokenInfo = await fetchTokenInfo(connection, trancheConfigAccountInfo.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfo(trancheConfigAccountInfo.reserveMint);
+	res.programBuyerTA = accountInfo.otcSeniorReserveTokenAccount;
+	res.programSellerTA = accountInfo.otcJuniorReserveTokenAccount;
 
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
@@ -80,7 +85,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 	if (res.settleExecuted) {
 		// @ts-ignore
-		res.priceAtSettlement = new RustDecimalWrapper(new Uint8Array(trancheConfigAccountInfo.trancheData.reserveFairValue.value[0])).toNumber();
+		res.pricesAtSettlement = trancheConfigAccountInfo.trancheData.reserveFairValue.value.map((c) => new RustDecimalWrapper(new Uint8Array(c)).toNumber());
 	}
 
 	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
@@ -113,11 +118,16 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.sellerTA = accountInfo.juniorSideBeneficiary;
 	if (res.sellerTA) {
 		const taInfo = multipleAccountInfos.find((c) => c.pubkey.equals(accountInfo.juniorSideBeneficiary));
-		res.sellerTA = unpackAccount(taInfo.pubkey, taInfo.data).owner;
+		res.sellerWallet = unpackAccount(taInfo.pubkey, taInfo.data).owner;
 	}
 
-	// Rate plugin
+	// * * * * * * * * * * * * * * * * * * * * * * *
+	// RATE PLUGIN
+	// * * * * * * * * * * * * * * * * * * * * * * *
+
 	if (trancheConfigAccountInfo.rateProgram.equals(new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// SWITCHBOARD
 		try {
 			const rateSwitchboardProgram = new Program<RateSwitchboard>(
 				RateSwitchboardIDL,
@@ -127,10 +137,11 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.rateProgramState));
 			const rateStateAccountInfo = rateSwitchboardProgram.coder.accounts.decode<IdlAccounts<RateSwitchboard>['rateState']>('rateState', c.data.data);
-			const rateState = new RateSwitchboardState(
+			const rateState = new RateSwitchboardPlugin(
 				trancheConfigAccountInfo.rateProgram,
 				trancheConfigAccountInfo.rateProgramState,
-				rateStateAccountInfo.switchboardAggregators[0]
+				// @ts-ignore
+				rateStateAccountInfo.switchboardAggregators.filter((a) => a)
 			);
 
 			await rateState.loadData(connection);
@@ -138,9 +149,9 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 		} catch (err) {
 			console.error(err);
 		}
-	}
-
-	if (trancheConfigAccountInfo.rateProgram.equals(new PublicKey(PROGRAMS.RATE_PYTH_PROGRAM_ID))) {
+	} else if (trancheConfigAccountInfo.rateProgram.equals(new PublicKey(PROGRAMS.RATE_PYTH_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// PYTH
 		try {
 			const ratePythProgram = new Program<RatePyth>(
 				RatePythIDL,
@@ -150,42 +161,156 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.rateProgramState));
 			const rateStateAccountInfo = ratePythProgram.coder.accounts.decode<IdlAccounts<RatePyth>['rateState']>('rateState', c.data.data);
-			const rateState = new RatePythState(trancheConfigAccountInfo.rateProgram, trancheConfigAccountInfo.rateProgramState, rateStateAccountInfo.pythOracles[0]);
+			const rateState = new RatePythPlugin(
+				trancheConfigAccountInfo.rateProgram,
+				trancheConfigAccountInfo.rateProgramState,
+				// @ts-ignore
+				rateStateAccountInfo.pythOracles.filter((a) => a)
+			);
 			await rateState.loadData(connection);
 			res.rateState = rateState;
 		} catch (err) {
 			console.error(err);
 		}
+	} else {
+		throw Error('rate plugin not supported: ' + trancheConfigAccountInfo.rateProgram);
 	}
 
-	// Redeem logic plugin
-	try {
-		const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
-			RedeemLogicForwardIDL,
-			PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID,
-			new AnchorProvider(connection, undefined, {})
-		);
+	// * * * * * * * * * * * * * * * * * * * * * * *
+	// REDEEM LOGIC PLUGIN
+	// * * * * * * * * * * * * * * * * * * * * * * *
+	if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// FORWARD
 
-		const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+		try {
+			const redeemLogicForwardProgram = new Program<RedeemLogicForward>(
+				RedeemLogicForwardIDL,
+				trancheConfigAccountInfo.redeemLogicProgram,
+				new AnchorProvider(connection, undefined, {})
+			);
 
-		const redeemLogicAccountInfo = redeemLogicForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicForward>['redeemLogicConfig']>(
-			'redeemLogicConfig',
-			c.data.data
-		);
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
 
-		const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
-		const isLinear = redeemLogicAccountInfo.isLinear;
-		const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
-		const redeemLogicState = new RedeemLogicForwardState(
-			trancheConfigAccountInfo.redeemLogicProgram,
-			trancheConfigAccountInfo.redeemLogicProgramState,
-			strike,
-			isLinear,
-			notional
-		);
-		res.redeemLogicState = redeemLogicState;
-	} catch (err) {
-		console.error(err);
+			const redeemLogicAccountInfo = redeemLogicForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicForward>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
+
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const isLinear = redeemLogicAccountInfo.isLinear;
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const redeemLogicState = new RedeemLogicForwardPlugin(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				isLinear,
+				notional
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
+	} else if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_SETTLED_FORWARD_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// FORWARD SETTLED
+
+		try {
+			const redeemLogicSettledForwardProgram = new Program<RedeemLogicSettledForward>(
+				RedeemLogicSettledForwardIDL,
+				trancheConfigAccountInfo.redeemLogicProgram,
+				new AnchorProvider(connection, undefined, {})
+			);
+
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+
+			const redeemLogicAccountInfo = redeemLogicSettledForwardProgram.coder.accounts.decode<IdlAccounts<RedeemLogicSettledForward>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
+
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const isLinear = redeemLogicAccountInfo.isLinear;
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const isStandard = redeemLogicAccountInfo.isStandard;
+			const redeemLogicState = new RedeemLogicSettledForwardPlugin(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				isLinear,
+				notional,
+				isStandard
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
+	} else if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// DIGITAL
+
+		try {
+			const redeemLogicDigitalProgram = new Program<RedeemLogicDigital>(
+				RedeemLogicDigitalIDL,
+				trancheConfigAccountInfo.redeemLogicProgram,
+				new AnchorProvider(connection, undefined, {})
+			);
+
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+
+			const redeemLogicAccountInfo = redeemLogicDigitalProgram.coder.accounts.decode<IdlAccounts<RedeemLogicDigital>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
+
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const isCall = redeemLogicAccountInfo.isCall;
+			const redeemLogicState = new RedeemLogicDigitalPlugin(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				isCall
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
+	} else if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_VANILLA_OPTION_PROGRAM_ID))) {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// VANILLA OPTION
+
+		try {
+			const redeemLogicVanillaOptionProgram = new Program<RedeemLogicVanillaOption>(
+				RedeemLogicVanillaOptionIDL,
+				trancheConfigAccountInfo.redeemLogicProgram,
+				new AnchorProvider(connection, undefined, {})
+			);
+
+			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.redeemLogicProgramState));
+
+			const redeemLogicAccountInfo = redeemLogicVanillaOptionProgram.coder.accounts.decode<IdlAccounts<RedeemLogicVanillaOption>['redeemLogicConfig']>(
+				'redeemLogicConfig',
+				c.data.data
+			);
+
+			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const isCall = redeemLogicAccountInfo.isCall;
+			const isLinear = redeemLogicAccountInfo.isLinear;
+			const redeemLogicState = new RedeemLogicVanillaOptionPlugin(
+				trancheConfigAccountInfo.redeemLogicProgram,
+				trancheConfigAccountInfo.redeemLogicProgramState,
+				strike,
+				notional,
+				isCall,
+				isLinear
+			);
+			res.redeemLogicState = redeemLogicState;
+		} catch (err) {
+			console.error(err);
+		}
+	} else {
+		throw Error('redeem logic plugin not supported: ' + trancheConfigAccountInfo.redeemLogicProgram);
 	}
 
 	return res;
@@ -208,7 +333,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	res.redeemLogicState = data.redeemLogicState.clone();
 	res.rateState = data.rateState.clone();
-	res.reserveTokenInfo = await fetchTokenInfo(connection, res.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfo(res.reserveMint);
 
 	// first fetch
 
@@ -216,7 +341,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	firstFetch_pubkeys.push(data.publickey);
 	firstFetch_pubkeys.push(data.vyperCoreTrancheConfig);
 	firstFetch_pubkeys.push(data.reserveMint);
-	firstFetch_pubkeys.push(...data.rateState.getPublicKeysForRefresh());
+	firstFetch_pubkeys.push(...data.rateState.accountsRequiredForRefresh);
 
 	const firstFetch_accountsData = await getMultipleAccountsInfo(connection, firstFetch_pubkeys);
 
@@ -224,9 +349,12 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 		'otcState',
 		firstFetch_accountsData.find((c) => c.pubkey.equals(data.publickey)).data.data
 	);
+	res.programBuyerTA = currentOtcStateAccount.otcSeniorReserveTokenAccount;
+	res.programSellerTA = currentOtcStateAccount.otcJuniorReserveTokenAccount;
 
 	res.reserveMintInfo = unpackMint(res.reserveMint, firstFetch_accountsData.find((c) => c.pubkey.equals(res.reserveMint)).data);
 	res.settleExecuted = currentOtcStateAccount.settleExecuted;
+
 	if (res.settleExecuted) {
 		const currentTrancheConfigStateAccount = vyperCoreProgram.coder.accounts.decode<IdlAccounts<VyperCore>['trancheConfig']>(
 			'trancheConfig',
@@ -234,7 +362,9 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 		);
 
 		// @ts-ignore
-		res.priceAtSettlement = new RustDecimalWrapper(new Uint8Array(currentTrancheConfigStateAccount.trancheData.reserveFairValue.value[0])).toNumber();
+		res.pricesAtSettlement = currentTrancheConfigStateAccount.trancheData.reserveFairValue.value.map((c) =>
+			new RustDecimalWrapper(new Uint8Array(c)).toNumber()
+		);
 	}
 
 	// second fetch
@@ -257,27 +387,22 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	res.sellerTA = currentOtcStateAccount.juniorSideBeneficiary;
 	if (res.sellerTA) res.sellerWallet = secondFetch_accountsData.find((c) => c.address.equals(res.sellerTA)).owner;
 
-	// switchboard
-	if (res.rateState.getTypeId() === 'switchboard') {
-		// const switchboardProgram = await loadSwitchboardProgram(getCurrentCluster() as "devnet" | "mainnet-beta", connection);
-		const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'devnet' | 'mainnet-beta', connection);
+	// * * * * * * * * * * * * * * * * * * * * * * *
+	// RATE PLUGIN
+	// * * * * * * * * * * * * * * * * * * * * * * *
 
-		(res.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
-			switchboardProgram,
-			firstFetch_accountsData.find((c) => c.pubkey.equals((res.rateState as RateSwitchboardState).switchboardAggregator)).data
-		);
-		const aggregatorLastValue_startMark = performance.mark('aggregatorLastValue_startMark');
-		(res.rateState as RateSwitchboardState).aggregatorLastValue = (
-			await new AggregatorAccount({ program: switchboardProgram, publicKey: (res.rateState as RateSwitchboardState).switchboardAggregator }).getLatestValue(
-				(res.rateState as RateSwitchboardState).aggregatorData
-			)
-		).toNumber();
-		console.log('aggregatorLastValue elapsed: ', performance.measure('aggregatorLastValue_end', aggregatorLastValue_startMark.name));
-	}
+	if (res.rateState.typeId === 'switchboard') {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// SWITCHBOARD
 
-	// pyth
-	if (res.rateState.getTypeId() === 'pyth') {
-		await res.rateState.loadData(connection);
+		await (res.rateState as RateSwitchboardPlugin).loadData(connection);
+	} else if (res.rateState.typeId === 'pyth') {
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// PYTH
+
+		await (res.rateState as RatePythPlugin).loadData(connection);
+	} else {
+		throw Error('rate plugin not supported: ' + res.rateState.typeId);
 	}
 
 	return res;

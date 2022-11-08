@@ -1,7 +1,7 @@
 .wrapper {
 	display: flex;
 	justify-content: center;
-	margin-top: 10px;
+	margin-top: var(--space-10);
 	position: relative;
 	z-index: 1;
 }
@@ -9,11 +9,11 @@
 .error {
 	color: var(--color-error) !important;
 	font-style: italic;
-	margin-top: 2px;
+	margin-top: var(--space-2);
 
 	svg {
 		margin-bottom: -2px;
-		margin-right: 4px;
+		margin-right: var(--space-4);
 	}
 }
 
@@ -32,10 +32,12 @@
 
 .input_outter {
 	display: flex;
+    justify-content: center;
 
 	.adorsement {
 		margin-right: -30px;
 		margin-top: 15px;
+        margin-left: 14px;
 		z-index: 1;
 		color: var(--color-black-600);
 	}
@@ -43,17 +45,27 @@
 	input {
 		width: 455px;
 		height: 49px;
-		padding: 12px 16px;
+		padding: var(--space-12) var(--space-16);
 		padding-left: 40px;
 		outline: none;
 		border: 1px solid var(--color-black-300);
-		border-radius: 10px;
-		box-shadow: 5px 5px 20px var(--color-black-400);
-		font-size: 16px;
+		border-radius: var(--border-radius-extend);
+		box-shadow: 5px 5px var(--space-20) var(--color-black-400);
+		font-size: var(--space-16);
 		color: var(--color-black);
 
 		&::placeholder {
 			color: var(--color-black-600);
 		}
 	}
+}
+
+@media (max-width: 725px) {
+    .wrapper {
+        padding: 0 16px;
+
+        div {
+            width: 100%;
+        }
+    }
 }

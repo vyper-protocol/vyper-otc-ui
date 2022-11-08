@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
-import { getMultipleAccounts, unpackMint } from '@solana/spl-token';
+import { unpackAccount, unpackMint } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectContracts';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
@@ -12,8 +11,9 @@ import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import RateSwitchboardState from 'models/plugins/rate/RateSwitchboardState';
-import { RedeemLogicForwardState } from 'models/plugins/RedeemLogicForwardState';
+import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
+import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
@@ -21,9 +21,7 @@ import { FetchContractsParams } from './FetchContractsParams';
 const fetchContracts = async (connection: Connection, params: FetchContractsParams): Promise<ChainOtcState[]> => {
 	console.group('CONTROLLER: fetch contracts');
 
-	console.log('fetching contract from db');
 	const dbEntries = await supabaseSelectContracts(params);
-	console.log('fetched: ', dbEntries);
 
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), new AnchorProvider(connection, undefined, {}));
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), new AnchorProvider(connection, undefined, {}));
@@ -33,7 +31,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	const firstFetch_otcStateChainAccountPubkeys = dbEntries.map((c) => c.publickey);
 	const firstFetch_vyperCoreTrancheConfig = dbEntries.map((c) => c.vyperCoreTrancheConfig);
 	const firstFetch_reserveMintAccountPubkeys = dbEntries.map((c) => c.reserveMint);
-	const firstFetch_rateAccounts = _.flatten(dbEntries.map((c) => c.rateState.getPublicKeysForRefresh()));
+	const firstFetch_rateAccounts = _.flatten(dbEntries.map((c) => c.rateState.accountsRequiredForRefresh));
 
 	const firstFetch_unionPubkeys = _.uniq([
 		...firstFetch_otcStateChainAccountPubkeys,
@@ -41,10 +39,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		...firstFetch_reserveMintAccountPubkeys,
 		...firstFetch_rateAccounts
 	]) as PublicKey[];
-	const firstFetch_accountsData = (await connection.getMultipleAccountsInfo(firstFetch_unionPubkeys)).map((c, i) => ({
-		pubkey: firstFetch_unionPubkeys[i],
-		data: c
-	}));
+	const firstFetch_accountsData = await getMultipleAccountsInfo(connection, firstFetch_unionPubkeys);
 
 	const firstFetch_otcStateAccountInfos = firstFetch_accountsData
 		.filter((c) => firstFetch_otcStateChainAccountPubkeys.map((f) => f.toBase58()).includes(c.pubkey.toBase58()))
@@ -59,7 +54,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	secondFetch_TAPubkeys.push(...firstFetch_otcStateAccountInfos.map((c) => c.juniorSideBeneficiary));
 
 	const secondFetch_unionPubkeys = _.uniq(secondFetch_TAPubkeys.filter((c) => c !== null)) as PublicKey[];
-	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
+	const secondFetch_accountsData = (await getMultipleAccountsInfo(connection, secondFetch_unionPubkeys)).map((c) => unpackAccount(c.pubkey, c.data));
 
 	const res: ChainOtcState[] = [];
 	for (let i = 0; i < dbEntries.length; i++) {
@@ -74,15 +69,9 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.settleAvailableFromAt = dbEntries[i].settleAvailableFromAt;
 		r.buyerDepositAmount = dbEntries[i].buyerDepositAmount;
 		r.sellerDepositAmount = dbEntries[i].sellerDepositAmount;
-		r.redeemLogicState = new RedeemLogicForwardState(
-			dbEntries[i].redeemLogicState.programPubkey,
-			dbEntries[i].redeemLogicState.statePubkey,
-			dbEntries[i].redeemLogicState.strike,
-			dbEntries[i].redeemLogicState.isLinear,
-			dbEntries[i].redeemLogicState.notional
-		);
 
 		r.rateState = dbEntries[i].rateState.clone();
+		r.redeemLogicState = dbEntries[i].redeemLogicState.clone();
 
 		const currentOtcStateAccount = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>(
 			'otcState',
@@ -97,8 +86,10 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 				firstFetch_accountsData.find((c) => c.pubkey.equals(r.vyperCoreTrancheConfig)).data.data
 			);
 
-			// @ts-ignore
-			r.priceAtSettlement = new RustDecimalWrapper(new Uint8Array(currentTrancheConfigStateAccount.trancheData.reserveFairValue.value[0])).toNumber();
+			// @ts-expect-error
+			r.pricesAtSettlement = currentTrancheConfigStateAccount.trancheData.reserveFairValue.value
+				.filter((c) => c)
+				.map((c) => new RustDecimalWrapper(new Uint8Array(c)).toNumber());
 		}
 
 		r.programBuyerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcSeniorReserveTokenAccount)).amount);
@@ -109,29 +100,27 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.sellerTA = currentOtcStateAccount.juniorSideBeneficiary;
 		if (r.sellerTA) r.sellerWallet = secondFetch_accountsData.find((c) => c.address.equals(r.sellerTA)).owner;
 
-		if (r.rateState.getTypeId() === 'switchboard') {
-			// switchboard
-			const switchboardProgram = await loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
+		// * * * * * * * * * * * * * * * * * * * * * * *
+		// RATE PLUGIN
+		// * * * * * * * * * * * * * * * * * * * * * * *
 
-			(r.rateState as RateSwitchboardState).aggregatorData = AggregatorAccount.decode(
-				switchboardProgram,
-				firstFetch_accountsData.find((c) => c.pubkey.equals((r.rateState as RateSwitchboardState).switchboardAggregator)).data
+		if (r.rateState.typeId === 'switchboard') {
+			// * * * * * * * * * * * * * * * * * * * * * * *
+			// SWITCHBOARD
+
+			const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
+			(r.rateState as RateSwitchboardPlugin).aggregatorsData = (r.rateState as RateSwitchboardPlugin).oracles.map((c) =>
+				switchboardProgram.coder.accounts.decode('AggregatorAccountData', firstFetch_accountsData.find((cc) => c.equals(cc.pubkey)).data.data)
 			);
-			(r.rateState as RateSwitchboardState).aggregatorLastValue = (
-				await new AggregatorAccount({ program: switchboardProgram, publicKey: (r.rateState as RateSwitchboardState).switchboardAggregator }).getLatestValue(
-					(r.rateState as RateSwitchboardState).aggregatorData
-				)
-			).toNumber();
-		}
+		} else if (r.rateState.typeId === 'pyth') {
+			// * * * * * * * * * * * * * * * * * * * * * * *
+			// PYTH
 
-		if (r.rateState.getTypeId() === 'pyth') {
-			await r.rateState.loadData(connection);
+			await (r.rateState as RatePythPlugin).loadData(connection);
 		}
 
 		res.push(r);
 	}
-
-	console.log('fetch result: ', res);
 
 	console.groupEnd();
 	return res;
