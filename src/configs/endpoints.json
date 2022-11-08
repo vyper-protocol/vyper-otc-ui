@@ -1,12 +1,26 @@
 [
 	{
 		"cluster": "devnet",
+		"env": "production",
 		"rpcEndpoint": "https://responsive-few-shard.solana-devnet.quiknode.pro/df16ce666799f93981533706a246e5f76e27db04/",
 		"wssEndpoint": "wss://responsive-few-shard.solana-devnet.quiknode.pro/df16ce666799f93981533706a246e5f76e27db04/"
 	},
 	{
 		"cluster": "mainnet-beta",
+		"env": "production",
 		"rpcEndpoint": "https://solemn-muddy-bush.solana-mainnet.quiknode.pro/4d07d7f6f3bc511eafb722636ab3fddc320c4e9d/",
 		"wssEndpoint": "wss://solemn-muddy-bush.solana-mainnet.quiknode.pro/4d07d7f6f3bc511eafb722636ab3fddc320c4e9d/"
+	},
+	{
+		"cluster": "devnet",
+		"env": "development",
+		"rpcEndpoint": "https://api.devnet.solana.com",
+		"wssEndpoint": "wss://api.devnet.solana.com/"
+	},
+	{
+		"cluster": "mainnet-beta",
+		"env": "development",
+		"rpcEndpoint": "https://api.mainnet-beta.solana.com",
+		"wssEndpoint": "wss://api.mainnet-beta.solana.com/"
 	}
 ]

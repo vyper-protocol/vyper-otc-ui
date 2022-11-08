@@ -14,10 +14,12 @@ import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsP
 import { Badge } from 'evergreen-ui';
 import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
+import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
+import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
+import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -48,51 +50,66 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Instrument',
 			sortable: false,
 			filterable: true,
-			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS,
+			flex: 1,
+			minWidth: 150,
+			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS as any,
 			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
 			valueGetter: (params) => {
 				return params.row.redeemLogicState.typeId;
-			},
-			width: 150
+			}
 		},
 		{
 			type: 'string',
 			field: 'rateState.title',
 			headerName: 'Underlying',
+			flex: 1,
+			minWidth: 150,
 			valueGetter: (params) => {
 				return params.row.rateState.title;
-			},
-			width: 280
+			}
 		},
 		{
 			type: 'number',
 			field: 'redeemLogicState.notional',
 			headerName: 'Size',
+			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
-				if (params.row.redeemLogicState.typeId === 'forward') {
-					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
-				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
-					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
-				} else {
-					return '-';
+				switch (params.row.redeemLogicState.typeId as RedeemLogicPluginTypeIds) {
+					case 'forward':
+						return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
+					case 'settled_forward':
+						return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
+					case 'digital':
+						// TODO: find common columns
+						return '-';
+					case 'vanilla_option':
+						return (params.row.redeemLogicState as RedeemLogicVanillaOptionPlugin).notional;
+					default:
+						return '-';
 				}
-			},
-			width: 80
+			}
 		},
 		{
 			type: 'number',
 			field: 'redeemLogicState.strike',
 			headerName: 'Strike',
+			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
-				if (params.row.redeemLogicState.typeId === 'forward') {
-					return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
-				} else if (params.row.redeemLogicState.typeId === 'settled_forward') {
-					return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
-				} else {
-					return '-';
+				switch (params.row.redeemLogicState.typeId as RedeemLogicPluginTypeIds) {
+					case 'forward':
+						return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
+					case 'settled_forward':
+						return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
+					case 'digital':
+						return (params.row.redeemLogicState as RedeemLogicDigitalPlugin).strike;
+					case 'vanilla_option':
+						return (params.row.redeemLogicState as RedeemLogicVanillaOptionPlugin).strike;
+					default:
+						return '-';
 				}
-			},
-			width: 150
+			}
 		},
 		{
 			type: 'number',
@@ -101,7 +118,8 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<any>) => (
 				<OracleLivePrice oracleType={params.row.rateState.typeId} pubkey={(params.row.rateState as AbsRatePlugin).livePriceAccounts[0].toBase58()} />
 			),
-			width: 150
+			flex: 1,
+			minWidth: 125
 		},
 		{
 			field: 'settleAvailableFromAt',
@@ -110,7 +128,8 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			sortable: true,
 			filterable: true,
-			width: 150
+			flex: 1,
+			minWidth: 100
 		},
 		{
 			type: 'boolean',
@@ -118,7 +137,8 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Long funded',
 			sortable: true,
 			filterable: true,
-			width: 150,
+			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
 				return params.row.isBuyerFunded();
 			}
@@ -129,7 +149,8 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Short funded',
 			sortable: true,
 			filterable: true,
-			width: 150,
+			flex: 1,
+			minWidth: 100,
 			valueGetter: (params) => {
 				return params.row.isSellerFunded();
 			}
@@ -139,7 +160,8 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Buyer wallet',
 			sortable: true,
 			filterable: true,
-			width: 120,
+			flex: 1,
+			minWidth: 50,
 			renderCell: (params) => {
 				if (!params.row.buyerWallet) return <></>;
 				return <PublicKeyLink address={params.row.buyerWallet?.toBase58()} />;
@@ -150,7 +172,8 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Seller wallet',
 			sortable: true,
 			filterable: true,
-			width: 120,
+			flex: 1,
+			minWidth: 50,
 			renderCell: (params) => {
 				if (!params.row.sellerWallet) return <></>;
 				return <PublicKeyLink address={params.row.sellerWallet?.toBase58()} />;
@@ -161,7 +184,8 @@ const ExplorerContractDataGrid = () => {
 			headerName: 'Status',
 			sortable: true,
 			filterable: true,
-			width: 100,
+			flex: 1,
+			minWidth: 100,
 			renderCell: (params) => {
 				return <ContractStatusBadge status={params.row.getContractStatus()} />;
 			}
@@ -170,7 +194,7 @@ const ExplorerContractDataGrid = () => {
 			field: 'actions',
 			type: 'actions',
 			headerName: 'Show details',
-			width: 150,
+			flex: 1,
 			getActions: (params: GridRowParams) => [
 				<GridActionsCellItem
 					key="open"
@@ -201,8 +225,8 @@ const ExplorerContractDataGrid = () => {
 			{contractsLoading && <Spinner />}
 
 			{contracts.length > 0 && (
-				<Box sx={{ height: 800, maxWidth: 1600, width: '90%' }}>
-					<DataGrid getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
+				<Box sx={{ maxWidth: 1600, width: '90%' }}>
+					<DataGrid autoHeight getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
 				</Box>
 			)}
 		</>

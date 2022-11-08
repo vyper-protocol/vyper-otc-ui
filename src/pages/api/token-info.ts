@@ -1,8 +1,8 @@
 import { findMetadataPda } from '@metaplex-foundation/js';
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import { TokenListProvider } from '@solana/spl-token-registry';
-import { Cluster, Connection, PublicKey } from '@solana/web3.js';
-import { getClusterEndpoint } from 'components/providers/OtcConnectionProvider';
+import { Cluster, clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TokenInfo } from 'models/TokenInfo';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -13,12 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	}
 
 	try {
-		const mint = new PublicKey(req.query.mint as string);
-		const cluster = process.env.NEXT_PUBLIC_CLUSTER;
-		const connection = new Connection(getClusterEndpoint(cluster as Cluster));
-		const tokenInfo = await fetchTokenInfo(connection, mint);
+		const tokenInfo = await getTokenInfoFromRequest(req);
 		// console.log(tokenInfo);
-
 		res.status(200).json(tokenInfo);
 	} catch (err) {
 		res.status(500).json({ err });
@@ -47,7 +43,7 @@ const fetchTokenInfoFromMetaplex = async (connection: Connection, mint: PublicKe
 	}
 };
 
-const fetchTokenInfoFromSolanaProvider = async (mint: PublicKey): Promise<TokenInfo | undefined> => {
+const fetchTokenInfoFromSolanaProviderUsingMint = async (mint: PublicKey): Promise<TokenInfo | undefined> => {
 	try {
 		const tokenListProvider = new TokenListProvider();
 		const tokenListContainer = await tokenListProvider.resolve();
@@ -67,10 +63,49 @@ const fetchTokenInfoFromSolanaProvider = async (mint: PublicKey): Promise<TokenI
 	}
 };
 
-export const fetchTokenInfo = async (connection: Connection, mint: PublicKey): Promise<TokenInfo | undefined> => {
-	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProvider(mint);
+const fetchTokenInfoFromSolanaProviderUsingSymbol = async (symbol: string): Promise<TokenInfo | undefined> => {
+	try {
+		const tokenListProvider = new TokenListProvider();
+		const tokenListContainer = await tokenListProvider.resolve();
+		const tokenInfoList = tokenListContainer.getList();
+		const res = tokenInfoList.find((c) => {
+			return c.symbol === symbol;
+		});
+
+		return {
+			address: res.address,
+			symbol: res.symbol,
+			name: res.name,
+			logoURI: res.logoURI
+		};
+	} catch {
+		return null;
+	}
+};
+
+export const fetchTokenInfoUsingMint = async (connection: Connection, mint: PublicKey): Promise<TokenInfo | undefined> => {
+	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProviderUsingMint(mint);
 	if (tokenInfoFromSolana) return tokenInfoFromSolana;
 
 	const tokenInfoFromMetaplex = await fetchTokenInfoFromMetaplex(connection, mint);
 	return tokenInfoFromMetaplex;
+};
+
+export const fetchTokenInfoUsingSymbol = async (symbol: string): Promise<TokenInfo | undefined> => {
+	const tokenInfoFromSolana = await fetchTokenInfoFromSolanaProviderUsingSymbol(symbol);
+	return tokenInfoFromSolana;
+};
+
+const getTokenInfoFromRequest = async (req: NextApiRequest): Promise<TokenInfo | undefined> => {
+	const connection = new Connection(clusterApiUrl(getCurrentCluster()));
+
+	if (req.query.mint) {
+		const mint = new PublicKey(req.query.mint as string);
+		return await fetchTokenInfoUsingMint(connection, mint);
+	}
+	if (req.query.symbol) {
+		const symbol = req.query.symbol as string;
+		return await fetchTokenInfoUsingSymbol(symbol);
+	}
+	return;
 };

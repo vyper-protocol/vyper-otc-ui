@@ -5,15 +5,18 @@ import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { deposit } from 'api/otc-state/deposit';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
+import { fundContract } from 'controllers/fundContract';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
+import { useRouter } from 'next/router';
+import * as UrlBuilder from 'utils/urlBuilder';
 
 import PROGRAMS from '../../../configs/programs.json';
 
 const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+	const router = useRouter();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -69,18 +72,21 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		return () => {
 			connection.removeAccountChangeListener(subscriptionId);
 		};
-	});
+	}, []);
 
-	const onDepositClick = async () => {
-		try {
-			setIsLoading(true);
-			const tx = await deposit(provider, new PublicKey(otcStatePubkey), isBuyer);
-			await txHandler.handleTxs(tx);
-		} catch (err) {
-			console.log(err);
-		} finally {
-			setIsLoading(false);
-			rateStateQuery.refetch();
+	const onDepositClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		if (e.altKey) {
+			router.push(UrlBuilder.buildDepositQRCodeUrl(otcStatePubkey, isBuyer));
+		} else {
+			try {
+				setIsLoading(true);
+				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), isBuyer);
+			} catch (err) {
+				console.log(err);
+			} finally {
+				setIsLoading(false);
+				rateStateQuery.refetch();
+			}
 		}
 	};
 

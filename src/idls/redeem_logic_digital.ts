@@ -1,6 +1,6 @@
-export type RedeemLogicSettledForward = {
-	version: '0.1.1';
-	name: 'redeem_logic_settled_forward';
+export type RedeemLogicDigital = {
+	version: '0.1.0';
+	name: 'redeem_logic_digital';
 	instructions: [
 		{
 			name: 'initialize';
@@ -32,15 +32,7 @@ export type RedeemLogicSettledForward = {
 					type: 'f64';
 				},
 				{
-					name: 'notional';
-					type: 'u64';
-				},
-				{
-					name: 'isLinear';
-					type: 'bool';
-				},
-				{
-					name: 'isStandard';
+					name: 'isCall';
 					type: 'bool';
 				}
 			];
@@ -65,15 +57,7 @@ export type RedeemLogicSettledForward = {
 					type: 'f64';
 				},
 				{
-					name: 'notional';
-					type: 'u64';
-				},
-				{
-					name: 'isLinear';
-					type: 'bool';
-				},
-				{
-					name: 'isStandard';
+					name: 'isCall';
 					type: 'bool';
 				}
 			];
@@ -104,15 +88,7 @@ export type RedeemLogicSettledForward = {
 				kind: 'struct';
 				fields: [
 					{
-						name: 'notional';
-						type: 'u64';
-					},
-					{
-						name: 'isLinear';
-						type: 'bool';
-					},
-					{
-						name: 'isStandard';
+						name: 'isCall';
 						type: 'bool';
 					},
 					{
@@ -187,9 +163,9 @@ export type RedeemLogicSettledForward = {
 	];
 };
 
-export const IDL: RedeemLogicSettledForward = {
-	version: '0.1.1',
-	name: 'redeem_logic_settled_forward',
+export const IDL: RedeemLogicDigital = {
+	version: '0.1.0',
+	name: 'redeem_logic_digital',
 	instructions: [
 		{
 			name: 'initialize',
@@ -221,15 +197,7 @@ export const IDL: RedeemLogicSettledForward = {
 					type: 'f64'
 				},
 				{
-					name: 'notional',
-					type: 'u64'
-				},
-				{
-					name: 'isLinear',
-					type: 'bool'
-				},
-				{
-					name: 'isStandard',
+					name: 'isCall',
 					type: 'bool'
 				}
 			]
@@ -254,15 +222,7 @@ export const IDL: RedeemLogicSettledForward = {
 					type: 'f64'
 				},
 				{
-					name: 'notional',
-					type: 'u64'
-				},
-				{
-					name: 'isLinear',
-					type: 'bool'
-				},
-				{
-					name: 'isStandard',
+					name: 'isCall',
 					type: 'bool'
 				}
 			]
@@ -293,15 +253,7 @@ export const IDL: RedeemLogicSettledForward = {
 				kind: 'struct',
 				fields: [
 					{
-						name: 'notional',
-						type: 'u64'
-					},
-					{
-						name: 'isLinear',
-						type: 'bool'
-					},
-					{
-						name: 'isStandard',
+						name: 'isCall',
 						type: 'bool'
 					},
 					{

@@ -100,7 +100,7 @@ export class ChainOtcState extends AbsOtcState {
 	}
 
 	isSettlementAvailable(): boolean {
-		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted;
+		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted && this.buyerWallet !== undefined && this.sellerWallet !== undefined;
 	}
 
 	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {

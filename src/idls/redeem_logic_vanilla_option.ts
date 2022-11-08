@@ -1,6 +1,6 @@
-export type RedeemLogicSettledForward = {
-	version: '0.1.1';
-	name: 'redeem_logic_settled_forward';
+export type RedeemLogicVanillaOption = {
+	version: '1.0.0';
+	name: 'redeem_logic_vanilla_option';
 	instructions: [
 		{
 			name: 'initialize';
@@ -9,11 +9,6 @@ export type RedeemLogicSettledForward = {
 					name: 'redeemLogicConfig';
 					isMut: true;
 					isSigner: true;
-				},
-				{
-					name: 'owner';
-					isMut: false;
-					isSigner: false;
 				},
 				{
 					name: 'payer';
@@ -36,44 +31,11 @@ export type RedeemLogicSettledForward = {
 					type: 'u64';
 				},
 				{
-					name: 'isLinear';
+					name: 'isCall';
 					type: 'bool';
-				},
-				{
-					name: 'isStandard';
-					type: 'bool';
-				}
-			];
-		},
-		{
-			name: 'update';
-			accounts: [
-				{
-					name: 'redeemLogicConfig';
-					isMut: true;
-					isSigner: false;
-				},
-				{
-					name: 'owner';
-					isMut: false;
-					isSigner: true;
-				}
-			];
-			args: [
-				{
-					name: 'strike';
-					type: 'f64';
-				},
-				{
-					name: 'notional';
-					type: 'u64';
 				},
 				{
 					name: 'isLinear';
-					type: 'bool';
-				},
-				{
-					name: 'isStandard';
 					type: 'bool';
 				}
 			];
@@ -104,26 +66,22 @@ export type RedeemLogicSettledForward = {
 				kind: 'struct';
 				fields: [
 					{
-						name: 'notional';
-						type: 'u64';
-					},
-					{
-						name: 'isLinear';
-						type: 'bool';
-					},
-					{
-						name: 'isStandard';
-						type: 'bool';
-					},
-					{
 						name: 'strike';
 						type: {
 							array: ['u8', 16];
 						};
 					},
 					{
-						name: 'owner';
-						type: 'publicKey';
+						name: 'notional';
+						type: 'u64';
+					},
+					{
+						name: 'isCall';
+						type: 'bool';
+					},
+					{
+						name: 'isLinear';
+						type: 'bool';
 					}
 				];
 			};
@@ -187,9 +145,9 @@ export type RedeemLogicSettledForward = {
 	];
 };
 
-export const IDL: RedeemLogicSettledForward = {
-	version: '0.1.1',
-	name: 'redeem_logic_settled_forward',
+export const IDL: RedeemLogicVanillaOption = {
+	version: '1.0.0',
+	name: 'redeem_logic_vanilla_option',
 	instructions: [
 		{
 			name: 'initialize',
@@ -198,11 +156,6 @@ export const IDL: RedeemLogicSettledForward = {
 					name: 'redeemLogicConfig',
 					isMut: true,
 					isSigner: true
-				},
-				{
-					name: 'owner',
-					isMut: false,
-					isSigner: false
 				},
 				{
 					name: 'payer',
@@ -225,44 +178,11 @@ export const IDL: RedeemLogicSettledForward = {
 					type: 'u64'
 				},
 				{
-					name: 'isLinear',
+					name: 'isCall',
 					type: 'bool'
-				},
-				{
-					name: 'isStandard',
-					type: 'bool'
-				}
-			]
-		},
-		{
-			name: 'update',
-			accounts: [
-				{
-					name: 'redeemLogicConfig',
-					isMut: true,
-					isSigner: false
-				},
-				{
-					name: 'owner',
-					isMut: false,
-					isSigner: true
-				}
-			],
-			args: [
-				{
-					name: 'strike',
-					type: 'f64'
-				},
-				{
-					name: 'notional',
-					type: 'u64'
 				},
 				{
 					name: 'isLinear',
-					type: 'bool'
-				},
-				{
-					name: 'isStandard',
 					type: 'bool'
 				}
 			]
@@ -293,26 +213,22 @@ export const IDL: RedeemLogicSettledForward = {
 				kind: 'struct',
 				fields: [
 					{
-						name: 'notional',
-						type: 'u64'
-					},
-					{
-						name: 'isLinear',
-						type: 'bool'
-					},
-					{
-						name: 'isStandard',
-						type: 'bool'
-					},
-					{
 						name: 'strike',
 						type: {
 							array: ['u8', 16]
 						}
 					},
 					{
-						name: 'owner',
-						type: 'publicKey'
+						name: 'notional',
+						type: 'u64'
+					},
+					{
+						name: 'isCall',
+						type: 'bool'
+					},
+					{
+						name: 'isLinear',
+						type: 'bool'
 					}
 				]
 			}

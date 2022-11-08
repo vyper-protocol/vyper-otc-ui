@@ -15,7 +15,7 @@ import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
@@ -210,10 +210,8 @@ const CreateContractPage = () => {
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
 
 	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>('pyth');
-	const availableRatePluginTypes: RatePluginTypeIds[] = ['switchboard', 'pyth'];
 
 	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
-	const availableRedeemPluginTypes: RedeemLogicPluginTypeIds[] = ['forward', 'settled_forward'];
 
 	const [switchboardAggregator_1, setSwitchboardAggregator_1] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
 	const [switchboardAggregator_2, setSwitchboardAggregator_2] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
@@ -221,13 +219,17 @@ const CreateContractPage = () => {
 	const [pythPrice_2, setPythPrice_2] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
 
 	const setStrikeToDefaultValue = async () => {
-		if (ratePluginType === 'pyth') {
-			const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
-			setStrike(price?.price ?? 0);
-		}
-		if (ratePluginType === 'switchboard') {
-			const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
-			setStrike(price ?? 0);
+		try {
+			if (ratePluginType === 'pyth') {
+				const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
+				setStrike(price?.price ?? 0);
+			}
+			if (ratePluginType === 'switchboard') {
+				const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
+				setStrike(price ?? 0);
+			}
+		} catch {
+			setStrike(0);
 		}
 	};
 
@@ -238,6 +240,7 @@ const CreateContractPage = () => {
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
+	const [isCall, setIsCall] = useState(true);
 
 	useEffect(() => {
 		getAggregatorLatestValue(provider.connection, new PublicKey(switchboardAggregator_1))
@@ -263,25 +266,55 @@ const CreateContractPage = () => {
 				rateAccounts.push(new PublicKey(pythPrice_2));
 			}
 
+			let redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
+
+			if (redeemLogicPluginType === 'forward') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					isLinear: true,
+					notional,
+					strike
+				};
+			} else if (redeemLogicPluginType === 'settled_forward') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					isLinear: true,
+					notional,
+					strike,
+					isStandard: false
+				};
+			} else if (redeemLogicPluginType === 'digital') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					strike,
+					isCall
+				};
+			} else if (redeemLogicPluginType === 'vanilla_option') {
+				redeemLogicOption = {
+					redeemLogicPluginType,
+					strike,
+					notional,
+					isCall,
+					isLinear: true
+				};
+			} else {
+				throw Error('redeem logic plugin not supported: ' + redeemLogicPluginType);
+			}
+
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey(reserveMint),
-				depositStart: depositStart,
-				depositEnd: depositEnd,
-				settleStart: settleStart,
+				depositStart,
+				depositEnd,
+				settleStart,
 				seniorDepositAmount,
 				juniorDepositAmount,
 				rateOption: {
 					ratePluginType,
 					rateAccounts
 				},
-				redeemLogicOption: {
-					redeemLogicPluginType,
-					isLinear: true,
-					notional,
-					strike
-				},
-				saveOnDatabase: saveOnDatabase,
-				sendNotification: sendNotification
+				redeemLogicOption,
+				saveOnDatabase,
+				sendNotification
 			};
 
 			// create contract
@@ -300,24 +333,36 @@ const CreateContractPage = () => {
 	return (
 		<Layout>
 			<Pane>
-				<Pane display="flex" alignItems="center">
-					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
-				</Pane>
-				<Pane display="flex" alignItems="center">
-					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
-					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
-					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
-				</Pane>
+				<b>Redeem Logic</b>
+
+				<Combobox
+					width="100%"
+					initialSelectedItem={redeemLogicPluginType}
+					items={AVAILABLE_REDEEM_LOGIC_PLUGINS as any}
+					onChange={setRedeemLogicPluginType}
+					margin={12}
+				/>
 
 				<Pane display="flex" alignItems="center">
-					<AmountPicker title="Side A amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
-					<AmountPicker title="Side B amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
+					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
+					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward' || redeemLogicPluginType === 'vanilla_option') && (
+						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
+					)}
+					{(redeemLogicPluginType === 'digital' || redeemLogicPluginType === 'vanilla_option') && (
+						<FormGroup>
+							<FormControlLabel
+								control={<Switch defaultChecked checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />}
+								label={isCall ? 'Call' : 'Put'}
+							/>
+						</FormGroup>
+					)}
 				</Pane>
 
 				<hr />
+
 				<b>Rate Plugin</b>
 
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={availableRatePluginTypes} onChange={setRatePluginType} margin={12} />
+				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
 
 				{ratePluginType === 'switchboard' && (
 					<>
@@ -336,16 +381,21 @@ const CreateContractPage = () => {
 
 				<hr />
 
-				<b>Redeem Logic</b>
-
-				<Combobox width="100%" initialSelectedItem={redeemLogicPluginType} items={availableRedeemPluginTypes} onChange={setRedeemLogicPluginType} margin={12} />
-
 				<Pane display="flex" alignItems="center">
-					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
-					<AmountPicker title="Notional" value={notional} onChange={setNotional} />
+					<AmountPicker title="Long amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
+					<AmountPicker title="Short amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
 				</Pane>
 
 				<hr />
+
+				<Pane display="flex" alignItems="center">
+					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
+				</Pane>
+				<Pane display="flex" alignItems="center">
+					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
+					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
+					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
+				</Pane>
 
 				<FormGroup>
 					<FormControlLabel
