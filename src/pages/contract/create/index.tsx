@@ -333,42 +333,6 @@ const CreateContractPage = () => {
 	return (
 		<Layout>
 			<Pane>
-				<Pane display="flex" alignItems="center">
-					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
-				</Pane>
-				<Pane display="flex" alignItems="center">
-					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
-					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
-					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
-				</Pane>
-
-				<Pane display="flex" alignItems="center">
-					<AmountPicker title="Side A amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
-					<AmountPicker title="Side B amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
-				</Pane>
-
-				<hr />
-				<b>Rate Plugin</b>
-
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
-
-				{ratePluginType === 'switchboard' && (
-					<>
-						<SwitchboardAggregatorPicker title="Switchboard Aggregator #1" value={switchboardAggregator_1} onChange={setSwitchboardAggregator_1} />
-						{redeemLogicPluginType === 'settled_forward' && (
-							<SwitchboardAggregatorPicker title="Switchboard Aggregator #2" value={switchboardAggregator_2} onChange={setSwitchboardAggregator_2} />
-						)}
-					</>
-				)}
-				{ratePluginType === 'pyth' && (
-					<>
-						<PythPricePicker title="Pyth Price #1" value={pythPrice_1} onChange={setPythPrice_1} />
-						{redeemLogicPluginType === 'settled_forward' && <PythPricePicker title="Pyth Price #2" value={pythPrice_2} onChange={setPythPrice_2} />}
-					</>
-				)}
-
-				<hr />
-
 				<b>Redeem Logic</b>
 
 				<Combobox
@@ -395,6 +359,43 @@ const CreateContractPage = () => {
 				</Pane>
 
 				<hr />
+
+				<b>Rate Plugin</b>
+
+				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
+
+				{ratePluginType === 'switchboard' && (
+					<>
+						<SwitchboardAggregatorPicker title="Switchboard Aggregator #1" value={switchboardAggregator_1} onChange={setSwitchboardAggregator_1} />
+						{redeemLogicPluginType === 'settled_forward' && (
+							<SwitchboardAggregatorPicker title="Switchboard Aggregator #2" value={switchboardAggregator_2} onChange={setSwitchboardAggregator_2} />
+						)}
+					</>
+				)}
+				{ratePluginType === 'pyth' && (
+					<>
+						<PythPricePicker title="Pyth Price #1" value={pythPrice_1} onChange={setPythPrice_1} />
+						{redeemLogicPluginType === 'settled_forward' && <PythPricePicker title="Pyth Price #2" value={pythPrice_2} onChange={setPythPrice_2} />}
+					</>
+				)}
+
+				<hr />
+
+				<Pane display="flex" alignItems="center">
+					<AmountPicker title="Long amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
+					<AmountPicker title="Short amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
+				</Pane>
+
+				<hr />
+
+				<Pane display="flex" alignItems="center">
+					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
+				</Pane>
+				<Pane display="flex" alignItems="center">
+					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
+					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
+					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
+				</Pane>
 
 				<FormGroup>
 					<FormControlLabel
