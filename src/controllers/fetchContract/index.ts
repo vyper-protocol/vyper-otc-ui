@@ -74,6 +74,8 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
 	res.reserveTokenInfo = await fetchTokenInfo(trancheConfigAccountInfo.reserveMint);
+	res.programBuyerTA = accountInfo.otcSeniorReserveTokenAccount;
+	res.programSellerTA = accountInfo.otcJuniorReserveTokenAccount;
 
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
@@ -347,6 +349,8 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 		'otcState',
 		firstFetch_accountsData.find((c) => c.pubkey.equals(data.publickey)).data.data
 	);
+	res.programBuyerTA = currentOtcStateAccount.otcSeniorReserveTokenAccount;
+	res.programSellerTA = currentOtcStateAccount.otcJuniorReserveTokenAccount;
 
 	res.reserveMintInfo = unpackMint(res.reserveMint, firstFetch_accountsData.find((c) => c.pubkey.equals(res.reserveMint)).data);
 	res.settleExecuted = currentOtcStateAccount.settleExecuted;

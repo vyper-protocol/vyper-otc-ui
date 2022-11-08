@@ -16,7 +16,6 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
-	console.log(rateStateQuery);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const onSettleClick = async () => {
