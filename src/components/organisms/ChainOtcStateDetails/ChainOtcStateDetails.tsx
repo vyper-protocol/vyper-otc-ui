@@ -9,6 +9,7 @@ import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator } from
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
+import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
@@ -177,6 +178,17 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
 					<b>Collateral</b>
 				</Pane>
+
+				{reserveTokenInfo ? (
+					<div className={styles.token}>
+						<Image layout="fixed" width="32px" height="32px" src={reserveTokenInfo.logoURI} alt={reserveTokenInfo.symbol} />
+
+						<div>
+							<b>{reserveTokenInfo.symbol}</b>
+							<p>{reserveTokenInfo.name}</p>
+						</div>
+					</div>
+				) : null}
 				<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
 					<Pane margin={6} textAlign="center">
 						Long
