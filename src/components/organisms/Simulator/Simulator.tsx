@@ -64,7 +64,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				<div className={styles.center}>
 					Long
 					<br />
-					<Chip label={buyerPnl + ' ' + tokenSymbol} color={buyerColor} variant="outlined" size="small" /> 
+					<Chip label={buyerPnl + ' ' + tokenSymbol} color={buyerColor} variant="outlined" size="small" />
 				</div>
 				<div className={styles.center}>
 					Short
