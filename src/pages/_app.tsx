@@ -3,6 +3,7 @@
 import 'styles/base.css';
 import { useMemo } from 'react';
 
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { WalletProvider } from '@solana/wallet-adapter-react';
@@ -24,6 +25,12 @@ require('react-toastify/dist/ReactToastify.min.css');
 require('@solana/wallet-adapter-react-ui/styles.css');
 
 export const queryClient = new QueryClient();
+
+const theme = createTheme({
+	typography: {
+		fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif'
+	}
+});
 
 const Application = ({ Component, pageProps }) => {
 	const wallets = useMemo(() => {
@@ -48,7 +55,9 @@ const Application = ({ Component, pageProps }) => {
 							<WalletModalProvider>
 								<TxHandlerProvider>
 									<ErrorBoundary FallbackComponent={ApplicationError}>
-										<Component {...pageProps} />
+										<ThemeProvider theme={theme}>
+											<Component {...pageProps} />
+										</ThemeProvider>
 									</ErrorBoundary>
 								</TxHandlerProvider>
 							</WalletModalProvider>
