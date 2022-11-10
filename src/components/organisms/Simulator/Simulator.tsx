@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
-import { Badge, TextInput } from 'evergreen-ui';
+import { TextInput } from 'evergreen-ui';
+import { Chip, TextField } from '@mui/material';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -20,7 +21,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	const { id } = router.query;
 
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
-	const tokenSymbol = rateStateQuery?.data?.reserveTokenInfo?.symbol;
+	const tokenSymbol = (rateStateQuery?.data?.reserveTokenInfo?.symbol ?? '');
 
 	const buyerPnl = formatWithDecimalDigits(
 		rateStateQuery?.data?.redeemLogicState?.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[0],
@@ -31,12 +32,12 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 		4
 	);
 
-	const buyerColor = buyerPnl > 0 ? 'green' : 'red';
-	const sellerColor = sellerPnl > 0 ? 'green' : 'red';
+	const buyerColor = buyerPnl > 0 ? 'success' : 'error';
+	const sellerColor = sellerPnl > 0 ? 'success' : 'error';
 
-	const handleOnPriceChange = (newValue: number, i: number) => {
+	const handleOnPriceChange = (newValue: string, i: number) => {
 		const pricesValueClone = _.clone(prices);
-		pricesValueClone[i] = newValue;
+		pricesValueClone[i] = parseInt(newValue);
 		setPrices(pricesValueClone);
 	};
 
@@ -46,7 +47,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 			{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
 					<p>{c}:</p>
-					<TextInput type="number" style={{ width: '70%' }} value={prices[i]} onChange={(e) => handleOnPriceChange(e.target.value, i)} />
+					<TextField type="number" size="small" sx={{ width: '70%' }} value={prices[i]} onChange={(e) => handleOnPriceChange(e.target.value, i)} />
 				</div>
 			))}
 
@@ -63,16 +64,12 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				<div className={styles.center}>
 					Long
 					<br />
-					<Badge color={buyerColor}>
-						{buyerPnl} {tokenSymbol}
-					</Badge>
+					<Chip label={buyerPnl + ' ' + tokenSymbol} color={buyerColor} variant="outlined" size="small" /> 
 				</div>
 				<div className={styles.center}>
 					Short
 					<br />
-					<Badge color={sellerColor}>
-						{sellerPnl} {tokenSymbol}
-					</Badge>
+					<Chip label={sellerPnl + ' ' + tokenSymbol} color={sellerColor} variant="outlined" size="small" />
 				</div>
 			</div>
 

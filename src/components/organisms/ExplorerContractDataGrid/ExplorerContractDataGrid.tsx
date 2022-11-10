@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Chip } from '@mui/material';
 import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
@@ -11,8 +11,6 @@ import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
-import { Badge } from 'evergreen-ui';
-import { Spinner } from 'evergreen-ui';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
@@ -53,7 +51,7 @@ const ExplorerContractDataGrid = () => {
 			flex: 1,
 			minWidth: 150,
 			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS as any,
-			renderCell: (params: GridRenderCellParams<string>) => <Badge>{params.value}</Badge>,
+			renderCell: (params: GridRenderCellParams<string>) => <Chip label={params.value} />,
 			valueGetter: (params) => {
 				return params.row.redeemLogicState.typeId;
 			}
@@ -222,7 +220,7 @@ const ExplorerContractDataGrid = () => {
 
 	return (
 		<>
-			{contractsLoading && <Spinner />}
+			{contractsLoading && <CircularProgress />}
 
 			{contracts.length > 0 && (
 				<Box sx={{ maxWidth: 1600, width: '90%' }}>
