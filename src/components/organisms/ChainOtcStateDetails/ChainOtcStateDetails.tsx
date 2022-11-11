@@ -69,7 +69,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					<Chip label={otcState.redeemLogicState.typeId} variant="outlined" color="secondary" size="small" sx={{ marginX: '3px', textTransform: 'capitalize' }}/>
 
 					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
-						<HelpIcon fontSize="small" color="#6e62b6" onClick={handleDocumentationClick} className={styles.notionHelp} />
+						<HelpIcon fontSize="small" onClick={handleDocumentationClick} className={styles.notionHelp} />
 					</Tooltip>
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.getContractStatus()} />
