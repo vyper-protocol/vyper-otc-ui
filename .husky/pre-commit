@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+echo '🏗️ ------------------------------------------------ 🏗️'
+echo 'Checking & Styling your project before committing'
+echo 'please be patient, this may take a while...'
+echo '🏗️ ------------------------------------------------ 🏗️'
+
 yarn lint && yarn prettier --check .
