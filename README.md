@@ -115,6 +115,8 @@ There are a couple of points to take into consideration when working with CSS he
 
 ### Storybook
 
+[![Storybook](https://img.shields.io/badge/-Storybook-FF4785?style=for-the-badge&logo=storybook&logoColor=white)](https://vyper-otc-storybook.netlify.app)
+
 Storybook is a visual documentation of the components that are available in the project. So, it's encouraged that for each component that you create or modify, it's better if you also create/update the component's story.
 
 The guideline for creating a component's story is:
@@ -123,6 +125,8 @@ The guideline for creating a component's story is:
 2. The title of the component metadata should follow the path under `src`, for example `<ButtonPill />` is located at `src/components/atoms/ButtonPill`, then it should be `components/atoms/ButonPill`
 3. It's encouraged that developers to give a comment above each props of the actual component, the comments will act as the description of the props in Storybook
 4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options.
+
+You can check the current project storybook live [here](https://vyper-otc-storybook.netlify.app).
 
 ### Commits with Commitizens & Releases
 
