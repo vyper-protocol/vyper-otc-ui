@@ -85,7 +85,6 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
-				owner: provider.wallet.publicKey,
 				payer: provider.wallet.publicKey
 			})
 			.signers([redeemLogicPluginState])
@@ -105,7 +104,6 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
-				owner: provider.wallet.publicKey,
 				payer: provider.wallet.publicKey
 			})
 			.signers([redeemLogicPluginState])
@@ -120,7 +118,6 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			.initialize(params.redeemLogicOption.strike, params.redeemLogicOption.isCall)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
-				owner: provider.wallet.publicKey,
 				payer: provider.wallet.publicKey
 			})
 			.signers([redeemLogicPluginState])
