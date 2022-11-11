@@ -10,11 +10,21 @@ import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
-export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: string[]): { pricesValue: number[]; isInitialized: boolean } => {
+export const useOracleLivePrice = (
+	oracleType: RatePluginTypeIds,
+	pubkeys: string[]
+): { pricesValue: number[]; isInitialized: boolean; removeListener: () => void } => {
 	const [pricesValue, setPricesValue] = useState<number[]>([]);
 	const [isInitialized, setIsInitialized] = useState(false);
 	const [accountsToWatch] = useState<PublicKey[]>(pubkeys.map((c) => new PublicKey(c)));
+	const [subscriptionsId, setSubscriptionsId] = useState<number[]>([]);
+
 	const { connection } = useConnection();
+
+	const removeListener = useCallback(() => {
+		// console.log('Remove Listener Called');
+		subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
+	}, [connection, subscriptionsId]);
 
 	const decodeAccountInfo = useCallback(
 		async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
@@ -45,7 +55,7 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 	// listen for account changes
 	useEffect(() => {
 		const mutex = new Mutex();
-		const subscriptionsId = accountsToWatch.map((pubkey, i) =>
+		const subscriptionIds = accountsToWatch.map((pubkey, i) =>
 			connection.onAccountChange(
 				pubkey,
 				async (updatedAccountInfo) => {
@@ -65,11 +75,12 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 				'confirmed'
 			)
 		);
+		setSubscriptionsId(subscriptionIds);
 
 		return () => {
-			subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
+			subscriptionIds.map((c) => connection.removeAccountChangeListener(c));
 		};
 	}, [accountsToWatch, connection, decodeAccountInfo, isInitialized, oracleType, pricesValue]);
 
-	return { pricesValue, isInitialized };
+	return { pricesValue, isInitialized, removeListener };
 };

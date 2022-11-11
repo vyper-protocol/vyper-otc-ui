@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Tooltip } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -46,10 +46,20 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const reserveTokenInfo = otcState.reserveTokenInfo;
 
-	const { pricesValue: livePricesValue, isInitialized: livePriceIsInitialized } = useOracleLivePrice(
+	const {
+		pricesValue: livePricesValue,
+		isInitialized: livePriceIsInitialized,
+		removeListener
+	} = useOracleLivePrice(
 		otcState.rateState.typeId,
 		otcState.rateState.livePriceAccounts.map((c) => c.toBase58())
 	);
+
+	useEffect(() => {
+		if (otcState.settleExecuted) {
+			removeListener();
+		}
+	}, [otcState.settleExecuted, removeListener]);
 
 	return (
 		<div className={styles.cards}>
