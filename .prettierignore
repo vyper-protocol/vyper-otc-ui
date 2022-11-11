@@ -6,3 +6,4 @@ public
 storybook-static
 .github/ISSUE_TEMPLATE
 src/idls
+out
