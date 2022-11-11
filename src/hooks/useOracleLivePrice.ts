@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
@@ -13,13 +13,10 @@ import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: string[]): { pricesValue: number[]; isInitialized: boolean } => {
 	const [pricesValue, setPricesValue] = useState<number[]>([]);
 	const [isInitialized, setIsInitialized] = useState(false);
+	const [accountsToWatch] = useState<PublicKey[]>(pubkeys.map((c) => new PublicKey(c)));
 	const { connection } = useConnection();
 
-	const mutex = new Mutex();
-
-	const accountsToWatch = pubkeys.map((c) => new PublicKey(c));
-
-	const decodeAccountInfo = async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
+	const decodeAccountInfo = useCallback(async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
 		let newPriceValue = 0;
 		if (oracleType === 'switchboard') {
 			newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
@@ -28,7 +25,7 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 			newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
 		}
 		return newPriceValue;
-	};
+	}, [connection, oracleType]);
 
 	// first fetch
 	useEffect(() => {
@@ -39,13 +36,12 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 			setPricesValue(newPricesValue);
 			setIsInitialized(true);
 		};
-
 		fetchData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [accountsToWatch, connection, decodeAccountInfo]);
 
 	// listen for account changes
 	useEffect(() => {
+		const mutex = new Mutex();
 		const subscriptionsId = accountsToWatch.map((pubkey, i) =>
 			connection.onAccountChange(
 				pubkey,
@@ -70,7 +66,7 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 		return () => {
 			subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
 		};
-	}, []);
+	}, [accountsToWatch, connection, decodeAccountInfo, isInitialized, oracleType, pricesValue]);
 
 	return { pricesValue, isInitialized };
 };
