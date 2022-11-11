@@ -32,12 +32,12 @@
 
 .input_outter {
 	display: flex;
-    justify-content: center;
+	justify-content: center;
 
 	.adorsement {
 		margin-right: -30px;
 		margin-top: 15px;
-        margin-left: 14px;
+		margin-left: 14px;
 		z-index: 1;
 		color: var(--color-black-600);
 	}
@@ -61,11 +61,11 @@
 }
 
 @media (max-width: 725px) {
-    .wrapper {
-        padding: 0 16px;
+	.wrapper {
+		padding: 0 16px;
 
-        div {
-            width: 100%;
-        }
-    }
+		div {
+			width: 100%;
+		}
+	}
 }

@@ -20,13 +20,13 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDeposited, setIsDeposited] = useState(false);
 
-	useEffect(()=>{
+	useEffect(() => {
 		const programTokenAccount = isBuyer ? rateStateQuery.data.programBuyerTA : rateStateQuery.data.programSellerTA;
 		const subscriptionId = connection.onAccountChange(
 			programTokenAccount,
 			async (updatedAccountInfo) => {
 				const programTokenAmount = Number(unpackAccount(programTokenAccount, updatedAccountInfo).amount);
-				if(programTokenAmount === 0) setIsDeposited(true);
+				if (programTokenAmount === 0) setIsDeposited(true);
 			},
 			'confirmed'
 		);
@@ -47,7 +47,7 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 			rateStateQuery.refetch();
 		}
 	};
-	if(isDeposited) {
+	if (isDeposited) {
 		return <></>;
 	} else if (isBuyer) {
 		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimSeniorAvailable(wallet.publicKey)) {

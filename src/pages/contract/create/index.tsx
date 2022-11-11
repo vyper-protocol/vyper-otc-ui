@@ -101,6 +101,7 @@ const PublicKeyPicker = ({
 }: {
 	title: string;
 	value: string;
+	// eslint-disable-next-line no-unused-vars
 	onChange: (val: string) => void;
 	hints: { pubkey: string; label: string }[];
 }) => {

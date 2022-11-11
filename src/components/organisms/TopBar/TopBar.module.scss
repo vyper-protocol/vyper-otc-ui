@@ -23,7 +23,7 @@
 	.nav {
 		display: flex;
 		justify-content: space-evenly;
-        align-items: center;
+		align-items: center;
 		margin-top: var(--space-10);
 
 		.item {
@@ -45,9 +45,9 @@
 			}
 		}
 
-        .item.mobileonly {
-            display: none;
-        }
+		.item.mobileonly {
+			display: none;
+		}
 
 		.item:hover {
 			cursor: pointer;
@@ -81,7 +81,7 @@ div[evergreen-portal-container] {
 
 			.container {
 				padding: var(--space-20) var(--space-32) var(--space-20) var(--space-24);
-                margin-bottom: -10px;
+				margin-bottom: -10px;
 				min-width: 100px;
 
 				display: flex;
@@ -107,7 +107,8 @@ div[evergreen-portal-container] {
 						fill: var(--color-text-disabled);
 					}
 
-					span, a {
+					span,
+					a {
 						font-family: var(--font-primary) !important;
 						font-size: 15px;
 						color: var(--color-text-disabled);
@@ -127,27 +128,28 @@ div[evergreen-portal-container] {
 					}
 				}
 
-                &.mobileNav {               
-                    .item {
-                        margin-left: 0;
-                        margin-right: 0;
-                        margin-bottom: var(--space-16);
-                    }
+				&.mobileNav {
+					.item {
+						margin-left: 0;
+						margin-right: 0;
+						margin-bottom: var(--space-16);
+					}
 
-                    .item:hover {
-                        cursor: pointer;
-                    }
-            
-                    .active, .item:hover {
-                        a {
-                            color: var(--color-black);
-                        }
+					.item:hover {
+						cursor: pointer;
+					}
 
-                        svg {
-                            fill: var(--color-black);
-                        }
-                    }
-                }
+					.active,
+					.item:hover {
+						a {
+							color: var(--color-black);
+						}
+
+						svg {
+							fill: var(--color-black);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -158,24 +160,24 @@ div[evergreen-portal-container] {
 }
 
 @media (max-width: 725px) {
-    .topbar {
-        .navRightItems {
-            display: none;
-        }
-    
-        .nav {
-            width: 100%;
-            justify-content: flex-end;
-            margin-top: var(--space-6);
+	.topbar {
+		.navRightItems {
+			display: none;
+		}
 
-            .item {
-                display: none;
-                margin-left: 0;
-            }
-    
-            .item.mobileonly {
-                display: block;
-            }
-        }
-    }
+		.nav {
+			width: 100%;
+			justify-content: flex-end;
+			margin-top: var(--space-6);
+
+			.item {
+				display: none;
+				margin-left: 0;
+			}
+
+			.item.mobileonly {
+				display: block;
+			}
+		}
+	}
 }

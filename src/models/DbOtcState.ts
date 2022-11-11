@@ -2,13 +2,13 @@ import { Cluster, PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
+import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from './plugins/AbsPlugin';
 import { RatePythPlugin } from './plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from './plugins/rate/RateSwitchboardPlugin';
+import { RedeemLogicDigitalPlugin } from './plugins/redeemLogic/RedeemLogicDigitalPlugin';
 import { RedeemLogicForwardPlugin } from './plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from './plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
-import { RedeemLogicDigitalPlugin } from './plugins/redeemLogic/RedeemLogicDigitalPlugin';
 import { RedeemLogicVanillaOptionPlugin } from './plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from './plugins/AbsPlugin';
 
 export class DbOtcState extends AbsOtcState {
 	cluster: Cluster;
