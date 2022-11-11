@@ -128,31 +128,7 @@ The guideline for creating a component's story is:
 
 You can check the current project storybook live [here](https://vyper-otc-storybook.netlify.app).
 
-### Commits with Commitizens & Releases
-
-Commitizens defines a standard way of committing rules that are easier to read, formatted with a concise way and keeping the commit history clean & organised.
-
-Before every commit you should **always** run:
-
-```bash
-yarn commit
-```
-
-This will run `git add. & cz` and will prompt you to choose what type of commit you want to make.
-
-![commitizens](https://raw.githubusercontent.com/commitizen-tools/commitizen/master/docs/images/demo.gif)
-
-Some useful features are:
-
-- You can reference active **github issues** from commitizens' prompt
-- You can highligh a commit that has a **breaking change**
-- Before submitting any commits, commitizens is also configured to uses `lint-staged` that will run Eslint & Prettier to all the staged files ready to be committed. If this check fails, the commit exits.
-
-Then you can either run `git push origin [name_of_branch]` or create a release by running `npm run release` and then pushing the tag to github by runing `npm run push-tags`.
-
-Generally, it's a good practice to create releases regularly at the end of each sprint by running `npm run release`. This will **bump** the version on `package.json` and will also generate a changelog in the root directory with all the changes that have been made.
-
-#### Troubleshooting
+### Troubleshooting
 
 1. If you encounter this error `fatal: cannot run .husky No such file or directory` then follow these steps:
 
