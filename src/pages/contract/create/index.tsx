@@ -180,7 +180,7 @@ const CreateContractPage = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
-	const [sendNotification, setSendNotification] = useState(false);
+	const [sendNotification, setSendNotification] = useState(true);
 
 	const reserveMintHints = [
 		{
@@ -396,18 +396,18 @@ const CreateContractPage = () => {
 					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
 					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
 				</Pane>
-
-				<FormGroup>
-					<FormControlLabel
-						control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
-						label="Save on database"
-					/>
-					<FormControlLabel
-						control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
-						label="Send notification"
-					/>
-				</FormGroup>
-
+				{process.env.NODE_ENV === 'development' && (
+					<FormGroup>
+						<FormControlLabel
+							control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
+							label="Save on database"
+						/>
+						<FormControlLabel
+							control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
+							label="Send notification"
+						/>
+					</FormGroup>
+				)}
 				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract
 				</Button>
