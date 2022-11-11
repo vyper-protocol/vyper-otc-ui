@@ -1,7 +1,7 @@
 import { findMetadataPda } from '@metaplex-foundation/js';
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import { TokenListProvider } from '@solana/spl-token-registry';
-import { Cluster, clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
+import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TokenInfo } from 'models/TokenInfo';
 import { NextApiRequest, NextApiResponse } from 'next';

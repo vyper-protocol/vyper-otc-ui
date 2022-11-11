@@ -5,14 +5,14 @@ import { Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
+import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
-import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
 import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { TxPackage } from 'models/TxPackage';
 import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
 

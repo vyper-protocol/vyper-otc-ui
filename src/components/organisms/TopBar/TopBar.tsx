@@ -20,12 +20,11 @@ import {
 	Popover,
 	Position,
 	PathSearchIcon,
-	Badge,
-	Menu
+	Badge
 } from 'evergreen-ui';
-import { GiHamburgerMenu } from 'react-icons/gi';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { GiHamburgerMenu } from 'react-icons/gi';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './TopBar.module.scss';
