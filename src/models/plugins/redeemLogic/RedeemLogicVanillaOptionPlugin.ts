@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { PublicKey } from '@solana/web3.js';
 import { ListItemDetail } from 'models/ListItemDetail';
 
@@ -85,8 +86,7 @@ export class RedeemLogicVanillaOptionPlugin extends AbsRedeemLogicPlugin {
 		isCall: boolean,
 		isLinear: boolean
 	): [number, number] {
-		const payoff =
-			price === 0 && !isLinear ? (!isCall || (isCall && strike > 0) ? 0 : 1) : Math.max(0, isCall ? price - strike : strike - price) / (isLinear ? 1 : price);
+		const payoff = price === 0 && !isLinear ? (!isCall || strike > 0 ? 0 : 1) : Math.max(0, isCall ? price - strike : strike - price) / (isLinear ? 1 : price);
 		const buyerPnl = -buyerDepositAmount + Math.min(sellerDepositAmount, notional * payoff);
 		const sellerPnl = -buyerPnl;
 		return [buyerPnl, sellerPnl];

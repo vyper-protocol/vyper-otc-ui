@@ -16,16 +16,19 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 	const [accountsToWatch] = useState<PublicKey[]>(pubkeys.map((c) => new PublicKey(c)));
 	const { connection } = useConnection();
 
-	const decodeAccountInfo = useCallback(async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
-		let newPriceValue = 0;
-		if (oracleType === 'switchboard') {
-			newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
-		}
-		if (oracleType === 'pyth') {
-			newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
-		}
-		return newPriceValue;
-	}, [connection, oracleType]);
+	const decodeAccountInfo = useCallback(
+		async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
+			let newPriceValue = 0;
+			if (oracleType === 'switchboard') {
+				newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
+			}
+			if (oracleType === 'pyth') {
+				newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
+			}
+			return newPriceValue;
+		},
+		[connection, oracleType]
+	);
 
 	// first fetch
 	useEffect(() => {
