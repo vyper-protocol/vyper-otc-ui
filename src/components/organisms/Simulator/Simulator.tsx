@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
-import { TextInput } from 'evergreen-ui';
 import { Chip, TextField } from '@mui/material';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';

@@ -9,6 +9,12 @@
 	z-index: 99;
 	position: relative;
 
+	.typography {
+		font-size: 14px;
+		font-weight: 400;
+		color: rgb(71, 77, 102);
+	}
+
 	.navLeftItems {
 		position: absolute;
 		left: 50px;
@@ -41,7 +47,8 @@
 
 			svg {
 				margin-bottom: -2px;
-				margin-right: 5px;
+				margin-right: 3px;
+				vertical-align: text-top;
 			}
 		}
 
@@ -74,80 +81,76 @@
 	margin-right: var(--space-20);
 }
 
-div[evergreen-portal-container] {
-	div {
-		.popover {
-			min-width: 100px;
+.popover {
+	min-width: 100px;
 
-			.container {
-				padding: var(--space-20) var(--space-32) var(--space-20) var(--space-24);
-                margin-bottom: -10px;
-				min-width: 100px;
+	.container {
+		padding: var(--space-20) var(--space-32) var(--space-8) var(--space-24);
+		margin-bottom: 0;
+		min-width: 100px;
 
-				display: flex;
-				flex-direction: column;
-				align-items: flex-start;
-				justify-content: flex-start;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
 
-				.item {
-					margin-bottom: var(--space-16);
-					width: 100%;
-					display: flex;
-					align-items: center;
+		.item {
+			margin-bottom: var(--space-16);
+			width: 100%;
+			display: flex;
+			align-items: center;
 
-					&.hidden {
-						display: none;
-					}
+			&.hidden {
+				display: none;
+			}
 
-					svg {
-						margin-bottom: -1px;
-						margin-right: 12px;
-						width: var(--space-16);
-						height: var(--space-16);
-						fill: var(--color-text-disabled);
-					}
+			svg {
+				margin-bottom: -1px;
+				margin-right: 12px;
+				width: var(--space-16);
+				height: var(--space-16);
+				fill: var(--color-text-disabled);
+			}
 
-					span, a {
-						font-family: var(--font-primary) !important;
-						font-size: 15px;
-						color: var(--color-text-disabled);
-						font-weight: 500;
-					}
+			span, a, .typography {
+				font-family: var(--font-primary) !important;
+				font-size: 15px;
+				color: var(--color-text-disabled);
+				font-weight: 500;
+			}
+		}
+
+		.item:hover {
+			cursor: pointer;
+
+			svg {
+				fill: var(--color-black);
+			}
+
+			span {
+				color: var(--color-black);
+			}
+		}
+
+		&.mobileNav {               
+			.item {
+				margin-left: 0;
+				margin-right: 0;
+				margin-bottom: var(--space-12);
+			}
+
+			.item:hover {
+				cursor: pointer;
+			}
+	
+			.active, .item:hover {
+				a {
+					color: var(--color-black);
 				}
 
-				.item:hover {
-					cursor: pointer;
-
-					svg {
-						fill: var(--color-black);
-					}
-
-					span {
-						color: var(--color-black);
-					}
+				svg {
+					fill: var(--color-black);
 				}
-
-                &.mobileNav {               
-                    .item {
-                        margin-left: 0;
-                        margin-right: 0;
-                        margin-bottom: var(--space-16);
-                    }
-
-                    .item:hover {
-                        cursor: pointer;
-                    }
-            
-                    .active, .item:hover {
-                        a {
-                            color: var(--color-black);
-                        }
-
-                        svg {
-                            fill: var(--color-black);
-                        }
-                    }
-                }
 			}
 		}
 	}

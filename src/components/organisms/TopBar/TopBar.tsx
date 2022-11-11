@@ -9,21 +9,18 @@ import SelectWallet from 'components/organisms/SelectWallet';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import resources from 'configs/resources.json';
 import {
-	Text,
-	Pane,
-	Heading,
-	StackedChartIcon,
-	CubeAddIcon,
-	GridViewIcon,
-	ChevronDownIcon,
+	Box,
+	Typography,
 	Tooltip,
-	Popover,
-	Position,
-	PathSearchIcon,
-	Badge,
-	Menu
-} from 'evergreen-ui';
+	Chip,
+	Popover
+} from '@mui/material';
 import { GiHamburgerMenu } from 'react-icons/gi';
+import { HiFolderAdd } from 'react-icons/hi';
+import { TbMapSearch } from 'react-icons/tb';
+import { MdStackedBarChart } from 'react-icons/md';
+import { RiLayoutGridFill } from 'react-icons/ri';
+import { BiChevronDown } from "react-icons/bi";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
@@ -34,12 +31,21 @@ const TopBar = () => {
 	const router = useRouter();
 	const pathname = router.pathname;
 	const cluster = getCurrentCluster();
+	const [socialsMenuAnchor, setSocialsMenuAnchor] = useState();
+	const [mobileMenuAnchor, setMobileMenuAnchor] = useState();
+	const showSocialsMenu = !!socialsMenuAnchor;
+	const showMobileMenu = !!mobileMenuAnchor;
 
 	const onCreateContractClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
 		if (e.altKey) {
 			router.push(UrlBuilder.buildCreateContractUrl());
 		}
 	};
+
+	const openSocialsMenu = event => setSocialsMenuAnchor(event.currentTarget);
+	const closeSocialsMenu = () => setSocialsMenuAnchor(undefined);
+	const openMobileMenu = event => setMobileMenuAnchor(event.currentTarget);
+	const closeMobileMenu = () => setMobileMenuAnchor(undefined);
 
 	const [navigation, setNavigation] = useState([
 		{ href: ['/', '/contract/summary/[id]'], current: false },
@@ -52,16 +58,16 @@ const TopBar = () => {
 		<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 			<Link href={UrlBuilder.buildHomeUrl()}>
 				<a>
-					<StackedChartIcon /> Home
+					<MdStackedBarChart size="20px" /> Home
 				</a>
 			</Link>
 		</div>
 
 		{/* CREATE CONTRACT LINK */}
 		<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Tooltip content="Coming soon">
+			<Tooltip title="Coming soon">
 				<a onClick={onCreateContractClick}>
-					<CubeAddIcon /> Create contract
+					<HiFolderAdd size="20px" /> Create contract
 				</a>
 			</Tooltip>
 		</div>
@@ -70,35 +76,39 @@ const TopBar = () => {
 		<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
 			<Link href={UrlBuilder.buildExplorerUrl()}>
 				<a>
-					<PathSearchIcon /> Explorer
+					<TbMapSearch size="20px" /> Explorer
 				</a>
 			</Link>
 		</div>
 
 		{/* SOCIALS */}
+		<div className={styles.item} onClick={openSocialsMenu}>
+			<Typography className={styles.typography}>
+				<RiLayoutGridFill size="20px" /> More <BiChevronDown size="20px" />
+			</Typography>
+		</div>
 		<Popover
-			statelessProps={{
-				className: cn(styles.popover)
+			open={showSocialsMenu}
+			anchorEl={socialsMenuAnchor}
+			anchorOrigin={{
+				horizontal: "left",
+				vertical: "bottom"
 			}}
-			position={Position.BOTTOM}
-			content={
-				<Pane className={styles.container}>
+			PaperProps={{
+				className: styles.popover
+			}}
+			onClose={closeSocialsMenu}
+		>
+			<Box className={styles.container}>
 					{resources.socialMedias.map((item) => {
 						return (
 							<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
 								<Icon name={item.icon as AvailableIconNames} />
-								<Text>{item.name}</Text>
+								<Typography className={styles.typography}>{item.name}</Typography>
 							</a>
 						);
 					})}
-				</Pane>
-			}
-		>
-			<div className={styles.item}>
-				<Text>
-					<GridViewIcon /> More <ChevronDownIcon />
-				</Text>
-			</div>
+				</Box>
 		</Popover>
 
 		<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
@@ -118,53 +128,55 @@ const TopBar = () => {
 
 	return (
 		<>
-			<Pane className={styles.topbar}>
+			<Box className={styles.topbar}>
 				<div className={styles.navLeftItems}>
 					<Link href={UrlBuilder.buildHomeUrl()}>
-						<Heading size={600} className={styles.hover}>
-							Vyper OTC
-						</Heading>
+						<a>
+							<Typography component="h2" variant="h6" sx={{ fontWeight: 600, fontSize: '1.15rem' }} className={styles.hover}>
+								Vyper OTC
+							</Typography>
+						</a>
 					</Link>
 				</div>
 
-				<Pane className={styles.nav}>
+				<Box className={styles.nav}>
 					{ menuItems }
 
 					{cluster !== 'mainnet-beta' && (
-						<Badge color="orange" marginRight={100} className={cn(styles.item, styles.mobileonly)}>
-							{cluster}
-						</Badge>
+						<Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} className={cn(styles.item, styles.mobileonly)} />
 					)}
 
+					<Box className={cn(styles.item, styles.mobileonly)} onClick={openMobileMenu}>
+						<GiHamburgerMenu />
+					</Box>
 					<Popover
-						position={Position.BOTTOM_RIGHT}
-						statelessProps={{
-							className: cn(styles.popover)
+						open={showMobileMenu}
+						anchorEl={mobileMenuAnchor}
+						anchorOrigin={{
+							horizontal: "left",
+							vertical: "bottom"
 						}}
-						content={
-							<Pane className={cn(styles.container, styles.mobileNav)}>
-								{ menuItems }
-								<Pane className={styles.item}>
-									<SelectWallet />
-								</Pane>
-							</Pane>
-						}
+						PaperProps={{
+							className: styles.popover
+						}}
+						onClose={closeMobileMenu}
 					>
-						<Pane className={cn(styles.item, styles.mobileonly)}>
-							<GiHamburgerMenu />
-						</Pane>
+						<Box className={cn(styles.container, styles.mobileNav)}>
+							{ menuItems }
+							<Box className={styles.item}>
+								<SelectWallet />
+							</Box>
+						</Box>
 					</Popover>
-				</Pane>
+				</Box>
 
-				<Pane className={styles.navRightItems} display="flex" alignItems="center">
+				<Box className={styles.navRightItems} display="flex" alignItems="center">
 					{cluster !== 'mainnet-beta' && (
-						<Badge color="orange" marginRight={10}>
-							{cluster}
-						</Badge>
+						<Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} />
 					)}
 					<SelectWallet />
-				</Pane>
-			</Pane>
+				</Box>
+			</Box>
 		</>
 	);
 };
