@@ -39,7 +39,7 @@ jobs:
 
       - name: Build next.js app
         # change this if your site requires a custom build command
-        run: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} ./node_modules/.bin/next build
+        run: NEXT_PUBLIC_CLUSTER=mainnet-beta SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }} NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} ./node_modules/.bin/next build
 
       # Here's the first place where next-bundle-analysis' own script is used
       # This step pulls the raw bundle stats for the current bundle
