@@ -47,64 +47,66 @@ const TopBar = () => {
 		{ href: ['/explorer'], current: false }
 	]);
 
-	const menuItems = <>
-		{/* HOME LINK */}
-		<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Link href={UrlBuilder.buildHomeUrl()}>
-				<a>
-					<StackedChartIcon /> Home
-				</a>
-			</Link>
-		</div>
-
-		{/* CREATE CONTRACT LINK */}
-		<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Tooltip content="Coming soon">
-				<a onClick={onCreateContractClick}>
-					<CubeAddIcon /> Create contract
-				</a>
-			</Tooltip>
-		</div>
-
-		{/* EXPLORER LINK */}
-		<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Link href={UrlBuilder.buildExplorerUrl()}>
-				<a>
-					<PathSearchIcon /> Explorer
-				</a>
-			</Link>
-		</div>
-
-		{/* SOCIALS */}
-		<Popover
-			statelessProps={{
-				className: cn(styles.popover)
-			}}
-			position={Position.BOTTOM}
-			content={
-				<Pane className={styles.container}>
-					{resources.socialMedias.map((item) => {
-						return (
-							<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
-								<Icon name={item.icon as AvailableIconNames} />
-								<Text>{item.name}</Text>
-							</a>
-						);
-					})}
-				</Pane>
-			}
-		>
-			<div className={styles.item}>
-				<Text>
-					<GridViewIcon /> More <ChevronDownIcon />
-				</Text>
+	const menuItems = (
+		<>
+			{/* HOME LINK */}
+			<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+				<Link href={UrlBuilder.buildHomeUrl()}>
+					<a>
+						<StackedChartIcon /> Home
+					</a>
+				</Link>
 			</div>
-		</Popover>
 
-		<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
-			<AirdropButton />
-		</div>
-	</>;
+			{/* CREATE CONTRACT LINK */}
+			<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+				<Tooltip content="Coming soon">
+					<a onClick={onCreateContractClick}>
+						<CubeAddIcon /> Create contract
+					</a>
+				</Tooltip>
+			</div>
+
+			{/* EXPLORER LINK */}
+			<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+				<Link href={UrlBuilder.buildExplorerUrl()}>
+					<a>
+						<PathSearchIcon /> Explorer
+					</a>
+				</Link>
+			</div>
+
+			{/* SOCIALS */}
+			<Popover
+				statelessProps={{
+					className: cn(styles.popover)
+				}}
+				position={Position.BOTTOM}
+				content={
+					<Pane className={styles.container}>
+						{resources.socialMedias.map((item) => {
+							return (
+								<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
+									<Icon name={item.icon as AvailableIconNames} />
+									<Text>{item.name}</Text>
+								</a>
+							);
+						})}
+					</Pane>
+				}
+			>
+				<div className={styles.item}>
+					<Text>
+						<GridViewIcon /> More <ChevronDownIcon />
+					</Text>
+				</div>
+			</Popover>
+
+			<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
+				<AirdropButton />
+			</div>
+		</>
+	);
 
 	useEffect(() => {
 		const newNavigation = [...navigation];
@@ -128,7 +130,7 @@ const TopBar = () => {
 				</div>
 
 				<Pane className={styles.nav}>
-					{ menuItems }
+					{menuItems}
 
 					{cluster !== 'mainnet-beta' && (
 						<Badge color="orange" marginRight={100} className={cn(styles.item, styles.mobileonly)}>
@@ -143,7 +145,7 @@ const TopBar = () => {
 						}}
 						content={
 							<Pane className={cn(styles.container, styles.mobileNav)}>
-								{ menuItems }
+								{menuItems}
 								<Pane className={styles.item}>
 									<SelectWallet />
 								</Pane>
