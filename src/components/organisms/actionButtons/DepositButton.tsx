@@ -91,6 +91,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		return () => {
 			connection.removeAccountChangeListener(subscriptionId);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const onDepositClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

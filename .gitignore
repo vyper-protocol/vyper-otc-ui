@@ -52,3 +52,6 @@ out
 
 # Sentry
 .sentryclirc
+
+# Storybook
+storybook-static

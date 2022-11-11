@@ -35,7 +35,7 @@ export const OtcConnectionProvider = ({ children }) => {
 	const wssEndpoint = getWssClusterEndpoint(cluster);
 
 	return (
-		<ConnectionProvider endpoint={endpoint} config={{ wsEndpoint: wssEndpoint }}>
+		<ConnectionProvider endpoint={endpoint} config={{ wsEndpoint: wssEndpoint, commitment: 'processed' }}>
 			{children}
 		</ConnectionProvider>
 	);

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ListItemDetail } from 'models/ListItemDetail';
 
 import { AbsPlugin, RedeemLogicPluginTypeIds } from '../AbsPlugin';

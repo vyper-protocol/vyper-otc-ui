@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { PublicKey } from '@solana/web3.js';
 import { ListItemDetail } from 'models/ListItemDetail';
 
