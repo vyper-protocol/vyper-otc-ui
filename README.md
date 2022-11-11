@@ -17,6 +17,12 @@
 
 ### Getting Started
 
+Use the selected node version
+
+```bash
+nvm use
+```
+
 Install dependencies
 
 ```bash
@@ -39,22 +45,16 @@ yarn build
 
 | Script          | Use                                                                                             |
 | --------------- | ----------------------------------------------------------------------------------------------- |
+| prebuild        | Clean `.next` folder                                                                            |
 | dev             | Starts the development server                                                                   |
 | build           | Creates an optimized production build                                                           |
 | export          | Export the app to static HTML, which can be run standalone without the need of a Node.js server |
 | analyze         | Visualize and track the production build bundle size                                            |
 | lint            | Lints src files with Eslint                                                                     |
 | format          | Formats src files with prettier                                                                 |
+| prepare         | Husky install                                                                                   |
 | storybook       | Starts the storybook development server                                                         |
 | build-storybook | Creates the storybook production build                                                          |
-| commit          | Runs `git add .` and `cz`                                                                       |
-| first-release   | Creates the first version for the auto-changelog generator. _(This should run only once)_       |
-| release         | Bumbs version & writes changes to changelog                                                     |
-| release:minor   | Bumbs minor version & writes changes to changelog                                               |
-| release:patch   | Bumbs patch version & writes changes to changelog                                               |
-| release:major   | Bumbs major version & writes changes to changelog                                               |
-| push-tags       | Creates github tag with the current release                                                     |
-| prepare         | Husky install                                                                                   |
 
 ### Next.js
 
@@ -67,39 +67,6 @@ This project is using the `Atomic Design Methodology`. Atomic design thinks of b
 Then we also have **templates**, which are, like the names implies, generic layouts for our components. And last but not least **pages**, which are templates with real content inside.
 
 In our case the section **pages**, has being moved outside of the `components` folder, because in Next.js, a page lives inside the `pages` directory and is associated with a `route` based on its file name.
-
-### Folder Structure
-
-├── public
-└── src
-├── api
-│   ├── dummy-tokens
-│   ├── next-api
-│   ├── otc-state
-│   ├── supabase
-│   └── switchboard
-├── components
-│   ├── atoms
-│   ├── molecules
-│   ├── organisms
-│   ├── providers
-│   └── templates
-├── configs
-├── controllers
-│   ├── createContract
-│   ├── fetchContract
-│   └── fetchContracts
-├── hooks
-├── idls
-├── models
-│   └── plugins
-├── pages
-│   ├── api
-│   ├── contract
-│   └── explorer
-├── styles
-└── utils
-└── queries
 
 ### Styles & CSS
 
@@ -127,27 +94,3 @@ The guideline for creating a component's story is:
 4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options.
 
 You can check the current project storybook live [here](https://vyper-otc-storybook.netlify.app).
-
-### Troubleshooting
-
-1. If you encounter this error `fatal: cannot run .husky No such file or directory` then follow these steps:
-
-- delete `pre-commit` file inside `.husky` directory
-- run `npx husky add ./.husky/pre-commit`
-- open the new `pre-commit` file and paste the below content:
-
-```bash
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-echo '🏗️ ------------------------------------------------ 🏗️'
-echo 'Checking & Styling your project before committing'
-echo 'please be patient, this may take a while...'
-echo '🏗️ ------------------------------------------------ 🏗️'
-
-npx lint-staged
-```
-
-2. If you encounter this error in your imported CSS modules: `Cannot find module './File.module.css' or its corresponding type declarations.ts(2307)`
-
-   - Check that there is `next-env.d.ts` in the root directory. This file references TypeScript types declarations that are specific to projects started with Next.js and it adds support for importing CSS Modules. This relates to import of files with .module.css,.module.scss, and .module.sass extensions.
