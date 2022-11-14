@@ -2,7 +2,10 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { FormControlLabel, FormGroup, Switch, Button, Box, TextField, Select, InputAdornment, ButtonGroup, MenuItem } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { HiOutlineRefresh } from 'react-icons/hi';
+import { GrShare } from 'react-icons/gr';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -14,7 +17,6 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
@@ -35,31 +37,39 @@ const StrikePicker = ({
 	onRefreshClick: () => void;
 }) => {
 	return (
-		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField
+		<Box sx={{ display: "flex", alignItems: "center", margin: "12px" }}>
+			<TextField
 				label={title}
+				variant="outlined"
 				type="number"
+				size="small"
 				value={value}
 				onChange={(e) => {
-					return onChange(e.target.value);
+					return onChange(parseInt(e.target.value));
 				}}
+				InputProps={{ endAdornment: <InputAdornment position="end">
+					<ButtonGroup variant='text'>
+						<Button onClick={onRefreshClick}>
+							<HiOutlineRefresh />
+						</Button>
+						<Button
+							onClick={() => {
+								return onChange(value * 2);
+							}}
+						>
+							* 2
+						</Button>
+						<Button
+							onClick={() => {
+								return onChange(value / 2);
+							}}
+						>
+							/ 2
+						</Button>
+					</ButtonGroup>
+				</InputAdornment> }}
 			/>
-			<IconButton icon={RefreshIcon} onClick={onRefreshClick} intent="success" />
-			<Button
-				onClick={() => {
-					return onChange(value * 2);
-				}}
-			>
-				* 2
-			</Button>
-			<Button
-				onClick={() => {
-					return onChange(value / 2);
-				}}
-			>
-				/ 2
-			</Button>
-		</Pane>
+		</Box>
 	);
 };
 
@@ -77,19 +87,23 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 	}, [value, connection]);
 
 	return (
-		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField
-				width="100%"
+		<Box sx={{ display: "flex", alignItems: "center", margin: "6px" }}>
+			<TextField
+				sx={{ width: "100%" }}
 				label={title + ' ' + aggregatorName}
+				variant="outlined"
+				size="small"
 				value={value}
 				onChange={(e) => {
 					return onChange(e.target.value);
 				}}
 			/>
 			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
-				<IconButton icon={ShareIcon} intent="success" />
+				<Button variant="text" size="small">
+					<GrShare />
+				</Button>
 			</a>
-		</Pane>
+		</Box>
 	);
 };
 
@@ -105,21 +119,29 @@ const PublicKeyPicker = ({
 	hints: { pubkey: string; label: string }[];
 }) => {
 	return (
-		<Pane display="flex" width="100%" alignItems="center" margin={6}>
-			<TextInputField
-				width="100%"
+		<Box sx={{ display: "flex", alignItems: "center", margin: "6px" }}>
+			<TextField
+				sx={{ width: "100%" }}
 				label={title}
+				variant="outlined"
+				size="small"
 				value={value}
 				onChange={(e) => {
 					return onChange(e.target.value);
 				}}
 			/>
-			<Combobox
-				items={hints}
-				itemToString={(item) => (item ? item.label : '')}
-				initialSelectedItem={hints.find((c) => c.pubkey)?.label}
-				onChange={(selected) => onChange(selected.pubkey)}
-			/>
+			<Select
+				sx={{ width: "100%", margin: "12px" }}
+				value={value}
+				size="small"
+				onChange={event => onChange(event.target.value)}
+			>
+				{
+					hints.map(hint =>
+						<MenuItem key={hint.pubkey} value={hint.pubkey}>{hint.label}</MenuItem>
+					)
+				}
+			</Select>
 
 			{/* {hints.map((c) => (
 				<Button
@@ -131,7 +153,7 @@ const PublicKeyPicker = ({
 					{c.label}
 				</Button>
 			))} */}
-		</Pane>
+		</Box>
 	);
 };
 
@@ -154,19 +176,23 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 	}, [value, connection]);
 
 	return (
-		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField
-				width="100%"
+		<Box sx={{ display: "flex", alignItems: "center", margin: "6px" }}>
+			<TextField
+				sx={{ width: "100%" }}
 				label={title + ' ' + productSymbol}
+				variant="outlined"
+				size="small"
 				value={value}
 				onChange={(e) => {
 					return onChange(e.target.value);
 				}}
 			/>
 			<a target="_blank" href="https://pyth.network/price-feeds" rel="noopener noreferrer">
-				<IconButton icon={ShareIcon} intent="success" />
+				<Button variant="text" size="small">
+					<GrShare />
+				</Button>
 			</a>
-		</Pane>
+		</Box>
 	);
 };
 
@@ -332,18 +358,23 @@ const CreateContractPage = () => {
 
 	return (
 		<Layout>
-			<Pane>
+			<Box>
 				<b>Redeem Logic</b>
 
-				<Combobox
-					width="100%"
-					initialSelectedItem={redeemLogicPluginType}
-					items={AVAILABLE_REDEEM_LOGIC_PLUGINS as any}
-					onChange={setRedeemLogicPluginType}
-					margin={12}
-				/>
+				<Select
+					sx={{ width: "100%", margin: "12px" }}
+					value={redeemLogicPluginType}
+					size="small"
+					onChange={event => setRedeemLogicPluginType(event.target.value as RedeemLogicPluginTypeIds)}
+				>
+					{
+						AVAILABLE_REDEEM_LOGIC_PLUGINS.map(plugin =>
+							<MenuItem key={plugin} value={plugin}>{plugin}</MenuItem>
+						)
+					}
+				</Select>
 
-				<Pane display="flex" alignItems="center">
+				<Box sx={{ display: "flex", alignItems: "center" }}>
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
 					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward' || redeemLogicPluginType === 'vanilla_option') && (
 						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
@@ -356,13 +387,23 @@ const CreateContractPage = () => {
 							/>
 						</FormGroup>
 					)}
-				</Pane>
+				</Box>
 
 				<hr />
 
 				<b>Rate Plugin</b>
 
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
+				<Select
+					sx={{ width: "100%", margin: "12px" }}
+					value={ratePluginType}
+					size="small"
+					onChange={event => setRatePluginType(event.target.value as RatePluginTypeIds)}>
+						{
+							AVAILABLE_RATE_PLUGINS.map(plugin =>
+								<MenuItem key={plugin} value={plugin}>{plugin}</MenuItem>
+							)
+						}
+				</Select>
 
 				{ratePluginType === 'switchboard' && (
 					<>
@@ -381,21 +422,21 @@ const CreateContractPage = () => {
 
 				<hr />
 
-				<Pane display="flex" alignItems="center">
+				<Box sx={{ display: "flex", alignItems: "center" }}>
 					<AmountPicker title="Long amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
 					<AmountPicker title="Short amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
-				</Pane>
+				</Box>
 
 				<hr />
 
-				<Pane display="flex" alignItems="center">
+				<Box sx={{ display: "flex", alignItems: "center" }}>
 					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
-				</Pane>
-				<Pane display="flex" alignItems="center">
+				</Box>
+				<Box sx={{ display: "flex", alignItems: "center" }}>
 					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
 					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
 					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
-				</Pane>
+				</Box>
 
 				<FormGroup>
 					<FormControlLabel
@@ -408,10 +449,10 @@ const CreateContractPage = () => {
 					/>
 				</FormGroup>
 
-				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+				<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract
-				</Button>
-			</Pane>
+				</LoadingButton>
+			</Box>
 		</Layout>
 	);
 };
