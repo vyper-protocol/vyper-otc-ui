@@ -1,4 +1,4 @@
-import { Badge } from '@mui/material';
+import { Chip } from '@mui/material';
 import { ContractStatusIds } from 'models/ChainOtcState';
 
 type ContractStatusBadgeInput = {
@@ -21,7 +21,7 @@ const ContractStatusBadge = ({ status }: ContractStatusBadgeInput) => {
 	};
 
 	return (
-		<Badge badgeContent={getLabelFromStatus(status)} color={getColorFromStatus(status)} />
+		<Chip label={getLabelFromStatus(status)} color={getColorFromStatus(status)} variant="outlined" size="small" sx={{ marginX: '3px', textTransform: 'capitalize' }}/>
 	);
 };
 
