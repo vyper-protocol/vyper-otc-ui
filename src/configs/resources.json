@@ -35,5 +35,8 @@
 			"icon": "FaTelegram",
 			"link": "https://t.me/+aiK0sR0msfk1NWNk"
 		}
-	]
+	],
+  "solscan": {
+    "baseUrl": "https://solscan.io"
+  }
 }

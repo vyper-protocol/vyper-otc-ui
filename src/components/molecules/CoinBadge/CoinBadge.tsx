@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material';
+import { solscan } from 'configs/resources.json';
 import { TokenInfo } from 'models/TokenInfo';
 import Image from 'next/image';
 
@@ -15,7 +15,7 @@ const CoinBadge = (props: Props) => {
 		<div className={styles.container}>
 			<p className={styles.title}>{props.title}</p>
 
-			<div className={styles.chip}>
+			<a href={`${solscan.baseUrl}/token/${props.token.address}`} target="_blank" rel="noopener noreferrer" className={styles.chip}>
 				<p className={styles.amount}>{props.amount}</p>
 
 				<div className={styles.token}>
@@ -23,7 +23,7 @@ const CoinBadge = (props: Props) => {
 
 					<p>{props.token.symbol}</p>
 				</div>
-			</div>
+			</a>
 		</div>
 	);
 };
