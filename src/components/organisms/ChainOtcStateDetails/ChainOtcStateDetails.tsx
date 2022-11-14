@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { Tooltip } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
+import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
@@ -20,7 +20,6 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
-import CoinBadge from 'components/molecules/CoinBadge';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: ChainOtcState;
