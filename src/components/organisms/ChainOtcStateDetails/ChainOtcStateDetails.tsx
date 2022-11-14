@@ -20,6 +20,7 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
+import CoinBadge from 'components/molecules/CoinBadge';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: ChainOtcState;
@@ -175,35 +176,13 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* COLLATERAL AMOUNTS */}
-				<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+				<Pane width="100%" display="flex" justifyContent="center" alignItems="center" marginBottom={4}>
 					<b>Collateral</b>
 				</Pane>
 
-				{reserveTokenInfo ? (
-					<div className={styles.token}>
-						<Image layout="fixed" width="32px" height="32px" src={reserveTokenInfo.logoURI} alt={reserveTokenInfo.symbol} />
-
-						<div>
-							<b>{reserveTokenInfo.symbol}</b>
-							<p>{reserveTokenInfo.name}</p>
-						</div>
-					</div>
-				) : null}
 				<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
-					<Pane margin={6} textAlign="center">
-						Long
-						<br />
-						<Badge color="neutral">
-							{otcState.buyerDepositAmount} {reserveTokenInfo?.symbol}
-						</Badge>
-					</Pane>
-					<Pane margin={6} textAlign="center">
-						Short
-						<br />
-						<Badge color="neutral">
-							{otcState.sellerDepositAmount} {reserveTokenInfo?.symbol}
-						</Badge>
-					</Pane>
+					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
+					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
 				</Pane>
 				<hr />
 				{/* + + + + + + + + + + + + +  */}

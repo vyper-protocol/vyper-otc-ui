@@ -33,28 +33,6 @@
 				justify-content: space-between;
 			}
 		}
-
-    .token {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 8px;
-      margin-bottom: 4px;
-
-      div {
-        margin-left: 6px;
-
-        b {
-          margin: 0 4px;
-          font-size: 14px;
-        }
-
-        p {
-          font-size: 12px;
-          color: var(--color-black-700);
-        }
-      }
-    }
 	}
 
 	/* Simulator */
