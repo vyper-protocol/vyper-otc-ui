@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Tooltip } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
+import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
@@ -184,24 +185,13 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* COLLATERAL AMOUNTS */}
-				<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+				<Pane width="100%" display="flex" justifyContent="center" alignItems="center" marginBottom={4}>
 					<b>Collateral</b>
 				</Pane>
+
 				<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
-					<Pane margin={6} textAlign="center">
-						Long
-						<br />
-						<Badge color="neutral">
-							{otcState.buyerDepositAmount} {reserveTokenInfo?.symbol}
-						</Badge>
-					</Pane>
-					<Pane margin={6} textAlign="center">
-						Short
-						<br />
-						<Badge color="neutral">
-							{otcState.sellerDepositAmount} {reserveTokenInfo?.symbol}
-						</Badge>
-					</Pane>
+					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
+					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
 				</Pane>
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
