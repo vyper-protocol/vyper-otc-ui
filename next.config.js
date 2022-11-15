@@ -19,6 +19,16 @@ const moduleExports = {
 		// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#use-hidden-source-map
 		// for more information.
 		hideSourceMaps: true
+	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'raw.githubusercontent.com',
+				port: '',
+				pathname: '/solana-labs/token-list/**'
+			}
+		]
 	}
 };
 

@@ -1,9 +1,9 @@
-import { createQR, createQROptions, encodeURL, TransactionRequestURLFields } from '@solana/pay';
-import Layout from 'components/templates/Layout';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { createQROptions, encodeURL, TransactionRequestURLFields } from '@solana/pay';
 import QRCodeStyling from '@solana/qr-code-styling';
+import Layout from 'components/templates/Layout';
 import { useRouter } from 'next/router';
-import { ParsedUrlQuery } from 'querystring';
 
 const QRPage = () => {
 	const router = useRouter();

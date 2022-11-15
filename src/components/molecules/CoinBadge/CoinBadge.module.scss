@@ -1,0 +1,34 @@
+.container {
+	text-align: center;
+
+	.title {
+		font-size: var(--font-p-medium);
+		margin-bottom: 8px;
+	}
+
+	.chip {
+		background-color: var(--color-black-200);
+		padding: 4px 8px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+
+		.amount {
+			margin-right: 6px;
+			font-weight: 500;
+			margin-bottom: 3px;
+		}
+
+		.token {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 0.5px;
+
+			p {
+				margin-left: 4px;
+				margin-bottom: 4px;
+			}
+		}
+	}
+}

@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Tooltip } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
+import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
+import { Badge, HelpIcon, InfoSignIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -29,12 +29,12 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const [showSimulator, setShowSimulator] = useState(false);
 
-	const handleAddressClick = (e) => {
-		copyToClipboard(e.target.getAttribute('data-id'));
-		toast.info('Address copied to clipboard', {
-			autoClose: 2000
-		});
-	};
+	// const handleAddressClick = (e) => {
+	// 	copyToClipboard(e.target.getAttribute('data-id'));
+	// 	toast.info('Address copied to clipboard', {
+	// 		autoClose: 2000
+	// 	});
+	// };
 
 	const handleDocumentationClick = () => {
 		window.open(otcState.redeemLogicState.documentationLink);
@@ -46,10 +46,20 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const reserveTokenInfo = otcState.reserveTokenInfo;
 
-	const { pricesValue: livePricesValue, isInitialized: livePriceIsInitialized } = useOracleLivePrice(
+	const {
+		pricesValue: livePricesValue,
+		isInitialized: livePriceIsInitialized,
+		removeListener
+	} = useOracleLivePrice(
 		otcState.rateState.typeId,
 		otcState.rateState.livePriceAccounts.map((c) => c.toBase58())
 	);
+
+	useEffect(() => {
+		if (otcState.settleExecuted) {
+			removeListener();
+		}
+	}, [otcState.settleExecuted, removeListener]);
 
 	return (
 		<div className={styles.cards}>
@@ -63,12 +73,8 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* PLUGIN USED */}
 				<Pane width="100%" display="flex" alignItems="center">
 					<Badge color="purple" margin={6}>
-						{otcState.redeemLogicState.typeId}
+						{otcState.rateState.typeId}
 					</Badge>
-
-					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
-						<HelpIcon size={12} marginX={3} color="#6e62b6" onClick={handleDocumentationClick} className={styles.notionHelp} />
-					</Tooltip>
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.getContractStatus()} />
 				</Pane>
@@ -90,15 +96,12 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
-				<Pane width="100%" justifyContent="center" alignItems="center">
-					<Pane width="100%" textAlign="center">
-						<h5>{otcState.getContractTitle()}</h5>
-					</Pane>
-					<Pane width="100%" textAlign="center">
-						<Button onClick={handleAddressClick} data-id={otcState.publickey.toBase58()}>
-							{abbreviateAddress(otcState.publickey.toBase58())}
-						</Button>
-					</Pane>
+				<Pane width="100%" justifyContent="center" alignItems="center" textAlign="center">
+					<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
+					<Tooltip title="" placement="right">
+						<InfoSignIcon size={12} marginX={3} onClick={handleDocumentationClick} className={styles.notionHelp} />
+					</Tooltip>
+					<h5>{otcState.getContractTitle()}</h5>
 				</Pane>
 				<hr />
 
@@ -174,24 +177,13 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* COLLATERAL AMOUNTS */}
-				<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+				<Pane width="100%" display="flex" justifyContent="center" alignItems="center" marginBottom={4}>
 					<b>Collateral</b>
 				</Pane>
+
 				<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
-					<Pane margin={6} textAlign="center">
-						Long
-						<br />
-						<Badge color="neutral">
-							{otcState.buyerDepositAmount} {reserveTokenInfo?.symbol}
-						</Badge>
-					</Pane>
-					<Pane margin={6} textAlign="center">
-						Short
-						<br />
-						<Badge color="neutral">
-							{otcState.sellerDepositAmount} {reserveTokenInfo?.symbol}
-						</Badge>
-					</Pane>
+					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
+					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
 				</Pane>
 				<hr />
 				{/* + + + + + + + + + + + + +  */}

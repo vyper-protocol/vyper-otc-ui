@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { AnchorProvider } from '@project-serum/anchor';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
 import { buildCreateContractMessage as buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
@@ -31,7 +31,9 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 		if (initParams.saveOnDatabase) {
 			for (let i = 0; i < MAX_RETRIES; i++) {
 				try {
-					chainOtcState = await fetchContract(provider.connection, otcPublicKey, true);
+					// override commitment to go as fast as we can 🏎️
+					const conn = new Connection(provider.connection.rpcEndpoint, { commitment: 'processed' });
+					chainOtcState = await fetchContract(conn, otcPublicKey, true);
 				} catch {}
 
 				if (chainOtcState === undefined) {
