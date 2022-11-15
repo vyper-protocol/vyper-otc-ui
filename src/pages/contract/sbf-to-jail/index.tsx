@@ -34,6 +34,7 @@ const CreateSbfJailContractPage = () => {
 		try {
 			if (getCurrentCluster() !== 'devnet') {
 				alert('this page is only available on devnet');
+				return;
 			}
 
 			setIsLoading(true);
