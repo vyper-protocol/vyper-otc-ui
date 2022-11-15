@@ -2,6 +2,7 @@ import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHt
 import { PythHttpClientResult } from '@pythnetwork/client/lib/PythHttpClient';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
@@ -17,7 +18,13 @@ export class RatePythPlugin extends AbsRatePlugin {
 	}
 
 	get title(): string {
-		return this.pythProducts[0]?.symbol;
+		const oracleFromList = getOracleByPubkey(this.accountsRequiredForRefresh[0]);
+
+		if (oracleFromList) {
+			return oracleFromList.title;
+		} else {
+			return this.pythProducts[0]?.symbol;
+		}
 	}
 
 	get description(): string {

@@ -1,0 +1,76 @@
+{
+	"oracles": [
+		{
+			"type": "switchboard",
+			"cluster": "mainnet-beta",
+			"pubkey": "8SXvChNYFhRq4EZuZvnhjrB3jJRQCv4k3P4W6hesH3Ee",
+			"title": "BTC/USD",
+			"baseCurrency": "BTC",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "mainnet-beta",
+			"pubkey": "7Y3nWv5B2rLiDBsNpkfXqa4cbJqszJos2sZVutF8R3FE",
+			"title": "Solend cUSDC",
+			"baseCurrency": "cUSDC",
+			"quoteCurrency": "USDC"
+		},
+		{
+			"type": "pyth",
+			"cluster": "devnet",
+			"pubkey": "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix",
+			"title": "SOL/USD",
+			"baseCurrency": "SOL",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "pyth",
+			"cluster": "devnet",
+			"pubkey": "FVb5h1VmHPfVb1RfqZckchq18GxRv4iKt8T4eVTQAqdz",
+			"title": "AVAX/USD",
+			"baseCurrency": "AVAX",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "pyth",
+			"cluster": "devnet",
+			"pubkey": "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J",
+			"title": "BTC/USD",
+			"baseCurrency": "BCT",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "pyth",
+			"cluster": "mainnet-beta",
+			"pubkey": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
+			"title": "ETH/USD",
+			"baseCurrency": "ETH",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
+			"title": "SOL/USD",
+			"baseCurrency": "SOL",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
+			"title": "SOL/USD2",
+			"baseCurrency": "SOL",
+			"quoteCurrency": "USD"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "C6BciZWyhZRbjE1XdwAsYP2PZRErnDUdGChW1tKBV9wH",
+			"title": "Deribit.DVOL_BTC",
+			"baseCurrency": "",
+			"quoteCurrency": ""
+		}
+	]
+}

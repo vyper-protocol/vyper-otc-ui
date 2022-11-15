@@ -6,13 +6,12 @@ import cn from 'classnames';
 import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import { Badge, Button, HelpIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
+import { Badge, HelpIcon, InfoSignIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -30,12 +29,12 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const [showSimulator, setShowSimulator] = useState(false);
 
-	const handleAddressClick = (e) => {
-		copyToClipboard(e.target.getAttribute('data-id'));
-		toast.info('Address copied to clipboard', {
-			autoClose: 2000
-		});
-	};
+	// const handleAddressClick = (e) => {
+	// 	copyToClipboard(e.target.getAttribute('data-id'));
+	// 	toast.info('Address copied to clipboard', {
+	// 		autoClose: 2000
+	// 	});
+	// };
 
 	const handleDocumentationClick = () => {
 		window.open(otcState.redeemLogicState.documentationLink);
@@ -74,12 +73,8 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* PLUGIN USED */}
 				<Pane width="100%" display="flex" alignItems="center">
 					<Badge color="purple" margin={6}>
-						{otcState.redeemLogicState.typeId}
+						{otcState.rateState.typeId}
 					</Badge>
-
-					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
-						<HelpIcon size={12} marginX={3} color="#6e62b6" onClick={handleDocumentationClick} className={styles.notionHelp} />
-					</Tooltip>
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.getContractStatus()} />
 				</Pane>
@@ -101,15 +96,12 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
-				<Pane width="100%" justifyContent="center" alignItems="center">
-					<Pane width="100%" textAlign="center">
-						<h5>{otcState.getContractTitle()}</h5>
-					</Pane>
-					<Pane width="100%" textAlign="center">
-						<Button onClick={handleAddressClick} data-id={otcState.publickey.toBase58()}>
-							{abbreviateAddress(otcState.publickey.toBase58())}
-						</Button>
-					</Pane>
+				<Pane width="100%" justifyContent="center" alignItems="center" textAlign="center">
+					<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
+					<Tooltip title="" placement="right">
+						<InfoSignIcon size={12} marginX={3} onClick={handleDocumentationClick} className={styles.notionHelp} />
+					</Tooltip>
+					<h5>{otcState.getContractTitle()}</h5>
 				</Pane>
 				<hr />
 
