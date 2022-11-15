@@ -2,13 +2,13 @@ import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import { oracles as oracleData } from 'configs/oracles.json';
+import oraclesData from 'configs/oracles.json';
 import { OracleDetail } from 'models/OracleDetail';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
 
-const oraclesList = oracleData as OracleDetail[];
+const oraclesList = oraclesData.oracles as OracleDetail[];
 
 export default class RateSwitchboardPlugin extends AbsRatePlugin {
 	aggregatorsData: any;

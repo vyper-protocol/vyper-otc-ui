@@ -12,7 +12,7 @@ import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
-import { oracles } from 'configs/oracles.json';
+import oraclesData from 'configs/oracles.json';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
@@ -25,7 +25,7 @@ import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 const currentCluster = getCurrentCluster();
-const oraclesList = oracles as OracleDetail[];
+const oraclesList = oraclesData.oracles as OracleDetail[];
 
 const StrikePicker = ({
 	title,

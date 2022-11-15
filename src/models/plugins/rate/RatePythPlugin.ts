@@ -2,13 +2,13 @@ import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHt
 import { PythHttpClientResult } from '@pythnetwork/client/lib/PythHttpClient';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import { oracles as oracleData } from 'configs/oracles.json';
+import oraclesData from 'configs/oracles.json';
 import { OracleDetail } from 'models/OracleDetail';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
 
-const oraclesList = oracleData as OracleDetail[];
+const oraclesList = oraclesData.oracles as OracleDetail[];
 
 export class RatePythPlugin extends AbsRatePlugin {
 	static pythData: PythHttpClientResult = undefined;

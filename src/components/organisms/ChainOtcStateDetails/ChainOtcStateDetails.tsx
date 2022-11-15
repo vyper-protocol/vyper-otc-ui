@@ -8,9 +8,9 @@ import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { Badge, HelpIcon, InfoSignIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 import ClaimButton from '../actionButtons/ClaimButton';
