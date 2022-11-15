@@ -8,19 +8,13 @@ import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import resources from 'configs/resources.json';
-import {
-	Box,
-	Typography,
-	Tooltip,
-	Chip,
-	Popover
-} from '@mui/material';
+import { Box, Typography, Tooltip, Chip, Popover } from '@mui/material';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { HiFolderAdd } from 'react-icons/hi';
 import { TbMapSearch } from 'react-icons/tb';
 import { MdStackedBarChart } from 'react-icons/md';
 import { RiLayoutGridFill } from 'react-icons/ri';
-import { BiChevronDown } from "react-icons/bi";
+import { BiChevronDown } from 'react-icons/bi';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
@@ -42,9 +36,9 @@ const TopBar = () => {
 		}
 	};
 
-	const openSocialsMenu = event => setSocialsMenuAnchor(event.currentTarget);
+	const openSocialsMenu = (event) => setSocialsMenuAnchor(event.currentTarget);
 	const closeSocialsMenu = () => setSocialsMenuAnchor(undefined);
-	const openMobileMenu = event => setMobileMenuAnchor(event.currentTarget);
+	const openMobileMenu = (event) => setMobileMenuAnchor(event.currentTarget);
 	const closeMobileMenu = () => setMobileMenuAnchor(undefined);
 
 	const [navigation, setNavigation] = useState([
@@ -53,53 +47,54 @@ const TopBar = () => {
 		{ href: ['/explorer'], current: false }
 	]);
 
-	const menuItems = <>
-		{/* HOME LINK */}
-		<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Link href={UrlBuilder.buildHomeUrl()}>
-				<a>
-					<MdStackedBarChart size="20px" /> Home
-				</a>
-			</Link>
-		</div>
+	const menuItems = (
+		<>
+			{/* HOME LINK */}
+			<div className={navigation[0].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+				<Link href={UrlBuilder.buildHomeUrl()}>
+					<a>
+						<MdStackedBarChart size="20px" /> Home
+					</a>
+				</Link>
+			</div>
 
-		{/* CREATE CONTRACT LINK */}
-		<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Tooltip title="Coming soon">
-				<a onClick={onCreateContractClick}>
-					<HiFolderAdd size="20px" /> Create contract
-				</a>
-			</Tooltip>
-		</div>
+			{/* CREATE CONTRACT LINK */}
+			<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+				<Tooltip title="Coming soon">
+					<a onClick={onCreateContractClick}>
+						<HiFolderAdd size="20px" /> Create contract
+					</a>
+				</Tooltip>
+			</div>
 
-		{/* EXPLORER LINK */}
-		<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-			<Link href={UrlBuilder.buildExplorerUrl()}>
-				<a>
-					<TbMapSearch size="20px" /> Explorer
-				</a>
-			</Link>
-		</div>
+			{/* EXPLORER LINK */}
+			<div className={navigation[2].current ? cn(styles.item, styles.active) : cn(styles.item)}>
+				<Link href={UrlBuilder.buildExplorerUrl()}>
+					<a>
+						<TbMapSearch size="20px" /> Explorer
+					</a>
+				</Link>
+			</div>
 
-		{/* SOCIALS */}
-		<div className={styles.item} onClick={openSocialsMenu}>
-			<Typography className={styles.typography}>
-				<RiLayoutGridFill size="20px" /> More <BiChevronDown size="20px" />
-			</Typography>
-		</div>
-		<Popover
-			open={showSocialsMenu}
-			anchorEl={socialsMenuAnchor}
-			anchorOrigin={{
-				horizontal: "left",
-				vertical: "bottom"
-			}}
-			PaperProps={{
-				className: styles.popover
-			}}
-			onClose={closeSocialsMenu}
-		>
-			<Box className={styles.container}>
+			{/* SOCIALS */}
+			<div className={styles.item} onClick={openSocialsMenu}>
+				<Typography className={styles.typography}>
+					<RiLayoutGridFill size="20px" /> More <BiChevronDown size="20px" />
+				</Typography>
+			</div>
+			<Popover
+				open={showSocialsMenu}
+				anchorEl={socialsMenuAnchor}
+				anchorOrigin={{
+					horizontal: 'left',
+					vertical: 'bottom'
+				}}
+				PaperProps={{
+					className: styles.popover
+				}}
+				onClose={closeSocialsMenu}
+			>
+				<Box className={styles.container}>
 					{resources.socialMedias.map((item) => {
 						return (
 							<a key={item.name} className={styles.item} href={item.link} target="_blank" rel="noopener noreferrer">
@@ -109,12 +104,13 @@ const TopBar = () => {
 						);
 					})}
 				</Box>
-		</Popover>
+			</Popover>
 
-		<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
-			<AirdropButton />
-		</div>
-	</>;
+			<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
+				<AirdropButton />
+			</div>
+		</>
+	);
 
 	useEffect(() => {
 		const newNavigation = [...navigation];
@@ -140,7 +136,7 @@ const TopBar = () => {
 				</div>
 
 				<Box className={styles.nav}>
-					{ menuItems }
+					{menuItems}
 
 					{cluster !== 'mainnet-beta' && (
 						<Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} className={cn(styles.item, styles.mobileonly)} />
@@ -153,8 +149,8 @@ const TopBar = () => {
 						open={showMobileMenu}
 						anchorEl={mobileMenuAnchor}
 						anchorOrigin={{
-							horizontal: "left",
-							vertical: "bottom"
+							horizontal: 'left',
+							vertical: 'bottom'
 						}}
 						PaperProps={{
 							className: styles.popover
@@ -162,7 +158,7 @@ const TopBar = () => {
 						onClose={closeMobileMenu}
 					>
 						<Box className={cn(styles.container, styles.mobileNav)}>
-							{ menuItems }
+							{menuItems}
 							<Box className={styles.item}>
 								<SelectWallet />
 							</Box>
@@ -171,9 +167,7 @@ const TopBar = () => {
 				</Box>
 
 				<Box className={styles.navRightItems} display="flex" alignItems="center">
-					{cluster !== 'mainnet-beta' && (
-						<Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} />
-					)}
+					{cluster !== 'mainnet-beta' && <Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} />}
 					<SelectWallet />
 				</Box>
 			</Box>

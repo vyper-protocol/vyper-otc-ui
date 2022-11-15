@@ -21,7 +21,13 @@ const ContractStatusBadge = ({ status }: ContractStatusBadgeInput) => {
 	};
 
 	return (
-		<Chip label={getLabelFromStatus(status)} color={getColorFromStatus(status)} variant="outlined" size="small" sx={{ marginX: '3px', textTransform: 'capitalize' }}/>
+		<Chip
+			label={getLabelFromStatus(status)}
+			color={getColorFromStatus(status)}
+			variant="outlined"
+			size="small"
+			sx={{ marginX: '3px', textTransform: 'capitalize' }}
+		/>
 	);
 };
 

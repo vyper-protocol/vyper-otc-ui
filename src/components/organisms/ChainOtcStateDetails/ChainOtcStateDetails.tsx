@@ -72,12 +72,20 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* PLUGIN USED */}
-				<Box sx={{
-					width: '100%',
-					display: 'flex',
-					alignItems: 'center'
-				}}>
-					<Chip label={otcState.redeemLogicState.typeId} variant="outlined" color="secondary" size="small" sx={{ marginX: '3px', textTransform: 'capitalize' }}/>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						alignItems: 'center'
+					}}
+				>
+					<Chip
+						label={otcState.redeemLogicState.typeId}
+						variant="outlined"
+						color="secondary"
+						size="small"
+						sx={{ marginX: '3px', textTransform: 'capitalize' }}
+					/>
 
 					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
 						<HelpIcon fontSize="small" onClick={handleDocumentationClick} className={styles.notionHelp} />
@@ -88,27 +96,41 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* FUNDED SIDES */}
-				<Box sx={{
-					width: "100%",
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center"
-				}}>
-					<Chip label={otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'} variant="outlined" color={otcState.isBuyerFunded() ? 'success' : 'error'} size="small" sx={{ margin: '6px', textTransform: 'capitalize' }} />
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center'
+					}}
+				>
+					<Chip
+						label={otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'}
+						variant="outlined"
+						color={otcState.isBuyerFunded() ? 'success' : 'error'}
+						size="small"
+						sx={{ margin: '6px', textTransform: 'capitalize' }}
+					/>
 
 					<div style={{ flex: 1 }} />
 
-					<Chip label={otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'} variant="outlined" color={otcState.isSellerFunded() ? 'success' : 'error'} size="small" sx={{ margin: '6px', textTransform: 'capitalize' }} />
+					<Chip
+						label={otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'}
+						variant="outlined"
+						color={otcState.isSellerFunded() ? 'success' : 'error'}
+						size="small"
+						sx={{ margin: '6px', textTransform: 'capitalize' }}
+					/>
 				</Box>
 				<hr />
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
-				<Box sx={{ width: "100%", justifyContent: "center", alignItems: "center" }}>
-					<Box sx={{ width: "100%", textAlign: "center" }}>
+				<Box sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+					<Box sx={{ width: '100%', textAlign: 'center' }}>
 						<h5>{otcState.getContractTitle()}</h5>
 					</Box>
-					<Box sx={{ width: "100%", textAlign: "center" }}>
+					<Box sx={{ width: '100%', textAlign: 'center' }}>
 						<Button variant="outlined" onClick={handleAddressClick} data-id={otcState.publickey.toBase58()}>
 							{abbreviateAddress(otcState.publickey.toBase58())}
 						</Button>
@@ -180,7 +202,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-							<Chip label="SHORT" variant="outlined" color="error" size="small" />
+								<Chip label="SHORT" variant="outlined" color="error" size="small" />
 							</p>
 						</div>
 					)}
@@ -188,20 +210,24 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* COLLATERAL AMOUNTS */}
-				<Box sx={{
-					width: "100%",
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center"
-				}}>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center'
+					}}
+				>
 					<b>Collateral</b>
 				</Box>
-				<Box sx={{
-					width: "100%",
-					display: "flex",
-					justifyContent: "space-evenly",
-					alignItems: "center"
-				}}>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'space-evenly',
+						alignItems: 'center'
+					}}
+				>
 					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
 					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
 				</Box>
@@ -210,20 +236,30 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* PnL */}
 				{livePriceIsInitialized && otcState.isPnlAvailable() && (
 					<>
-						<Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 							<b>PnL</b>
 						</Box>
 
-						<Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-							<Box sx={{ margin: "6px", textAlign: "center" }}>
+						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+							<Box sx={{ margin: '6px', textAlign: 'center' }}>
 								Long
 								<br />
-								<Chip label={`${formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`} variant="outlined" color={otcState.getPnlBuyer(livePricesValue) > 0 ? 'success' : 'error'} size="small" />
+								<Chip
+									label={`${formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
+									variant="outlined"
+									color={otcState.getPnlBuyer(livePricesValue) > 0 ? 'success' : 'error'}
+									size="small"
+								/>
 							</Box>
-							<Box sx={{ margin: "6px", textAlign: "center" }}>
+							<Box sx={{ margin: '6px', textAlign: 'center' }}>
 								Short
 								<br />
-								<Chip label={`${formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`} variant="outlined" color={otcState.getPnlSeller(livePricesValue) > 0 ? 'success' : 'error'} size="small" />
+								<Chip
+									label={`${formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
+									variant="outlined"
+									color={otcState.getPnlSeller(livePricesValue) > 0 ? 'success' : 'error'}
+									size="small"
+								/>
 							</Box>
 						</Box>
 					</>

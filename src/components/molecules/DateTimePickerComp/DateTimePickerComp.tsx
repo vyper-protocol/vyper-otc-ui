@@ -32,7 +32,7 @@ const DateTimePickerComp = ({ title, value, onChange }: DateTimePickerCompInput)
 	];
 
 	return (
-		<Box sx={{ marginY:6, marginX:1 }}>
+		<Box sx={{ marginY: 6, marginX: 1 }}>
 			<DateTimePicker
 				renderInput={(props) => <TextField {...props} helperText={moment(value).fromNow()} />}
 				label={title}
@@ -42,7 +42,7 @@ const DateTimePickerComp = ({ title, value, onChange }: DateTimePickerCompInput)
 					onChange(newValue);
 				}}
 			/>
-			<Box sx={{ display:'flex', alignItems:'center' }}>
+			<Box sx={{ display: 'flex', alignItems: 'center' }}>
 				<ButtonGroup variant="outlined">
 					{auxButtons.map(({ label, onClick }, i) => (
 						<Button key={i} onClick={onClick}>

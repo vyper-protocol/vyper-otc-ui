@@ -8,7 +8,6 @@ import cn from 'classnames';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
-
 import styles from './SearchBar.module.scss';
 
 type SearchBarProps = {
@@ -58,7 +57,7 @@ const SearchBar = ({ searchState, className }: SearchBarProps) => {
 			<p className={cn(styles.error, !hasError ? styles.hidden : styles.visible)}>
 				{' '}
 				<ErrorIcon />
-					Invalid Public Key
+				Invalid Public Key
 			</p>
 		</div>
 	);

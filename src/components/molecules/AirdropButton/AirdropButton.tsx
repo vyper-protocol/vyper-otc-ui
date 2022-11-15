@@ -35,7 +35,7 @@ const AirdropButton = () => {
 
 	return (
 		<Tooltip title="Airdrop tokens">
-			<div onClick={onAirdropClick} style={{ display:'flex', flexDirection:'row', alignItems:'center' }}>
+			<div onClick={onAirdropClick} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 				<CloudDownloadIcon />
 				<p>Airdrop</p>
 			</div>

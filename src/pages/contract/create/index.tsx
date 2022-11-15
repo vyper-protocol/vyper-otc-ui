@@ -37,7 +37,7 @@ const StrikePicker = ({
 	onRefreshClick: () => void;
 }) => {
 	return (
-		<Box sx={{ display: "flex", alignItems: "center", margin: "12px" }}>
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '12px' }}>
 			<TextField
 				label={title}
 				variant="outlined"
@@ -47,27 +47,31 @@ const StrikePicker = ({
 				onChange={(e) => {
 					return onChange(parseInt(e.target.value));
 				}}
-				InputProps={{ endAdornment: <InputAdornment position="end">
-					<ButtonGroup variant='text'>
-						<Button onClick={onRefreshClick}>
-							<HiOutlineRefresh />
-						</Button>
-						<Button
-							onClick={() => {
-								return onChange(value * 2);
-							}}
-						>
-							* 2
-						</Button>
-						<Button
-							onClick={() => {
-								return onChange(value / 2);
-							}}
-						>
-							/ 2
-						</Button>
-					</ButtonGroup>
-				</InputAdornment> }}
+				InputProps={{
+					endAdornment: (
+						<InputAdornment position="end">
+							<ButtonGroup variant="text">
+								<Button onClick={onRefreshClick}>
+									<HiOutlineRefresh />
+								</Button>
+								<Button
+									onClick={() => {
+										return onChange(value * 2);
+									}}
+								>
+									* 2
+								</Button>
+								<Button
+									onClick={() => {
+										return onChange(value / 2);
+									}}
+								>
+									/ 2
+								</Button>
+							</ButtonGroup>
+						</InputAdornment>
+					)
+				}}
 			/>
 		</Box>
 	);
@@ -87,9 +91,9 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 	}, [value, connection]);
 
 	return (
-		<Box sx={{ display: "flex", alignItems: "center", margin: "6px" }}>
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '6px' }}>
 			<TextField
-				sx={{ width: "100%" }}
+				sx={{ width: '100%' }}
 				label={title + ' ' + aggregatorName}
 				variant="outlined"
 				size="small"
@@ -120,9 +124,9 @@ const PublicKeyPicker = ({
 	hints: { pubkey: string; label: string }[];
 }) => {
 	return (
-		<Box sx={{ display: "flex", alignItems: "center", margin: "6px" }}>
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '6px' }}>
 			<TextField
-				sx={{ width: "100%" }}
+				sx={{ width: '100%' }}
 				label={title}
 				variant="outlined"
 				size="small"
@@ -131,17 +135,12 @@ const PublicKeyPicker = ({
 					return onChange(e.target.value);
 				}}
 			/>
-			<Select
-				sx={{ width: "100%", margin: "12px" }}
-				value={value}
-				size="small"
-				onChange={event => onChange(event.target.value)}
-			>
-				{
-					hints.map(hint =>
-						<MenuItem key={hint.pubkey} value={hint.pubkey}>{hint.label}</MenuItem>
-					)
-				}
+			<Select sx={{ width: '100%', margin: '12px' }} value={value} size="small" onChange={(event) => onChange(event.target.value)}>
+				{hints.map((hint) => (
+					<MenuItem key={hint.pubkey} value={hint.pubkey}>
+						{hint.label}
+					</MenuItem>
+				))}
 			</Select>
 
 			{/* {hints.map((c) => (
@@ -177,9 +176,9 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 	}, [value, connection]);
 
 	return (
-		<Box sx={{ display: "flex", alignItems: "center", margin: "6px" }}>
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '6px' }}>
 			<TextField
-				sx={{ width: "100%" }}
+				sx={{ width: '100%' }}
 				label={title + ' ' + productSymbol}
 				variant="outlined"
 				size="small"
@@ -363,19 +362,19 @@ const CreateContractPage = () => {
 				<b>Redeem Logic</b>
 
 				<Select
-					sx={{ width: "100%", margin: "12px" }}
+					sx={{ width: '100%', margin: '12px' }}
 					value={redeemLogicPluginType}
 					size="small"
-					onChange={event => setRedeemLogicPluginType(event.target.value as RedeemLogicPluginTypeIds)}
+					onChange={(event) => setRedeemLogicPluginType(event.target.value as RedeemLogicPluginTypeIds)}
 				>
-					{
-						AVAILABLE_REDEEM_LOGIC_PLUGINS.map(plugin =>
-							<MenuItem key={plugin} value={plugin}>{plugin}</MenuItem>
-						)
-					}
+					{AVAILABLE_REDEEM_LOGIC_PLUGINS.map((plugin) => (
+						<MenuItem key={plugin} value={plugin}>
+							{plugin}
+						</MenuItem>
+					))}
 				</Select>
 
-				<Box sx={{ display: "flex", alignItems: "center" }}>
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
 					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward' || redeemLogicPluginType === 'vanilla_option') && (
 						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
@@ -395,15 +394,16 @@ const CreateContractPage = () => {
 				<b>Rate Plugin</b>
 
 				<Select
-					sx={{ width: "100%", margin: "12px" }}
+					sx={{ width: '100%', margin: '12px' }}
 					value={ratePluginType}
 					size="small"
-					onChange={event => setRatePluginType(event.target.value as RatePluginTypeIds)}>
-						{
-							AVAILABLE_RATE_PLUGINS.map(plugin =>
-								<MenuItem key={plugin} value={plugin}>{plugin}</MenuItem>
-							)
-						}
+					onChange={(event) => setRatePluginType(event.target.value as RatePluginTypeIds)}
+				>
+					{AVAILABLE_RATE_PLUGINS.map((plugin) => (
+						<MenuItem key={plugin} value={plugin}>
+							{plugin}
+						</MenuItem>
+					))}
 				</Select>
 
 				{ratePluginType === 'switchboard' && (
@@ -423,17 +423,17 @@ const CreateContractPage = () => {
 
 				<hr />
 
-				<Box sx={{ display: "flex", alignItems: "center" }}>
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<AmountPicker title="Long amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
 					<AmountPicker title="Short amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
 				</Box>
 
 				<hr />
 
-				<Box sx={{ display: "flex", alignItems: "center" }}>
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
 				</Box>
-				<Box sx={{ display: "flex", alignItems: "center" }}>
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
 					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
 					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
@@ -441,10 +441,7 @@ const CreateContractPage = () => {
 
 				{process.env.NODE_ENV === 'development' && (
 					<FormGroup>
-						<FormControlLabel
-							control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
-							label="Save on database"
-						/>
+						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
 						<FormControlLabel
 							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
 							label="Send notification"

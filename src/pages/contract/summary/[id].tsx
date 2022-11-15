@@ -3,10 +3,7 @@
 import { useConnection } from '@solana/wallet-adapter-react';
 import ChainOtcStateDetails from 'components/organisms/ChainOtcStateDetails/ChainOtcStateDetails';
 import Layout from 'components/templates/Layout';
-import {
-	Box,
-	CircularProgress
-} from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
 import styles from './summary.module.scss';
