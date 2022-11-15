@@ -1,19 +1,20 @@
 /* eslint-disable no-console */
 import { useContext, useState } from 'react';
 
-import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
+import { Alert, AlertTitle, FormControlLabel, FormGroup, Slider, Stack, Switch, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { Button, Pane, TextInputField } from 'evergreen-ui';
+import { Button, Pane } from 'evergreen-ui';
 import moment from 'moment';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 
 const CreateSbfJailContractPage = () => {
 	const { connection } = useConnection();
@@ -47,7 +48,7 @@ const CreateSbfJailContractPage = () => {
 
 			const depositStart = moment().toDate().getTime();
 			const depositEnd = moment().add(2, 'days').toDate().getTime();
-			const settleStart = moment('2023-01-01 00:00:00').toDate().getTime();
+			const settleStart = moment('2022-12-30 09:00:00Z').toDate().getTime();
 
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
@@ -80,33 +81,38 @@ const CreateSbfJailContractPage = () => {
 
 	return (
 		<Layout>
-			<Grid container direction="row">
-				<Grid item>
-					<Grid container direction="column">
-						<Grid item>1</Grid>
-						<Grid item>2</Grid>
-					</Grid>
-				</Grid>
-				<Grid item>
-					<Grid container direction="column">
-						<Grid item>3</Grid>
-						<Grid item>4</Grid>
-					</Grid>
-				</Grid>
-			</Grid>
+			<Pane maxWidth={600}>
+				<Pane textAlign="center">
+					<h1>SBF JAIL Contract</h1>
+					<Image width="400" height="200" alt="abstract-colors" src="/sbf-to-jail.jpg" />
+				</Pane>
+				<Alert sx={{ maxWidth: '800px', marginBottom: '10' }} severity="warning">
+					<AlertTitle>How to trade this? </AlertTitle>
+					Each contract value can range from 0 to 100 so use the slider below to input the probability of SBF being indicted, where 0 is &apos;NOT GONNA
+					HAPPEN&apos; and 100 is &apos;DEFINITELY HAPPENING&apos;. Once the contract is created you also need to deposit the funds so remember to click on LONG
+					to buy the contract, and SHORT if you want to sell it. SHORT side has to deposit the full collateral amount, whereas the LONG side just need to
+					deposit an amount equal to the probability of the event. If you want to check the orders created by other users just head to the Explorer{' '}
+					<a target="_blank" rel="noreferrer" href={UrlBuilder.buildExplorerUrl()}>
+						here
+					</a>
+				</Alert>
 
-			<Pane>
-				<TextInputField
-					label="Long amount"
-					type="number"
-					value={longAmount}
-					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						const val = Number(e.target.value);
-						if (val < 1) return setLongAmount(1);
-						if (val > 100) return setLongAmount(100);
-						return setLongAmount(val);
-					}}
-				/>
+				<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+					<Typography>NOT GONNA HAPPEN (0)</Typography>
+
+					<Slider
+						aria-label="Volume"
+						sx={{ paddingLeft: '10', paddingRight: '10' }}
+						value={longAmount}
+						onChange={(e: Event, newValue: number) => {
+							if (newValue < 1) return setLongAmount(1);
+							if (newValue > 100) return setLongAmount(100);
+							return setLongAmount(newValue);
+						}}
+					/>
+
+					<Typography>DEFINITELY HAPPENING (100)</Typography>
+				</Stack>
 
 				{process.env.NODE_ENV === 'development' && (
 					<FormGroup>
@@ -120,10 +126,34 @@ const CreateSbfJailContractPage = () => {
 						/>
 					</FormGroup>
 				)}
-				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-					Create Contract
-				</Button>
+
+				<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+					<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+						Create Contract 🔥🚀
+					</Button>
+					<Typography>This will deploy the contract on devnet with fake USDC</Typography>
+				</Stack>
+				<hr />
+
+				<Alert sx={{ maxWidth: '800px' }} severity="info" variant="outlined">
+					<AlertTitle>SBF/FREE - SBF/JAIL ?</AlertTitle>
+					What is the SBF-JAIL-2022 contract? SBF-JAIL-2022 is An event contract on Vyper Protocol. SBF-JAIL-2022 expires to $1 if Sam Bankman Fried is indicted
+					for ANY CRIME by a Court in any country (United States of America, Bahamas, Hong Kong, etc), and $0 otherwise.
+					<br />
+					The event contract expires on 30th DECEMBER 9AM UTC TIME. You can think of this as a yes-or-no question, where there are only two outcomes possible.
+					The price of the contract fluctuates and reflects the difference in demand for Yes or No. For example, the price for the Yes side will be higher if
+					more people believe there is a high chance of SBF being convicted, and lower if more believe in No. In this way, event contracts aggregate opinions
+					and can offer an objective measure of the likelihood of any event.
+					<br />
+					The primary resolution source for this market shall be any news outlet and publication such as Bloomberg, WSJ plus others as well as any official
+					information from government entities such as FBI, Justice Department and others. A consensus of the above reporting may be also used.
+					<br />
+					We retain the final right to interpretation of this contract. We will not entertain any objections to this contract’s settlement mechanisms. By
+					trading these contracts, you are agreeing to abide by interpretations of terms above.
+				</Alert>
 			</Pane>
+
+			<Pane></Pane>
 		</Layout>
 	);
 };
