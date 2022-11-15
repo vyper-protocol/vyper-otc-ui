@@ -43,10 +43,6 @@ const CreateSbfJailContractPage = () => {
 			const depositEnd = moment().add(2, 'days').toDate().getTime();
 			const settleStart = moment('2023-01-01 00:00:00').toDate().getTime();
 
-			console.log('depositStart: ', depositStart);
-			console.log('depositEnd: ', depositEnd);
-			console.log('settleStart: ', settleStart);
-
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
 				depositStart,
