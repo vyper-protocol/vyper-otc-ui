@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
@@ -10,25 +10,35 @@ import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
-export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: string[]): { pricesValue: number[]; isInitialized: boolean } => {
+export const useOracleLivePrice = (
+	oracleType: RatePluginTypeIds,
+	pubkeys: string[]
+): { pricesValue: number[]; isInitialized: boolean; removeListener: () => void } => {
 	const [pricesValue, setPricesValue] = useState<number[]>([]);
 	const [isInitialized, setIsInitialized] = useState(false);
+	const [accountsToWatch] = useState<PublicKey[]>(pubkeys.map((c) => new PublicKey(c)));
+	const [subscriptionsId, setSubscriptionsId] = useState<number[]>([]);
+
 	const { connection } = useConnection();
 
-	const mutex = new Mutex();
+	const removeListener = useCallback(() => {
+		// console.log('Remove Listener Called');
+		subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
+	}, [connection, subscriptionsId]);
 
-	const accountsToWatch = pubkeys.map((c) => new PublicKey(c));
-
-	const decodeAccountInfo = async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
-		let newPriceValue = 0;
-		if (oracleType === 'switchboard') {
-			newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
-		}
-		if (oracleType === 'pyth') {
-			newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
-		}
-		return newPriceValue;
-	};
+	const decodeAccountInfo = useCallback(
+		async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
+			let newPriceValue = 0;
+			if (oracleType === 'switchboard') {
+				newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
+			}
+			if (oracleType === 'pyth') {
+				newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
+			}
+			return newPriceValue;
+		},
+		[connection, oracleType]
+	);
 
 	// first fetch
 	useEffect(() => {
@@ -39,14 +49,13 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 			setPricesValue(newPricesValue);
 			setIsInitialized(true);
 		};
-
 		fetchData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [accountsToWatch, connection, decodeAccountInfo]);
 
 	// listen for account changes
 	useEffect(() => {
-		const subscriptionsId = accountsToWatch.map((pubkey, i) =>
+		const mutex = new Mutex();
+		const subscriptionIds = accountsToWatch.map((pubkey, i) =>
 			connection.onAccountChange(
 				pubkey,
 				async (updatedAccountInfo) => {
@@ -66,11 +75,12 @@ export const useOracleLivePrice = (oracleType: RatePluginTypeIds, pubkeys: strin
 				'confirmed'
 			)
 		);
+		setSubscriptionsId(subscriptionIds);
 
 		return () => {
-			subscriptionsId.map((c) => connection.removeAccountChangeListener(c));
+			subscriptionIds.map((c) => connection.removeAccountChangeListener(c));
 		};
-	}, []);
+	}, [accountsToWatch, connection, decodeAccountInfo, isInitialized, oracleType, pricesValue]);
 
-	return { pricesValue, isInitialized };
+	return { pricesValue, isInitialized, removeListener };
 };

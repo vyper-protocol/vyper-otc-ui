@@ -8,9 +8,9 @@ import { fetchTokenInfo } from 'api/next-api/fetchTokenInfo';
 import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
+import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
 import { RedeemLogicForward, IDL as RedeemLogicForwardIDL } from 'idls/redeem_logic_forward';
 import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from 'idls/redeem_logic_settled_forward';
-import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
 import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
@@ -18,9 +18,9 @@ import _ from 'lodash';
 import { DbOtcState } from 'models/DbOtcState';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
-import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
 import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
@@ -74,6 +74,8 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
 	res.reserveTokenInfo = await fetchTokenInfo(trancheConfigAccountInfo.reserveMint);
+	res.programBuyerTA = accountInfo.otcSeniorReserveTokenAccount;
+	res.programSellerTA = accountInfo.otcJuniorReserveTokenAccount;
 
 	res.createdAt = accountInfo.created.toNumber() * 1000;
 	res.depositAvailableFrom = accountInfo.depositStart.toNumber() * 1000;
@@ -347,6 +349,8 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 		'otcState',
 		firstFetch_accountsData.find((c) => c.pubkey.equals(data.publickey)).data.data
 	);
+	res.programBuyerTA = currentOtcStateAccount.otcSeniorReserveTokenAccount;
+	res.programSellerTA = currentOtcStateAccount.otcJuniorReserveTokenAccount;
 
 	res.reserveMintInfo = unpackMint(res.reserveMint, firstFetch_accountsData.find((c) => c.pubkey.equals(res.reserveMint)).data);
 	res.settleExecuted = currentOtcStateAccount.settleExecuted;

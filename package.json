@@ -10,13 +10,6 @@
 		"analyze": "ANALYZE=true yarn build",
 		"lint": "next lint",
 		"format": "prettier --write \"src/**/*.tsx\" \"src/**/*.ts\" ",
-		"commit": "git add . && cz",
-		"first-release": "standard-version -- --first-release",
-		"release": "standard-version",
-		"release:minor": "standard-version --release-as minor",
-		"release:patch": "standard-version --release-as patch",
-		"release:major": "standard-version --release-as major",
-		"push-tags": "git push --follow-tags origin master",
 		"prepare": "husky install",
 		"storybook": "start-storybook -p 6006 -s ./public",
 		"build-storybook": "build-storybook -s public"
@@ -54,7 +47,6 @@
 		"axios": "^1.1.3",
 		"bignumber.js": "^9.1.0",
 		"classnames": "^2.3.2",
-		"coingecko-api": "^1.0.10",
 		"evergreen-ui": "^6.10.3",
 		"lodash": "^4.17.21",
 		"moment": "^2.29.4",
@@ -84,7 +76,6 @@
 		"@typescript-eslint/parser": "^5.37.0",
 		"@vyper-protocol/prettier-config": "^0.1.0",
 		"babel-loader": "^8.2.5",
-		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "^8.23.1",
 		"eslint-config-standard": "^17.0.0",
 		"eslint-plugin-css-modules": "^2.11.0",
@@ -98,15 +89,9 @@
 		"prettier": "^2.7.1",
 		"rimraf": "^3.0.2",
 		"sass": "^1.54.9",
-		"standard-version": "^9.5.0",
 		"storybook-addon-next": "^1.6.9",
 		"storybook-addon-sass-postcss": "^0.1.3",
 		"typescript": "4.8.3"
-	},
-	"config": {
-		"commitizen": {
-			"path": "./node_modules/cz-conventional-changelog"
-		}
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx}": [

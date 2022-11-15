@@ -30,14 +30,24 @@ export class ChainOtcState extends AbsOtcState {
 	pricesAtSettlement: number[] | undefined;
 
 	/**
-	 * OTC program token account for buyer tokens
+	 * OTC program token amount for buyer tokens
 	 */
 	programBuyerTAAmount: number;
 
 	/**
-	 * OTC program token account for seller tokens
+	 * OTC program token account for buyer tokens
+	 */
+	programBuyerTA: PublicKey;
+
+	/**
+	 * OTC program token amount for seller tokens
 	 */
 	programSellerTAAmount: number;
+
+	/**
+	 * OTC program token account for seller tokens
+	 */
+	programSellerTA: PublicKey;
 
 	/**
 	 * Buyer wallet

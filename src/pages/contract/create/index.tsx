@@ -115,6 +115,7 @@ const PublicKeyPicker = ({
 }: {
 	title: string;
 	value: string;
+	// eslint-disable-next-line no-unused-vars
 	onChange: (val: string) => void;
 	hints: { pubkey: string; label: string }[];
 }) => {
@@ -206,7 +207,7 @@ const CreateContractPage = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
-	const [sendNotification, setSendNotification] = useState(false);
+	const [sendNotification, setSendNotification] = useState(true);
 
 	const reserveMintHints = [
 		{
@@ -438,16 +439,18 @@ const CreateContractPage = () => {
 					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
 				</Box>
 
-				<FormGroup>
-					<FormControlLabel
-						control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
-						label="Save on database"
-					/>
-					<FormControlLabel
-						control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
-						label="Send notification"
-					/>
-				</FormGroup>
+				{process.env.NODE_ENV === 'development' && (
+					<FormGroup>
+						<FormControlLabel
+							control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
+							label="Save on database"
+						/>
+						<FormControlLabel
+							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
+							label="Send notification"
+						/>
+					</FormGroup>
+				)}
 
 				<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract

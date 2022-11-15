@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Tooltip, Chip, Button, Box } from '@mui/material';
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
+import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
@@ -46,10 +47,20 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const reserveTokenInfo = otcState.reserveTokenInfo;
 
-	const { pricesValue: livePricesValue, isInitialized: livePriceIsInitialized } = useOracleLivePrice(
+	const {
+		pricesValue: livePricesValue,
+		isInitialized: livePriceIsInitialized,
+		removeListener
+	} = useOracleLivePrice(
 		otcState.rateState.typeId,
 		otcState.rateState.livePriceAccounts.map((c) => c.toBase58())
 	);
+
+	useEffect(() => {
+		if (otcState.settleExecuted) {
+			removeListener();
+		}
+	}, [otcState.settleExecuted, removeListener]);
 
 	return (
 		<div className={styles.cards}>
@@ -188,19 +199,11 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<Box sx={{
 					width: "100%",
 					display: "flex",
-					justifyContent: "center",
+					justifyContent: "space-evenly",
 					alignItems: "center"
 				}}>
-					<Box sx={{ margin: "6px", textAlign: "center" }}>
-						Long
-						<br />
-						<Chip variant="outlined" size="small" label={`${otcState.buyerDepositAmount} ${reserveTokenInfo?.symbol ?? ''}`} />
-					</Box>
-					<Box sx={{ margin: "6px", textAlign: "center" }}>
-						Short
-						<br />
-						<Chip variant="outlined" size="small" label={`${otcState.sellerDepositAmount} ${reserveTokenInfo?.symbol ?? ''}`} />
-					</Box>
+					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
+					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
 				</Box>
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
