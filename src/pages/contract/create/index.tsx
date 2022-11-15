@@ -6,21 +6,26 @@ import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
+import { getAggregatorLatestValue } from 'api/switchboard/switchboardHelper';
 import AmountPicker from 'components/molecules/AmountPicker';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
+import { oracles } from 'configs/oracles.json';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
+import { OracleDetail } from 'models/OracleDetail';
 import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
+
+const currentCluster = getCurrentCluster();
+const oraclesList = oracles as OracleDetail[];
 
 const StrikePicker = ({
 	title,
@@ -59,36 +64,6 @@ const StrikePicker = ({
 			>
 				/ 2
 			</Button>
-		</Pane>
-	);
-};
-
-// eslint-disable-next-line no-unused-vars
-const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
-	const [aggregatorName, setAggregatorName] = useState('');
-	const { connection } = useConnection();
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const n = await getAggregatorName(connection, new PublicKey(value));
-			setAggregatorName(n);
-		};
-		fetchData();
-	}, [value, connection]);
-
-	return (
-		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField
-				width="100%"
-				label={title + ' ' + aggregatorName}
-				value={value}
-				onChange={(e) => {
-					return onChange(e.target.value);
-				}}
-			/>
-			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
-				<IconButton icon={ShareIcon} intent="success" />
-			</a>
 		</Pane>
 	);
 };
@@ -136,32 +111,43 @@ const PublicKeyPicker = ({
 	);
 };
 
-// eslint-disable-next-line no-unused-vars
-const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
-	const [productSymbol, setProductSymbol] = useState('');
-	const { connection } = useConnection();
+// RATE PLUGINS
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const [product] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(value));
-				if (product) setProductSymbol(product?.symbol ?? '');
-				else setProductSymbol('');
-			} catch {
-				setProductSymbol('');
-			}
-		};
-		fetchData();
-	}, [value, connection]);
+// eslint-disable-next-line no-unused-vars
+const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
+	const filteredOracles = oraclesList.filter(({ type, cluster }) => type === 'switchboard' && cluster === currentCluster);
 
 	return (
 		<Pane display="flex" alignItems="center" margin={6}>
-			<TextInputField
+			<Combobox
+				placeholder={title}
 				width="100%"
-				label={title + ' ' + productSymbol}
-				value={value}
+				items={filteredOracles}
+				itemToString={(item) => (item ? item.title : '')}
 				onChange={(e) => {
-					return onChange(e.target.value);
+					return onChange(e.pubkey);
+				}}
+			/>
+			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
+				<IconButton icon={ShareIcon} intent="success" />
+			</a>
+		</Pane>
+	);
+};
+
+// eslint-disable-next-line no-unused-vars
+const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
+	const filteredOracles = oraclesList.filter(({ type, cluster }) => type === 'pyth' && cluster === currentCluster);
+
+	return (
+		<Pane display="flex" alignItems="center" margin={6}>
+			<Combobox
+				placeholder={title}
+				width="100%"
+				items={filteredOracles}
+				itemToString={(item) => (item ? item.title : '')}
+				onChange={(e) => {
+					return onChange(e.pubkey);
 				}}
 			/>
 			<a target="_blank" href="https://pyth.network/price-feeds" rel="noopener noreferrer">
@@ -180,10 +166,10 @@ const CreateContractPage = () => {
 	const txHandler = useContext(TxHandlerContext);
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
-	const [sendNotification, setSendNotification] = useState(true);
+	const [saveOnDatabase, setSaveOnDatabase] = useState(process.env.NODE_ENV === 'development' ? false : true);
+	const [sendNotification, setSendNotification] = useState(process.env.NODE_ENV === 'development' ? false : true);
 
-	const reserveMintHints = [
+	const reserveMintHintsMainnet = [
 		{
 			pubkey: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
 			label: 'mainnet USDC'
@@ -195,13 +181,16 @@ const CreateContractPage = () => {
 		{
 			pubkey: 'So11111111111111111111111111111111111111112',
 			label: 'mainnet wSOL'
-		},
+		}
+	];
+
+	const reserveMintHintsDevnet = [
 		{
 			pubkey: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
 			label: 'devnet test tokens'
 		}
 	];
-	const [reserveMint, setReserveMint] = useState(reserveMintHints[0].pubkey);
+	const [reserveMint, setReserveMint] = useState(currentCluster === 'devnet' ? reserveMintHintsDevnet[0].pubkey : reserveMintHintsMainnet[0].pubkey);
 
 	const [depositStart, setDepositStart] = useState(moment().add(0, 'minutes').toDate().getTime());
 	const [depositEnd, setDepositEnd] = useState(moment().add(5, 'minutes').toDate().getTime());
@@ -222,7 +211,7 @@ const CreateContractPage = () => {
 	const setStrikeToDefaultValue = async () => {
 		try {
 			if (ratePluginType === 'pyth') {
-				const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
+				const [, price] = await RatePythPlugin.GetProductPrice(connection, currentCluster, new PublicKey(pythPrice_1));
 				setStrike(price?.price ?? 0);
 			}
 			if (ratePluginType === 'switchboard') {
@@ -260,11 +249,15 @@ const CreateContractPage = () => {
 			const rateAccounts: PublicKey[] = [];
 			if (ratePluginType === 'switchboard') {
 				rateAccounts.push(new PublicKey(switchboardAggregator_1));
-				rateAccounts.push(new PublicKey(switchboardAggregator_2));
+				if (redeemLogicPluginType === 'settled_forward') {
+					rateAccounts.push(new PublicKey(switchboardAggregator_2));
+				}
 			}
 			if (ratePluginType === 'pyth') {
 				rateAccounts.push(new PublicKey(pythPrice_1));
-				rateAccounts.push(new PublicKey(pythPrice_2));
+				if (redeemLogicPluginType === 'settled_forward') {
+					rateAccounts.push(new PublicKey(pythPrice_2));
+				}
 			}
 
 			let redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
@@ -351,10 +344,7 @@ const CreateContractPage = () => {
 					)}
 					{(redeemLogicPluginType === 'digital' || redeemLogicPluginType === 'vanilla_option') && (
 						<FormGroup>
-							<FormControlLabel
-								control={<Switch defaultChecked checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />}
-								label={isCall ? 'Call' : 'Put'}
-							/>
+							<FormControlLabel control={<Switch checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />} label={isCall ? 'Call' : 'Put'} />
 						</FormGroup>
 					)}
 				</Pane>
@@ -390,7 +380,12 @@ const CreateContractPage = () => {
 				<hr />
 
 				<Pane display="flex" alignItems="center">
-					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
+					<PublicKeyPicker
+						title="Reserve Mint"
+						value={reserveMint}
+						onChange={setReserveMint}
+						hints={currentCluster === 'devnet' ? reserveMintHintsDevnet : reserveMintHintsMainnet}
+					/>
 				</Pane>
 				<Pane display="flex" alignItems="center">
 					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
@@ -399,12 +394,9 @@ const CreateContractPage = () => {
 				</Pane>
 				{process.env.NODE_ENV === 'development' && (
 					<FormGroup>
+						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
 						<FormControlLabel
-							control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
-							label="Save on database"
-						/>
-						<FormControlLabel
-							control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
+							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
 							label="Send notification"
 						/>
 					</FormGroup>

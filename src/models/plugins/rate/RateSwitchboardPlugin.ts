@@ -2,9 +2,13 @@ import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { oracles as oracleData } from 'configs/oracles.json';
+import { OracleDetail } from 'models/OracleDetail';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
+
+const oraclesList = oracleData as OracleDetail[];
 
 export default class RateSwitchboardPlugin extends AbsRatePlugin {
 	aggregatorsData: any;
@@ -16,7 +20,15 @@ export default class RateSwitchboardPlugin extends AbsRatePlugin {
 
 	get title(): string {
 		try {
-			return AggregatorAccount.getName(this.aggregatorsData[0]);
+			const oracleFromList = oraclesList.find(
+				({ pubkey, cluster }) => pubkey === this.accountsRequiredForRefresh[0].toBase58() && cluster === getCurrentCluster()
+			);
+
+			if (oracleFromList) {
+				return oracleFromList.title;
+			} else {
+				return AggregatorAccount.getName(this.aggregatorsData[0]);
+			}
 		} catch {
 			return '-';
 		}
