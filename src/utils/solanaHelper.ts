@@ -10,7 +10,7 @@ export async function accountExists(c: Connection, a: PublicKey): Promise<boolea
 	}
 }
 
-export async function getTokenAmount(connection: Connection, accountPubKey: PublicKey, mintPubKey: PublicKey):Promise<bigint> {
+export async function getTokenAmount(connection: Connection, accountPubKey: PublicKey, mintPubKey: PublicKey): Promise<bigint> {
 	try {
 		const atoken = await getAssociatedTokenAddress(mintPubKey, accountPubKey);
 		const accountInfo = await getAccount(connection, atoken);

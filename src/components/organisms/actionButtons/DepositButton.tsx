@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { useCallback, useContext, useEffect, useState } from 'react';
 
+import { Tooltip } from '@mui/material';
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -8,7 +9,6 @@ import { PublicKey } from '@solana/web3.js';
 import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { fundContract } from 'controllers/fundContract';
-import { Tooltip } from 'evergreen-ui';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { useRouter } from 'next/router';
@@ -29,19 +29,26 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	const [isLoading, setIsLoading] = useState(false);
 	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-	const checkTokenAmount = useCallback(async()=>{
-		try{
+	const checkTokenAmount = useCallback(async () => {
+		try {
 			const requiredAmount = isBuyer ? rateStateQuery.data.buyerDepositAmount : rateStateQuery.data.sellerDepositAmount;
 			const mintInfo = rateStateQuery.data.reserveMintInfo;
 			const tokenAmount = await getTokenAmount(connection, wallet.publicKey, mintInfo.address);
-			if(tokenAmount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) setIsButtonDisabled(false);
+			if (tokenAmount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) setIsButtonDisabled(false);
 			else setIsButtonDisabled(true);
-		}catch(err) {
+		} catch (err) {
 			console.error(err);
 		}
-	}, [isBuyer, rateStateQuery.data.buyerDepositAmount, rateStateQuery.data.sellerDepositAmount, rateStateQuery.data.reserveMintInfo, connection, wallet.publicKey]);
+	}, [
+		isBuyer,
+		rateStateQuery.data.buyerDepositAmount,
+		rateStateQuery.data.sellerDepositAmount,
+		rateStateQuery.data.reserveMintInfo,
+		connection,
+		wallet.publicKey
+	]);
 
-	useEffect(()=>{
+	useEffect(() => {
 		checkTokenAmount();
 	}, [checkTokenAmount]);
 
@@ -121,9 +128,18 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	if (!isAvailable) {
 		return <></>;
 	}
-	return (<Tooltip isShown={!isButtonDisabled ? false : undefined} content="Not enough tokens">
-		<ButtonPill mode={isBuyer ? 'success' : 'error'} text={isBuyer ? 'Long' : 'Short'} onClick={onDepositClick} loading={isLoading} disabled={isButtonDisabled} />
-	</Tooltip>
+	return (
+		<Tooltip title={isButtonDisabled ? 'Not enough tokens' : ''}>
+			<div style={{ display: 'flex', flex: 1 }}>
+				<ButtonPill
+					mode={isButtonDisabled ? 'disabled' : isBuyer ? 'success' : 'error'}
+					text={isBuyer ? 'Long' : 'Short'}
+					onClick={onDepositClick}
+					loading={isLoading}
+					disabled={isButtonDisabled}
+				/>
+			</div>
+		</Tooltip>
 	);
 };
 
