@@ -13,6 +13,7 @@ import { Button, Pane, TextInputField } from 'evergreen-ui';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 
 const CreateSbfJailContractPage = () => {
 	const { connection } = useConnection();
@@ -31,6 +32,10 @@ const CreateSbfJailContractPage = () => {
 
 	const onCreateContractButtonClick = async () => {
 		try {
+			if (getCurrentCluster() !== 'devnet') {
+				alert('this page is only available on devnet');
+			}
+
 			setIsLoading(true);
 
 			const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
