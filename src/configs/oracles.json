@@ -40,7 +40,7 @@
 			"baseCurrency": "BCT",
 			"quoteCurrency": "USD"
 		},
-        {
+		{
 			"type": "pyth",
 			"cluster": "mainnet-beta",
 			"pubkey": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
@@ -48,7 +48,7 @@
 			"baseCurrency": "ETH",
 			"quoteCurrency": "USD"
 		},
-        {
+		{
 			"type": "switchboard",
 			"cluster": "devnet",
 			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
@@ -56,7 +56,7 @@
 			"baseCurrency": "SOL",
 			"quoteCurrency": "USD"
 		},
-        {
+		{
 			"type": "switchboard",
 			"cluster": "devnet",
 			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
@@ -64,7 +64,7 @@
 			"baseCurrency": "SOL",
 			"quoteCurrency": "USD"
 		},
-        {
+		{
 			"type": "switchboard",
 			"cluster": "devnet",
 			"pubkey": "C6BciZWyhZRbjE1XdwAsYP2PZRErnDUdGChW1tKBV9wH",

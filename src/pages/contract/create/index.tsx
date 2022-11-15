@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { Autocomplete, FormControlLabel, FormGroup, Switch, TextField } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -12,20 +12,16 @@ import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
-import oraclesData from 'configs/oracles.json';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
-import { OracleDetail } from 'models/OracleDetail';
 import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
-
-const currentCluster = getCurrentCluster();
-const oraclesList = oraclesData.oracles as OracleDetail[];
+import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
 
 const StrikePicker = ({
 	title,
@@ -115,10 +111,10 @@ const PublicKeyPicker = ({
 
 // eslint-disable-next-line no-unused-vars
 const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
-	const filteredOracles = oraclesList.filter(({ type, cluster }) => type === 'switchboard' && cluster === currentCluster);
+	const filteredOracles = getOraclesByType('switchboard');
 
 	return (
-		<Pane display="flex" alignItems="center" margin={6}>
+		<Pane display="flex" alignItems="center">
 			<Combobox
 				placeholder={title}
 				width="100%"
@@ -128,19 +124,16 @@ const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string
 					return onChange(e.pubkey);
 				}}
 			/>
-			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
-				<IconButton icon={ShareIcon} intent="success" />
-			</a>
 		</Pane>
 	);
 };
 
 // eslint-disable-next-line no-unused-vars
 const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
-	const filteredOracles = oraclesList.filter(({ type, cluster }) => type === 'pyth' && cluster === currentCluster);
+	const filteredOracles = getOraclesByType('pyth');
 
 	return (
-		<Pane display="flex" alignItems="center" margin={6}>
+		<Pane display="flex" alignItems="center">
 			<Combobox
 				placeholder={title}
 				width="100%"
@@ -150,14 +143,12 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 					return onChange(e.pubkey);
 				}}
 			/>
-			<a target="_blank" href="https://pyth.network/price-feeds" rel="noopener noreferrer">
-				<IconButton icon={ShareIcon} intent="success" />
-			</a>
 		</Pane>
 	);
 };
 
 const CreateContractPage = () => {
+	const currentCluster = getCurrentCluster();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -353,7 +344,7 @@ const CreateContractPage = () => {
 
 				<b>Rate Plugin</b>
 
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} margin={12} />
+				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} marginY={6} />
 
 				{ratePluginType === 'switchboard' && (
 					<>

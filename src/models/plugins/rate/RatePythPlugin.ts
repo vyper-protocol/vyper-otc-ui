@@ -2,13 +2,10 @@ import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHt
 import { PythHttpClientResult } from '@pythnetwork/client/lib/PythHttpClient';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import oraclesData from 'configs/oracles.json';
-import { OracleDetail } from 'models/OracleDetail';
+import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 
 import { RatePluginTypeIds } from '../AbsPlugin';
 import { AbsRatePlugin } from './AbsRatePlugin';
-
-const oraclesList = oraclesData.oracles as OracleDetail[];
 
 export class RatePythPlugin extends AbsRatePlugin {
 	static pythData: PythHttpClientResult = undefined;
@@ -21,9 +18,7 @@ export class RatePythPlugin extends AbsRatePlugin {
 	}
 
 	get title(): string {
-		const oracleFromList = oraclesList.find(
-			({ pubkey, cluster }) => pubkey === this.accountsRequiredForRefresh[0].toBase58() && cluster === getCurrentCluster()
-		);
+		const oracleFromList = getOracleByPubkey(this.accountsRequiredForRefresh[0]);
 
 		if (oracleFromList) {
 			return oracleFromList.title;
