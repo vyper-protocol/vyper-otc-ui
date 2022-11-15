@@ -15,7 +15,6 @@ const CoinBadge = (props: Props) => {
 	return (
 		<div className={styles.container}>
 			<p className={styles.title}>{props.title}</p>
-
 			{props.token !== null && (
 				<a
 					href={getExplorerLink(props.token.address, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
