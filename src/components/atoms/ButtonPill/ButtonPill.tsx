@@ -13,7 +13,7 @@ type ButtonPillProps = {
 	/**
 	 * The mode that specifies the color of the button
 	 */
-	mode: 'success' | 'error' | 'info';
+	mode: 'success' | 'error' | 'info' | 'disabled';
 
 	/**
 	 * Additional props for icon that will be added in the left side of the button
@@ -24,9 +24,10 @@ type ButtonPillProps = {
 	 * Shows a spinner to display a loading state when set to true
 	 */
 	loading?: boolean;
+	disabled?: boolean;
 } & React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
 
-const ButtonPill = ({ text, onClick, mode = 'info', icon, loading }: ButtonPillProps) => {
+const ButtonPill = ({ text, onClick, mode = 'info', icon, loading, disabled }: ButtonPillProps) => {
 	return (
 		<Button
 			className={cn(styles.button, styles[mode], loading && styles.disabled)}
@@ -34,6 +35,7 @@ const ButtonPill = ({ text, onClick, mode = 'info', icon, loading }: ButtonPillP
 			appearance="primary"
 			iconBefore={icon}
 			isLoading={loading}
+			disabled={disabled}
 		>
 			{text}
 		</Button>
