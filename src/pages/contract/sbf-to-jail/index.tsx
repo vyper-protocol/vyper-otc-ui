@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { useContext, useState } from 'react';
 
-import { Alert, AlertTitle, FormControlLabel, FormGroup, Slider, Stack, Switch, Typography } from '@mui/material';
+import { Alert, AlertTitle, Box, Button, CircularProgress, FormControlLabel, FormGroup, Slider, Stack, Switch, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -10,9 +10,7 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { Button, Pane } from 'evergreen-ui';
 import moment from 'moment';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -81,11 +79,21 @@ const CreateSbfJailContractPage = () => {
 
 	return (
 		<Layout>
-			<Pane maxWidth={600}>
-				<Pane textAlign="center">
+			<Stack spacing={2} direction="column">
+				<Stack spacing={2} direction="column" justifyContent="center" alignItems="center">
 					<h1>SBF JAIL Contract</h1>
-					<Image width="400" height="200" alt="abstract-colors" src="/sbf-to-jail.jpg" />
-				</Pane>
+					<Box
+						component="img"
+						sx={{
+							// height: 233,
+							// width: 350,
+							// maxHeight: { xs: 233, md: 167 },
+							maxWidth: { xs: 650, md: 400 }
+						}}
+						alt="sbf-to-jail"
+						src="/sbf-to-jail.jpg"
+					/>
+				</Stack>
 				<Alert sx={{ maxWidth: '800px', marginBottom: '10' }} severity="warning">
 					<AlertTitle>How to trade this? </AlertTitle>
 					Each contract value can range from 0 to 100 so use the slider below to input the probability of SBF being indicted, where 0 is &apos;NOT GONNA
@@ -97,13 +105,13 @@ const CreateSbfJailContractPage = () => {
 					</a>
 				</Alert>
 
-				<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+				<Stack spacing={10} direction="row" sx={{ mb: 1 }} alignItems="center">
 					<Typography>NOT GONNA HAPPEN (0)</Typography>
 
 					<Slider
 						aria-label="Volume"
-						sx={{ paddingLeft: '10', paddingRight: '10' }}
 						value={longAmount}
+						valueLabelDisplay="auto"
 						onChange={(e: Event, newValue: number) => {
 							if (newValue < 1) return setLongAmount(1);
 							if (newValue > 100) return setLongAmount(100);
@@ -128,9 +136,14 @@ const CreateSbfJailContractPage = () => {
 				)}
 
 				<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
-					<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-						Create Contract 🔥🚀
-					</Button>
+					{isLoading ? (
+						<CircularProgress />
+					) : (
+						<Button variant="outlined" disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+							Create Contract 🔥🚀
+						</Button>
+					)}
+
 					<Typography>This will deploy the contract on devnet with fake USDC</Typography>
 				</Stack>
 				<hr />
@@ -151,9 +164,7 @@ const CreateSbfJailContractPage = () => {
 					We retain the final right to interpretation of this contract. We will not entertain any objections to this contract’s settlement mechanisms. By
 					trading these contracts, you are agreeing to abide by interpretations of terms above.
 				</Alert>
-			</Pane>
-
-			<Pane></Pane>
+			</Stack>
 		</Layout>
 	);
 };
