@@ -1,4 +1,4 @@
-import { Pane, TextInputField, Button } from 'evergreen-ui';
+import { Box, Button, ButtonGroup, InputAdornment, TextField } from '@mui/material';
 
 type AmountPickerInput = {
 	// title of input component
@@ -32,37 +32,48 @@ const AmountPicker = ({ title, value, onChange, resetValue, incrementValues }: A
 	incrementValues = incrementValues ?? [100, -100];
 
 	return (
-		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField
+		<Box sx={{ display: 'flex', alignItems: 'center', marginY: 6 }}>
+			<TextField
+				size="small"
 				label={title}
-				type="number"
+				variant="outlined"
 				value={value}
 				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 					return onChange(Number(e.target.value));
 				}}
+				InputProps={{
+					endAdornment: (
+						<InputAdornment position="end">
+							<ButtonGroup variant="text">
+								<Button
+									onClick={() => {
+										return onChange(resetValue);
+									}}
+								>
+									reset
+								</Button>
+								<Button
+									// variant="outlined"
+									onClick={() => {
+										return onChange(value + incrementValues[0]);
+									}}
+								>
+									{getDisplayString(incrementValues[0])}
+								</Button>
+								<Button
+									// variant="outlined"
+									onClick={() => {
+										return onChange(value + incrementValues[1]);
+									}}
+								>
+									{getDisplayString(incrementValues[1])}
+								</Button>
+							</ButtonGroup>
+						</InputAdornment>
+					)
+				}}
 			/>
-			<Button
-				onClick={() => {
-					return onChange(resetValue);
-				}}
-			>
-				reset
-			</Button>
-			<Button
-				onClick={() => {
-					return onChange(value + incrementValues[0]);
-				}}
-			>
-				{getDisplayString(incrementValues[0])}
-			</Button>
-			<Button
-				onClick={() => {
-					return onChange(value + incrementValues[1]);
-				}}
-			>
-				{getDisplayString(incrementValues[1])}
-			</Button>
-		</Pane>
+		</Box>
 	);
 };
 

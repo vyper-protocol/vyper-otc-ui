@@ -1,6 +1,5 @@
-import { Button, ButtonGroup, TextField } from '@mui/material';
+import { Box, Button, ButtonGroup, TextField } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { Pane } from 'evergreen-ui';
 import moment from 'moment';
 
 type DateTimePickerCompInput = {
@@ -33,7 +32,7 @@ const DateTimePickerComp = ({ title, value, onChange }: DateTimePickerCompInput)
 	];
 
 	return (
-		<Pane margin={6}>
+		<Box sx={{ marginY: 6, marginX: 1 }}>
 			<DateTimePicker
 				renderInput={(props) => <TextField {...props} helperText={moment(value).fromNow()} />}
 				label={title}
@@ -43,7 +42,7 @@ const DateTimePickerComp = ({ title, value, onChange }: DateTimePickerCompInput)
 					onChange(newValue);
 				}}
 			/>
-			<Pane display="flex" alignItems="center">
+			<Box sx={{ display: 'flex', alignItems: 'center' }}>
 				<ButtonGroup variant="outlined">
 					{auxButtons.map(({ label, onClick }, i) => (
 						<Button key={i} onClick={onClick}>
@@ -51,8 +50,8 @@ const DateTimePickerComp = ({ title, value, onChange }: DateTimePickerCompInput)
 						</Button>
 					))}
 				</ButtonGroup>
-			</Pane>
-		</Pane>
+			</Box>
+		</Box>
 	);
 };
 

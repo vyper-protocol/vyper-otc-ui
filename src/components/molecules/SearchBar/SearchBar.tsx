@@ -1,9 +1,10 @@
 /* eslint-disable css-modules/no-unused-class */
 import React, { useState } from 'react';
 
+import ErrorIcon from '@mui/icons-material/Error';
+import SearchIcon from '@mui/icons-material/Search';
 import { PublicKey } from '@solana/web3.js';
 import cn from 'classnames';
-import { Pane, Text, SearchIcon, ErrorIcon } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -40,26 +41,24 @@ const SearchBar = ({ searchState, className }: SearchBarProps) => {
 
 	return (
 		<div className={cn(styles.wrapper, className)}>
-			<Pane>
-				<div className={cn(hasError && styles.error_border, styles.input_outter)}>
-					<SearchIcon className={styles.adorsement} />
-					<input
-						type="text"
-						onChange={(e) => {
-							return searchState.setValue(e.target.value);
-						}}
-						value={searchState.value}
-						placeholder="Search for contract with public key..."
-						onKeyDown={handleEnterPress}
-					/>
-				</div>
+			<div className={cn(hasError && styles.error_border, styles.input_outter)}>
+				<SearchIcon className={styles.adorsement} />
+				<input
+					type="text"
+					onChange={(e) => {
+						return searchState.setValue(e.target.value);
+					}}
+					value={searchState.value}
+					placeholder="Search for contract with public key..."
+					onKeyDown={handleEnterPress}
+				/>
+			</div>
 
-				<Text className={cn(styles.error, !hasError ? styles.hidden : styles.visible)}>
-					{' '}
-					<ErrorIcon />
-					Invalid Public Key
-				</Text>
-			</Pane>
+			<p className={cn(styles.error, !hasError ? styles.hidden : styles.visible)}>
+				{' '}
+				<ErrorIcon />
+				Invalid Public Key
+			</p>
 		</div>
 	);
 };

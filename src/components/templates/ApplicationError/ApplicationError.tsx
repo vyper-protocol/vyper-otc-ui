@@ -1,20 +1,27 @@
-import { Button, Heading, Pane, Paragraph, WarningSignIcon } from 'evergreen-ui';
+import { Box, Button, styled, Typography } from '@mui/material';
 import { FallbackProps } from 'react-error-boundary';
 
+import Icon from '../../atoms/Icon';
 import Layout from '../Layout';
 import styles from './ApplicationError.module.scss';
+
+const StyledButton = styled(Button)(`
+  text-transform: none;
+`);
 
 const ApplicationError = ({ resetErrorBoundary }: FallbackProps) => {
 	return (
 		<Layout>
-			<Pane className={styles.container}>
+			<Box className={styles.container}>
 				<div className={styles.title}>
-					<WarningSignIcon size={20} />
-					<Heading size={800}>Application Error</Heading>
+					<Icon name="AiFillWarning" size={24} />
+					<Typography variant="h5">Application Error</Typography>
 				</div>
-				<Paragraph>Vyper OTC encountered an application error.</Paragraph>
-				<Button onClick={resetErrorBoundary}>Try Again</Button>
-			</Pane>
+				<Typography>Vyper OTC encountered an application error.</Typography>
+				<StyledButton variant="outlined" onClick={resetErrorBoundary}>
+					Try Again
+				</StyledButton>
+			</Box>
 		</Layout>
 	);
 };

@@ -2,11 +2,12 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { Autocomplete, FormControlLabel, FormGroup, Switch, TextField } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { FormControlLabel, FormGroup, Switch, Button, Box, TextField, Select, InputAdornment, ButtonGroup, MenuItem } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getAggregatorLatestValue } from 'api/switchboard/switchboardHelper';
+import { getAggregatorLatestValue, getAggregatorName } from 'api/switchboard/switchboardHelper';
 import AmountPicker from 'components/molecules/AmountPicker';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -14,14 +15,15 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { Button, Combobox, IconButton, Pane, RefreshIcon, ShareIcon, TextInputField } from 'evergreen-ui';
 import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { GrShare } from 'react-icons/gr';
+import { HiOutlineRefresh } from 'react-icons/hi';
+import { getOraclesByType } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
-import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
 
 const StrikePicker = ({
 	title,
@@ -36,31 +38,77 @@ const StrikePicker = ({
 	onRefreshClick: () => void;
 }) => {
 	return (
-		<Pane display="flex" alignItems="center" margin={12}>
-			<TextInputField
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '12px' }}>
+			<TextField
 				label={title}
+				variant="outlined"
 				type="number"
+				size="small"
+				value={value}
+				onChange={(e) => {
+					return onChange(parseInt(e.target.value));
+				}}
+				InputProps={{
+					endAdornment: (
+						<InputAdornment position="end">
+							<ButtonGroup variant="text">
+								<Button onClick={onRefreshClick}>
+									<HiOutlineRefresh />
+								</Button>
+								<Button
+									onClick={() => {
+										return onChange(value * 2);
+									}}
+								>
+									* 2
+								</Button>
+								<Button
+									onClick={() => {
+										return onChange(value / 2);
+									}}
+								>
+									/ 2
+								</Button>
+							</ButtonGroup>
+						</InputAdornment>
+					)
+				}}
+			/>
+		</Box>
+	);
+};
+
+// eslint-disable-next-line no-unused-vars
+const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
+	const [aggregatorName, setAggregatorName] = useState('');
+	const { connection } = useConnection();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const n = await getAggregatorName(connection, new PublicKey(value));
+			setAggregatorName(n);
+		};
+		fetchData();
+	}, [value, connection]);
+
+	return (
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '6px' }}>
+			<TextField
+				sx={{ width: '100%' }}
+				label={title + ' ' + aggregatorName}
+				variant="outlined"
+				size="small"
 				value={value}
 				onChange={(e) => {
 					return onChange(e.target.value);
 				}}
 			/>
-			<IconButton icon={RefreshIcon} onClick={onRefreshClick} intent="success" />
-			<Button
-				onClick={() => {
-					return onChange(value * 2);
-				}}
-			>
-				* 2
-			</Button>
-			<Button
-				onClick={() => {
-					return onChange(value / 2);
-				}}
-			>
-				/ 2
-			</Button>
-		</Pane>
+			<a target="_blank" href="https://switchboard.xyz/explorer" rel="noopener noreferrer">
+				<Button variant="text" size="small">
+					<GrShare />
+				</Button>
+			</a>
+		</Box>
 	);
 };
 
@@ -77,21 +125,24 @@ const PublicKeyPicker = ({
 	hints: { pubkey: string; label: string }[];
 }) => {
 	return (
-		<Pane display="flex" width="100%" alignItems="center" margin={6}>
-			<TextInputField
-				width="100%"
+		<Box sx={{ display: 'flex', alignItems: 'center', margin: '6px' }}>
+			<TextField
+				sx={{ width: '100%' }}
 				label={title}
+				variant="outlined"
+				size="small"
 				value={value}
 				onChange={(e) => {
 					return onChange(e.target.value);
 				}}
 			/>
-			<Combobox
-				items={hints}
-				itemToString={(item) => (item ? item.label : '')}
-				initialSelectedItem={hints.find((c) => c.pubkey)?.label}
-				onChange={(selected) => onChange(selected.pubkey)}
-			/>
+			<Select sx={{ width: '100%', margin: '12px' }} value={value} size="small" onChange={(event) => onChange(event.target.value)}>
+				{hints.map((hint) => (
+					<MenuItem key={hint.pubkey} value={hint.pubkey}>
+						{hint.label}
+					</MenuItem>
+				))}
+			</Select>
 
 			{/* {hints.map((c) => (
 				<Button
@@ -103,47 +154,32 @@ const PublicKeyPicker = ({
 					{c.label}
 				</Button>
 			))} */}
-		</Pane>
+		</Box>
 	);
 };
 
 // RATE PLUGINS
 
 // eslint-disable-next-line no-unused-vars
-const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
-	const filteredOracles = getOraclesByType('switchboard');
-
-	return (
-		<Pane display="flex" alignItems="center">
-			<Combobox
-				placeholder={title}
-				width="100%"
-				items={filteredOracles}
-				itemToString={(item) => (item ? item.title : '')}
-				onChange={(e) => {
-					return onChange(e.pubkey);
-				}}
-			/>
-		</Pane>
-	);
-};
-
-// eslint-disable-next-line no-unused-vars
 const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
 	const filteredOracles = getOraclesByType('pyth');
 
 	return (
-		<Pane display="flex" alignItems="center">
-			<Combobox
-				placeholder={title}
-				width="100%"
-				items={filteredOracles}
-				itemToString={(item) => (item ? item.title : '')}
-				onChange={(e) => {
-					return onChange(e.pubkey);
-				}}
-			/>
-		</Pane>
+		<Box display="flex" alignItems="center">
+			<Select sx={{ width: '100%', margin: '12px' }} value={value} size="small" onChange={(event) => onChange(event.target.value as RedeemLogicPluginTypeIds)}>
+				{filteredOracles.map((p) => (
+					<MenuItem key={p.pubkey} value={p.pubkey}>
+						{p.title}
+					</MenuItem>
+				))}
+			</Select>
+
+			<a target="_blank" href="https://pyth.network/price-feeds" rel="noopener noreferrer">
+				<Button variant="text" size="small">
+					<GrShare />
+				</Button>
+			</a>
+		</Box>
 	);
 };
 
@@ -317,18 +353,23 @@ const CreateContractPage = () => {
 
 	return (
 		<Layout>
-			<Pane>
+			<Box>
 				<b>Redeem Logic</b>
 
-				<Combobox
-					width="100%"
-					initialSelectedItem={redeemLogicPluginType}
-					items={AVAILABLE_REDEEM_LOGIC_PLUGINS as any}
-					onChange={setRedeemLogicPluginType}
-					margin={12}
-				/>
+				<Select
+					sx={{ width: '100%', margin: '12px' }}
+					value={redeemLogicPluginType}
+					size="small"
+					onChange={(event) => setRedeemLogicPluginType(event.target.value as RedeemLogicPluginTypeIds)}
+				>
+					{AVAILABLE_REDEEM_LOGIC_PLUGINS.map((plugin) => (
+						<MenuItem key={plugin} value={plugin}>
+							{plugin}
+						</MenuItem>
+					))}
+				</Select>
 
-				<Pane display="flex" alignItems="center">
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<StrikePicker title="Strike" value={strike} onChange={setStrike} onRefreshClick={setStrikeToDefaultValue} />
 					{(redeemLogicPluginType === 'forward' || redeemLogicPluginType === 'settled_forward' || redeemLogicPluginType === 'vanilla_option') && (
 						<AmountPicker title="Notional" value={notional} onChange={setNotional} />
@@ -338,13 +379,24 @@ const CreateContractPage = () => {
 							<FormControlLabel control={<Switch checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />} label={isCall ? 'Call' : 'Put'} />
 						</FormGroup>
 					)}
-				</Pane>
+				</Box>
 
 				<hr />
 
 				<b>Rate Plugin</b>
 
-				<Combobox width="100%" initialSelectedItem={ratePluginType} items={AVAILABLE_RATE_PLUGINS as any} onChange={setRatePluginType} marginY={6} />
+				<Select
+					sx={{ width: '100%', margin: '12px' }}
+					value={ratePluginType}
+					size="small"
+					onChange={(event) => setRatePluginType(event.target.value as RatePluginTypeIds)}
+				>
+					{AVAILABLE_RATE_PLUGINS.map((plugin) => (
+						<MenuItem key={plugin} value={plugin}>
+							{plugin}
+						</MenuItem>
+					))}
+				</Select>
 
 				{ratePluginType === 'switchboard' && (
 					<>
@@ -363,26 +415,27 @@ const CreateContractPage = () => {
 
 				<hr />
 
-				<Pane display="flex" alignItems="center">
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<AmountPicker title="Long amount" value={seniorDepositAmount} onChange={setSeniorDepositAmount} />
 					<AmountPicker title="Short amount" value={juniorDepositAmount} onChange={setJuniorDepositAmount} />
-				</Pane>
+				</Box>
 
 				<hr />
 
-				<Pane display="flex" alignItems="center">
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<PublicKeyPicker
 						title="Reserve Mint"
 						value={reserveMint}
 						onChange={setReserveMint}
 						hints={currentCluster === 'devnet' ? reserveMintHintsDevnet : reserveMintHintsMainnet}
 					/>
-				</Pane>
-				<Pane display="flex" alignItems="center">
+				</Box>
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />
 					<DateTimePickerComp title="Deposit End" value={depositEnd} onChange={setDepositEnd} />
 					<DateTimePickerComp title="Settle Start" value={settleStart} onChange={setSettleStart} />
-				</Pane>
+				</Box>
+
 				{process.env.NODE_ENV === 'development' && (
 					<FormGroup>
 						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
@@ -392,10 +445,11 @@ const CreateContractPage = () => {
 						/>
 					</FormGroup>
 				)}
-				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+
+				<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 					Create Contract
-				</Button>
-			</Pane>
+				</LoadingButton>
+			</Box>
 		</Layout>
 	);
 };
