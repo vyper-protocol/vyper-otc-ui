@@ -14,6 +14,7 @@ import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 // import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -39,7 +40,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	// };
 
 	const handleDocumentationClick = () => {
-		window.open(otcState.redeemLogicState.documentationLink);
+		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicState.typeId));
 	};
 
 	const handleToggle = () => {

@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { ListItemDetail } from 'models/ListItemDetail';
+import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
 import { AbsPlugin, RedeemLogicPluginTypeIds } from '../AbsPlugin';
 
@@ -17,10 +18,20 @@ export abstract class AbsRedeemLogicPlugin extends AbsPlugin {
 	abstract get rateFeedsDescription(): string[];
 	abstract get settlementPricesDescription(): string[];
 
-	/**
-	 * Returns the documentation link
-	 */
-	abstract get documentationLink(): string;
+	// /**
+	//  * Returns the documentation link
+	//  */
+	// abstract get documentationLink(): string;
+
+	// /**
+	//  * Returns source code link
+	//  */
+	// abstract get sourceLink(): string;
+
+	// /**
+	//  * Returns redeem logic description
+	//  */
+	// abstract get redeemLogicDescription(): string;
 
 	/**
 	 * Compute the redeem logic PnL
@@ -33,6 +44,10 @@ export abstract class AbsRedeemLogicPlugin extends AbsPlugin {
 
 	abstract get typeId(): RedeemLogicPluginTypeIds;
 	abstract clone(): AbsRedeemLogicPlugin;
+
+	get documentationLink(): string {
+		return getRedeemLogicDocumentionLink(this.typeId);
+	}
 
 	// abstract getSettlementPriceLabels(): string[];
 }
