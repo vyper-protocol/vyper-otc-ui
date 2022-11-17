@@ -7,7 +7,7 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
 import { getMints } from 'utils/mintDatasetHelper';
 
-type ReservePickerInput = {
+export type ReservePickerInput = {
 	seniorDepositAmount: number;
 
 	// eslint-disable-next-line no-unused-vars
@@ -23,7 +23,13 @@ type ReservePickerInput = {
 	setReserveMint: (pubkey: string) => void;
 };
 
-const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepositAmount, setJuniorDepositAmount, setReserveMint }: ReservePickerInput) => {
+export const ReservePicker = ({
+	seniorDepositAmount,
+	setSeniorDepositAmount,
+	juniorDepositAmount,
+	setJuniorDepositAmount,
+	setReserveMint
+}: ReservePickerInput) => {
 	const [selectedMint, setSelectedMint] = useState('');
 
 	const handleMint = (pubkey: string) => {
@@ -33,7 +39,6 @@ const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepo
 
 	return (
 		<Box sx={{ marginY: 2 }}>
-			{/* <b>{'SELECT COLLATERAL'}</b> */}
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<Autocomplete
 					sx={{ width: 300, alignItems: 'center', marginY: 2 }}
@@ -84,5 +89,3 @@ const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepo
 		</Box>
 	);
 };
-
-export default ReservePicker;

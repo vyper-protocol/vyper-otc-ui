@@ -6,7 +6,7 @@ import { Box, Checkbox } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 
-type ExpiryPickerInput = {
+export type ExpiryPickerInput = {
 	// end of the deposit period expressed in ms
 	depositEnd: number;
 
@@ -22,7 +22,7 @@ type ExpiryPickerInput = {
 	setSettleStart: (val: number) => void;
 };
 
-const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart }: ExpiryPickerInput) => {
+export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart }: ExpiryPickerInput) => {
 	const [showExact, setShowExact] = useState(false);
 
 	return (
@@ -42,5 +42,3 @@ const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart }
 		</Box>
 	);
 };
-
-export default ExpiryPicker;

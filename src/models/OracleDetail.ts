@@ -6,7 +6,8 @@ export type OracleDetail = {
 	type: RatePluginTypeIds;
 	cluster: Cluster;
 	pubkey: string;
-	title: string;
+	title: string | undefined;
 	baseCurrency: string | undefined;
 	quoteCurrency: string | undefined;
+	explorerUrl: string | undefined;
 };
