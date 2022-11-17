@@ -1,9 +1,10 @@
 import { useContext, useState } from 'react';
 
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { CircularProgress, Tooltip } from '@mui/material';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { airdrop } from 'api/dummy-tokens/airdrop';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { Text, CloudDownloadIcon, Spinner, Tooltip } from 'evergreen-ui';
 import { toast } from 'react-toastify';
 
 const AirdropButton = () => {
@@ -30,13 +31,14 @@ const AirdropButton = () => {
 
 	if (!wallet.connected) return <></>;
 
-	if (isLoading) return <Spinner size={24} />;
+	if (isLoading) return <CircularProgress size={24} />;
 
 	return (
-		<Tooltip content="Airdrop tokens">
-			<Text onClick={onAirdropClick}>
-				<CloudDownloadIcon /> Airdrop
-			</Text>
+		<Tooltip title="Airdrop tokens">
+			<div onClick={onAirdropClick} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+				<CloudDownloadIcon />
+				<p>Airdrop</p>
+			</div>
 		</Tooltip>
 	);
 };

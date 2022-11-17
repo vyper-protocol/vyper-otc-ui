@@ -32,9 +32,11 @@ const NonAuditedDisclaimer = () => {
 			<AlertTitle>Warning</AlertTitle>
 			Vyper OTC and related smart contracts are currently in open alpha. The software is unaudited so use it at your own risk. The code is open source and
 			available on{' '}
-			<a href="https://github.com/vyper-protocol/vyper-otc" target="_blank" rel="noreferrer">
-				GitHub
-			</a>{' '}
+			<u>
+				<a href="https://github.com/vyper-protocol/vyper-otc" target="_blank" rel="noreferrer">
+					GitHub
+				</a>
+			</u>{' '}
 			for review.
 		</Alert>
 	);

@@ -27,7 +27,7 @@ const CreateSbfJailContractPage = () => {
 	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
 	const [sendNotification, setSendNotification] = useState(true);
 
-	const [longAmount, setLongAmount] = useState(20);
+	const [longAmount, setLongAmount] = useState(50);
 
 	const onCreateContractButtonClick = async () => {
 		try {
@@ -46,7 +46,7 @@ const CreateSbfJailContractPage = () => {
 
 			const depositStart = moment().toDate().getTime();
 			const depositEnd = moment().add(2, 'days').toDate().getTime();
-			const settleStart = moment('2022-12-30 09:00:00Z').toDate().getTime();
+			const settleStart = moment('2022-12-31 09:00:00Z').toDate().getTime();
 
 			const initParams: OtcInitializationParams = {
 				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
@@ -79,92 +79,104 @@ const CreateSbfJailContractPage = () => {
 
 	return (
 		<Layout>
-			<Stack spacing={2} direction="column">
+			<Box>
 				<Stack spacing={2} direction="column" justifyContent="center" alignItems="center">
-					<h1>SBF JAIL Contract</h1>
-					<Box
-						component="img"
-						sx={{
-							// height: 233,
-							// width: 350,
-							// maxHeight: { xs: 233, md: 167 },
-							maxWidth: { xs: 650, md: 400 }
-						}}
-						alt="sbf-to-jail"
-						src="/sbf-to-jail.jpg"
-					/>
-				</Stack>
-				<Alert sx={{ maxWidth: '800px', marginBottom: '10' }} severity="warning">
-					<AlertTitle>How to trade this? </AlertTitle>
-					Each contract value can range from 0 to 100 so use the slider below to input the probability of SBF being indicted, where 0 is &apos;NOT GONNA
-					HAPPEN&apos; and 100 is &apos;DEFINITELY HAPPENING&apos;. Once the contract is created you also need to deposit the funds so remember to click on LONG
-					to buy the contract, and SHORT if you want to sell it. SHORT side has to deposit the full collateral amount, whereas the LONG side just need to
-					deposit an amount equal to the probability of the event. If you want to check the orders created by other users just head to the Explorer{' '}
-					<a target="_blank" rel="noreferrer" href={UrlBuilder.buildExplorerUrl()}>
-						here
-					</a>
-				</Alert>
-
-				<Stack spacing={10} direction="row" sx={{ mb: 1 }} alignItems="center">
-					<Typography>NOT GONNA HAPPEN (0)</Typography>
-
-					<Slider
-						aria-label="Volume"
-						value={longAmount}
-						valueLabelDisplay="auto"
-						onChange={(e: Event, newValue: number) => {
-							if (newValue < 1) return setLongAmount(1);
-							if (newValue > 100) return setLongAmount(100);
-							return setLongAmount(newValue);
-						}}
-					/>
-
-					<Typography>DEFINITELY HAPPENING (100)</Typography>
-				</Stack>
-
-				{process.env.NODE_ENV === 'development' && (
-					<FormGroup>
-						<FormControlLabel
-							control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
-							label="Save on database"
+					<Stack spacing={2} direction="column">
+						<h1>SBF-JAIL-2022 Contract</h1>
+						<Box
+							component="img"
+							sx={{
+								// height: 233,
+								// width: 350,
+								// maxHeight: { xs: 233, md: 167 },
+								maxWidth: { xs: 650, md: 400 }
+							}}
+							alt="sbf-to-jail"
+							src="/sbf-to-jail.jpg"
 						/>
-						<FormControlLabel
-							control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
-							label="Send notification"
-						/>
-					</FormGroup>
-				)}
+					</Stack>
+					<Alert sx={{ maxWidth: '800px', marginBottom: '10' }} severity="warning">
+						<AlertTitle>How to trade this? </AlertTitle>
+						<Typography>
+							Choose a value from 0 to 100 to select the probability of SBF being convicted by 31-Dec-22, where 0 is <b>NOT GONNA HAPPEN</b> and 100 is{' '}
+							<b>DEFINITELY HAPPENING</b>.<br />
+							<br />
+							Once the contract is created you also need to deposit the funds so remember to click on LONG to buy the contract, and SHORT if you want to sell
+							it.
+							<br />
+							<br />
+							LONG side just needs to deposit an amount equal to the probability of SBF being convicted. SHORT side has to deposit 100. If you want to check the
+							orders created by other users just head to the{' '}
+							<u>
+								<a target="_blank" rel="noreferrer" href={UrlBuilder.buildExplorerUrl()}>
+									explorer
+								</a>
+							</u>
+						</Typography>
+					</Alert>
 
-				<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
-					{isLoading ? (
-						<CircularProgress />
-					) : (
-						<Button variant="outlined" disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-							Create Contract 🔥🚀
-						</Button>
+					<Stack spacing={10} direction="row" sx={{ mb: 1 }} alignItems="center">
+						<Typography sx={{ mb: 1 }}>NOT GONNA HAPPEN (0)</Typography>
+
+						<Slider
+							value={longAmount}
+							valueLabelDisplay="on"
+							onChange={(_, newValue: number) => {
+								if (newValue < 1) return setLongAmount(1);
+								if (newValue > 100) return setLongAmount(100);
+								return setLongAmount(newValue);
+							}}
+						/>
+
+						<Typography>DEFINITELY HAPPENING (100)</Typography>
+					</Stack>
+
+					{process.env.NODE_ENV === 'development' && (
+						<FormGroup>
+							<FormControlLabel
+								control={<Switch defaultChecked checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />}
+								label="Save on database"
+							/>
+							<FormControlLabel
+								control={<Switch defaultChecked checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
+								label="Send notification"
+							/>
+						</FormGroup>
 					)}
 
-					<Typography>This will deploy the contract on devnet with fake USDC</Typography>
-				</Stack>
-				<hr />
+					<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+						{isLoading ? (
+							<CircularProgress />
+						) : (
+							<Button variant="outlined" disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+								{wallet.connected ? 'Create Contract 🔥🚀' : 'Connect wallet'}
+							</Button>
+						)}
 
-				<Alert sx={{ maxWidth: '800px' }} severity="info" variant="outlined">
-					<AlertTitle>SBF/FREE - SBF/JAIL ?</AlertTitle>
-					What is the SBF-JAIL-2022 contract? SBF-JAIL-2022 is An event contract on Vyper Protocol. SBF-JAIL-2022 expires to $1 if Sam Bankman Fried is indicted
-					for ANY CRIME by a Court in any country (United States of America, Bahamas, Hong Kong, etc), and $0 otherwise.
-					<br />
-					The event contract expires on 30th DECEMBER 9AM UTC TIME. You can think of this as a yes-or-no question, where there are only two outcomes possible.
-					The price of the contract fluctuates and reflects the difference in demand for Yes or No. For example, the price for the Yes side will be higher if
-					more people believe there is a high chance of SBF being convicted, and lower if more believe in No. In this way, event contracts aggregate opinions
-					and can offer an objective measure of the likelihood of any event.
-					<br />
-					The primary resolution source for this market shall be any news outlet and publication such as Bloomberg, WSJ plus others as well as any official
-					information from government entities such as FBI, Justice Department and others. A consensus of the above reporting may be also used.
-					<br />
-					We retain the final right to interpretation of this contract. We will not entertain any objections to this contract’s settlement mechanisms. By
-					trading these contracts, you are agreeing to abide by interpretations of terms above.
-				</Alert>
-			</Stack>
+						<Typography>
+							This will deploy the contract on <b>DEVNET</b> with fake USDC.
+						</Typography>
+					</Stack>
+					<hr />
+
+					<Alert sx={{ maxWidth: '800px' }} severity="info" variant="outlined">
+						<AlertTitle>What is the SBF-JAIL-2022 contract?</AlertTitle>
+						<Typography>
+							<br /> SBF-JAIL-2022 is an event contract on Vyper Protocol. SBF-JAIL-2022 expires to 100 if Sam Bankman Fried is convicted for ANY CRIME by a
+							Court in any country (United States of America, Bahamas, Hong Kong, etc), and 0 otherwise.
+							<br />
+							<br />
+							The event contract expires on <b>31th DECEMBER 2022 - 9AM UTC</b>. You can think of this as a yes-or-no question, where there are only two
+							outcomes possible. The price for the JAIL side will be higher if more people believe there is a high chance of SBF being convicted, and lower if
+							more believe in NO JAIL.
+							<br />
+							<br />
+							The primary resolution source for this market shall be any news outlet and publication such as Bloomberg, WSJ plus others as well as any official
+							information from government entities such as FBI, Justice Department and others.
+						</Typography>
+					</Alert>
+				</Stack>
+			</Box>
 		</Layout>
 	);
 };

@@ -4,6 +4,7 @@
 	font-size: var(--font-p) !important;
 	font-weight: 600 !important;
 	border-radius: 0 !important;
+	color: var(--color-white) !important;
 }
 
 .success {
@@ -23,4 +24,9 @@
 	background-color: var(--color-black-400) !important;
 	border-color: var(--color-black-400) !important;
 	color: var(--color-black-700) !important;
+}
+
+.progress {
+	margin-right: 0.75rem;
+	color: var(--color-black-500) !important;
 }

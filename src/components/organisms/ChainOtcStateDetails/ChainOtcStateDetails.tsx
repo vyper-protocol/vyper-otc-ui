@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 
-import { Tooltip } from '@mui/material';
+import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import { Tooltip, Chip, Box, IconButton, Stack } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
-import { Badge, HelpIcon, InfoSignIcon, Pane, PanelStatsIcon as ToggleSimulator } from 'evergreen-ui';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 // import _ from 'lodash';
+import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 // import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -37,7 +40,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	// };
 
 	const handleDocumentationClick = () => {
-		window.open(otcState.redeemLogicState.documentationLink);
+		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicState.typeId));
 	};
 
 	const handleToggle = () => {
@@ -66,43 +69,76 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 			<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
 				<span className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }}>
 					Simulator
-					<ToggleSimulator />
+					<ToggleSimulator fontSize="small" />
 				</span>
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* PLUGIN USED */}
-				<Pane width="100%" display="flex" alignItems="center">
-					<Badge color="purple" margin={6}>
-						{otcState.rateState.typeId}
-					</Badge>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						alignItems: 'center'
+					}}
+				>
+					<Chip
+						label={otcState.redeemLogicState.typeId}
+						variant="outlined"
+						color="secondary"
+						size="small"
+						sx={{ marginX: '3px', textTransform: 'capitalize' }}
+					/>
+
+					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
+						<HelpIcon fontSize="small" onClick={handleDocumentationClick} className={styles.notionHelp} />
+					</Tooltip>
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.getContractStatus()} />
-				</Pane>
+				</Box>
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* FUNDED SIDES */}
-				<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
-					<Badge color={otcState.isBuyerFunded() ? 'green' : 'red'} margin={6}>
-						{otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'}
-					</Badge>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center'
+					}}
+				>
+					<Chip
+						label={otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'}
+						variant="outlined"
+						color={otcState.isBuyerFunded() ? 'success' : 'error'}
+						size="small"
+						sx={{ margin: '6px', textTransform: 'capitalize' }}
+					/>
 
 					<div style={{ flex: 1 }} />
 
-					<Badge color={otcState.isSellerFunded() ? 'green' : 'red'} margin={6}>
-						{otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'}
-					</Badge>
-				</Pane>
+					<Chip
+						label={otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'}
+						variant="outlined"
+						color={otcState.isSellerFunded() ? 'success' : 'error'}
+						size="small"
+						sx={{ margin: '6px', textTransform: 'capitalize' }}
+					/>
+				</Box>
 				<hr />
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
-				<Pane width="100%" justifyContent="center" alignItems="center" textAlign="center">
-					<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
-					<Tooltip title="" placement="right">
-						<InfoSignIcon size={12} marginX={3} onClick={handleDocumentationClick} className={styles.notionHelp} />
-					</Tooltip>
+				<Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+					<Stack direction="row" sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+						<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
+						<Tooltip title="" placement="right">
+							<IconButton aria-label="close" color="inherit" size="small" onClick={handleDocumentationClick}>
+								<QuestionMarkIcon fontSize="inherit" />
+							</IconButton>
+						</Tooltip>
+					</Stack>
 					<h5>{otcState.getContractTitle()}</h5>
-				</Pane>
+				</Stack>
 				<hr />
 
 				{/* + + + + + + + + + + + + +  */}
@@ -131,7 +167,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 								{c.label}
 								{c.tooltip && (
 									<Tooltip title={c.tooltip} placement="right">
-										<HelpIcon size={12} marginX={3} />
+										<HelpIcon fontSize="small" sx={{ marginX: '3px', textTransform: 'capitalize' }} />
 									</Tooltip>
 								)}
 							</p>
@@ -160,7 +196,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<Badge color="green">LONG</Badge>
+								<Chip label="LONG" variant="outlined" color="success" size="small" />
 							</p>
 						</div>
 					)}
@@ -169,7 +205,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<Badge color="red">SHORT</Badge>
+								<Chip label="SHORT" variant="outlined" color="error" size="small" />
 							</p>
 						</div>
 					)}
@@ -177,39 +213,58 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* COLLATERAL AMOUNTS */}
-				<Pane width="100%" display="flex" justifyContent="center" alignItems="center" marginBottom={4}>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center'
+					}}
+				>
 					<b>Collateral</b>
-				</Pane>
-
-				<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
+				</Box>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'space-evenly',
+						alignItems: 'center'
+					}}
+				>
 					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
 					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
-				</Pane>
+				</Box>
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* PnL */}
 				{livePriceIsInitialized && otcState.isPnlAvailable() && (
 					<>
-						<Pane width="100%" display="flex" justifyContent="center" alignItems="center">
+						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 							<b>PnL</b>
-						</Pane>
+						</Box>
 
-						<Pane width="100%" display="flex" justifyContent="space-evenly" alignItems="center">
-							<Pane margin={6} textAlign="center">
+						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+							<Box sx={{ margin: '6px', textAlign: 'center' }}>
 								Long
 								<br />
-								<Badge color={otcState.getPnlBuyer(livePricesValue) > 0 ? 'green' : 'red'}>
-									{formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} {reserveTokenInfo?.symbol}
-								</Badge>
-							</Pane>
-							<Pane margin={6} textAlign="center">
+								<Chip
+									label={`${formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
+									variant="outlined"
+									color={otcState.getPnlBuyer(livePricesValue) > 0 ? 'success' : 'error'}
+									size="small"
+								/>
+							</Box>
+							<Box sx={{ margin: '6px', textAlign: 'center' }}>
 								Short
 								<br />
-								<Badge color={otcState.getPnlSeller(livePricesValue) > 0 ? 'green' : 'red'}>
-									{formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} {reserveTokenInfo?.symbol}
-								</Badge>
-							</Pane>
-						</Pane>
+								<Chip
+									label={`${formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
+									variant="outlined"
+									color={otcState.getPnlSeller(livePricesValue) > 0 ? 'success' : 'error'}
+									size="small"
+								/>
+							</Box>
+						</Box>
 					</>
 				)}
 				<div className={styles.buttons}>
