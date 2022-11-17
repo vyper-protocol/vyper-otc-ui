@@ -48,10 +48,6 @@ export class RedeemLogicForwardPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
-	static get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76';
-	}
-
 	static get sourceLink(): string {
 		return 'https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-forward';
 	}

@@ -58,10 +58,6 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
-	static get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Settled-Forward-aa0f295f291545c281be6fa6363ca79a';
-	}
-
 	static get sourceLink(): string {
 		return 'https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-settled-forward';
 	}

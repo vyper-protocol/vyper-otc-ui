@@ -2,11 +2,10 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { FormControlLabel, FormGroup, Switch, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-
 import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
 import CreateContractFlow from 'components/organisms/CreateContractFlow';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -14,54 +13,12 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { Button, Combobox, IconButton, Pane, RefreshIcon, TextInputField } from 'evergreen-ui';
-import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { getOraclesByType } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
-
-// RATE PLUGINS
-
-// eslint-disable-next-line no-unused-vars
-const SwitchboardAggregatorPicker = ({ title, value, onChange }: { title: string; value: string; onChange: (val: string) => void }) => {
-	const filteredOracles = getOraclesByType('switchboard');
-
-	return (
-		<Pane display="flex" alignItems="center">
-			<Combobox
-				placeholder={title}
-				width="100%"
-				items={filteredOracles}
-				itemToString={(item) => (item ? item.title : '')}
-				onChange={(e) => {
-					return onChange(e.pubkey);
-				}}
-			/>
-		</Pane>
-	);
-};
-
-// eslint-disable-next-line no-unused-vars
-const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
-	const filteredOracles = getOraclesByType('pyth');
-
-	return (
-		<Pane display="flex" alignItems="center">
-			<Combobox
-				placeholder={title}
-				width="100%"
-				items={filteredOracles}
-				itemToString={(item) => (item ? item.title : '')}
-				onChange={(e) => {
-					return onChange(e.pubkey);
-				}}
-			/>
-		</Pane>
-	);
-};
 
 const CreateContractPage = () => {
 	const currentCluster = getCurrentCluster();

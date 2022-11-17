@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { ListItemDetail } from 'models/ListItemDetail';
+import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
 import { AbsPlugin, RedeemLogicPluginTypeIds } from '../AbsPlugin';
 
@@ -43,6 +44,10 @@ export abstract class AbsRedeemLogicPlugin extends AbsPlugin {
 
 	abstract get typeId(): RedeemLogicPluginTypeIds;
 	abstract clone(): AbsRedeemLogicPlugin;
+
+	get documentationLink(): string {
+		return getRedeemLogicDocumentionLink(this.typeId);
+	}
 
 	// abstract getSettlementPriceLabels(): string[];
 }

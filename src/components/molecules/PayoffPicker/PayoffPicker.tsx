@@ -4,6 +4,7 @@ import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogic
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
+import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
 type PayoffPickerInput = {
 	// redeem logic plugin of the contract
@@ -16,28 +17,24 @@ type PayoffPickerInput = {
 
 const buildDescription = (redeemLogic: RedeemLogicPluginTypeIds) => {
 	let description: string;
-	let docLink;
 	let sourceLink;
+	const docLink = getRedeemLogicDocumentionLink(redeemLogic);
 
 	switch (redeemLogic) {
 		case 'forward':
 			description = RedeemLogicForwardPlugin.redeemLogicDescription;
-			docLink = RedeemLogicForwardPlugin.documentationLink;
 			sourceLink = RedeemLogicForwardPlugin.sourceLink;
 			break;
 		case 'settled_forward':
 			description = RedeemLogicSettledForwardPlugin.redeemLogicDescription;
-			docLink = RedeemLogicSettledForwardPlugin.documentationLink;
 			sourceLink = RedeemLogicSettledForwardPlugin.sourceLink;
 			break;
 		case 'digital':
 			description = RedeemLogicDigitalPlugin.redeemLogicDescription;
-			docLink = RedeemLogicDigitalPlugin.documentationLink;
 			sourceLink = RedeemLogicDigitalPlugin.sourceLink;
 			break;
 		case 'vanilla_option':
 			description = RedeemLogicVanillaOptionPlugin.redeemLogicDescription;
-			docLink = RedeemLogicVanillaOptionPlugin.documentationLink;
 			sourceLink = RedeemLogicVanillaOptionPlugin.sourceLink;
 			break;
 		default:

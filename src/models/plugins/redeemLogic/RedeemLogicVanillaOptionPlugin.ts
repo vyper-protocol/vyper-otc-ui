@@ -61,10 +61,6 @@ export class RedeemLogicVanillaOptionPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
-	static get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Vanilla-Option-47b362270a164d7b96732d139e4d7ee2';
-	}
-
 	static get sourceLink(): string {
 		return 'https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-vanilla-option';
 	}

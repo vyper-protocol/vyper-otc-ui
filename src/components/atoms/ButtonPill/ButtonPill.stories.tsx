@@ -34,3 +34,10 @@ ButtonWithIcon.args = {
 	mode: 'success',
 	icon: <Icon name={'FaGithub' as AvailableIconNames} />
 };
+
+export const ButtonWithLoading = Template.bind({});
+ButtonWithLoading.args = {
+	text: 'Create Contract',
+	mode: 'success',
+	loading: true
+};

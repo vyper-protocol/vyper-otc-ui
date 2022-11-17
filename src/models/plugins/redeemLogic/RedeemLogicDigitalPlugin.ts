@@ -48,10 +48,6 @@ export class RedeemLogicDigitalPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
-	static get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Digital-39cab877a28a4a6fa349d9b816bd15a4';
-	}
-
 	static get sourceLink(): string {
 		return 'https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-digital';
 	}
