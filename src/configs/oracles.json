@@ -20,7 +20,7 @@
 			"type": "pyth",
 			"cluster": "devnet",
 			"pubkey": "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix",
-			"title": "SOL/USD",
+			"title": "SOL/USD3",
 			"baseCurrency": "SOL",
 			"quoteCurrency": "USD"
 		},

@@ -2,17 +2,12 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { LoadingButton } from '@mui/lab';
-import { FormControlLabel, FormGroup, Switch, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import ExpiryPicker from 'components/molecules/ExpiryPicker';
 import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
-import OraclesPicker from 'components/molecules/OraclesPicker';
-import ParamsPicker from 'components/molecules/ParamsPicker';
-import PayoffPicker from 'components/molecules/PayoffPicker';
-import ReservePicker from 'components/molecules/ReservePicker';
+import CreateContractFlow from 'components/organisms/CreateContractFlow';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
@@ -160,52 +155,35 @@ const CreateContractPage = () => {
 	return (
 		<Layout>
 			<NonAuditedDisclaimer />
-			<Box sx={{ width: '75vh', alignItems: 'center' }}>
-				<PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />
-
-				<hr />
-
-				<ParamsPicker
+			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
+				<CreateContractFlow
 					redeemLogicPluginType={redeemLogicPluginType}
+					setRedeemLogicPluginType={setRedeemLogicPluginType}
 					strike={strike}
 					setStrike={setStrike}
 					notional={notional}
 					setNotional={setNotional}
 					isCall={isCall}
 					setIsCall={setIsCall}
-				/>
-
-				<hr />
-
-				<OraclesPicker setRateMain={setRateMain} setRate2={setRate2} ratePluginType={ratePluginType} redeemLogicPluginType={redeemLogicPluginType} />
-
-				<hr />
-
-				<ReservePicker
+					setRateMain={setRateMain}
+					setRate2={setRate2}
+					ratePluginType={ratePluginType}
 					seniorDepositAmount={seniorDepositAmount}
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
 					setReserveMint={setReserveMint}
+					depositEnd={depositEnd}
+					setDepositEnd={setDepositEnd}
+					settleStart={settleStart}
+					setSettleStart={setSettleStart}
+					saveOnDatabase={saveOnDatabase}
+					setSaveOnDatabase={setSaveOnDatabase}
+					sendNotification={sendNotification}
+					setSendNotification={setSendNotification}
+					isLoading={isLoading}
+					onCreateContractButtonClick={onCreateContractButtonClick}
 				/>
-
-				<hr />
-
-				<ExpiryPicker depositEnd={depositEnd} setDepositEnd={setDepositEnd} settleStart={settleStart} setSettleStart={setSettleStart} />
-
-				{process.env.NODE_ENV === 'development' && (
-					<FormGroup>
-						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
-						<FormControlLabel
-							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
-							label="Send notification"
-						/>
-					</FormGroup>
-				)}
-
-				<LoadingButton sx={{ mt: 1, mr: 1 }} variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-					{wallet.connected ? 'Create Contract' : 'Connect Wallet'}
-				</LoadingButton>
 			</Box>
 		</Layout>
 	);

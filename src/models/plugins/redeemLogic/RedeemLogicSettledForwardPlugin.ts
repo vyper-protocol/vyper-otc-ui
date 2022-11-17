@@ -58,8 +58,16 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
-	get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Settled-Forward-aa0f295f291545c281be6fa6363ca79a';
+	static get sourceLink(): string {
+		return 'https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-settled-forward';
+	}
+
+	static get redeemLogicDescription(): string {
+		return `A forward contract gives linear exposure to the underlying. 
+				Long expects that the underlying will increase in price. 
+				Short expects that the underlying will decrease in price.
+				The difference vs a standard forward is that you can settle the payoff in a third currency.
+				For example provide the SOL/USD and cUSDC/USD oracles to settle the SOL/USD payoff in cUSDC`;
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
