@@ -50,19 +50,19 @@ const CreateContractFlow = ({
 		{
 			title: 'payoff',
 			description: 'Select the payoff of your contract from the list available',
-			content: <PayoffPicker value={redeemLogicPluginType} onChange={setRedeemLogicPluginType} />
+			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />
 		},
 		{
 			title: 'underlying',
 			description: 'Select the underlying of the contract',
-			content: <OraclesPicker onChange={setRateMain} onChangeSecondary={setRate2} rate={ratePluginType} redeemLogic={redeemLogicPluginType} />
+			content: <OraclesPicker setRateMain={setRateMain} setRate2={setRate2} ratePluginType={ratePluginType} redeemLogicPluginType={redeemLogicPluginType} />
 		},
 		{
 			title: 'contract parameters',
 			description: 'Select the parameters of the contract',
 			content: (
 				<ParamsPicker
-					redeemLogic={redeemLogicPluginType}
+					redeemLogicPluginType={redeemLogicPluginType}
 					strike={strike}
 					setStrike={setStrike}
 					notional={notional}

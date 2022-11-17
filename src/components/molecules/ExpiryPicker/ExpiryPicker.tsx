@@ -6,7 +6,23 @@ import { Box, Checkbox } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 
-const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart }) => {
+type ExpiryPickerInput = {
+	// end of the deposit period expressed in ms
+	depositEnd: number;
+
+	// set callback, returns the provided datetime expressed in ms
+	// eslint-disable-next-line no-unused-vars
+	setDepositEnd: (val: number) => void;
+
+	// contract expiry expressed in ms
+	settleStart: number;
+
+	// set callback, returns the provided datetime expressed in ms
+	// eslint-disable-next-line no-unused-vars
+	setSettleStart: (val: number) => void;
+};
+
+const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart }: ExpiryPickerInput) => {
 	const [showExact, setShowExact] = useState(false);
 
 	return (

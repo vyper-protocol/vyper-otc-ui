@@ -5,6 +5,15 @@ import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogic
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 
+type PayoffPickerInput = {
+	// redeem logic plugin of the contract
+	redeemLogicPluginType: RedeemLogicPluginTypeIds;
+
+	// set callback, sets the redeem logic plugin type and the main rate puybey
+	// eslint-disable-next-line no-unused-vars
+	setRedeemLogicPluginType: (redeemLogicPluginType: RedeemLogicPluginTypeIds) => void;
+};
+
 const buildDescription = (redeemLogic: RedeemLogicPluginTypeIds) => {
 	let description: string;
 	let docLink;
@@ -49,16 +58,15 @@ const buildDescription = (redeemLogic: RedeemLogicPluginTypeIds) => {
 	);
 };
 
-const PayoffPicker = ({ value, onChange }) => {
+const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
 	return (
 		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
-			{/* <b>{'SELECT PAYOFF'}</b> */}
-			<Tabs value={value} onChange={(_, v) => onChange(v)}>
+			<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
 				{AVAILABLE_REDEEM_LOGIC_PLUGINS.map((plugin) => (
 					<Tab label={plugin} key={plugin} value={plugin} />
 				))}
 			</Tabs>
-			{buildDescription(value)}
+			{buildDescription(redeemLogicPluginType)}
 		</Box>
 	);
 };

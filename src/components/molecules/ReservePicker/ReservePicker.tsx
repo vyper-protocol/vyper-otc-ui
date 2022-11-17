@@ -7,7 +7,23 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
 import { getMints } from 'utils/mintDatasetHelper';
 
-const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepositAmount, setJuniorDepositAmount, setReserveMint }) => {
+type ReservePickerInput = {
+	seniorDepositAmount: number;
+
+	// eslint-disable-next-line no-unused-vars
+	setSeniorDepositAmount: (value: number) => void;
+
+	juniorDepositAmount: number;
+
+	// eslint-disable-next-line no-unused-vars
+	setJuniorDepositAmount: (value: number) => void;
+
+	// reserve mint of collateral tokens
+	// eslint-disable-next-line no-unused-vars
+	setReserveMint: (pubkey: string) => void;
+};
+
+const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepositAmount, setJuniorDepositAmount, setReserveMint }: ReservePickerInput) => {
 	const [selectedMint, setSelectedMint] = useState('');
 
 	const handleMint = (pubkey: string) => {
@@ -50,7 +66,7 @@ const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepo
 						shrink: true
 					}}
 					value={seniorDepositAmount}
-					onChange={(e) => setSeniorDepositAmount(e.target.value)}
+					onChange={(e) => setSeniorDepositAmount(+e.target.value)}
 				/>
 
 				<TextField
@@ -62,7 +78,7 @@ const ReservePicker = ({ seniorDepositAmount, setSeniorDepositAmount, juniorDepo
 						shrink: true
 					}}
 					value={juniorDepositAmount}
-					onChange={(e) => setJuniorDepositAmount(e.target.value)}
+					onChange={(e) => setJuniorDepositAmount(+e.target.value)}
 				/>
 			</Box>
 		</Box>

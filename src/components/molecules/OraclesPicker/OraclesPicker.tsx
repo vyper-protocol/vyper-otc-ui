@@ -1,11 +1,27 @@
 import { Box, Autocomplete, TextField, Grid, Typography } from '@mui/material';
 import { OracleDetail } from 'models/OracleDetail';
-import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
+
+type OraclesPickerInput = {
+	// set callback, sets the rate plugin type and the main rate puybey
+	// eslint-disable-next-line no-unused-vars
+	setRateMain: (rateType: RatePluginTypeIds, pubkey: string) => void;
+
+	// set callback, sets the secondary rate puybey
+	// eslint-disable-next-line no-unused-vars
+	setRate2: (pubkey: string) => void;
+
+	// rate plugin of the contract
+	ratePluginType: RatePluginTypeIds;
+
+	// redeem logic plugin of the contract
+	redeemLogicPluginType: RedeemLogicPluginTypeIds;
+};
 
 // TODO allow arbitrary oracle ids
 
-const OraclesPicker = ({ onChange, onChangeSecondary, rate, redeemLogic }) => {
+const OraclesPicker = ({ setRateMain, setRate2, ratePluginType, redeemLogicPluginType }: OraclesPickerInput) => {
 	return (
 		<Box sx={{ marginY: 2 }}>
 			{/* <b>{redeemLogic === 'settled_forward' ? 'SELECT UNDERLYINGS' : 'SELECT UNDERLYING'}</b> */}
@@ -29,11 +45,11 @@ const OraclesPicker = ({ onChange, onChangeSecondary, rate, redeemLogic }) => {
 						)}
 						options={getOracles()}
 						renderInput={(params) => <TextField {...params} label="Oracle #1" />}
-						onChange={(_, oracle: OracleDetail) => onChange(oracle.type, oracle.pubkey)}
+						onChange={(_, oracle: OracleDetail) => setRateMain(oracle.type, oracle.pubkey)}
 					/>
 				</Grid>
 				<Grid item xs={6}>
-					{(redeemLogic as RedeemLogicPluginTypeIds) === 'settled_forward' && (
+					{(redeemLogicPluginType as RedeemLogicPluginTypeIds) === 'settled_forward' && (
 						<Autocomplete
 							sx={{ width: 300, alignItems: 'center', marginY: 2 }}
 							disableClearable
@@ -46,9 +62,9 @@ const OraclesPicker = ({ onChange, onChangeSecondary, rate, redeemLogic }) => {
 									</Typography>
 								</Box>
 							)}
-							options={getOraclesByType(rate)}
+							options={getOraclesByType(ratePluginType)}
 							renderInput={(params) => <TextField {...params} label="Oracle #2" />}
-							onChange={(_, oracle: OracleDetail) => onChangeSecondary(oracle.pubkey)}
+							onChange={(_, oracle: OracleDetail) => setRate2(oracle.pubkey)}
 						/>
 					)}
 				</Grid>
