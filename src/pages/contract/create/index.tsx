@@ -47,8 +47,12 @@ const CreateContractPage = () => {
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
 
 	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
-	const [ratePlugin1, setRatePlugin1] = useState<OracleDetail>(getOracleByPubkey('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'));
-	const [ratePlugin2, setRatePlugin2] = useState<OracleDetail>(getOracleByPubkey('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'));
+
+	// pyth SOL/USD
+	const defaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
+
+	const [ratePlugin1, setRatePlugin1] = useState<OracleDetail>(getOracleByPubkey(defaultOracle));
+	const [ratePlugin2, setRatePlugin2] = useState<OracleDetail>(getOracleByPubkey(defaultOracle));
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);

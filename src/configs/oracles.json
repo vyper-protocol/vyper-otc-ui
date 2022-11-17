@@ -29,6 +29,15 @@
 		},
 		{
 			"type": "pyth",
+			"cluster": "mainnet-beta",
+			"pubkey": "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG",
+			"title": "SOL/USD",
+			"baseCurrency": "SOL",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=mainnet-beta"
+		},
+		{
+			"type": "pyth",
 			"cluster": "devnet",
 			"pubkey": "FVb5h1VmHPfVb1RfqZckchq18GxRv4iKt8T4eVTQAqdz",
 			"title": "AVAX/USD",
