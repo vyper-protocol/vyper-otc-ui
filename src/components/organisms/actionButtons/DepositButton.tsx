@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
+import { Tooltip } from '@mui/material';
 import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -11,6 +12,7 @@ import { fundContract } from 'controllers/fundContract';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import { useRouter } from 'next/router';
+import { getTokenAmount } from 'utils/solanaHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import PROGRAMS from '../../../configs/programs.json';
@@ -25,6 +27,30 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+	const checkTokenAmount = useCallback(async () => {
+		try {
+			const requiredAmount = isBuyer ? rateStateQuery.data.buyerDepositAmount : rateStateQuery.data.sellerDepositAmount;
+			const mintInfo = rateStateQuery.data.reserveMintInfo;
+			const tokenAmount = await getTokenAmount(connection, wallet.publicKey, mintInfo.address);
+			if (tokenAmount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) setIsButtonDisabled(false);
+			else setIsButtonDisabled(true);
+		} catch (err) {
+			console.error(err);
+		}
+	}, [
+		isBuyer,
+		rateStateQuery.data.buyerDepositAmount,
+		rateStateQuery.data.sellerDepositAmount,
+		rateStateQuery.data.reserveMintInfo,
+		connection,
+		wallet.publicKey
+	]);
+
+	useEffect(() => {
+		checkTokenAmount();
+	}, [checkTokenAmount]);
 
 	// flag for is available fetched in realtime via ws
 	const [isAvailable, setIsAvailable] = useState(true);
@@ -102,8 +128,19 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	if (!isAvailable) {
 		return <></>;
 	}
-
-	return <ButtonPill mode={isBuyer ? 'success' : 'error'} text={isBuyer ? 'Long' : 'Short'} onClick={onDepositClick} loading={isLoading} />;
+	return (
+		<Tooltip title={isButtonDisabled ? 'Not enough tokens' : ''}>
+			<div style={{ display: 'flex', flex: 1 }}>
+				<ButtonPill
+					mode={isButtonDisabled ? 'disabled' : isBuyer ? 'success' : 'error'}
+					text={isBuyer ? 'Long' : 'Short'}
+					onClick={onDepositClick}
+					loading={isLoading}
+					disabled={isButtonDisabled}
+				/>
+			</div>
+		</Tooltip>
+	);
 };
 
 export default DepositButton;

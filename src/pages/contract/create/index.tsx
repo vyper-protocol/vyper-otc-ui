@@ -2,10 +2,8 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { FormControlLabel, FormGroup, Switch, Button, Box, TextField, Select, InputAdornment, ButtonGroup, MenuItem } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { HiOutlineRefresh } from 'react-icons/hi';
-import { GrShare } from 'react-icons/gr';
+import { FormControlLabel, FormGroup, Switch, Button, Box, TextField, Select, InputAdornment, ButtonGroup, MenuItem } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -22,6 +20,9 @@ import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { GrShare } from 'react-icons/gr';
+import { HiOutlineRefresh } from 'react-icons/hi';
+import { getOraclesByType } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 const StrikePicker = ({
@@ -157,36 +158,22 @@ const PublicKeyPicker = ({
 	);
 };
 
+// RATE PLUGINS
+
 // eslint-disable-next-line no-unused-vars
 const PythPricePicker = ({ title, value, onChange }: { title: string; value: string; onChange: (_: string) => void }) => {
-	const [productSymbol, setProductSymbol] = useState('');
-	const { connection } = useConnection();
-
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const [product] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(value));
-				if (product) setProductSymbol(product?.symbol ?? '');
-				else setProductSymbol('');
-			} catch {
-				setProductSymbol('');
-			}
-		};
-		fetchData();
-	}, [value, connection]);
+	const filteredOracles = getOraclesByType('pyth');
 
 	return (
-		<Box sx={{ display: 'flex', alignItems: 'center', margin: '6px' }}>
-			<TextField
-				sx={{ width: '100%' }}
-				label={title + ' ' + productSymbol}
-				variant="outlined"
-				size="small"
-				value={value}
-				onChange={(e) => {
-					return onChange(e.target.value);
-				}}
-			/>
+		<Box display="flex" alignItems="center">
+			<Select sx={{ width: '100%', margin: '12px' }} value={value} size="small" onChange={(event) => onChange(event.target.value as RedeemLogicPluginTypeIds)}>
+				{filteredOracles.map((p) => (
+					<MenuItem key={p.pubkey} value={p.pubkey}>
+						{p.title}
+					</MenuItem>
+				))}
+			</Select>
+
 			<a target="_blank" href="https://pyth.network/price-feeds" rel="noopener noreferrer">
 				<Button variant="text" size="small">
 					<GrShare />
@@ -197,6 +184,7 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 };
 
 const CreateContractPage = () => {
+	const currentCluster = getCurrentCluster();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -205,10 +193,10 @@ const CreateContractPage = () => {
 	const txHandler = useContext(TxHandlerContext);
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [saveOnDatabase, setSaveOnDatabase] = useState(true);
-	const [sendNotification, setSendNotification] = useState(true);
+	const [saveOnDatabase, setSaveOnDatabase] = useState(process.env.NODE_ENV === 'development' ? false : true);
+	const [sendNotification, setSendNotification] = useState(process.env.NODE_ENV === 'development' ? false : true);
 
-	const reserveMintHints = [
+	const reserveMintHintsMainnet = [
 		{
 			pubkey: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
 			label: 'mainnet USDC'
@@ -220,13 +208,16 @@ const CreateContractPage = () => {
 		{
 			pubkey: 'So11111111111111111111111111111111111111112',
 			label: 'mainnet wSOL'
-		},
+		}
+	];
+
+	const reserveMintHintsDevnet = [
 		{
 			pubkey: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
 			label: 'devnet test tokens'
 		}
 	];
-	const [reserveMint, setReserveMint] = useState(reserveMintHints[0].pubkey);
+	const [reserveMint, setReserveMint] = useState(currentCluster === 'devnet' ? reserveMintHintsDevnet[0].pubkey : reserveMintHintsMainnet[0].pubkey);
 
 	const [depositStart, setDepositStart] = useState(moment().add(0, 'minutes').toDate().getTime());
 	const [depositEnd, setDepositEnd] = useState(moment().add(5, 'minutes').toDate().getTime());
@@ -247,7 +238,7 @@ const CreateContractPage = () => {
 	const setStrikeToDefaultValue = async () => {
 		try {
 			if (ratePluginType === 'pyth') {
-				const [, price] = await RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), new PublicKey(pythPrice_1));
+				const [, price] = await RatePythPlugin.GetProductPrice(connection, currentCluster, new PublicKey(pythPrice_1));
 				setStrike(price?.price ?? 0);
 			}
 			if (ratePluginType === 'switchboard') {
@@ -285,11 +276,15 @@ const CreateContractPage = () => {
 			const rateAccounts: PublicKey[] = [];
 			if (ratePluginType === 'switchboard') {
 				rateAccounts.push(new PublicKey(switchboardAggregator_1));
-				rateAccounts.push(new PublicKey(switchboardAggregator_2));
+				if (redeemLogicPluginType === 'settled_forward') {
+					rateAccounts.push(new PublicKey(switchboardAggregator_2));
+				}
 			}
 			if (ratePluginType === 'pyth') {
 				rateAccounts.push(new PublicKey(pythPrice_1));
-				rateAccounts.push(new PublicKey(pythPrice_2));
+				if (redeemLogicPluginType === 'settled_forward') {
+					rateAccounts.push(new PublicKey(pythPrice_2));
+				}
 			}
 
 			let redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
@@ -381,10 +376,7 @@ const CreateContractPage = () => {
 					)}
 					{(redeemLogicPluginType === 'digital' || redeemLogicPluginType === 'vanilla_option') && (
 						<FormGroup>
-							<FormControlLabel
-								control={<Switch defaultChecked checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />}
-								label={isCall ? 'Call' : 'Put'}
-							/>
+							<FormControlLabel control={<Switch checked={isCall} onChange={(e) => setIsCall(e.target.checked)} />} label={isCall ? 'Call' : 'Put'} />
 						</FormGroup>
 					)}
 				</Box>
@@ -431,7 +423,12 @@ const CreateContractPage = () => {
 				<hr />
 
 				<Box sx={{ display: 'flex', alignItems: 'center' }}>
-					<PublicKeyPicker title="Reserve Mint" value={reserveMint} onChange={setReserveMint} hints={reserveMintHints} />
+					<PublicKeyPicker
+						title="Reserve Mint"
+						value={reserveMint}
+						onChange={setReserveMint}
+						hints={currentCluster === 'devnet' ? reserveMintHintsDevnet : reserveMintHintsMainnet}
+					/>
 				</Box>
 				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<DateTimePickerComp title="Deposit Start" value={depositStart} onChange={setDepositStart} />

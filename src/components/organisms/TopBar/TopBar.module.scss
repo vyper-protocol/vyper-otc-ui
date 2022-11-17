@@ -112,7 +112,9 @@
 				fill: var(--color-text-disabled);
 			}
 
-			span, a, .typography {
+			span,
+			a,
+			.typography {
 				font-family: var(--font-primary) !important;
 				font-size: 15px;
 				color: var(--color-text-disabled);
@@ -132,7 +134,7 @@
 			}
 		}
 
-		&.mobileNav {               
+		&.mobileNav {
 			.item {
 				margin-left: 0;
 				margin-right: 0;
@@ -142,8 +144,9 @@
 			.item:hover {
 				cursor: pointer;
 			}
-	
-			.active, .item:hover {
+
+			.active,
+			.item:hover {
 				a {
 					color: var(--color-black);
 				}
@@ -161,24 +164,24 @@
 }
 
 @media (max-width: 725px) {
-    .topbar {
-        .navRightItems {
-            display: none;
-        }
-    
-        .nav {
-            width: 100%;
-            justify-content: flex-end;
-            margin-top: var(--space-6);
+	.topbar {
+		.navRightItems {
+			display: none;
+		}
 
-            .item {
-                display: none;
-                margin-left: 0;
-            }
-    
-            .item.mobileonly {
-                display: block;
-            }
-        }
-    }
+		.nav {
+			width: 100%;
+			justify-content: flex-end;
+			margin-top: var(--space-6);
+
+			.item {
+				display: none;
+				margin-left: 0;
+			}
+
+			.item.mobileonly {
+				display: block;
+			}
+		}
+	}
 }

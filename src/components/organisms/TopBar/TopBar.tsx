@@ -2,21 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 
+import { Box, Typography, Tooltip, Chip, Popover } from '@mui/material';
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import resources from 'configs/resources.json';
-import { Box, Typography, Tooltip, Chip, Popover } from '@mui/material';
-import { GiHamburgerMenu } from 'react-icons/gi';
-import { HiFolderAdd } from 'react-icons/hi';
-import { TbMapSearch } from 'react-icons/tb';
-import { MdStackedBarChart } from 'react-icons/md';
-import { RiLayoutGridFill } from 'react-icons/ri';
-import { BiChevronDown } from 'react-icons/bi';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { BiChevronDown } from 'react-icons/bi';
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { HiFolderAdd } from 'react-icons/hi';
+import { MdStackedBarChart } from 'react-icons/md';
+import { RiLayoutGridFill } from 'react-icons/ri';
+import { TbMapSearch } from 'react-icons/tb';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './TopBar.module.scss';

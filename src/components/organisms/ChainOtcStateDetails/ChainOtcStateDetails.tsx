@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import { Tooltip, Chip, Button, Box } from '@mui/material';
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import { Tooltip, Chip, Box, IconButton, Stack } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+// import _ from 'lodash';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { abbreviateAddress, copyToClipboard } from 'utils/stringHelpers';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -30,12 +31,12 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const [showSimulator, setShowSimulator] = useState(false);
 
-	const handleAddressClick = (e) => {
-		copyToClipboard(e.target.getAttribute('data-id'));
-		toast.info('Address copied to clipboard', {
-			autoClose: 2000
-		});
-	};
+	// const handleAddressClick = (e) => {
+	// 	copyToClipboard(e.target.getAttribute('data-id'));
+	// 	toast.info('Address copied to clipboard', {
+	// 		autoClose: 2000
+	// 	});
+	// };
 
 	const handleDocumentationClick = () => {
 		window.open(otcState.redeemLogicState.documentationLink);
@@ -126,16 +127,17 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
-				<Box sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-					<Box sx={{ width: '100%', textAlign: 'center' }}>
-						<h5>{otcState.getContractTitle()}</h5>
-					</Box>
-					<Box sx={{ width: '100%', textAlign: 'center' }}>
-						<Button variant="outlined" onClick={handleAddressClick} data-id={otcState.publickey.toBase58()}>
-							{abbreviateAddress(otcState.publickey.toBase58())}
-						</Button>
-					</Box>
-				</Box>
+				<Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+					<Stack direction="row" sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+						<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
+						<Tooltip title="" placement="right">
+							<IconButton aria-label="close" color="inherit" size="small" onClick={handleDocumentationClick}>
+								<QuestionMarkIcon fontSize="inherit" />
+							</IconButton>
+						</Tooltip>
+					</Stack>
+					<h5>{otcState.getContractTitle()}</h5>
+				</Stack>
 				<hr />
 
 				{/* + + + + + + + + + + + + +  */}
