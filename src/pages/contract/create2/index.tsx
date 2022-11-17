@@ -7,12 +7,8 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 
-import ExpiryPicker from 'components/molecules/ExpiryPicker';
 import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
-import OraclesPicker from 'components/molecules/OraclesPicker';
-import PayoffPicker from 'components/molecules/PayoffPicker';
-import ReservePicker from 'components/molecules/ReservePicker';
-import ParamsPicker from 'components/molecules/ParamsPicker';
+import CreateContractFlow from 'components/organisms/CreateContractFlow';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
@@ -202,51 +198,35 @@ const CreateContractPage = () => {
 	return (
 		<Layout>
 			<NonAuditedDisclaimer />
-			<Box sx={{ width: '75vh', alignItems: 'center' }}>
-				<PayoffPicker value={redeemLogicPluginType} onChange={setRedeemLogicPluginType} />
-
-				<hr />
-
-				<ParamsPicker
-					redeemLogic={redeemLogicPluginType}
+			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
+				<CreateContractFlow
+					redeemLogicPluginType={redeemLogicPluginType}
+					setRedeemLogicPluginType={setRedeemLogicPluginType}
 					strike={strike}
 					setStrike={setStrike}
 					notional={notional}
 					setNotional={setNotional}
 					isCall={isCall}
 					setIsCall={setIsCall}
-				/>
-
-				<hr />
-
-				<OraclesPicker onChange={setRateMain} onChangeSecondary={setRate2} rate={ratePluginType} redeemLogic={redeemLogicPluginType} />
-
-				<hr />
-
-				<ReservePicker
+					setRateMain={setRateMain}
+					setRate2={setRate2}
+					ratePluginType={ratePluginType}
 					seniorDepositAmount={seniorDepositAmount}
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
 					setReserveMint={setReserveMint}
+					depositEnd={depositEnd}
+					setDepositEnd={setDepositEnd}
+					settleStart={settleStart}
+					setSettleStart={setSettleStart}
+					saveOnDatabase={saveOnDatabase}
+					setSaveOnDatabase={setSaveOnDatabase}
+					sendNotification={sendNotification}
+					setSendNotification={setSendNotification}
+					isLoading={isLoading}
+					onCreateContractButtonClick={onCreateContractButtonClick}
 				/>
-
-				<hr />
-
-				<ExpiryPicker depositEnd={depositEnd} setDepositEnd={setDepositEnd} settleStart={settleStart} setSettleStart={setSettleStart} />
-
-				{process.env.NODE_ENV === 'development' && (
-					<FormGroup>
-						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
-						<FormControlLabel
-							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
-							label="Send notification"
-						/>
-					</FormGroup>
-				)}
-				<Button isLoading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-					{wallet.connected ? 'Create Contract' : 'Connect Wallet'}
-				</Button>
 			</Box>
 		</Layout>
 	);

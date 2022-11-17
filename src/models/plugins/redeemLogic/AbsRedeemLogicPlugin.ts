@@ -17,10 +17,20 @@ export abstract class AbsRedeemLogicPlugin extends AbsPlugin {
 	abstract get rateFeedsDescription(): string[];
 	abstract get settlementPricesDescription(): string[];
 
-	/**
-	 * Returns the documentation link
-	 */
-	abstract get documentationLink(): string;
+	// /**
+	//  * Returns the documentation link
+	//  */
+	// abstract get documentationLink(): string;
+
+	// /**
+	//  * Returns source code link
+	//  */
+	// abstract get sourceLink(): string;
+
+	// /**
+	//  * Returns redeem logic description
+	//  */
+	// abstract get redeemLogicDescription(): string;
 
 	/**
 	 * Compute the redeem logic PnL

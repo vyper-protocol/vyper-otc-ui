@@ -36,6 +36,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	// 	});
 	// };
 
+	// TODO fix link
 	const handleDocumentationClick = () => {
 		window.open(otcState.redeemLogicState.documentationLink);
 	};
