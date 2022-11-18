@@ -85,7 +85,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					<StatusBadge label={otcState.rateState.typeId} mode={'info'} />
 
 					<div style={{ flex: 1 }} />
-					<ContractStatusBadge status={otcState.getContractStatus()} />
+					<ContractStatusBadge status={otcState.contractStatus} />
 				</Box>
 
 				{/* + + + + + + + + + + + + +  */}
