@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { Box, Typography, Tooltip, Chip, Popover } from '@mui/material';
+import { Box, Typography, Tooltip, Popover } from '@mui/material';
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
+import StatusBadge from 'components/atoms/StatusBadge';
 import AirdropButton from 'components/molecules/AirdropButton';
 import SelectWallet from 'components/organisms/SelectWallet';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -138,9 +139,11 @@ const TopBar = () => {
 				<Box className={styles.nav}>
 					{menuItems}
 
-					{cluster !== 'mainnet-beta' && (
-						<Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} className={cn(styles.item, styles.mobileonly)} />
-					)}
+					{/* {cluster !== 'mainnet-beta' && (
+						// TODO fix mobile only
+						<StatusBadge label={cluster} mode="error" />
+						// <Chip  sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} className={cn(styles.item, styles.mobileonly)} />
+					)} */}
 
 					<Box className={cn(styles.item, styles.mobileonly)} onClick={openMobileMenu}>
 						<GiHamburgerMenu />
@@ -167,7 +170,11 @@ const TopBar = () => {
 				</Box>
 
 				<Box className={styles.navRightItems} display="flex" alignItems="center">
-					{cluster !== 'mainnet-beta' && <Chip color="warning" sx={{ marginRight: '10px', textTransform: 'uppercase' }} label={cluster} />}
+					{cluster !== 'mainnet-beta' && (
+						<Box sx={{ mr: 2 }}>
+							<StatusBadge label={cluster} mode="warning" />
+						</Box>
+					)}
 					<SelectWallet />
 				</Box>
 			</Box>

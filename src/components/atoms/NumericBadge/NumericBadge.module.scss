@@ -1,0 +1,20 @@
+.chip {
+	text-align: center;
+	margin: 2px 3px;
+	background-color: var(--color-black-200);
+	padding: 4px 8px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	font-weight: 500;
+}
+
+.success {
+	color: var(--color-success);
+	background-color: var(--color-success-light);
+}
+
+.error {
+	color: var(--color-error);
+	background-color: var(--color-error-light);
+}
