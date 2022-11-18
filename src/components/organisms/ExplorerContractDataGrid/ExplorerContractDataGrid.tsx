@@ -12,7 +12,7 @@ import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
-import { ChainOtcState } from 'models/ChainOtcState';
+import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState, ContractStatusIds } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
 import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
@@ -179,6 +179,8 @@ const ExplorerContractDataGrid = () => {
 			}
 		},
 		{
+			type: 'singleSelect',
+			valueOptions: AVAILABLE_CONTRACT_STATUS_IDS as any,
 			field: 'contractStatus',
 			headerName: 'Status',
 			sortable: true,
@@ -186,7 +188,7 @@ const ExplorerContractDataGrid = () => {
 			flex: 1,
 			minWidth: 100,
 			renderCell: (params) => {
-				return <ContractStatusBadge status={params.row.getContractStatus()} />;
+				return <ContractStatusBadge status={params.row.contractStatus} />;
 			}
 		},
 		{
