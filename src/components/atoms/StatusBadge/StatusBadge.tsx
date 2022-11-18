@@ -1,6 +1,5 @@
 /* eslint-disable css-modules/no-unused-class */
 import { Chip } from '@mui/material';
-import cn from 'classnames';
 
 import styles from './StatusBadge.module.scss';
 
@@ -13,7 +12,11 @@ type StatusBadgeProps = {
 };
 
 const StatusBadge = ({ label, mode }: StatusBadgeProps) => {
-	return <Chip className={cn(styles.chip, styles[mode])} label={label} size="small" variant="filled" />;
+	return (
+		<div className={styles.chip}>
+			<Chip className={styles[mode]} sx={{ borderRadius: 1, fontSize: 11 }} label={label} size="small" variant="filled" />
+		</div>
+	);
 };
 
 export default StatusBadge;

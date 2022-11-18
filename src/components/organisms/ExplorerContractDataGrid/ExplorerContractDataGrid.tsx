@@ -12,7 +12,7 @@ import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
-import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState, ContractStatusIds } from 'models/ChainOtcState';
+import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
 import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
