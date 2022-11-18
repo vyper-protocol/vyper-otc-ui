@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { TextField } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
-import StatusBadge from 'components/atoms/StatusBadge';
+import NumericBadge from 'components/atoms/NumericBadge';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -61,12 +61,12 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				<div className={styles.center}>
 					Long
 					<br />
-					<StatusBadge label={buyerPnl + ' ' + tokenSymbol} mode={buyerPnl > 0 ? 'success' : 'error'} />
+					<NumericBadge label={buyerPnl + ' ' + tokenSymbol} mode={buyerPnl > 0 ? 'success' : 'error'} />
 				</div>
 				<div className={styles.center}>
 					Short
 					<br />
-					<StatusBadge label={sellerPnl + ' ' + tokenSymbol} mode={sellerPnl > 0 ? 'success' : 'error'} />
+					<NumericBadge label={sellerPnl + ' ' + tokenSymbol} mode={sellerPnl > 0 ? 'success' : 'error'} />
 				</div>
 			</div>
 
