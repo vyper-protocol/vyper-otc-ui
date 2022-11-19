@@ -6,7 +6,7 @@ import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/Rede
 import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
 import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
-type PayoffPickerInput = {
+export type PayoffPickerInput = {
 	// redeem logic plugin of the contract
 	redeemLogicPluginType: RedeemLogicPluginTypeIds;
 
@@ -55,7 +55,7 @@ const buildDescription = (redeemLogic: RedeemLogicPluginTypeIds) => {
 	);
 };
 
-const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
+export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
 	return (
 		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
 			<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
@@ -67,5 +67,3 @@ const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: Payof
 		</Box>
 	);
 };
-
-export default PayoffPicker;
