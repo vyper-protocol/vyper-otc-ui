@@ -5,13 +5,13 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '
 import { useWallet } from '@solana/wallet-adapter-react';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { MintDetail } from 'models/MintDetail';
 import { OracleDetail } from 'models/OracleDetail';
 import moment from 'moment';
-import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { shortenString } from 'utils/stringHelpers';
 
 import styles from './PreviewModal.module.scss';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 export type PreviewModalInput = {
 	// redeem logic contract params
@@ -34,7 +34,7 @@ export type PreviewModalInput = {
 	juniorDepositAmount: number;
 
 	// collateral mint
-	reserveMint: string;
+	reserveMint: MintDetail;
 
 	// loading during contract creation
 	isLoading: boolean;
@@ -62,7 +62,6 @@ export const PreviewModal = ({
 	const { redeemLogicPluginType, strike, notional, isCall } = redeemLogicOption;
 
 	const wallet = useWallet();
-	const mintInfo = getMintByPubkey(reserveMint);
 
 	const PreviewDescription = (
 		<div className={styles.content}>
@@ -90,28 +89,28 @@ export const PreviewModal = ({
 				{'.'}
 			</p>
 			{/* // TODO LONG/SHORT contextualized by payoff
-			// TODO load onchain data for unknwon mints */}
+			// TODO load onchain data for unknwon mints , checks are not useful for now*/}
 			<p className={styles.description}>
 				You selected{' '}
-				{mintInfo && (
+				{reserveMint && (
 					<span>
-						<span className={styles.highlightNoCap}>{mintInfo.title}</span> as collateral.
+						<span className={styles.highlightNoCap}>{reserveMint.title}</span> as collateral.
 					</span>
 				)}
-				{!mintInfo && (
+				{!reserveMint && (
 					<span>
-						an unknown token as collateral, with token mint <span className={styles.highlight}>{shortenString(reserveMint)}</span>.
+						an unknown token as collateral, with token mint <span className={styles.highlight}>{shortenString(reserveMint.pubkey)}</span>.
 					</span>
 				)}{' '}
 				The LONG side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{seniorDepositAmount}
-					{mintInfo && <span> {mintInfo.title}</span>}
+					{reserveMint && <span> {reserveMint.title}</span>}
 				</span>{' '}
 				while the SHORT side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{juniorDepositAmount}
-					{mintInfo && <span> {mintInfo.title}</span>}
+					{reserveMint && <span> {reserveMint.title}</span>}
 				</span>
 				.
 			</p>

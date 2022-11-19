@@ -52,6 +52,7 @@ export const OraclesPicker = ({ ratePlugin1, setRatePlugin1, ratePlugin2, setRat
 						onChange={(_, oracle: OracleDetail) => {
 							setRatePlugin1(oracle);
 						}}
+						value={ratePlugin1}
 					/>
 					<Fab sx={{ marginX: 2, boxShadow: 2 }} color="default" size="small">
 						<a href={ratePlugin1.explorerUrl} target="_blank" rel="noopener noreferrer">
@@ -79,6 +80,7 @@ export const OraclesPicker = ({ ratePlugin1, setRatePlugin1, ratePlugin2, setRat
 								onChange={(_, oracle: OracleDetail) => {
 									setRatePlugin2(oracle);
 								}}
+								value={ratePlugin1}
 							/>
 							<Fab sx={{ marginX: 2, boxShadow: 2 }} color="default" size="small">
 								<a href={ratePlugin2.explorerUrl} target="_blank" rel="noopener noreferrer">

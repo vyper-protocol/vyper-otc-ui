@@ -13,12 +13,12 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { OracleDetail } from 'models/OracleDetail';
 import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -35,7 +35,9 @@ const CreateContractPage = () => {
 	const [saveOnDatabase, setSaveOnDatabase] = useState(process.env.NODE_ENV === 'development' ? false : true);
 	const [sendNotification, setSendNotification] = useState(process.env.NODE_ENV === 'development' ? false : true);
 
-	const [reserveMint, setReserveMint] = useState('');
+	// USDC in mainnet, devUSD in devnet
+	const defaultMint = currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+	const [reserveMint, setReserveMint] = useState(getMintByPubkey(defaultMint));
 
 	// assume deposit always starts open
 	// eslint-disable-next-line no-unused-vars
@@ -51,8 +53,8 @@ const CreateContractPage = () => {
 	// pyth SOL/USD
 	const defaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
 
-	const [ratePlugin1, setRatePlugin1] = useState<OracleDetail>(getOracleByPubkey(defaultOracle));
-	const [ratePlugin2, setRatePlugin2] = useState<OracleDetail>(getOracleByPubkey(defaultOracle));
+	const [ratePlugin1, setRatePlugin1] = useState(getOracleByPubkey(defaultOracle));
+	const [ratePlugin2, setRatePlugin2] = useState(getOracleByPubkey(defaultOracle));
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
@@ -125,7 +127,7 @@ const CreateContractPage = () => {
 			}
 
 			const initParams: OtcInitializationParams = {
-				reserveMint: new PublicKey(reserveMint),
+				reserveMint: new PublicKey(reserveMint.pubkey),
 				depositStart,
 				depositEnd,
 				settleStart,

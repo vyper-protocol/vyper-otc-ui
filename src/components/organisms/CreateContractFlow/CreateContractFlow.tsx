@@ -1,13 +1,11 @@
 import { useState } from 'react';
 
-import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { ExpiryPicker, ExpiryPickerInput } from 'components/molecules/ExpiryPicker';
 import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesPicker';
 import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
 import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
-import { PreviewModal, PreviewModalInput } from 'components/molecules/PreviewModal';
+import { PreviewModal } from 'components/molecules/PreviewModal';
 import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 
@@ -37,13 +35,8 @@ type ContractLifecycleInput = {
 	onCreateContractButtonClick: () => Promise<void>;
 };
 
-type CreateContractFlowInput = OraclesPickerInput &
-	ParamsPickerInput &
-	ReservePickerInput &
-	ExpiryPickerInput &
-	PayoffPickerInput &
-	ContractLifecycleInput &
-	PreviewModalInput;
+// TODO add PreviewModalInput with OtcInitializationParams['redeemLogicOption']
+type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
 
 const CreateContractFlow = ({
 	redeemLogicPluginType,
@@ -76,7 +69,6 @@ const CreateContractFlow = ({
 	onCreateContractButtonClick
 }: CreateContractFlowInput) => {
 	const [activeStep, setActiveStep] = useState(0);
-	const wallet = useWallet();
 
 	const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
 		redeemLogicPluginType,
@@ -128,6 +120,7 @@ const CreateContractFlow = ({
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
+					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
 				/>
 			)
