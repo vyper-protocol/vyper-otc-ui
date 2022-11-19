@@ -11,9 +11,11 @@ type ExplorerIconProps = {
 
 const ExplorerIcon = ({ link }: ExplorerIconProps) => {
 	return (
-		<Fab className={styles.fab} sx={{ boxShadow: 1, alignItems: 'center' }} color="default" size="small" href={link}>
-			<SearchIcon className={styles.icon} />
-		</Fab>
+		<div className={styles.fab}>
+			<Fab sx={{ boxShadow: 1, alignItems: 'center' }} color="default" size="small" href={link}>
+				<SearchIcon className={styles.icon} />
+			</Fab>
+		</div>
 	);
 };
 
