@@ -1,0 +1,33 @@
+.content {
+	.title {
+		font-size: var(--font-p);
+		text-transform: uppercase;
+		font-weight: 650;
+		font-size: large;
+		color: var(--color-black-300);
+		background-color: var(--color-primary);
+	}
+
+	.description {
+		color: var(--color-black);
+		font-size: 16px;
+		padding: var(--space-10);
+	}
+
+	.highlight {
+		font-weight: 600;
+		text-transform: uppercase;
+		background: linear-gradient(180deg, #262629 0%, #3c44ac 52.92%, #a490d3 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.highlightNoCap {
+		font-weight: 600;
+		background: linear-gradient(180deg, #262629 0%, #3c44ac 52.92%, #a490d3 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+}

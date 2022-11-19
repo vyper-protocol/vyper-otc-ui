@@ -7,7 +7,9 @@ import { ExpiryPicker, ExpiryPickerInput } from 'components/molecules/ExpiryPick
 import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesPicker';
 import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
 import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
+import { PreviewModal, PreviewModalInput } from 'components/molecules/PreviewModal';
 import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
+import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 
 type StepElement = {
 	title: string;
@@ -35,7 +37,13 @@ type ContractLifecycleInput = {
 	onCreateContractButtonClick: () => Promise<void>;
 };
 
-type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
+type CreateContractFlowInput = OraclesPickerInput &
+	ParamsPickerInput &
+	ReservePickerInput &
+	ExpiryPickerInput &
+	PayoffPickerInput &
+	ContractLifecycleInput &
+	PreviewModalInput;
 
 const CreateContractFlow = ({
 	redeemLogicPluginType,
@@ -54,6 +62,7 @@ const CreateContractFlow = ({
 	setSeniorDepositAmount,
 	juniorDepositAmount,
 	setJuniorDepositAmount,
+	reserveMint,
 	setReserveMint,
 	depositEnd,
 	setDepositEnd,
@@ -68,6 +77,13 @@ const CreateContractFlow = ({
 }: CreateContractFlowInput) => {
 	const [activeStep, setActiveStep] = useState(0);
 	const wallet = useWallet();
+
+	const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
+		redeemLogicPluginType,
+		strike,
+		notional,
+		isCall
+	};
 
 	const steps: StepElement[] = [
 		{
@@ -140,7 +156,6 @@ const CreateContractFlow = ({
 			<Stepper activeStep={activeStep} orientation="vertical" connector={null}>
 				{steps.map((step: StepElement, i: number) => (
 					<Step key={step.title} sx={{ width: '100%' }}>
-						{/* <Box sx={{ display: 'inline-flex' }}> */}
 						<Stack direction="row">
 							<Box sx={{ width: '40%', flexDirection: 'column', justifyContent: 'space-between' }}>
 								<Box sx={{ my: 2 }}>
@@ -150,20 +165,23 @@ const CreateContractFlow = ({
 									{activeStep >= i && <Typography sx={{ fontWeight: 'light' }}>{step.description}</Typography>}
 								</Box>
 								{i === activeStep && (
-									<Box>
+									<Box sx={{ display: 'flex' }}>
 										<Button disabled={i === 0} onClick={handleBack} sx={{ mt: 1, mr: 1 }}>
 											Back
 										</Button>
 										{i === steps.length - 1 ? (
-											<LoadingButton
-												sx={{ mt: 1, mr: 1 }}
-												variant="contained"
-												loading={isLoading}
-												disabled={!wallet.connected}
-												onClick={onCreateContractButtonClick}
-											>
-												{wallet.connected ? 'Create Contract' : 'Connect Wallet'}
-											</LoadingButton>
+											<PreviewModal
+												redeemLogicOption={redeemLogicOption}
+												depositEnd={depositEnd}
+												settleStart={settleStart}
+												ratePlugin1={ratePlugin1}
+												ratePlugin2={ratePlugin2}
+												seniorDepositAmount={seniorDepositAmount}
+												juniorDepositAmount={juniorDepositAmount}
+												reserveMint={reserveMint}
+												isLoading={isLoading}
+												onCreateContractButtonClick={onCreateContractButtonClick}
+											/>
 										) : (
 											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }}>
 												Next

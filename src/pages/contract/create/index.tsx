@@ -174,6 +174,7 @@ const CreateContractPage = () => {
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
+					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
 					depositEnd={depositEnd}
 					setDepositEnd={setDepositEnd}
