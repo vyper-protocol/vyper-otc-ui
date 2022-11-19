@@ -4,7 +4,7 @@ import { OracleDetail } from 'models/OracleDetail';
 import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
 
-export type OraclePickerInput = {
+type OraclePickerInput = {
 	// label of the oracle
 	label: string;
 

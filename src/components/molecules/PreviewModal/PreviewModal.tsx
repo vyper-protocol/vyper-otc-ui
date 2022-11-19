@@ -69,14 +69,8 @@ export const PreviewModal = ({
 				You are creating a <span className={styles.highlight}>{redeemLogicPluginType}</span>{' '}
 				{redeemLogicPluginType === 'vanilla_option' ||
 					(redeemLogicPluginType === 'digital' && <span className={styles.highlight}>{isCall ? 'CALL' : 'PUT'}</span>)}{' '}
-				contract on <span className={styles.highlight}>{ratePlugin1.title}</span>{' '}
-				{redeemLogicPluginType === 'settled_forward' && (
-					<span>
-						{' '}
-						settled using <span className={styles.highlight}>{ratePlugin2.title}</span>
-					</span>
-				)}{' '}
-				with strike <span className={styles.highlight}>{formatWithDecimalDigits(strike, 6)}</span>
+				contract on <span className={styles.highlightNoCap}>{ratePlugin1.title}</span> with strike{' '}
+				<span className={styles.highlight}>{formatWithDecimalDigits(strike, 6)}</span>
 				{redeemLogicPluginType !== 'digital' && (
 					<span>
 						{' '}
@@ -86,28 +80,34 @@ export const PreviewModal = ({
 						</span>
 					</span>
 				)}
-				{'.'}
+				{'.'}{' '}
+				{redeemLogicPluginType === 'settled_forward' && (
+					<span>
+						{' '}
+						The contract will be settled using <span className={styles.highlightNoCap}>{ratePlugin2.title}.</span>
+					</span>
+				)}{' '}
 			</p>
 			{/* // TODO LONG/SHORT contextualized by payoff
 			// TODO load onchain data for unknwon mints , checks are not useful for now*/}
 			<p className={styles.description}>
-				You selected{' '}
+				The contract will be settled in{' '}
 				{reserveMint && (
 					<span>
-						<span className={styles.highlightNoCap}>{reserveMint.title}</span> as collateral.
+						<span className={styles.highlightNoCap}>{reserveMint.title}</span>.
 					</span>
 				)}
 				{!reserveMint && (
 					<span>
-						an unknown token as collateral, with token mint <span className={styles.highlight}>{shortenString(reserveMint.pubkey)}</span>.
+						an unknown token, with token mint <span className={styles.highlight}>{shortenString(reserveMint.pubkey)}</span>.
 					</span>
 				)}{' '}
-				The LONG side will need to deposit{' '}
+				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{seniorDepositAmount}
 					{reserveMint && <span> {reserveMint.title}</span>}
 				</span>{' '}
-				while the SHORT side will need to deposit{' '}
+				while the <span className={styles.highlight}>short</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{juniorDepositAmount}
 					{reserveMint && <span> {reserveMint.title}</span>}
