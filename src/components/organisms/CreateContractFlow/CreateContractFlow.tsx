@@ -3,17 +3,39 @@ import { useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
-import ExpiryPicker from 'components/molecules/ExpiryPicker';
-import OraclesPicker from 'components/molecules/OraclesPicker';
-import ParamsPicker from 'components/molecules/ParamsPicker';
-import PayoffPicker from 'components/molecules/PayoffPicker';
-import ReservePicker from 'components/molecules/ReservePicker';
+import { ExpiryPicker, ExpiryPickerInput } from 'components/molecules/ExpiryPicker';
+import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesPicker';
+import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
+import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
+import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
 
 type StepElement = {
 	title: string;
 	description: string;
 	content: JSX.Element;
 };
+
+type ContractLifecycleInput = {
+	// save contract on off-chain db
+	saveOnDatabase: boolean;
+
+	// eslint-disable-next-line no-unused-vars
+	setSaveOnDatabase: (val: boolean) => void;
+
+	// trigger notif flow
+	sendNotification: boolean;
+
+	// eslint-disable-next-line no-unused-vars
+	setSendNotification: (val: boolean) => void;
+
+	// loading during contract creation
+	isLoading: boolean;
+
+	// on-chain contract create callback
+	onCreateContractButtonClick: () => Promise<void>;
+};
+
+type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
 
 const CreateContractFlow = ({
 	redeemLogicPluginType,
@@ -24,9 +46,10 @@ const CreateContractFlow = ({
 	setNotional,
 	isCall,
 	setIsCall,
-	setRateMain,
-	setRate2,
-	ratePluginType,
+	ratePlugin1,
+	setRatePlugin1,
+	ratePlugin2,
+	setRatePlugin2,
 	seniorDepositAmount,
 	setSeniorDepositAmount,
 	juniorDepositAmount,
@@ -42,7 +65,7 @@ const CreateContractFlow = ({
 	setSendNotification,
 	isLoading,
 	onCreateContractButtonClick
-}) => {
+}: CreateContractFlowInput) => {
 	const [activeStep, setActiveStep] = useState(0);
 	const wallet = useWallet();
 
@@ -55,7 +78,15 @@ const CreateContractFlow = ({
 		{
 			title: 'underlying',
 			description: 'Select the underlying of the contract',
-			content: <OraclesPicker setRateMain={setRateMain} setRate2={setRate2} ratePluginType={ratePluginType} redeemLogicPluginType={redeemLogicPluginType} />
+			content: (
+				<OraclesPicker
+					ratePlugin1={ratePlugin1}
+					setRatePlugin1={setRatePlugin1}
+					ratePlugin2={ratePlugin2}
+					setRatePlugin2={setRatePlugin2}
+					redeemLogicPluginType={redeemLogicPluginType}
+				/>
+			)
 		},
 		{
 			title: 'contract parameters',
