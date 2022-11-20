@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Box, Alert, Collapse, Grid, Button } from '@mui/material';
+import { Alert, Collapse, Grid } from '@mui/material';
+import ErrorAlert from 'components/atoms/ErrorAlert/ErrorAlert';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import moment from 'moment';
 import { getNextHour, getNextDay, getTomNextDay, getNextFriday, getLastFridayOfMonth, getLastFridayOfQuarter } from 'utils/momentHelpers';
 
+// TODO fix typing
 export type ExpiryPickerInput = {
 	// end of the deposit period expressed in ms
 	depositEnd: number;
@@ -21,7 +23,15 @@ export type ExpiryPickerInput = {
 	setSettleStart: (val: number) => void;
 };
 
-export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart }: ExpiryPickerInput) => {
+export type ExpiryPickerProps = ExpiryPickerInput & {
+	// error in expiry inputs
+	expiryError: boolean;
+
+	// eslint-disable-next-line no-unused-vars
+	setExpiryError: (error: boolean) => void;
+};
+
+export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettleStart, expiryError, setExpiryError }: ExpiryPickerProps) => {
 	// at the 30th minute go to next hourly slot
 	const minuteCutoff = 30;
 
@@ -29,6 +39,14 @@ export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettle
 	const utcHour = 9;
 
 	const [open, setOpen] = useState(true);
+
+	useEffect(() => {
+		if (settleStart < depositEnd) {
+			setExpiryError(true);
+		} else {
+			setExpiryError(false);
+		}
+	}, [depositEnd, setDepositEnd, settleStart, setExpiryError]);
 
 	const depositPillar = [
 		{ label: '5 min', onClick: () => setDepositEnd(moment().add(5, 'minutes').toDate().getTime()) },
@@ -38,6 +56,7 @@ export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettle
 		{ label: '12 hours', onClick: () => setDepositEnd(moment().add(12, 'hour').toDate().getTime()) },
 		{ label: '1 day', onClick: () => setDepositEnd(moment().add(1, 'day').toDate().getTime()) }
 	];
+
 	const expiryPillars = [
 		{ label: 'Hourly', onClick: () => setSettleStart(getNextHour(minuteCutoff).toDate().getTime()) },
 		{ label: 'Daily', onClick: () => setSettleStart(getNextDay(utcHour).toDate().getTime()) },
@@ -51,7 +70,7 @@ export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettle
 		<Grid container spacing={1} sx={{ mt: 2 }}>
 			<Grid item xs={12}>
 				<Collapse in={open}>
-					<Alert sx={{ maxWidth: '800px' }} severity="info" onClose={() => setOpen(false)}>
+					<Alert severity="info" onClose={() => setOpen(false)}>
 						We highly suggest to pick one of the below expiries to increase the probability of trade.
 					</Alert>
 				</Collapse>
@@ -63,6 +82,12 @@ export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettle
 			<Grid item xs={6}>
 				<DateTimePickerComp title="Contract Expiry" value={settleStart} onChange={setSettleStart} pillars={expiryPillars} />
 			</Grid>
+
+			{expiryError && (
+				<Grid item xs={12}>
+					<ErrorAlert message={'Contract expiry should be after the deposit expiry!'} />
+				</Grid>
+			)}
 		</Grid>
 	);
 };
