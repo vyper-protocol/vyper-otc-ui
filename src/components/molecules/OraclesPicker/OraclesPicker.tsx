@@ -28,6 +28,7 @@ type OraclesPickerInput = {
 const OraclePicker = ({ setRate, oracles }) => {
 	const { connection } = useConnection();
 	const currentCluster = getCurrentCluster();
+	const [value, setValue] = useState<string | OracleDetail>('');
 	const [label, setLabel] = useState(<></>);
 
 	async function getOracleInfo(oracle: string): Promise<['pyth' | 'switchboard', string]> {
@@ -56,6 +57,30 @@ const OraclePicker = ({ setRate, oracles }) => {
 			handleHomeEndKeys
 			disableClearable
 			freeSolo={currentCluster === 'devnet'}
+			value={value}
+			onInputChange={async (_, oracle: string, reason: string) => {
+				if (reason !== 'input') return;
+
+				const [ratePluginType, symbol] = await getOracleInfo(oracle);
+				if (ratePluginType) {
+					setRate(ratePluginType, oracle);
+					setLabel(
+						<Box sx={{ paddingX: '16px', paddingY: '6px' }}>
+							<Typography component="span">{symbol}</Typography>
+							<Typography component="span" sx={{ color: 'grey', ml: 1, fontSize: '0.7em' }}>
+								{ratePluginType.toUpperCase()}
+							</Typography>
+						</Box>
+					);
+				} else {
+					setLabel(
+						<Box sx={{ paddingY: '6px' }}>
+							<Alert severity="error">The name / public key is not a recognized oracle.</Alert>
+						</Box>
+					);
+				}
+				setValue(oracle);
+			}}
 			getOptionLabel={(oracle: string | OracleDetail) => typeof oracle === 'string' ? oracle : oracle.title}
 			renderOption={(props, option: OracleDetail) => (
 				<Box component="li" {...props}>
@@ -71,28 +96,10 @@ const OraclePicker = ({ setRate, oracles }) => {
 				{label}
 			</>}
 			onChange={async (_, oracle: OracleDetail | string) => {
-				if (typeof oracle === 'string') {
-					const [ratePluginType, symbol] = await getOracleInfo(oracle);
-					if (ratePluginType) {
-						setRate(ratePluginType, oracle);
-						setLabel(
-							<Box sx={{ paddingX: '16px', paddingY: '6px' }}>
-								<Typography component="span">{symbol}</Typography>
-								<Typography component="span" sx={{ color: 'grey', ml: 1, fontSize: '0.7em' }}>
-									{ratePluginType.toUpperCase()}
-								</Typography>
-							</Box>
-						);
-					} else {
-						setLabel(
-							<Box sx={{ paddingY: '6px' }}>
-								<Alert severity="error">The public key is not a recognized oracle.</Alert>
-							</Box>
-						);
-					}
-				} else {
+				if (typeof oracle === 'object') {
 					setRate(oracle.type, oracle.pubkey);
 					setLabel(<></>);
+					setValue(oracle);
 				}
 			}}
 		/>
