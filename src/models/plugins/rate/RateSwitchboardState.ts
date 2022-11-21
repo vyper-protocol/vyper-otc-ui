@@ -4,15 +4,15 @@ import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 
-import { RatePluginTypeIds } from '../AbsPlugin';
-import { AbsRatePlugin } from './AbsRatePlugin';
+import { AbsRateState } from './AbsRateState';
+import { RatePluginTypeIds } from './RatePluginTypeIds';
 
-export default class RateSwitchboardPlugin extends AbsRatePlugin {
+export class RateSwitchboardState extends AbsRateState {
 	aggregatorsData: any;
 
 	// eslint-disable-next-line no-unused-vars
-	constructor(programPubkey: PublicKey, statePubkey: PublicKey, public oracles: PublicKey[]) {
-		super(programPubkey, statePubkey);
+	constructor(public oracles: PublicKey[]) {
+		super();
 	}
 
 	get title(): string {
@@ -51,12 +51,20 @@ export default class RateSwitchboardPlugin extends AbsRatePlugin {
 		};
 	}
 
-	clone(): RateSwitchboardPlugin {
-		return new RateSwitchboardPlugin(this.programPubkey, this.statePubkey, this.oracles);
+	static createFromDBData(data: any): RateSwitchboardState {
+		if (data.switchboardAggregator) {
+			return new RateSwitchboardState([new PublicKey(data.switchboardAggregator)]);
+		} else {
+			return new RateSwitchboardState(data.oracles.map((c) => new PublicKey(c)));
+		}
+	}
+
+	clone(): RateSwitchboardState {
+		return new RateSwitchboardState(this.oracles);
 	}
 
 	async loadData(connection: Connection) {
-		this.aggregatorsData = await Promise.all(this.oracles.map((c) => RateSwitchboardPlugin.LoadAggregatorData(connection, c)));
+		this.aggregatorsData = await Promise.all(this.oracles.map((c) => RateSwitchboardState.LoadAggregatorData(connection, c)));
 	}
 
 	static async LoadAggregatorData(connection: Connection, switchboardAggregator: PublicKey): Promise<any> {

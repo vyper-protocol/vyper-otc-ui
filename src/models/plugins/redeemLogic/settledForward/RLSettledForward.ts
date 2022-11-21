@@ -1,26 +1,16 @@
-/* eslint-disable no-unused-vars */
-import { PublicKey } from '@solana/web3.js';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { RedeemLogicPluginTypeIds } from '../AbsPlugin';
-import { AbsRedeemLogicPlugin } from './AbsRedeemLogicPlugin';
+import { AbsRLState } from '../AbsRLState';
+import { RLStateType } from '../RLStateType';
 
-/* eslint-disable space-before-function-paren */
-export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
+export class RLSettledForward extends AbsRLState {
 	// eslint-disable-next-line no-unused-vars
-	constructor(
-		programPubkey: PublicKey,
-		statePubkey: PublicKey,
-		public strike: number,
-		public isLinear: boolean,
-		public notional: number,
-		public isStandard: boolean
-	) {
-		super(programPubkey, statePubkey);
+	constructor(public strike: number, public isLinear: boolean, public notional: number, public isStandard: boolean) {
+		super();
 	}
 
-	get typeId(): RedeemLogicPluginTypeIds {
-		return 'settled_forward';
+	get stateType(): RLStateType {
+		return new RLStateType('settled_forward');
 	}
 
 	getPluginDataObj(): any {
@@ -30,10 +20,6 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 			notional: this.notional,
 			isStandard: this.isStandard
 		};
-	}
-
-	clone(): RedeemLogicSettledForwardPlugin {
-		return new RedeemLogicSettledForwardPlugin(this.programPubkey, this.statePubkey, this.strike, this.isLinear, this.notional, this.isStandard);
 	}
 
 	get rateFeedsDescription(): string[] {
@@ -58,12 +44,16 @@ export class RedeemLogicSettledForwardPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
+	clone(): RLSettledForward {
+		return new RLSettledForward(this.strike, this.isLinear, this.notional, this.isStandard);
+	}
+
 	get documentationLink(): string {
 		return 'https://vyperprotocol.notion.site/Contract-Payoff-Settled-Forward-aa0f295f291545c281be6fa6363ca79a';
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RedeemLogicSettledForwardPlugin.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike);
+		return RLSettledForward.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike);
 	}
 
 	static getPnlExtended(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number, notional: number, strike: number): [number, number] {

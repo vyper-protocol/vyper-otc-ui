@@ -15,9 +15,10 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS, RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
-import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { AVAILABLE_RATE_TYPES, RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
+import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { GrShare } from 'react-icons/gr';
@@ -166,7 +167,7 @@ const PythPricePicker = ({ title, value, onChange }: { title: string; value: str
 
 	return (
 		<Box display="flex" alignItems="center">
-			<Select sx={{ width: '100%', margin: '12px' }} value={value} size="small" onChange={(event) => onChange(event.target.value as RedeemLogicPluginTypeIds)}>
+			<Select sx={{ width: '100%', margin: '12px' }} value={value} size="small" onChange={(event) => onChange(event.target.value as RLPluginTypeIds)}>
 				{filteredOracles.map((p) => (
 					<MenuItem key={p.pubkey} value={p.pubkey}>
 						{p.title}
@@ -228,7 +229,7 @@ const CreateContractPage = () => {
 
 	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>('pyth');
 
-	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
+	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RLPluginTypeIds>('forward');
 
 	const [switchboardAggregator_1, setSwitchboardAggregator_1] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
 	const [switchboardAggregator_2, setSwitchboardAggregator_2] = useState('GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR');
@@ -238,11 +239,11 @@ const CreateContractPage = () => {
 	const setStrikeToDefaultValue = async () => {
 		try {
 			if (ratePluginType === 'pyth') {
-				const [, price] = await RatePythPlugin.GetProductPrice(connection, currentCluster, new PublicKey(pythPrice_1));
+				const [, price] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(pythPrice_1));
 				setStrike(price?.price ?? 0);
 			}
 			if (ratePluginType === 'switchboard') {
-				const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
+				const [, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(switchboardAggregator_1));
 				setStrike(price ?? 0);
 			}
 		} catch {
@@ -360,9 +361,9 @@ const CreateContractPage = () => {
 					sx={{ width: '100%', margin: '12px' }}
 					value={redeemLogicPluginType}
 					size="small"
-					onChange={(event) => setRedeemLogicPluginType(event.target.value as RedeemLogicPluginTypeIds)}
+					onChange={(event) => setRedeemLogicPluginType(event.target.value as RLPluginTypeIds)}
 				>
-					{AVAILABLE_REDEEM_LOGIC_PLUGINS.map((plugin) => (
+					{AVAILABLE_RL_TYPES.map((plugin) => (
 						<MenuItem key={plugin} value={plugin}>
 							{plugin}
 						</MenuItem>
@@ -391,7 +392,7 @@ const CreateContractPage = () => {
 					size="small"
 					onChange={(event) => setRatePluginType(event.target.value as RatePluginTypeIds)}
 				>
-					{AVAILABLE_RATE_PLUGINS.map((plugin) => (
+					{AVAILABLE_RATE_TYPES.map((plugin) => (
 						<MenuItem key={plugin} value={plugin}>
 							{plugin}
 						</MenuItem>

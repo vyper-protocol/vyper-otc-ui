@@ -1,17 +1,16 @@
-/* eslint-disable no-unused-vars */
-import { PublicKey } from '@solana/web3.js';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { RedeemLogicPluginTypeIds } from '../AbsPlugin';
-import { AbsRedeemLogicPlugin } from './AbsRedeemLogicPlugin';
+import { AbsRLState } from '../AbsRLState';
+import { RLStateType } from '../RLStateType';
 
-export class RedeemLogicForwardPlugin extends AbsRedeemLogicPlugin {
-	constructor(programPubkey: PublicKey, statePubkey: PublicKey, public strike: number, public isLinear: boolean, public notional: number) {
-		super(programPubkey, statePubkey);
+export class RLForward extends AbsRLState {
+	// eslint-disable-next-line no-unused-vars
+	constructor(public strike: number, public isLinear: boolean, public notional: number) {
+		super();
 	}
 
-	get typeId(): RedeemLogicPluginTypeIds {
-		return 'forward';
+	get stateType(): RLStateType {
+		return new RLStateType('forward');
 	}
 
 	getPluginDataObj(): any {
@@ -20,10 +19,6 @@ export class RedeemLogicForwardPlugin extends AbsRedeemLogicPlugin {
 			isLinear: this.isLinear,
 			notional: this.notional
 		};
-	}
-
-	clone(): RedeemLogicForwardPlugin {
-		return new RedeemLogicForwardPlugin(this.programPubkey, this.statePubkey, this.strike, this.isLinear, this.notional);
 	}
 
 	get rateFeedsDescription(): string[] {
@@ -48,12 +43,16 @@ export class RedeemLogicForwardPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
+	clone(): RLForward {
+		return new RLForward(this.strike, this.isLinear, this.notional);
+	}
+
 	get documentationLink(): string {
 		return 'https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76';
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RedeemLogicForwardPlugin.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.notional, this.strike);
+		return RLForward.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.notional, this.strike);
 	}
 
 	static getPnlExtended(price: number, buyerDepositAmount: number, sellerDepositAmount: number, notional: number, strike: number): [number, number] {
