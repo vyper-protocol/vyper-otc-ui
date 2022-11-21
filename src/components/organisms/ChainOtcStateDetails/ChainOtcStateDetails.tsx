@@ -23,6 +23,7 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
+import ShareModal from 'components/molecules/ShareModal';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: ChainOtcState;
@@ -68,10 +69,20 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	return (
 		<div className={styles.cards}>
 			<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
-				<span className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }}>
-					Simulator
-					<ToggleSimulator fontSize="small" />
-				</span>
+				<Box
+					sx={{
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'space-between'
+					}}
+				>
+					<ShareModal />
+
+					<span className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }}>
+						Simulator
+						<ToggleSimulator fontSize="small" />
+					</span>
+				</Box>
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* PLUGIN USED */}

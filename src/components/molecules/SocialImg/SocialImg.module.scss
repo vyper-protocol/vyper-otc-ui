@@ -1,0 +1,128 @@
+.card {
+	min-height: fit-content;
+	min-width: fit-content;
+	border-radius: 16px;
+	background: linear-gradient(101.05deg, #121212 7.15%, rgba(66, 56, 74, 0.75) 115.39%);
+
+	.content {
+		padding: 28px;
+		display: flex;
+		flex-direction: row;
+		align-items: flex-end;
+
+		.leftContainer {
+			padding-right: 16px;
+			display: flex;
+			flex-direction: column;
+
+			.protocolContainer {
+				padding-bottom: 24px;
+				display: flex;
+
+				.logo {
+					width: 44px;
+					height: 44px;
+				}
+
+				.info {
+					padding: 0px 8px;
+					color: #cfcfcf;
+
+					.title {
+						font-weight: 500;
+						font-size: 20px;
+						margin-top: -4px;
+					}
+
+					.subtitle {
+						padding: 2px 0px;
+						font-weight: 400;
+						font-size: 14px;
+					}
+				}
+			}
+
+			.underlyingContainer {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				padding-bottom: 24px;
+
+				.underlying {
+					padding-right: 4px;
+					font-weight: 700;
+					font-size: 34px;
+					color: #cfcfcf;
+				}
+
+				.chip {
+					padding: 2px 4px;
+					background: #db9b9b;
+					border-radius: 2px;
+
+					.text {
+						font-weight: 559;
+						font-size: 11px;
+
+						text-align: center;
+						text-transform: uppercase;
+
+						color: rgba(182, 49, 49, 0.87);
+					}
+				}
+			}
+
+			.pnlContainer {
+				.title {
+					font-weight: 400;
+					font-size: 14px;
+					color: #cfcfcf;
+				}
+
+				.pnl {
+					font-weight: 700;
+					font-size: 60px;
+					color: #55d590;
+					line-height: 0.85;
+				}
+			}
+		}
+
+		.rightContainer {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			color: #cfcfcf;
+
+			.payoffTypeContainer {
+				background: rgba(49, 47, 47, 0.62);
+				border-radius: 4px;
+
+				.payoffType {
+					padding: 8px;
+					font-weight: 700;
+					font-size: 13px;
+					text-transform: uppercase;
+				}
+			}
+
+			.info {
+				padding-left: 8px;
+				display: flex;
+				justify-content: space-between;
+				width: 100%;
+
+				.title {
+					white-space: nowrap;
+					padding-right: 8px;
+					font-weight: 400;
+				}
+
+				.text {
+					padding-left: 12px;
+					font-weight: 600;
+				}
+			}
+		}
+	}
+}
