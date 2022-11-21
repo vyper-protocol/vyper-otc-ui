@@ -47,8 +47,10 @@ export class RLForward extends AbsRLState {
 		return new RLForward(this.strike, this.isLinear, this.notional);
 	}
 
-	get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76';
+	static get redeemLogicDescription(): string {
+		return `A forward contract gives linear exposure to the underlying. 
+				Long expects that the underlying will increase in price. 
+				Short expects that the underlying will decrease in price`;
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {

@@ -9,8 +9,8 @@ export function getOracles(): OracleDetail[] {
 	return oraclesList.filter(({ cluster }) => cluster === getCurrentCluster());
 }
 
-export function getOracleByPubkey(val: PublicKey): OracleDetail | undefined {
-	return getOracles().find(({ pubkey }) => pubkey === val.toBase58());
+export function getOracleByPubkey(val: PublicKey | string): OracleDetail | undefined {
+	return getOracles().find(({ pubkey }) => pubkey === (typeof val === 'string' ? val : val.toBase58()));
 }
 
 export function getOraclesByType(val: RatePluginTypeIds): OracleDetail[] {

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-import { Chip, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
+import NumericBadge from 'components/atoms/NumericBadge';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -31,9 +32,6 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 		4
 	);
 
-	const buyerColor = buyerPnl > 0 ? 'success' : 'error';
-	const sellerColor = sellerPnl > 0 ? 'success' : 'error';
-
 	const handleOnPriceChange = (newValue: string, i: number) => {
 		const pricesValueClone = _.clone(prices);
 		pricesValueClone[i] = parseInt(newValue);
@@ -42,7 +40,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 
 	return (
 		<div className={cn(styles.wrapper, className)} ref={ref}>
-			<p className={styles.title}>Simulate your P/L</p>
+			<p className={styles.title}>Simulate your PnL</p>
 			{rateStateQuery?.data.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
 					<p>{c}:</p>
@@ -63,12 +61,12 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				<div className={styles.center}>
 					Long
 					<br />
-					<Chip label={buyerPnl + ' ' + tokenSymbol} color={buyerColor} variant="outlined" size="small" />
+					<NumericBadge label={buyerPnl + ' ' + tokenSymbol} mode={buyerPnl > 0 ? 'success' : 'error'} />
 				</div>
 				<div className={styles.center}>
 					Short
 					<br />
-					<Chip label={sellerPnl + ' ' + tokenSymbol} color={sellerColor} variant="outlined" size="small" />
+					<NumericBadge label={sellerPnl + ' ' + tokenSymbol} mode={sellerPnl > 0 ? 'success' : 'error'} />
 				</div>
 			</div>
 

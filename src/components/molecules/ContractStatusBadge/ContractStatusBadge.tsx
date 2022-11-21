@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material';
+import StatusBadge from 'components/atoms/StatusBadge';
 import { ContractStatusIds } from 'models/ChainOtcState';
 
 type ContractStatusBadgeInput = {
@@ -20,15 +20,7 @@ const ContractStatusBadge = ({ status }: ContractStatusBadgeInput) => {
 		return 'not supported';
 	};
 
-	return (
-		<Chip
-			label={getLabelFromStatus(status)}
-			color={getColorFromStatus(status)}
-			variant="outlined"
-			size="small"
-			sx={{ marginX: '3px', textTransform: 'capitalize' }}
-		/>
-	);
+	return <StatusBadge label={getLabelFromStatus(status)} mode={getColorFromStatus(status)} />;
 };
 
 export default ContractStatusBadge;

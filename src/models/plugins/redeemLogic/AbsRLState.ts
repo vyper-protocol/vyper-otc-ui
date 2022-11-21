@@ -1,4 +1,5 @@
 import { ListItemDetail } from 'models/ListItemDetail';
+import { getRedeemLogicDocumentionLink, getRedeemLogicSoruceCodeLink as getRedeemLogicSourceCodeLink } from 'utils/urlBuilder';
 
 import { AbsPluginState } from '../AbsPluginState';
 import { RLStateType } from './RLStateType';
@@ -27,7 +28,16 @@ export abstract class AbsRLState extends AbsPluginState {
 	/**
 	 * Returns the documentation link
 	 */
-	abstract get documentationLink(): string;
+	get documentationLink(): string {
+		return getRedeemLogicDocumentionLink(this.stateType.type);
+	}
+
+	/**
+	 * Returns the source code reference link
+	 */
+	get sourceCode(): string {
+		return getRedeemLogicSourceCodeLink(this.stateType.type);
+	}
 
 	/**
 	 * Compute the redeem logic PnL

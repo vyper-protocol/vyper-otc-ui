@@ -46,8 +46,10 @@ export class RLDigital extends AbsRLState {
 		return new RLDigital(this.strike, this.isCall);
 	}
 
-	get documentationLink(): string {
-		return 'https://vyperprotocol.notion.site/Contract-Payoff-Digital-39cab877a28a4a6fa349d9b816bd15a4';
+	static get redeemLogicDescription(): string {
+		return `A digital option contract pays out a fixed amount on the condition that a certain event happens, while paying 0 otherwise. 
+				The Long amount represents the option premium, paid in any case to the Short side. 
+				The Short amount represents the max payout if the option expires in-the-money`;
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {

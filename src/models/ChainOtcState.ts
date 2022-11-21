@@ -6,7 +6,8 @@ import { PublicKey } from '@solana/web3.js';
 import { AbsOtcState } from './AbsOtcState';
 import { TokenInfo } from './TokenInfo';
 
-export type ContractStatusIds = 'active' | 'expired';
+export const AVAILABLE_CONTRACT_STATUS_IDS = ['active', 'expired'] as const;
+export type ContractStatusIds = typeof AVAILABLE_CONTRACT_STATUS_IDS[number];
 
 export class ChainOtcState extends AbsOtcState {
 	/**
@@ -131,7 +132,15 @@ export class ChainOtcState extends AbsOtcState {
 		);
 	}
 
-	getContractStatus(): ContractStatusIds {
+	// getContractStatus(): ContractStatusIds {
+	// 	const currentTime = Date.now();
+	// 	if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
+	// 		return 'expired';
+	// 	}
+	// 	return 'active';
+	// }
+
+	get contractStatus(): ContractStatusIds {
 		const currentTime = Date.now();
 		if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
 			return 'expired';
