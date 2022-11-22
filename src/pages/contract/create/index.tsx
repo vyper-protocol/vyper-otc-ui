@@ -14,9 +14,9 @@ import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { OracleDetail } from 'models/OracleDetail';
-import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
-import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -46,7 +46,7 @@ const CreateContractPage = () => {
 	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
 
-	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
+	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RLPluginTypeIds>('forward');
 
 	// pyth SOL/USD
 	const defaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
@@ -61,12 +61,12 @@ const CreateContractPage = () => {
 	const setStrikeToDefaultValue = async () => {
 		try {
 			if (ratePlugin1.type === 'pyth') {
-				const [, price] = await RatePythPlugin.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
+				const [, price] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
 				setStrike(price?.price ?? 0);
 			}
 			if (ratePlugin1.type === 'switchboard') {
 				// TODO fix fetching issue
-				const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(ratePlugin1.pubkey));
+				const [, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(ratePlugin1.pubkey));
 				setStrike(price ?? 0);
 			}
 		} catch {

@@ -24,9 +24,7 @@ const moduleExports = {
 		remotePatterns: [
 			{
 				protocol: 'https',
-				hostname: 'raw.githubusercontent.com',
-				port: '',
-				pathname: '/solana-labs/token-list/**'
+				hostname: 'raw.githubusercontent.com'
 			}
 		]
 	}

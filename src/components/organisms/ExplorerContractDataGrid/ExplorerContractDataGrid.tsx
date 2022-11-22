@@ -13,12 +13,11 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
 import { FetchContractsParams, SupabaseColumnOrder } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState } from 'models/ChainOtcState';
-import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
-import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
-import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
-import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
-import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
+import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
+import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
+import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { RLSettledForward } from 'models/plugins/redeemLogic/settledForward/RLSettledForward';
+import { RLVanillaOption } from 'models/plugins/redeemLogic/vanillaOption/RLVanillaOption';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -124,11 +123,11 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 			filterable: true,
 			flex: 1,
 			minWidth: 150,
-			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS as any,
 			sortable: false,
+			valueOptions: AVAILABLE_RL_TYPES as any,
 			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
 			valueGetter: (params) => {
-				return params.row.redeemLogicState.typeId;
+				return (params.row as ChainOtcState).redeemLogicAccount.state.getTypeLabel();
 			}
 		},
 		{
@@ -138,7 +137,7 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 			flex: 1,
 			minWidth: 150,
 			valueGetter: (params) => {
-				return params.row.rateState.title;
+				return params.row.rateAccount.state.title;
 			}
 		},
 		{
@@ -148,16 +147,16 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				switch (params.row.redeemLogicState.typeId as RedeemLogicPluginTypeIds) {
+				const rlState = params.row.redeemLogicAccount.state;
+				switch (rlState.stateType.type as RLPluginTypeIds) {
 					case 'forward':
-						return (params.row.redeemLogicState as RedeemLogicForwardPlugin).notional;
+						return (rlState as RLForward).notional;
 					case 'settled_forward':
-						return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).notional;
-					case 'digital':
-						// TODO: find common columns
-						return '-';
+						return (rlState as RLSettledForward).notional;
 					case 'vanilla_option':
-						return (params.row.redeemLogicState as RedeemLogicVanillaOptionPlugin).notional;
+						return (rlState as RLVanillaOption).notional;
+					// TODO: find common columns
+					case 'digital':
 					default:
 						return '-';
 				}
@@ -170,15 +169,16 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				switch (params.row.redeemLogicState.typeId as RedeemLogicPluginTypeIds) {
+				const rlState = params.row.redeemLogicAccount.state;
+				switch (rlState.stateType.type as RLPluginTypeIds) {
 					case 'forward':
-						return (params.row.redeemLogicState as RedeemLogicForwardPlugin).strike;
+						return (rlState as RLForward).strike;
 					case 'settled_forward':
-						return (params.row.redeemLogicState as RedeemLogicSettledForwardPlugin).strike;
-					case 'digital':
-						return (params.row.redeemLogicState as RedeemLogicDigitalPlugin).strike;
+						return (rlState as RLSettledForward).strike;
 					case 'vanilla_option':
-						return (params.row.redeemLogicState as RedeemLogicVanillaOptionPlugin).strike;
+						return (rlState as RLVanillaOption).strike;
+					case 'digital':
+						return (rlState as RLDigital).strike;
 					default:
 						return '-';
 				}
@@ -189,7 +189,10 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 			field: 'rateState.aggregatorLastValue',
 			headerName: 'Current Price',
 			renderCell: (params: GridRenderCellParams<any>) => (
-				<OracleLivePrice oracleType={params.row.rateState.typeId} pubkey={(params.row.rateState as AbsRatePlugin).livePriceAccounts[0].toBase58()} />
+				<OracleLivePrice
+					oracleType={(params.row as ChainOtcState).rateAccount.state.typeId}
+					pubkey={(params.row as ChainOtcState).rateAccount.state.livePriceAccounts[0].toBase58()}
+				/>
 			),
 			flex: 1,
 			minWidth: 125,

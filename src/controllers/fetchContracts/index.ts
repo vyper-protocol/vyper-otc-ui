@@ -11,8 +11,8 @@ import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
-import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -31,7 +31,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	const firstFetch_otcStateChainAccountPubkeys = dbEntries.map((c) => c.publickey);
 	const firstFetch_vyperCoreTrancheConfig = dbEntries.map((c) => c.vyperCoreTrancheConfig);
 	const firstFetch_reserveMintAccountPubkeys = dbEntries.map((c) => c.reserveMint);
-	const firstFetch_rateAccounts = _.flatten(dbEntries.map((c) => c.rateState.accountsRequiredForRefresh));
+	const firstFetch_rateAccounts = _.flatten(dbEntries.map((c) => c.rateAccount.state.accountsRequiredForRefresh));
 
 	const firstFetch_unionPubkeys = _.uniq([
 		...firstFetch_otcStateChainAccountPubkeys,
@@ -70,8 +70,8 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		r.buyerDepositAmount = dbEntries[i].buyerDepositAmount;
 		r.sellerDepositAmount = dbEntries[i].sellerDepositAmount;
 
-		r.rateState = dbEntries[i].rateState.clone();
-		r.redeemLogicState = dbEntries[i].redeemLogicState.clone();
+		r.rateAccount = dbEntries[i].rateAccount.clone();
+		r.redeemLogicAccount = dbEntries[i].redeemLogicAccount.clone();
 
 		const currentOtcStateAccount = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>(
 			'otcState',
@@ -104,19 +104,19 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 		// RATE PLUGIN
 		// * * * * * * * * * * * * * * * * * * * * * * *
 
-		if (r.rateState.typeId === 'switchboard') {
+		if (r.rateAccount.state.typeId === 'switchboard') {
 			// * * * * * * * * * * * * * * * * * * * * * * *
 			// SWITCHBOARD
 
 			const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
-			(r.rateState as RateSwitchboardPlugin).aggregatorsData = (r.rateState as RateSwitchboardPlugin).oracles.map((c) =>
+			(r.rateAccount.state as RateSwitchboardState).aggregatorsData = (r.rateAccount.state as RateSwitchboardState).oracles.map((c) =>
 				switchboardProgram.coder.accounts.decode('AggregatorAccountData', firstFetch_accountsData.find((cc) => c.equals(cc.pubkey)).data.data)
 			);
-		} else if (r.rateState.typeId === 'pyth') {
+		} else if (r.rateAccount.state.typeId === 'pyth') {
 			// * * * * * * * * * * * * * * * * * * * * * * *
 			// PYTH
 
-			await (r.rateState as RatePythPlugin).loadData(connection);
+			await (r.rateAccount.state as RatePythState).loadData(connection);
 		}
 
 		res.push(r);

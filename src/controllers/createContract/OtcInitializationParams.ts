@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 
 export type OtcInitializationParams = {
 	reserveMint: PublicKey;
@@ -13,7 +14,7 @@ export type OtcInitializationParams = {
 
 	// TODO: extend to other redeem logic
 	redeemLogicOption: {
-		redeemLogicPluginType: RedeemLogicPluginTypeIds;
+		redeemLogicPluginType: RLPluginTypeIds;
 		strike?: number;
 		notional?: number;
 		isLinear?: boolean;
