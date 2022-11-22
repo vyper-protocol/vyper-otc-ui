@@ -51,17 +51,9 @@
 		{
 			"type": "switchboard",
 			"cluster": "devnet",
-			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
-			"title": "SOL/USD",
-			"baseCurrency": "SOL",
-			"quoteCurrency": "USD"
-		},
-		{
-			"type": "switchboard",
-			"cluster": "devnet",
-			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
-			"title": "SOL/USD2",
-			"baseCurrency": "SOL",
+			"pubkey": "2steFGCbo9FNXksMBGDh9NwixtdG5PdQoaCuR4knyvrB",
+			"title": "BNB/USD",
+			"baseCurrency": "BNB",
 			"quoteCurrency": "USD"
 		},
 		{
