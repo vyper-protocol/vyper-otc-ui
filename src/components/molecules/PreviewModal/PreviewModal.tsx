@@ -1,8 +1,3 @@
-import { useState } from 'react';
-
-import LoadingButton from '@mui/lab/LoadingButton';
-import { Button } from '@mui/material';
-import { useWallet } from '@solana/wallet-adapter-react';
 import Modal from 'components/atoms/Modal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -37,11 +32,14 @@ export type PreviewModalInput = {
 	// collateral mint
 	reserveMint: MintDetail;
 
-	// loading during contract creation
-	isLoading: boolean;
+	// open state of the modal
+	open: boolean;
 
-	// on-chain contract create callback
-	onCreateContractButtonClick: () => Promise<void>;
+	// handle close of the modal
+	handleClose: () => void;
+
+	// actions of the modal
+	actionProps: JSX.Element;
 };
 
 export const PreviewModal = ({
@@ -53,16 +51,11 @@ export const PreviewModal = ({
 	seniorDepositAmount,
 	juniorDepositAmount,
 	reserveMint,
-	isLoading,
-	onCreateContractButtonClick
+	open,
+	handleClose,
+	actionProps
 }: PreviewModalInput) => {
-	const [open, setOpen] = useState(false);
-	const handleOpen = () => setOpen(true);
-	const handleClose = () => setOpen(false);
-
 	const { redeemLogicPluginType, strike, notional, isCall } = redeemLogicOption;
-
-	const wallet = useWallet();
 
 	const PreviewDescription = (
 		<div className={styles.content}>
@@ -129,20 +122,7 @@ export const PreviewModal = ({
 
 	return (
 		<div>
-			<Button sx={{ mt: 1, mr: 1 }} variant="contained" disabled={!wallet.connected || open} onClick={handleOpen}>
-				{wallet.connected ? 'Preview' : 'Connect Wallet'}
-			</Button>
-			<Modal
-				title={'Contract Summary'}
-				open={open}
-				handleClose={handleClose}
-				contentProps={PreviewDescription}
-				actionProps={
-					<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
-					</LoadingButton>
-				}
-			/>
+			<Modal title={'Contract Summary'} open={open} handleClose={handleClose} contentProps={PreviewDescription} actionProps={actionProps} />
 		</div>
 	);
 };

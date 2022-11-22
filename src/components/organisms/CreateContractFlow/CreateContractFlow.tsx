@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
+import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { ExpiryPicker, ExpiryPickerInput } from 'components/molecules/ExpiryPicker';
 import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesPicker';
 import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
@@ -35,7 +37,7 @@ type ContractLifecycleInput = {
 	onCreateContractButtonClick: () => Promise<void>;
 };
 
-// TODO add PreviewModalInput with OtcInitializationParams['redeemLogicOption']
+// TODO: add PreviewModalInput with OtcInitializationParams['redeemLogicOption']
 type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
 
 const CreateContractFlow = ({
@@ -69,6 +71,11 @@ const CreateContractFlow = ({
 	onCreateContractButtonClick
 }: CreateContractFlowInput) => {
 	const [activeStep, setActiveStep] = useState(0);
+	const [openPreview, setOpenPreview] = useState(false);
+	const handleOpenPreview = () => setOpenPreview(true);
+	const handleClosePreview = () => setOpenPreview(false);
+
+	const wallet = useWallet();
 
 	const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
 		redeemLogicPluginType,
@@ -163,18 +170,9 @@ const CreateContractFlow = ({
 											Back
 										</Button>
 										{i === steps.length - 1 ? (
-											<PreviewModal
-												redeemLogicOption={redeemLogicOption}
-												depositEnd={depositEnd}
-												settleStart={settleStart}
-												ratePlugin1={ratePlugin1}
-												ratePlugin2={ratePlugin2}
-												seniorDepositAmount={seniorDepositAmount}
-												juniorDepositAmount={juniorDepositAmount}
-												reserveMint={reserveMint}
-												isLoading={isLoading}
-												onCreateContractButtonClick={onCreateContractButtonClick}
-											/>
+											<Button sx={{ mt: 1, mr: 1 }} variant="contained" disabled={!wallet.connected || openPreview} onClick={handleOpenPreview}>
+												{wallet.connected ? 'Preview' : 'Connect Wallet'}
+											</Button>
 										) : (
 											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }}>
 												Next
@@ -202,6 +200,23 @@ const CreateContractFlow = ({
 					</FormGroup>
 				</Box>
 			)}
+			<PreviewModal
+				redeemLogicOption={redeemLogicOption}
+				depositEnd={depositEnd}
+				settleStart={settleStart}
+				ratePlugin1={ratePlugin1}
+				ratePlugin2={ratePlugin2}
+				seniorDepositAmount={seniorDepositAmount}
+				juniorDepositAmount={juniorDepositAmount}
+				reserveMint={reserveMint}
+				open={openPreview}
+				handleClose={handleClosePreview}
+				actionProps={
+					<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
+					</LoadingButton>
+				}
+			/>
 		</Box>
 	);
 };
