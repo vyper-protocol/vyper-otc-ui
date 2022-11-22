@@ -23,9 +23,13 @@ import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import useContractStore from 'store/useContractStore';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 const CreateContractPage = () => {
+	const { contractData } = useContractStore();
+	const contractStore = useContractStore();
+
 	const currentCluster = getCurrentCluster();
 	const { connection } = useConnection();
 	const wallet = useWallet();
@@ -35,28 +39,40 @@ const CreateContractPage = () => {
 	const txHandler = useContext(TxHandlerContext);
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [saveOnDatabase, setSaveOnDatabase] = useState(process.env.NODE_ENV === 'development' ? false : true);
-	const [sendNotification, setSendNotification] = useState(process.env.NODE_ENV === 'development' ? false : true);
+	const [saveOnDatabase, setSaveOnDatabase] = useState(
+		process.env.NODE_ENV === 'development' ? false : contractData?.saveOnDatabase !== undefined ? contractData.saveOnDatabase : true
+	);
+	const [sendNotification, setSendNotification] = useState(
+		process.env.NODE_ENV === 'development' ? false : contractData?.sendNotification !== undefined ? contractData.sendNotification : true
+	);
 
-	const [reserveMint, setReserveMint] = useState('');
+	const [reserveMint, setReserveMint] = useState(contractData?.reserveMint ? contractData.reserveMint : '');
 
 	// assume deposit always starts open
 	// eslint-disable-next-line no-unused-vars
-	const [depositStart, setDepositStart] = useState(moment().add(-60, 'minutes').toDate().getTime());
-	const [depositEnd, setDepositEnd] = useState(moment().add(5, 'minutes').toDate().getTime());
-	const [settleStart, setSettleStart] = useState(moment().add(15, 'minutes').toDate().getTime());
+	const [depositStart, setDepositStart] = useState(contractData?.depositStart ? contractData.depositStart : moment().add(-60, 'minutes').toDate().getTime());
+	const [depositEnd, setDepositEnd] = useState(contractData?.depositEnd ? contractData.depositEnd : moment().add(5, 'minutes').toDate().getTime());
+	const [settleStart, setSettleStart] = useState(contractData?.settleStart ? contractData.settleStart : moment().add(15, 'minutes').toDate().getTime());
 
-	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
-	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
+	const [seniorDepositAmount, setSeniorDepositAmount] = useState(contractData?.seniorDepositAmount ? contractData.seniorDepositAmount : 100);
+	const [juniorDepositAmount, setJuniorDepositAmount] = useState(contractData?.juniorDepositAmount ? contractData.juniorDepositAmount : 100);
 
-	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>('forward');
-	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>('pyth');
-	const [rate1, setRate1] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
-	const [rate2, setRate2] = useState('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
+	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>(
+		contractData?.redeemLogicOption?.redeemLogicPluginType ? contractData.redeemLogicOption.redeemLogicPluginType : 'forward'
+	);
+	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>(
+		contractData?.rateOption?.ratePluginType ? contractData.rateOption.ratePluginType : 'pyth'
+	);
+	const [rate1, setRate1] = useState(
+		contractData?.rateOption?.rateAccounts.length > 0 ? contractData.rateOption.rateAccounts[0] : 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'
+	);
+	const [rate2, setRate2] = useState(
+		contractData?.rateOption?.rateAccounts.length > 1 ? contractData.rateOption.rateAccounts[1] : 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'
+	);
 
-	const [notional, setNotional] = useState(1);
-	const [strike, setStrike] = useState(0);
-	const [isCall, setIsCall] = useState(true);
+	const [notional, setNotional] = useState(contractData?.redeemLogicOption?.notional ? contractData.redeemLogicOption.notional : 1);
+	const [strike, setStrike] = useState(contractData?.redeemLogicOption?.strike ? contractData.redeemLogicOption.strike : 0);
+	const [isCall, setIsCall] = useState(contractData?.redeemLogicOption?.isCall ? contractData.redeemLogicOption.isCall : true);
 
 	const setRateMain = (rateType: RatePluginTypeIds, rateValue1: string) => {
 		setRatePluginType(rateType);
@@ -79,7 +95,9 @@ const CreateContractPage = () => {
 	};
 
 	useEffect(() => {
-		setStrikeToDefaultValue();
+		if (!contractData?.redeemLogicOption?.strike) {
+			setStrikeToDefaultValue();
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ratePluginType, rate1]);
 
@@ -153,6 +171,7 @@ const CreateContractPage = () => {
 			// eslint-disable-next-line no-console
 			console.error(err);
 		} finally {
+			contractStore.delete();
 			setIsLoading(false);
 		}
 	};

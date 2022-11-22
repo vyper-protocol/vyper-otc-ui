@@ -9,7 +9,7 @@
 		padding: var(--space-20);
 
 		.toggle {
-			float: right;
+			float: left;
 			margin-bottom: var(--space-8);
 			color: var(--color-text-disabled);
 			font-size: 14px;
@@ -63,4 +63,14 @@
 
 .notionHelp:hover {
 	cursor: pointer;
+}
+
+.menuOpener {
+	float: right;
+	color: var(--color-text-disabled);
+}
+
+.menuOpener:hover {
+	cursor: pointer;
+	color: var(--color-primary);
 }

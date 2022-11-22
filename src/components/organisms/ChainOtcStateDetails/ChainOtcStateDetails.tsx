@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { Tooltip, Chip, Box, IconButton, Stack } from '@mui/material';
+import { Tooltip, Chip, Box, IconButton, Stack, Button, Menu, MenuItem } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import CoinBadge from 'components/molecules/CoinBadge';
@@ -13,6 +14,8 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 // import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
+import useContractStore from 'store/useContractStore';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
 
@@ -29,6 +32,45 @@ export type ChainOtcStateDetailsInput = {
 
 const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	const wallet = useWallet();
+	const router = useRouter();
+
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const openMoreIcon = Boolean(anchorEl);
+	const moreIconClick = (event: MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const moreIconClose = () => {
+		setAnchorEl(null);
+	};
+
+	const { create } = useContractStore();
+
+	const cloneContract = () => {
+		create({
+			reserveMint: otcState.reserveMint,
+			seniorDepositAmount: otcState.buyerDepositAmount,
+			juniorDepositAmount: otcState.sellerDepositAmount,
+			depositStart: otcState.depositAvailableFrom,
+			depositEnd: otcState.depositExpirationAt,
+			settleStart: otcState.settleAvailableFromAt,
+			redeemLogicOption: {
+				redeemLogicPluginType: otcState.redeemLogicState.typeId,
+				...otcState.redeemLogicState.getPluginDataObj()
+			},
+			rateOption: {
+				ratePluginType: otcState.rateState.typeId,
+				rateAccounts: otcState.rateState.accountsRequiredForRefresh
+			},
+			saveOnDatabase: true,
+			sendNotification: true
+		});
+		router.push('/contract/create');
+	};
+
+	const cloneContractHandler = () => {
+		moreIconClose();
+		cloneContract();
+	};
 
 	const [showSimulator, setShowSimulator] = useState(false);
 
@@ -71,6 +113,28 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					Simulator
 					<ToggleSimulator fontSize="small" />
 				</span>
+
+				<span
+					className={styles.menuOpener}
+					id="menuOpener"
+					aria-controls={open ? 'menu' : undefined}
+					aria-haspopup="true"
+					aria-expanded={open ? 'true' : undefined}
+					onClick={moreIconClick}
+				>
+					<MoreVertIcon fontSize="small" />
+				</span>
+				<Menu
+					id="menu"
+					anchorEl={anchorEl}
+					open={openMoreIcon}
+					onClose={moreIconClose}
+					MenuListProps={{
+						'aria-labelledby': 'menuOpener'
+					}}
+				>
+					<MenuItem onClick={cloneContractHandler}>Clone</MenuItem>
+				</Menu>
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* PLUGIN USED */}
