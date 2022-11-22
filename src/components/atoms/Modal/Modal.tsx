@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Button, Dialog } from '@mui/material';
 
 import styles from './Modal.module.scss';

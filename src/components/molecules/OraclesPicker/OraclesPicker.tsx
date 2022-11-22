@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, Stack, Autocomplete, TextField, Grid, Typography, Alert, Fab } from '@mui/material';
+import { Box, Stack, Autocomplete, TextField, Typography, Alert, Fab } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
