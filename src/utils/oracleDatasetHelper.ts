@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import oraclesData from 'configs/oracles.json';
 import { OracleDetail } from 'models/OracleDetail';
-import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 
 export function getOracles(): OracleDetail[] {
 	const oraclesList = oraclesData.oracles as OracleDetail[];

@@ -5,9 +5,9 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import { Mutex } from 'async-mutex';
 import _ from 'lodash';
-import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
-import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 export const useOracleLivePrice = (
@@ -30,10 +30,10 @@ export const useOracleLivePrice = (
 		async (updatedAccountInfo: AccountInfo<Buffer>): Promise<number> => {
 			let newPriceValue = 0;
 			if (oracleType === 'switchboard') {
-				newPriceValue = await RateSwitchboardPlugin.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
+				newPriceValue = await RateSwitchboardState.DecodePriceFromAccountInfo(connection, updatedAccountInfo);
 			}
 			if (oracleType === 'pyth') {
-				newPriceValue = RatePythPlugin.DecodePriceFromAccountInfo(updatedAccountInfo);
+				newPriceValue = RatePythState.DecodePriceFromAccountInfo(updatedAccountInfo);
 			}
 			return newPriceValue;
 		},

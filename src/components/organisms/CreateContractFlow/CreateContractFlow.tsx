@@ -15,6 +15,7 @@ type StepElement = {
 	title: string;
 	description: string;
 	content: JSX.Element;
+	error: boolean;
 };
 
 type ContractLifecycleInput = {
@@ -70,12 +71,12 @@ const CreateContractFlow = ({
 	isLoading,
 	onCreateContractButtonClick
 }: CreateContractFlowInput) => {
+	const wallet = useWallet();
+
 	const [activeStep, setActiveStep] = useState(0);
 	const [openPreview, setOpenPreview] = useState(false);
 	const handleOpenPreview = () => setOpenPreview(true);
 	const handleClosePreview = () => setOpenPreview(false);
-
-	const wallet = useWallet();
 
 	const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
 		redeemLogicPluginType,
@@ -83,12 +84,16 @@ const CreateContractFlow = ({
 		notional,
 		isCall
 	};
+	const [expiryError, setExpiryError] = useState(false);
+
+	// TODO fill other errors
 
 	const steps: StepElement[] = [
 		{
 			title: 'payoff',
 			description: 'Select the payoff of your contract from the list available',
-			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />
+			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />,
+			error: false
 		},
 		{
 			title: 'underlying',
@@ -101,7 +106,8 @@ const CreateContractFlow = ({
 					setRatePlugin2={setRatePlugin2}
 					redeemLogicPluginType={redeemLogicPluginType}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'contract parameters',
@@ -116,7 +122,8 @@ const CreateContractFlow = ({
 					isCall={isCall}
 					setIsCall={setIsCall}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'collateral',
@@ -130,12 +137,23 @@ const CreateContractFlow = ({
 					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'expiry',
 			description: 'Select the deposit expiry and contract expiry',
-			content: <ExpiryPicker depositEnd={depositEnd} setDepositEnd={setDepositEnd} settleStart={settleStart} setSettleStart={setSettleStart} />
+			content: (
+				<ExpiryPicker
+					depositEnd={depositEnd}
+					setDepositEnd={setDepositEnd}
+					settleStart={settleStart}
+					setSettleStart={setSettleStart}
+					expiryError={expiryError}
+					setExpiryError={setExpiryError}
+				/>
+			),
+			error: expiryError
 		}
 	];
 
@@ -159,7 +177,7 @@ const CreateContractFlow = ({
 						<Stack direction="row">
 							<Box sx={{ width: '40%', flexDirection: 'column', justifyContent: 'space-between' }}>
 								<Box sx={{ my: 2 }}>
-									<StepLabel>
+									<StepLabel error={step.error}>
 										<b>{step.title.toUpperCase()}</b>
 									</StepLabel>
 									{activeStep >= i && <Typography sx={{ fontWeight: 'light' }}>{step.description}</Typography>}
@@ -170,11 +188,16 @@ const CreateContractFlow = ({
 											Back
 										</Button>
 										{i === steps.length - 1 ? (
-											<Button sx={{ mt: 1, mr: 1 }} variant="contained" disabled={!wallet.connected || openPreview} onClick={handleOpenPreview}>
+											<Button
+												sx={{ mt: 1, mr: 1 }}
+												variant="contained"
+												disabled={!wallet.connected || openPreview || steps.some(({ error }) => error)}
+												onClick={handleOpenPreview}
+											>
 												{wallet.connected ? 'Preview' : 'Connect Wallet'}
 											</Button>
 										) : (
-											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }}>
+											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }} disabled={step.error}>
 												Next
 											</Button>
 										)}

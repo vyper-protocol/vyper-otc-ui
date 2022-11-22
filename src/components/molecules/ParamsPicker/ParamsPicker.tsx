@@ -1,9 +1,9 @@
 import { Box, Switch, FormControlLabel, FormGroup, TextField } from '@mui/material';
-import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 
 export type ParamsPickerInput = {
 	// redeem logic plugin of the contract
-	redeemLogicPluginType: RedeemLogicPluginTypeIds;
+	redeemLogicPluginType: RLPluginTypeIds;
 
 	strike: number;
 
