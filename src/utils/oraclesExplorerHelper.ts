@@ -1,5 +1,5 @@
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 
 export function getSwitchboardExplorer() {
 	return getCurrentCluster() === 'devnet' ? 'https://staging.switchboard.xyz/explorer' : 'https://switchboard.xyz/explorer';
