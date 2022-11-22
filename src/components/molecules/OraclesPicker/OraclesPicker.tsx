@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Box, Autocomplete, TextField, Grid, Typography, Alert, Fab } from '@mui/material';
+
 import SearchIcon from '@mui/icons-material/Search';
+import { Box, Autocomplete, TextField, Grid, Typography, Alert, Fab } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OracleDetail } from 'models/OracleDetail';
 import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
 import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
 import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
 
 export type OraclesPickerInput = {
 	// main rate plugin object
@@ -93,7 +94,7 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 					}
 					setValue(oracle);
 				}}
-				getOptionLabel={(oracle: string | OracleDetail) => typeof oracle === 'string' ? oracle : oracle.title}
+				getOptionLabel={(oracle: string | OracleDetail) => (typeof oracle === 'string' ? oracle : oracle.title)}
 				renderOption={(props, option: OracleDetail) => (
 					<Box component="li" {...props}>
 						<Typography align="left">{option.title}</Typography>
@@ -103,10 +104,12 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 					</Box>
 				)}
 				options={oracles}
-				renderInput={(params) => <>
-					<TextField {...params} label="Oracle #1" />
-					{label}
-				</>}
+				renderInput={(params) => (
+					<>
+						<TextField {...params} label="Oracle #1" />
+						{label}
+					</>
+				)}
 				onChange={async (_, oracle: OracleDetail | string) => {
 					if (typeof oracle === 'object') {
 						setRatePlugin(oracle);

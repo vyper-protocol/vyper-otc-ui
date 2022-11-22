@@ -65,8 +65,7 @@ const CreateContractPage = () => {
 				setStrike(price?.price ?? 0);
 			}
 			if (ratePlugin1.type === 'switchboard') {
-				// TODO fix fetching issue
-				const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(ratePlugin1.pubkey));
+				const price = await RateSwitchboardPlugin.GetLatestPrice(connection, new PublicKey(ratePlugin1.pubkey));
 				setStrike(price ?? 0);
 			}
 		} catch {
