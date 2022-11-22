@@ -1,18 +1,16 @@
-import { PublicKey } from '@solana/web3.js';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { RedeemLogicPluginTypeIds } from '../AbsPlugin';
-import { AbsRedeemLogicPlugin } from './AbsRedeemLogicPlugin';
+import { AbsRLState } from '../AbsRLState';
+import { RLStateType } from '../RLStateType';
 
-/* eslint-disable space-before-function-paren */
-export class RedeemLogicDigitalPlugin extends AbsRedeemLogicPlugin {
+export class RLDigital extends AbsRLState {
 	// eslint-disable-next-line no-unused-vars
-	constructor(programPubkey: PublicKey, statePubkey: PublicKey, public strike: number, public isCall: boolean) {
-		super(programPubkey, statePubkey);
+	constructor(public strike: number, public isCall: boolean) {
+		super();
 	}
 
-	get typeId(): RedeemLogicPluginTypeIds {
-		return 'digital';
+	get stateType(): RLStateType {
+		return new RLStateType('digital');
 	}
 
 	getPluginDataObj(): any {
@@ -20,10 +18,6 @@ export class RedeemLogicDigitalPlugin extends AbsRedeemLogicPlugin {
 			strike: this.strike,
 			isCall: this.isCall
 		};
-	}
-
-	clone(): RedeemLogicDigitalPlugin {
-		return new RedeemLogicDigitalPlugin(this.programPubkey, this.statePubkey, this.strike, this.isCall);
 	}
 
 	get rateFeedsDescription(): string[] {
@@ -48,8 +42,8 @@ export class RedeemLogicDigitalPlugin extends AbsRedeemLogicPlugin {
 		];
 	}
 
-	static get sourceLink(): string {
-		return 'https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-digital';
+	clone(): RLDigital {
+		return new RLDigital(this.strike, this.isCall);
 	}
 
 	static get redeemLogicDescription(): string {
@@ -59,7 +53,7 @@ export class RedeemLogicDigitalPlugin extends AbsRedeemLogicPlugin {
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RedeemLogicDigitalPlugin.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.isCall);
+		return RLDigital.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.isCall);
 	}
 
 	static getPnlExtended(price: number, buyerDepositAmount: number, sellerDepositAmount: number, strike: number, isCall: boolean): [number, number] {

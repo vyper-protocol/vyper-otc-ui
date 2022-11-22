@@ -1,41 +1,37 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
-import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
-import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
-import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
-import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
+import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
+import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
+import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { RLSettledForward } from 'models/plugins/redeemLogic/settledForward/RLSettledForward';
+import { RLVanillaOption } from 'models/plugins/redeemLogic/vanillaOption/RLVanillaOption';
+import { getRedeemLogicDocumentionLink, getRedeemLogicSoruceCodeLink } from 'utils/urlBuilder';
 
 export type PayoffPickerInput = {
 	// redeem logic plugin of the contract
-	redeemLogicPluginType: RedeemLogicPluginTypeIds;
+	redeemLogicPluginType: RLPluginTypeIds;
 
 	// set callback, sets the redeem logic plugin type and the main rate puybey
 	// eslint-disable-next-line no-unused-vars
-	setRedeemLogicPluginType: (redeemLogicPluginType: RedeemLogicPluginTypeIds) => void;
+	setRedeemLogicPluginType: (redeemLogicPluginType: RLPluginTypeIds) => void;
 };
 
-const buildDescription = (redeemLogic: RedeemLogicPluginTypeIds) => {
+const buildDescription = (rlType: RLPluginTypeIds) => {
 	let description: string;
-	let sourceLink;
-	const docLink = getRedeemLogicDocumentionLink(redeemLogic);
+	const sourceLink = getRedeemLogicSoruceCodeLink(rlType);
+	const docLink = getRedeemLogicDocumentionLink(rlType);
 
-	switch (redeemLogic) {
+	switch (rlType) {
 		case 'forward':
-			description = RedeemLogicForwardPlugin.redeemLogicDescription;
-			sourceLink = RedeemLogicForwardPlugin.sourceLink;
+			description = RLForward.redeemLogicDescription;
 			break;
 		case 'settled_forward':
-			description = RedeemLogicSettledForwardPlugin.redeemLogicDescription;
-			sourceLink = RedeemLogicSettledForwardPlugin.sourceLink;
+			description = RLSettledForward.redeemLogicDescription;
 			break;
 		case 'digital':
-			description = RedeemLogicDigitalPlugin.redeemLogicDescription;
-			sourceLink = RedeemLogicDigitalPlugin.sourceLink;
+			description = RLDigital.redeemLogicDescription;
 			break;
 		case 'vanilla_option':
-			description = RedeemLogicVanillaOptionPlugin.redeemLogicDescription;
-			sourceLink = RedeemLogicVanillaOptionPlugin.sourceLink;
+			description = RLVanillaOption.redeemLogicDescription;
 			break;
 		default:
 			return;
@@ -55,15 +51,13 @@ const buildDescription = (redeemLogic: RedeemLogicPluginTypeIds) => {
 	);
 };
 
-export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
-	return (
-		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
-			<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
-				{AVAILABLE_REDEEM_LOGIC_PLUGINS.map((plugin) => (
-					<Tab label={plugin} key={plugin} value={plugin} />
-				))}
-			</Tabs>
-			{buildDescription(redeemLogicPluginType)}
-		</Box>
-	);
-};
+export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => (
+	<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
+		<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
+			{AVAILABLE_RL_TYPES.map((plugin) => (
+				<Tab label={plugin} key={plugin} value={plugin} />
+			))}
+		</Tabs>
+		{buildDescription(redeemLogicPluginType)}
+	</Box>
+);

@@ -71,7 +71,7 @@ export class ChainOtcState extends AbsOtcState {
 	sellerTA: undefined | PublicKey;
 
 	getContractTitle(): string {
-		return this.rateState.title;
+		return this.rateAccount.state.title;
 	}
 
 	isDepositExpired(): boolean {
@@ -154,11 +154,11 @@ export class ChainOtcState extends AbsOtcState {
 
 	getPnlBuyer(prices: number[]): number {
 		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
-		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
+		return this.redeemLogicAccount.state.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
 	}
 
 	getPnlSeller(prices: number[]): number {
 		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
-		return this.redeemLogicState.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
+		return this.redeemLogicAccount.state.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
 	}
 }

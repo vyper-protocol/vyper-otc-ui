@@ -24,11 +24,11 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	const tokenSymbol = rateStateQuery?.data?.reserveTokenInfo?.symbol ?? '';
 
 	const buyerPnl = formatWithDecimalDigits(
-		rateStateQuery?.data?.redeemLogicState?.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[0],
+		rateStateQuery?.data?.redeemLogicAccount?.state.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[0],
 		4
 	);
 	const sellerPnl = formatWithDecimalDigits(
-		rateStateQuery?.data?.redeemLogicState?.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[1],
+		rateStateQuery?.data?.redeemLogicAccount?.state.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[1],
 		4
 	);
 
@@ -41,7 +41,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	return (
 		<div className={cn(styles.wrapper, className)} ref={ref}>
 			<p className={styles.title}>Simulate your PnL</p>
-			{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.map((c, i) => (
+			{rateStateQuery?.data.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
 					<p>{c}:</p>
 					<TextField type="number" size="small" sx={{ width: '70%' }} value={prices[i]} onChange={(e) => handleOnPriceChange(e.target.value, i)} />
@@ -49,7 +49,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 			))}
 
 			<div className={styles.margin}>
-				{rateStateQuery?.data?.redeemLogicState.pluginDetails.map((detail, index) => (
+				{rateStateQuery?.data?.redeemLogicAccount.state.pluginDetails.map((detail, index) => (
 					<div key={detail.label} className={cn(styles.flex, index % 2 && styles.row)}>
 						<p className={styles.bold}>{detail.label}</p>
 						<p className={styles.bold}>{typeof detail.value === 'number' ? formatWithDecimalDigits(detail.value) : detail.value}</p>
@@ -72,10 +72,10 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 
 			<p className={styles.note}>
 				This is the simulated PnL if{' '}
-				{rateStateQuery?.data.redeemLogicState.settlementPricesDescription.map((c, i) => (
+				{rateStateQuery?.data.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 					<span key={i}>
 						{c.toLowerCase()} gets to {prices[i]}
-						{i === rateStateQuery?.data.redeemLogicState.settlementPricesDescription.length - 1 ? '' : ', '}
+						{i === rateStateQuery?.data.redeemLogicAccount.state.settlementPricesDescription.length - 1 ? '' : ', '}
 					</span>
 				))}
 			</p>

@@ -1,6 +1,7 @@
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
 import { DbOtcState } from 'models/DbOtcState';
-import { AVAILABLE_RATE_PLUGINS, AVAILABLE_REDEEM_LOGIC_PLUGINS } from 'models/plugins/AbsPlugin';
+import { AVAILABLE_RATE_TYPES } from 'models/plugins/rate/RatePluginTypeIds';
+import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
 
 import { CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
@@ -21,12 +22,12 @@ export const selectContracts = async (params: FetchContractsParams): Promise<DbO
 	params.eq.forEach((f) => query.eq(f.column, f.value));
 
 	// filter for fetching only supported plugins in the UI
-	query.in('redeem_logic_plugin_type', AVAILABLE_REDEEM_LOGIC_PLUGINS as any);
-	query.in('rate_plugin_type', AVAILABLE_RATE_PLUGINS as any);
+	query.in('redeem_logic_plugin_type', AVAILABLE_RL_TYPES as any);
+	query.in('rate_plugin_type', AVAILABLE_RATE_TYPES as any);
 
 	const res = await query;
 
 	if (res.error) throw Error(res.error.message);
 
-	return res.data.map<DbOtcState>((c) => DbOtcState.fromSupabaseSelectRes(c));
+	return res.data.map<DbOtcState>((c) => DbOtcState.createFromDBData(c));
 };
