@@ -1,9 +1,14 @@
 import { Cluster } from '@solana/web3.js';
 
-type SupabaseColumnFilter = {
+export type SupabaseColumnFilter = {
 	column: string | number;
 	value: any;
 };
+
+export type SupabaseOrder = 'asc' | 'desc';
+
+// tuple: [column name, ascending / descending]
+export type SupabaseColumnOrder = [string, SupabaseOrder];
 
 export class FetchContractsParams {
 	lte: SupabaseColumnFilter[] = [];
@@ -11,6 +16,7 @@ export class FetchContractsParams {
 	gte: SupabaseColumnFilter[] = [];
 	gt: SupabaseColumnFilter[] = [];
 	eq: SupabaseColumnFilter[] = [];
+	order: SupabaseColumnOrder[] = [];
 
 	static buildNotExpiredContractsQuery(cluster: Cluster): FetchContractsParams {
 		const r = new FetchContractsParams();

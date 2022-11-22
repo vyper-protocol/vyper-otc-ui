@@ -93,7 +93,7 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 					}
 					setValue(oracle);
 				}}
-				getOptionLabel={(oracle: string | OracleDetail) => typeof oracle === 'string' ? oracle : oracle.title}
+				getOptionLabel={(oracle: string | OracleDetail) => (typeof oracle === 'string' ? oracle : oracle.title)}
 				renderOption={(props, option: OracleDetail) => (
 					<Box component="li" {...props}>
 						<Typography align="left">{option.title}</Typography>
@@ -103,10 +103,12 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 					</Box>
 				)}
 				options={oracles}
-				renderInput={(params) => <>
-					<TextField {...params} label="Oracle #1" />
-					{label}
-				</>}
+				renderInput={(params) => (
+					<>
+						<TextField {...params} label="Oracle #1" />
+						{label}
+					</>
+				)}
 				onChange={async (_, oracle: OracleDetail | string) => {
 					if (typeof oracle === 'object') {
 						setRatePlugin(oracle);

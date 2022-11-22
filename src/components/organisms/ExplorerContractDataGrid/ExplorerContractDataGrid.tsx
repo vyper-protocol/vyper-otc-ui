@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, CircularProgress } from '@mui/material';
-import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem, GridSortModel } from '@mui/x-data-grid';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -11,7 +11,7 @@ import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
-import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
+import { FetchContractsParams, SupabaseColumnOrder } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState } from 'models/ChainOtcState';
 import { AVAILABLE_REDEEM_LOGIC_PLUGINS, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
 import { AbsRatePlugin } from 'models/plugins/rate/AbsRatePlugin';
@@ -19,6 +19,7 @@ import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogic
 import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
 import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
 import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
+import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -28,11 +29,84 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
-const ExplorerContractDataGrid = () => {
+export type QueryParams = {
+	page?: number;
+	limit?: number;
+	sort?: SupabaseColumnOrder[];
+};
+
+type Props = {
+	query: QueryParams;
+};
+
+const fromSortModel = (model: GridSortModel): SupabaseColumnOrder[] => {
+	return model.filter((m) => ['asc', 'desc'].includes(m.sort)).map((m) => [m.field, m.sort]);
+};
+
+const toSortModel = (sort: SupabaseColumnOrder[]): GridSortModel => {
+	return sort.map((s) => ({
+		field: s[0],
+		sort: s[1]
+	}));
+};
+
+const transformSortParams = (orders: SupabaseColumnOrder[]): string => {
+	return orders.reduce((accumulator, current, i) => {
+		accumulator += accumulator + current[0] + ' ' + current[1];
+		if (i !== orders.length - 1) {
+			accumulator += ',';
+		}
+
+		return accumulator;
+	}, '');
+};
+
+const transformParams = (params: QueryParams): { [key: string]: string } => {
+	const transformedParams = Object.entries(params).reduce((acc, [key, value]) => {
+		if (value !== undefined) {
+			acc[key] = key === 'sort' ? transformSortParams(value as SupabaseColumnOrder[]) : value;
+		}
+
+		return acc;
+	}, {});
+
+	return transformedParams;
+};
+
+const cleanParams = (params: { [key: string]: string }): { [key: string]: string } => {
+	return Object.entries(params).reduce((acc, [key, value]) => {
+		acc[key] = value;
+		if (!value) {
+			delete acc[key];
+		}
+
+		return acc;
+	}, {});
+};
+
+const ExplorerContractDataGrid = ({ query }: Props) => {
+	const { page = 1, limit = 25, sort } = query;
+
 	const { connection } = useConnection();
+	const router = useRouter();
 
 	const [contractsLoading, setContractsLoading] = useState(false);
 	const [contracts, setContracts] = useState<ChainOtcState[]>([]);
+
+	const updateQueryParams = useCallback(
+		(updatedQueryParams: QueryParams) => {
+			const updatedQuery = cleanParams({
+				...transformParams(query),
+				...transformParams(updatedQueryParams)
+			});
+
+			router.push({
+				pathname: '/explorer',
+				query: updatedQuery
+			});
+		},
+		[query, router]
+	);
 
 	useEffect(() => {
 		setContractsLoading(true);
@@ -47,11 +121,11 @@ const ExplorerContractDataGrid = () => {
 			type: 'singleSelect',
 			field: 'redeemLogicState.typeId',
 			headerName: 'Instrument',
-			sortable: false,
 			filterable: true,
 			flex: 1,
 			minWidth: 150,
 			valueOptions: AVAILABLE_REDEEM_LOGIC_PLUGINS as any,
+			sortable: false,
 			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
 			valueGetter: (params) => {
 				return params.row.redeemLogicState.typeId;
@@ -118,7 +192,8 @@ const ExplorerContractDataGrid = () => {
 				<OracleLivePrice oracleType={params.row.rateState.typeId} pubkey={(params.row.rateState as AbsRatePlugin).livePriceAccounts[0].toBase58()} />
 			),
 			flex: 1,
-			minWidth: 125
+			minWidth: 125,
+			sortable: false
 		},
 		{
 			field: 'settleAvailableFromAt',
@@ -227,7 +302,21 @@ const ExplorerContractDataGrid = () => {
 
 			{contracts.length > 0 && (
 				<Box sx={{ maxWidth: 1600, width: '90%' }}>
-					<DataGrid autoHeight getRowId={(row) => row.publickey.toBase58()} rows={contracts} columns={columns} />
+					<DataGrid
+						pagination
+						paginationMode="server"
+						page={page - 1}
+						pageSize={limit}
+						// Material UI page starts from 0
+						onPageChange={(newPage) => updateQueryParams({ page: newPage + 1 })}
+						onPageSizeChange={(newLimit) => updateQueryParams({ limit: newLimit })}
+						autoHeight
+						getRowId={(row) => row.publickey.toBase58()}
+						rows={contracts}
+						columns={columns}
+						sortModel={sort ? toSortModel(sort) : []}
+						onSortModelChange={(newSortModel) => updateQueryParams({ sort: fromSortModel(newSortModel) })}
+					/>
 				</Box>
 			)}
 		</>
