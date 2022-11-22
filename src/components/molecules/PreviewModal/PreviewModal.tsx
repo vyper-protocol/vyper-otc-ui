@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
+import Modal from 'components/atoms/Modal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { MintDetail } from 'models/MintDetail';
@@ -88,8 +89,8 @@ export const PreviewModal = ({
 					</span>
 				)}{' '}
 			</p>
-			{/* // TODO LONG/SHORT contextualized by payoff
-			// TODO load onchain data for unknwon mints , checks are not useful for now*/}
+			{/* // TODO: LONG/SHORT contextualized by payoff
+			// TODO: load onchain data for unknwon mints , checks are not useful for now*/}
 			<p className={styles.description}>
 				The contract will be settled in{' '}
 				{reserveMint && (
@@ -127,29 +128,21 @@ export const PreviewModal = ({
 	);
 
 	return (
-		<Box>
+		<div>
 			<Button sx={{ mt: 1, mr: 1 }} variant="contained" disabled={!wallet.connected || open} onClick={handleOpen}>
 				{wallet.connected ? 'Preview' : 'Connect Wallet'}
 			</Button>
-			<Dialog
+			<Modal
+				title={'Contract Summary'}
 				open={open}
-				onClose={handleClose}
-				PaperProps={{
-					style: { borderRadius: 16 }
-				}}
-			>
-				{' '}
-				<div className={styles.content}>
-					<DialogTitle className={styles.title}>Contract Summary</DialogTitle>
-				</div>
-				<DialogContent>{PreviewDescription}</DialogContent>
-				<DialogActions sx={{ px: 4, mb: 2, mt: -2 }}>
-					<Button onClick={handleClose}>Cancel</Button>
+				handleClose={handleClose}
+				contentProps={PreviewDescription}
+				actionProps={
 					<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
 						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
 					</LoadingButton>
-				</DialogActions>
-			</Dialog>
-		</Box>
+				}
+			/>
+		</div>
 	);
 };

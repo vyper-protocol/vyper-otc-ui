@@ -1,0 +1,25 @@
+.dialog {
+	border-radius: 1px;
+
+	.title {
+		padding: var(--space-16);
+		font-size: var(--font-p);
+		text-transform: uppercase;
+		font-weight: 650;
+		font-size: large;
+		color: var(--color-black-300);
+		background-color: var(--color-primary);
+	}
+
+	.content {
+		color: var(--color-black);
+		font-size: var(--font-p-medium);
+		padding: var(--space-10);
+	}
+
+	.actions {
+		padding: var(--space-16);
+		display: flex;
+		justify-content: flex-end;
+	}
+}
