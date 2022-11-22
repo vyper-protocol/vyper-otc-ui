@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { translateAddress } from '@project-serum/anchor';
 import { Cluster, PublicKey } from '@solana/web3.js';
 import { ChainOtcState } from 'models/ChainOtcState';
 
@@ -18,15 +19,15 @@ export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy:
 			buyer_deposit_amount: otcState.buyerDepositAmount,
 			seller_deposit_amount: otcState.sellerDepositAmount,
 
-			redeem_logic_plugin_program_pubkey: otcState.redeemLogicState.programPubkey.toBase58(),
-			redeem_logic_plugin_state_pubkey: otcState.redeemLogicState.statePubkey.toBase58(),
-			redeem_logic_plugin_type: otcState.redeemLogicState.typeId,
-			redeem_logic_plugin_data: otcState.redeemLogicState.getPluginDataObj(),
+			redeem_logic_plugin_program_pubkey: translateAddress(otcState.redeemLogicAccount.programPubkey).toBase58(),
+			redeem_logic_plugin_state_pubkey: translateAddress(otcState.redeemLogicAccount.statePubkey).toBase58(),
+			redeem_logic_plugin_type: otcState.redeemLogicAccount.state.stateType.type,
+			redeem_logic_plugin_data: otcState.redeemLogicAccount.state.getPluginDataObj(),
 
-			rate_plugin_program_pubkey: otcState.rateState.programPubkey.toBase58(),
-			rate_plugin_state_pubkey: otcState.rateState.statePubkey.toBase58(),
-			rate_plugin_type: otcState.rateState.typeId,
-			rate_plugin_data: otcState.rateState.getPluginDataObj()
+			rate_plugin_program_pubkey: translateAddress(otcState.rateAccount.programPubkey).toBase58(),
+			rate_plugin_state_pubkey: translateAddress(otcState.rateAccount.statePubkey).toBase58(),
+			rate_plugin_type: otcState.rateAccount.state.typeId,
+			rate_plugin_data: otcState.rateAccount.state.getPluginDataObj()
 		}
 	]);
 

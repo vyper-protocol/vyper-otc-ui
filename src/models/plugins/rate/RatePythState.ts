@@ -4,17 +4,17 @@ import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 
-import { RatePluginTypeIds } from '../AbsPlugin';
-import { AbsRatePlugin } from './AbsRatePlugin';
+import { AbsRateState } from './AbsRateState';
+import { RatePluginTypeIds } from './RatePluginTypeIds';
 
-export class RatePythPlugin extends AbsRatePlugin {
+export class RatePythState extends AbsRateState {
 	static pythData: PythHttpClientResult = undefined;
 	pythProducts: Product[];
 	pythPricesData: PriceData[];
 
 	// eslint-disable-next-line no-unused-vars
-	constructor(programPubkey: PublicKey, statePubkey: PublicKey, public oracles: PublicKey[]) {
-		super(programPubkey, statePubkey);
+	constructor(public oracles: PublicKey[]) {
+		super();
 	}
 
 	get title(): string {
@@ -49,25 +49,33 @@ export class RatePythPlugin extends AbsRatePlugin {
 		};
 	}
 
-	clone(): AbsRatePlugin {
-		return new RatePythPlugin(this.programPubkey, this.statePubkey, this.oracles);
+	static createFromDBData(data: any): RatePythState {
+		if (data.pythProduct) {
+			return new RatePythState([new PublicKey(data.pythProduct)]);
+		} else {
+			return new RatePythState(data.oracles.map((c) => new PublicKey(c)));
+		}
+	}
+
+	clone(): AbsRateState {
+		return new RatePythState(this.oracles);
 	}
 
 	async loadData(connection: Connection) {
-		const res = await Promise.all(this.oracles.map((c) => RatePythPlugin.GetProductPrice(connection, getCurrentCluster(), c)));
+		const res = await Promise.all(this.oracles.map((c) => RatePythState.GetProductPrice(connection, getCurrentCluster(), c)));
 		this.pythProducts = res.map((c) => c[0]);
 		this.pythPricesData = res.map((c) => c[1]);
 	}
 
 	static async GetProductPrice(connection: Connection, cluster: Cluster, pythPrice: PublicKey): Promise<[Product, PriceData]> {
-		if (!RatePythPlugin.pythData) {
+		if (!RatePythState.pythData) {
 			const pythClient = new PythHttpClient(connection, getPythProgramKeyForCluster(cluster));
-			RatePythPlugin.pythData = await pythClient.getData();
+			RatePythState.pythData = await pythClient.getData();
 		}
 
-		const pythProduct = RatePythPlugin.pythData.products.find((c) => c.price_account === pythPrice.toBase58());
+		const pythProduct = RatePythState.pythData.products.find((c) => c.price_account === pythPrice.toBase58());
 		if (pythProduct) {
-			const pythPriceData = RatePythPlugin.pythData.productPrice.get(pythProduct.symbol);
+			const pythPriceData = RatePythState.pythData.productPrice.get(pythProduct.symbol);
 			return [pythProduct, pythPriceData];
 		} else {
 			return [undefined, undefined];
@@ -77,22 +85,4 @@ export class RatePythPlugin extends AbsRatePlugin {
 	static DecodePriceFromAccountInfo(accountInfo: AccountInfo<Buffer>): number {
 		return parsePriceData(accountInfo.data)?.price ?? 0;
 	}
-
-	// getPublicKeysForRefresh(): PublicKey[] {
-	// 	return this.pythPrices;
-	// }
-
-	// get pubkeysForLivePrice(): { label: string; pubkey: PublicKey }[] {
-	// 	const res: { label: string; pubkey: PublicKey }[] = [];
-
-	// 	if (this.pythPrices[0]) {
-	// 		res.push({ label: 'Current price', pubkey: this.pythPrices[0] });
-	// 	}
-
-	// 	if (this.pythPrices[1]) {
-	// 		res.push({ label: 'Settlement rate', pubkey: this.pythPrices[1] });
-	// 	}
-
-	// 	return res;
-	// }
 }

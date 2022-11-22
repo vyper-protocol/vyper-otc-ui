@@ -11,7 +11,8 @@ import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from '
 import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -72,7 +73,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RedeemLogicPluginTypeIds;
+	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RLPluginTypeIds;
 
 	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
