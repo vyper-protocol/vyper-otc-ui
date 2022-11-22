@@ -1,7 +1,12 @@
-import { Button, ButtonGroup, TextField } from '@mui/material';
-import { Box } from '@mui/material';
+import { useState } from 'react';
+
+import { TextField, ToggleButton, Typography, Grid, Stack } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import moment from 'moment';
+
+type PillarType = {
+	label: string;
+	onClick: () => void;
+};
 
 type DateTimePickerCompInput = {
 	// title of input component
@@ -14,59 +19,66 @@ type DateTimePickerCompInput = {
 	// eslint-disable-next-line no-unused-vars
 	onChange: (val: number) => void;
 
-	// show the exact date or not
-	showExact: boolean;
+	// List with possible selectors
+	pillars: PillarType[];
 };
 
 // eslint-disable-next-line no-unused-vars
-const DateTimePickerComp = ({ title, value, onChange, showExact }: DateTimePickerCompInput) => {
-	const auxButtons = [
-		{
-			label: 'Reset',
-			onClick: () => onChange(moment().toDate().getTime())
-		},
-		{
-			label: '+ 5min',
-			onClick: () => onChange(moment(value).add(5, 'minutes').toDate().getTime())
-		},
-		{
-			label: '+ 1d',
-			onClick: () => onChange(moment(value).add(1, 'day').toDate().getTime())
-		},
-		{
-			label: '+ 1w',
-			onClick: () => onChange(moment(value).add(1, 'week').toDate().getTime())
-		}
-	];
+const DateTimePickerComp = ({ title, value, onChange, pillars }: DateTimePickerCompInput) => {
+	const [selected, setSelected] = useState(pillars[0].label);
+
+	const handleChange = (_, pillarLabel: string) => {
+		setSelected(pillarLabel);
+
+		pillars.find(({ label }) => label === pillarLabel).onClick();
+	};
 
 	return (
-		<Box sx={{ mr: 2 }}>
-			<b>{title}</b>
+		<Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
+			<Typography sx={{ fontWeight: '600' }}>{title}</Typography>
+			<Stack spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+				<DateTimePicker
+					renderInput={(props) => <TextField {...props} />}
+					value={value}
+					inputFormat="DD MMM YYYY - hh:mm A"
+					disableMaskedInput
+					disablePast
+					onChange={(newValue) => {
+						onChange(newValue);
+					}}
+				/>
 
-			{showExact && (
-				<Box sx={{ mb: 2 }}>
-					<DateTimePicker
-						renderInput={(props) => <TextField {...props} />}
-						value={value}
-						onChange={(newValue) => {
-							// setAuxValue(newValue);
-							onChange(newValue);
-						}}
-					/>
-				</Box>
-			)}
-
-			<Box display="flex" alignItems="center">
-				<ButtonGroup variant="outlined">
-					{auxButtons.map(({ label, onClick }, i) => (
-						<Button key={i} onClick={onClick} sx={{ m: 1 }}>
-							{label}
-						</Button>
+				<Grid container spacing={0.1} sx={{ width: '80%' }}>
+					{pillars.map(({ label }, i) => (
+						<Grid item xs={4} key={i} sx={{ justifyContent: 'center', alignItems: 'center' }}>
+							<ToggleButton
+								key={i}
+								value={label}
+								sx={{
+									textTransform: 'none',
+									fontSize: 12,
+									padding: 0,
+									margin: 0,
+									border: 'none',
+									'&.Mui-disabled': {
+										border: 0
+									},
+									'&:not(:first-of-type)': {
+										borderRadius: 1
+									}
+								}}
+								size="small"
+								fullWidth={true}
+								selected={label === selected}
+								onChange={handleChange}
+							>
+								{label}
+							</ToggleButton>
+						</Grid>
 					))}
-				</ButtonGroup>
-			</Box>
-			<p>{moment(value).fromNow()}</p>
-		</Box>
+				</Grid>
+			</Stack>
+		</Stack>
 	);
 };
 

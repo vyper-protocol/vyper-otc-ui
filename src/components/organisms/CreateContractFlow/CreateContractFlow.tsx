@@ -13,6 +13,7 @@ type StepElement = {
 	title: string;
 	description: string;
 	content: JSX.Element;
+	error: boolean;
 };
 
 type ContractLifecycleInput = {
@@ -35,7 +36,7 @@ type ContractLifecycleInput = {
 	onCreateContractButtonClick: () => Promise<void>;
 };
 
-type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
+type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & PayoffPickerInput & ContractLifecycleInput & ExpiryPickerInput;
 
 const CreateContractFlow = ({
 	redeemLogicPluginType,
@@ -67,13 +68,18 @@ const CreateContractFlow = ({
 	onCreateContractButtonClick
 }: CreateContractFlowInput) => {
 	const [activeStep, setActiveStep] = useState(0);
+	const [expiryError, setExpiryError] = useState(false);
+
 	const wallet = useWallet();
+
+	// TODO fill other errors
 
 	const steps: StepElement[] = [
 		{
 			title: 'payoff',
 			description: 'Select the payoff of your contract from the list available',
-			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />
+			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />,
+			error: false
 		},
 		{
 			title: 'underlying',
@@ -86,7 +92,8 @@ const CreateContractFlow = ({
 					setRatePlugin2={setRatePlugin2}
 					redeemLogicPluginType={redeemLogicPluginType}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'contract parameters',
@@ -101,7 +108,8 @@ const CreateContractFlow = ({
 					isCall={isCall}
 					setIsCall={setIsCall}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'collateral',
@@ -114,12 +122,23 @@ const CreateContractFlow = ({
 					setJuniorDepositAmount={setJuniorDepositAmount}
 					setReserveMint={setReserveMint}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'expiry',
 			description: 'Select the deposit expiry and contract expiry',
-			content: <ExpiryPicker depositEnd={depositEnd} setDepositEnd={setDepositEnd} settleStart={settleStart} setSettleStart={setSettleStart} />
+			content: (
+				<ExpiryPicker
+					depositEnd={depositEnd}
+					setDepositEnd={setDepositEnd}
+					settleStart={settleStart}
+					setSettleStart={setSettleStart}
+					expiryError={expiryError}
+					setExpiryError={setExpiryError}
+				/>
+			),
+			error: expiryError
 		}
 	];
 
@@ -139,12 +158,11 @@ const CreateContractFlow = ({
 		<Box sx={{ width: '100vh' }}>
 			<Stepper activeStep={activeStep} orientation="vertical" connector={null}>
 				{steps.map((step: StepElement, i: number) => (
-					<Step key={step.title} sx={{ width: '100%' }}>
-						{/* <Box sx={{ display: 'inline-flex' }}> */}
+					<Step key={i} sx={{ width: '100%' }}>
 						<Stack direction="row">
 							<Box sx={{ width: '40%', flexDirection: 'column', justifyContent: 'space-between' }}>
 								<Box sx={{ my: 2 }}>
-									<StepLabel>
+									<StepLabel error={step.error}>
 										<b>{step.title.toUpperCase()}</b>
 									</StepLabel>
 									{activeStep >= i && <Typography sx={{ fontWeight: 'light' }}>{step.description}</Typography>}
@@ -159,13 +177,13 @@ const CreateContractFlow = ({
 												sx={{ mt: 1, mr: 1 }}
 												variant="contained"
 												loading={isLoading}
-												disabled={!wallet.connected}
+												disabled={!wallet.connected || steps.some(({ error }) => error)}
 												onClick={onCreateContractButtonClick}
 											>
 												{wallet.connected ? 'Create Contract' : 'Connect Wallet'}
 											</LoadingButton>
 										) : (
-											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }}>
+											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }} disabled={step.error}>
 												Next
 											</Button>
 										)}
