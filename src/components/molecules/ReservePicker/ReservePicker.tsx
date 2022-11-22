@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Autocomplete, TextField, Fab } from '@mui/material';
+import { Box, Autocomplete, TextField, Typography } from '@mui/material';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
@@ -52,15 +51,13 @@ export const ReservePicker = ({
 					renderInput={(params) => <TextField {...params} label="Collateral mint" />}
 					onChange={(_, mint: MintDetail) => handleMint(mint.pubkey)}
 				/>
-				<Fab sx={{ marginX: 2, boxShadow: 2 }} color="default" size="small">
-					<a
-						href={getExplorerLink(selectedMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<SearchIcon />
-					</a>
-				</Fab>
+				<a
+					href={getExplorerLink(selectedMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
+				</a>
 			</Box>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<TextField
