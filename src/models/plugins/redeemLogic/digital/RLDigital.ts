@@ -46,12 +46,6 @@ export class RLDigital extends AbsRLState {
 		return new RLDigital(this.strike, this.isCall);
 	}
 
-	static get redeemLogicDescription(): string {
-		return `A digital option contract pays out a fixed amount on the condition that a certain event happens, while paying 0 otherwise. 
-				The Long amount represents the option premium, paid in any case to the Short side. 
-				The Short amount represents the max payout if the option expires in-the-money`;
-	}
-
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
 		return RLDigital.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.isCall);
 	}

@@ -1,0 +1,24 @@
+{
+	"redeemLogicMetadata": {
+		"forward": {
+			"documentationLink": "https://vyperprotocol.notion.site/Contract-Payoff-Forward-0475d7640cd946f5be4a03d5e6bcad76",
+			"sourceCodeLink": "https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-forward",
+			"description": "A forward contract gives linear exposure to the underlying. Long expects that the underlying will increase in price. Short expects that the underlying will decrease in price"
+		},
+		"settled_forward": {
+			"documentationLink": "https://vyperprotocol.notion.site/Contract-Payoff-Settled-Forward-aa0f295f291545c281be6fa6363ca79a",
+			"sourceCodeLink": "https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-settled-forward",
+			"description": "A forward contract gives linear exposure to the underlying. Long expects that the underlying will increase in price. Short expects that the underlying will decrease in price. The difference vs a standard forward is that you can settle the payoff in a third currency. For example provide the SOL/USD and cUSDC/USD oracles to settle the SOL/USD payoff in cUSDC"
+		},
+		"digital": {
+			"documentationLink": "https://vyperprotocol.notion.site/Contract-Payoff-Digital-39cab877a28a4a6fa349d9b816bd15a4",
+			"sourceCodeLink": "https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-digital",
+			"description": "A digital option contract pays out a fixed amount on the condition that a certain event happens, while paying 0 otherwise. The Long amount represents the option premium, paid in any case to the Short side. The Short amount represents the max payout if the option expires in-the-money"
+		},
+		"vanilla_option": {
+			"documentationLink": "https://vyperprotocol.notion.site/Contract-Payoff-Vanilla-Option-47b362270a164d7b96732d139e4d7ee2",
+			"sourceCodeLink": "https://github.com/vyper-protocol/vyper-core/tree/dev/programs/redeem-logic-vanilla-option",
+			"description": "A vanilla option contract  gives the option buyer the right, but not the obligation, to buy (call) or sell (put) the underlying at the strike price. The Long amount represents the option premium, paid in any case to the Short side. The Short amount represents the max payout if the option expires in-the-money, paid according to: N*max(0, S-K) for calls and N*max(0, K-S) for puts"
+		}
+	}
+}
