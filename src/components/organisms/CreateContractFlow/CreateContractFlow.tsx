@@ -8,6 +8,7 @@ import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesP
 import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
 import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
 import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 
 type StepElement = {
 	title: string;
@@ -55,6 +56,7 @@ const CreateContractFlow = ({
 	setSeniorDepositAmount,
 	juniorDepositAmount,
 	setJuniorDepositAmount,
+	reserveMint,
 	setReserveMint,
 	depositEnd,
 	setDepositEnd,
@@ -69,6 +71,7 @@ const CreateContractFlow = ({
 }: CreateContractFlowInput) => {
 	const [activeStep, setActiveStep] = useState(0);
 	const [expiryError, setExpiryError] = useState(false);
+	const [reserveError, setReserveError] = useState(false);
 
 	const wallet = useWallet();
 
@@ -113,17 +116,22 @@ const CreateContractFlow = ({
 		},
 		{
 			title: 'collateral',
-			description: 'Select the token mint to be used as collateral for the contract',
+			description: `Select the token to be used as collateral for the contract${
+				getCurrentCluster() === 'devnet' ? '. You can also input your token of choice' : ''
+			}`,
 			content: (
 				<ReservePicker
 					seniorDepositAmount={seniorDepositAmount}
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
+					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
+					reserveError={reserveError}
+					setReserveError={setReserveError}
 				/>
 			),
-			error: false
+			error: reserveError
 		},
 		{
 			title: 'expiry',

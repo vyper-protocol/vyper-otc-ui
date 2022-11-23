@@ -21,7 +21,13 @@
 		{
 			"cluster": "devnet",
 			"pubkey": "7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W",
-			"title": "fake USDC",
+			"title": "devUSD",
+			"isStable": true
+		},
+		{
+			"cluster": "devnet",
+			"pubkey": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+			"title": "USDC",
 			"isStable": true
 		}
 	]

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Alert, Collapse, Grid } from '@mui/material';
-import ErrorAlert from 'components/atoms/ErrorAlert/ErrorAlert';
+import MessageAlert from 'components/atoms/MessageAlert';
 import DateTimePickerComp from 'components/molecules/DateTimePickerComp';
 import moment from 'moment';
 import { getNextHour, getNextDay, getTomNextDay, getNextFriday, getLastFridayOfMonth, getLastFridayOfQuarter } from 'utils/momentHelpers';
@@ -84,9 +84,9 @@ export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettle
 			</Grid>
 
 			{expiryError && (
-				<Grid item xs={12}>
-					<ErrorAlert message={'Contract expiry should be after the deposit expiry!'} />
-				</Grid>
+				<div>
+					<MessageAlert message={'Contract expiry should be after the deposit expiry!'} severity={'error'} />
+				</div>
 			)}
 		</Grid>
 	);
