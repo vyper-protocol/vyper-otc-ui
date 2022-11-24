@@ -117,6 +117,11 @@ export const PreviewModal = ({
 				The oracle provider is <span className={styles.highlight}>{ratePlugin1.type}</span>. The contract is being deployed on{' '}
 				<span className={styles.highlight}>{getCurrentCluster()}</span>.
 			</p>
+
+			<p className={styles.description}>
+				Vyper charges no fees for using the service. The contract has a Solana rent fee of <span className={styles.highlight}>~0.03 SOL</span> payed on
+				transaction submit.
+			</p>
 		</div>
 	);
 
