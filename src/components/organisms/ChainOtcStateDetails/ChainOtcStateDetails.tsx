@@ -15,7 +15,7 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
+import { getRedeemLogicDocumentionLink } from 'utils/redeemLogicMetadataHelper';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';

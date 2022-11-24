@@ -48,14 +48,6 @@ export class RLSettledForward extends AbsRLState {
 		return new RLSettledForward(this.strike, this.isLinear, this.notional, this.isStandard);
 	}
 
-	static get redeemLogicDescription(): string {
-		return `A forward contract gives linear exposure to the underlying. 
-				Long expects that the underlying will increase in price. 
-				Short expects that the underlying will decrease in price.
-				The difference vs a standard forward is that you can settle the payoff in a third currency.
-				For example provide the SOL/USD and cUSDC/USD oracles to settle the SOL/USD payoff in cUSDC`;
-	}
-
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
 		return RLSettledForward.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike);
 	}
