@@ -1,10 +1,6 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
-import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
 import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
-import { RLSettledForward } from 'models/plugins/redeemLogic/settledForward/RLSettledForward';
-import { RLVanillaOption } from 'models/plugins/redeemLogic/vanillaOption/RLVanillaOption';
-import { getRedeemLogicDocumentionLink, getRedeemLogicSoruceCodeLink } from 'utils/urlBuilder';
+import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
 
 export type PayoffPickerInput = {
 	// redeem logic plugin of the contract
@@ -15,35 +11,15 @@ export type PayoffPickerInput = {
 	setRedeemLogicPluginType: (redeemLogicPluginType: RLPluginTypeIds) => void;
 };
 
-const buildDescription = (rlType: RLPluginTypeIds) => {
-	let description: string;
-	const sourceLink = getRedeemLogicSoruceCodeLink(rlType);
-	const docLink = getRedeemLogicDocumentionLink(rlType);
-
-	switch (rlType) {
-		case 'forward':
-			description = RLForward.redeemLogicDescription;
-			break;
-		case 'settled_forward':
-			description = RLSettledForward.redeemLogicDescription;
-			break;
-		case 'digital':
-			description = RLDigital.redeemLogicDescription;
-			break;
-		case 'vanilla_option':
-			description = RLVanillaOption.redeemLogicDescription;
-			break;
-		default:
-			return;
-	}
+const buildDescription = (rateId: RLPluginTypeIds) => {
 	return (
 		<Box sx={{ marginY: 2 }}>
-			<Typography>{description}</Typography>
+			<Typography>{getRedeemLogicDescription(rateId)}</Typography>
 			<Box sx={{ display: 'flex', my: 1 }}>
-				<a href={docLink} target="_blank" rel="noopener noreferrer">
+				<a href={getRedeemLogicDocumentionLink(rateId)} target="_blank" rel="noopener noreferrer">
 					<Typography sx={{ textDecoration: 'underline' }}>Learn more</Typography>
 				</a>
-				<a href={sourceLink} target="_blank" rel="noopener noreferrer">
+				<a href={getRedeemLogicSourceCodeLink(rateId)} target="_blank" rel="noopener noreferrer">
 					<Typography sx={{ textDecoration: 'underline', ml: 2 }}>Source code</Typography>
 				</a>
 			</Box>
