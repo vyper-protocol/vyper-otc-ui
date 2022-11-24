@@ -1,8 +1,6 @@
-import { useState } from 'react';
-
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Autocomplete, TextField, Fab } from '@mui/material';
+import { Box, Autocomplete, TextField } from '@mui/material';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
+import ExplorerIcon from 'components/atoms/ExplorerIcon';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
 import { getMints } from 'utils/mintDatasetHelper';
@@ -18,9 +16,11 @@ export type ReservePickerInput = {
 	// eslint-disable-next-line no-unused-vars
 	setJuniorDepositAmount: (value: number) => void;
 
-	// reserve mint of collateral tokens
+	// collateral mint
+	reserveMint: MintDetail;
+
 	// eslint-disable-next-line no-unused-vars
-	setReserveMint: (pubkey: string) => void;
+	setReserveMint: (mint: MintDetail) => void;
 };
 
 export const ReservePicker = ({
@@ -28,15 +28,9 @@ export const ReservePicker = ({
 	setSeniorDepositAmount,
 	juniorDepositAmount,
 	setJuniorDepositAmount,
+	reserveMint,
 	setReserveMint
 }: ReservePickerInput) => {
-	const [selectedMint, setSelectedMint] = useState('');
-
-	const handleMint = (pubkey: string) => {
-		setSelectedMint(pubkey);
-		setReserveMint(pubkey);
-	};
-
 	return (
 		<Box sx={{ marginY: 2 }}>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -50,17 +44,10 @@ export const ReservePicker = ({
 					getOptionLabel={(mint: MintDetail) => mint.title}
 					options={getMints()}
 					renderInput={(params) => <TextField {...params} label="Collateral mint" />}
-					onChange={(_, mint: MintDetail) => handleMint(mint.pubkey)}
+					onChange={(_, mint: MintDetail) => setReserveMint(mint)}
+					value={reserveMint}
 				/>
-				<Fab sx={{ marginX: 2, boxShadow: 2 }} color="default" size="small">
-					<a
-						href={getExplorerLink(selectedMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<SearchIcon />
-					</a>
-				</Fab>
+				<ExplorerIcon link={getExplorerLink(reserveMint.pubkey, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })} />
 			</Box>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<TextField

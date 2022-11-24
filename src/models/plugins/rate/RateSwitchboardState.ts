@@ -76,6 +76,15 @@ export class RateSwitchboardState extends AbsRateState {
 		return await aggregatorAccount.loadData();
 	}
 
+	static async GetLatestPrice(connection: Connection, switchboardAggregator: PublicKey): Promise<any> {
+		const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
+		const aggregatorAccount: AggregatorAccount = new AggregatorAccount({
+			program: switchboardProgram,
+			publicKey: switchboardAggregator
+		});
+		return (await aggregatorAccount.getLatestValue()).toNumber();
+	}
+
 	static async DecodePriceFromAccountInfo(connection: Connection, accountInfo: AccountInfo<Buffer>): Promise<number> {
 		const switchboardProgram = loadSwitchboardProgramOffline(getCurrentCluster() as 'mainnet-beta' | 'devnet', connection);
 		const aggregatorAccount = new AggregatorAccount({
