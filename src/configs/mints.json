@@ -14,7 +14,7 @@
 		},
 		{
 			"cluster": "mainnet-beta",
-			"pubkey": "11111111111111111111111111111111",
+			"pubkey": "11111111111111111111111111111111s",
 			"title": "SOL",
 			"isStable": false
 		},
@@ -22,12 +22,6 @@
 			"cluster": "devnet",
 			"pubkey": "7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W",
 			"title": "devUSD",
-			"isStable": true
-		},
-		{
-			"cluster": "devnet",
-			"pubkey": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-			"title": "USDC",
 			"isStable": true
 		}
 	]

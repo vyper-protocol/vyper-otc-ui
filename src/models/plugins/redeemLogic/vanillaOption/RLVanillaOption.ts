@@ -51,12 +51,6 @@ export class RLVanillaOption extends AbsRLState {
 		};
 	}
 
-	static get redeemLogicDescription(): string {
-		return `A vanilla option contract  gives the option buyer the right, but not the obligation, to buy (call) or sell (put) the underlying at the strike price.
-				The Long amount represents the option premium, paid in any case to the Short side. 
-				The Short amount represents the max payout if the option expires in-the-money, paid according to: N*max(0, S-K) for calls and N*max(0, K-S) for puts`;
-	}
-
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
 		return RLVanillaOption.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
 	}
