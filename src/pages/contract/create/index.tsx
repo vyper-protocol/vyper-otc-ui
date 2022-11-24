@@ -18,8 +18,8 @@ import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 

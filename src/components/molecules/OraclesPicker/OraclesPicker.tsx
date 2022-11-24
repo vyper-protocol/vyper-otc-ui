@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Stack, Autocomplete, TextField, Typography, Alert, Fab } from '@mui/material';
+import { Box, Stack, Autocomplete, TextField, Typography, Alert } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -135,11 +134,9 @@ const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OracleP
 					}
 				}}
 			/>
-			<Fab sx={{ marginX: 2, boxShadow: 2 }} color="default" size="small">
-				<a href={ratePlugin.explorerUrl} target="_blank" rel="noopener noreferrer">
-					<SearchIcon />
-				</a>
-			</Fab>
+			<a href={ratePlugin.explorerUrl} target="_blank" rel="noopener noreferrer">
+				<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
+			</a>
 		</>
 	);
 };

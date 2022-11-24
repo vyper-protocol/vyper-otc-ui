@@ -1,6 +1,5 @@
-import { Box, Autocomplete, TextField } from '@mui/material';
+import { Box, Autocomplete, TextField, Typography } from '@mui/material';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
-import ExplorerIcon from 'components/atoms/ExplorerIcon';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
 import { getMints } from 'utils/mintDatasetHelper';
@@ -47,7 +46,13 @@ export const ReservePicker = ({
 					onChange={(_, mint: MintDetail) => setReserveMint(mint)}
 					value={reserveMint}
 				/>
-				<ExplorerIcon link={getExplorerLink(reserveMint.pubkey, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })} />
+				<a
+					href={getExplorerLink(reserveMint.pubkey, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
+				</a>
 			</Box>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<TextField
