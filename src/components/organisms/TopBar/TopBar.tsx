@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { Box, Typography, Tooltip, Popover } from '@mui/material';
+import { Box, Typography, Popover } from '@mui/material';
 import cn from 'classnames';
 import Icon, { AvailableIconNames } from 'components/atoms/Icon';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -31,12 +31,6 @@ const TopBar = () => {
 	const showSocialsMenu = !!socialsMenuAnchor;
 	const showMobileMenu = !!mobileMenuAnchor;
 
-	const onCreateContractClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-		if (e.altKey) {
-			router.push(UrlBuilder.buildCreateContractUrl());
-		}
-	};
-
 	const openSocialsMenu = (event) => setSocialsMenuAnchor(event.currentTarget);
 	const closeSocialsMenu = () => setSocialsMenuAnchor(undefined);
 	const openMobileMenu = (event) => setMobileMenuAnchor(event.currentTarget);
@@ -61,11 +55,11 @@ const TopBar = () => {
 
 			{/* CREATE CONTRACT LINK */}
 			<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
-				<Tooltip title="Coming soon">
-					<a onClick={onCreateContractClick}>
+				<Link href={UrlBuilder.buildCreateContractUrl()}>
+					<a>
 						<HiFolderAdd size="20px" /> Create contract
 					</a>
-				</Tooltip>
+				</Link>
 			</div>
 
 			{/* EXPLORER LINK */}
@@ -129,7 +123,7 @@ const TopBar = () => {
 				<div className={styles.navLeftItems}>
 					<Link href={UrlBuilder.buildHomeUrl()}>
 						<a>
-							<Typography component="h2" variant="h6" sx={{ fontWeight: 600, fontSize: '1.15rem' }} className={styles.hover}>
+							<Typography component="h2" variant="h6" sx={{ fontWeight: 600, fontSize: '1.15rem', fontFamily: 'monospace' }} className={styles.hover}>
 								Vyper OTC
 							</Typography>
 						</a>
