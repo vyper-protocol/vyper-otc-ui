@@ -4,6 +4,7 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { getOraclesByTitle } from 'utils/oracleDatasetHelper';
 
 import styles from './TemplateCard.module.scss';
 
@@ -16,11 +17,10 @@ export type TemplateCardProps = {
 	underlying: string;
 	imgPath: string;
 	rateId: RatePluginTypeIds;
-	// TODO: load from oracles.json
-	pubkey: string;
+	pubkey?: string;
 };
 export const TemplateCard = ({ payoff, type, expiry, underlying, imgPath, rateId, pubkey }: TemplateCardProps) => {
-	const { pricesValue, isInitialized } = useOracleLivePrice(rateId, [pubkey]);
+	const { pricesValue, isInitialized } = useOracleLivePrice(rateId, [pubkey ?? getOraclesByTitle(underlying, rateId).pubkey]);
 
 	return (
 		<div className={styles.container}>
