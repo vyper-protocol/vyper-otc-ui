@@ -18,6 +18,7 @@ import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
@@ -61,18 +62,22 @@ const CreateContractPage = () => {
 	const [isCall, setIsCall] = useState(true);
 
 	const setStrikeToDefaultValue = async () => {
+		let price = 0;
 		try {
 			if (ratePlugin1.type === 'pyth') {
-				const [, price] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
-				setStrike(price?.price ?? 0);
+				const [, priceData] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
+				price = priceData?.price ?? 0;
 			}
 			if (ratePlugin1.type === 'switchboard') {
-				const price = await RateSwitchboardState.GetLatestPrice(connection, new PublicKey(ratePlugin1.pubkey));
-				setStrike(price ?? 0);
+				// TODO fix fetching issue
+				const priceData = await RateSwitchboardState.GetLatestPrice(connection, new PublicKey(ratePlugin1.pubkey));
+				price = priceData ?? 0;
 			}
-		} catch {
-			setStrike(0);
+		} catch (e) {
+			// setStrike(0);
+			console.error('err: ', e);
 		}
+		setStrike(formatWithDecimalDigits(price));
 	};
 
 	useEffect(() => {
