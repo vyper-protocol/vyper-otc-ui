@@ -1,15 +1,14 @@
 import { useState } from 'react';
 
 import { Box, Autocomplete, TextField, Typography } from '@mui/material';
-import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
+import { fetchTokenInfo } from 'api/next-api/fetchTokenInfo';
 import MessageAlert from 'components/atoms/MessageAlert';
 import TokenSymbol from 'components/atoms/TokenSymbol';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
 import { TokenInfo } from 'models/TokenInfo';
-import { fetchTokenInfoUsingMint } from 'pages/api/token-info';
 import { getMintByPubkey, getMintByTitle, getMintFromTokenInfo, getMints } from 'utils/mintDatasetHelper';
 
 // TODO: fix typing
@@ -57,9 +56,9 @@ export const ReservePicker = ({
 	reserveError,
 	setReserveError
 }: ReservePickerProps) => {
-	const { connection } = useConnection();
 	const [value, setValue] = useState(reserveMint.title);
 	const [external, setExternal] = useState<ExternalType>({ isExternal: false });
+	const [isLoading, setIsLoading] = useState(false);
 
 	const handleInputChange = async (input: string) => {
 		const mint = getMintByPubkey(input) || getMintByTitle(input);
@@ -83,18 +82,28 @@ export const ReservePicker = ({
 				return;
 			}
 
-			const mintTokenInfo = await fetchTokenInfoUsingMint(connection, pubkey);
+			setIsLoading(true);
 
-			if (mintTokenInfo) {
-				// mint found on-chain
-				setReserveMint(getMintFromTokenInfo(mintTokenInfo));
-				setReserveError(false);
-				setExternal({ isExternal: true, token: mintTokenInfo });
-			} else {
-				// unknown mint, throw error
-				setReserveError(true);
-				setExternal({ isExternal: false });
-			}
+			await fetchTokenInfo(pubkey).then(
+				(mintTokenInfo) => {
+					setIsLoading(false);
+					if (mintTokenInfo) {
+						// mint found on-chain
+						setReserveMint(getMintFromTokenInfo(mintTokenInfo));
+						setReserveError(false);
+						setExternal({ isExternal: true, token: mintTokenInfo });
+					} else {
+						// unknown mint, throw error
+						setReserveError(true);
+						setExternal({ isExternal: false });
+					}
+				},
+				() => {
+					// fetch failed, throw error
+					setReserveError(true);
+					setExternal({ isExternal: false });
+				}
+			);
 		}
 	};
 
@@ -102,6 +111,7 @@ export const ReservePicker = ({
 		<Box sx={{ marginY: 2 }}>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<Autocomplete
+					disabled={isLoading}
 					sx={{ width: 300, alignItems: 'center', marginY: 2 }}
 					disableClearable
 					autoHighlight
@@ -118,7 +128,7 @@ export const ReservePicker = ({
 					}}
 					getOptionLabel={(mint: MintDetail | string) => (typeof mint === 'string' ? mint : mint.title)}
 					options={getMints()}
-					renderInput={(params) => <TextField {...params} label="Collateral mint" />}
+					renderInput={(params) => <TextField {...params} label={isLoading ? 'Loading' : 'Collateral mint'} />}
 					onChange={async (_, mintOrPubkey: MintDetail | string) => {
 						if (typeof mintOrPubkey === 'object') {
 							handleInputChange(mintOrPubkey.title);
