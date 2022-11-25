@@ -1,25 +1,20 @@
 /* eslint-disable no-console */
 import { Cluster } from '@solana/web3.js';
-import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { AbsRedeemLogicPlugin } from 'models/plugins/redeemLogic/AbsRedeemLogicPlugin';
-import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
+import { AbsRateState } from 'models/plugins/rate/AbsRateState';
+import { AbsRLState } from 'models/plugins/redeemLogic/AbsRLState';
+import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
 import moment from 'moment';
 import { abbreviateAddress } from 'utils/stringHelpers';
 
 import { SNS_PUBLISHER_RPC_NAME, supabase } from './client';
 
-export const buildCreateContractMessage = (
-	redeemLogicPluginType: RedeemLogicPluginTypeIds,
-	underlying: string,
-	redeemLogicState: AbsRedeemLogicPlugin,
-	expiry: number,
-	url: string
-) => {
-	return `New ${redeemLogicPluginType.toUpperCase()} contract created!
+export const buildCreateContractMessage = (redeemLogicState: AbsRLState, rateState: AbsRateState, expiry: number, url: string) => {
+	// TODO fix for other plugin types
+	return `New ${redeemLogicState.getTypeLabel().toUpperCase()} contract created!
 	
-	Underlying: ${underlying}
-	Strike: ${(redeemLogicState as RedeemLogicForwardPlugin).strike.toPrecision(4)}
-	Size: ${(redeemLogicState as RedeemLogicForwardPlugin).notional}
+	Underlying: ${rateState.title}
+	Strike: ${(redeemLogicState as RLForward).strike.toPrecision(4)}
+	Size: ${(redeemLogicState as RLForward).notional}
 	Expiry: ${moment(expiry).utc().format('D MMM yyyy hh:mm a [UTC]')}
 	
 	Trade now👇

@@ -2,22 +2,24 @@ import { MouseEvent, useEffect, useState } from 'react';
 
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { Tooltip, Chip, Box, IconButton, Stack, Button, Menu, MenuItem } from '@mui/material';
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+import { Tooltip, Box, IconButton, Stack, Button, Menu, MenuItem } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
+import NumericBadge from 'components/atoms/NumericBadge';
+import StatusBadge from 'components/atoms/StatusBadge';
 import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-// import _ from 'lodash';
+// eslint-disable-next-line no-unused-vars
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 // import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
+import { getRedeemLogicDocumentionLink } from 'utils/redeemLogicMetadataHelper';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -82,7 +84,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	// };
 
 	const handleDocumentationClick = () => {
-		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicState.typeId));
+		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.stateType.type));
 	};
 
 	const handleToggle = () => {
@@ -96,8 +98,8 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		isInitialized: livePriceIsInitialized,
 		removeListener
 	} = useOracleLivePrice(
-		otcState.rateState.typeId,
-		otcState.rateState.livePriceAccounts.map((c) => c.toBase58())
+		otcState.rateAccount.state.typeId,
+		otcState.rateAccount.state.livePriceAccounts.map((c) => c.toBase58())
 	);
 
 	useEffect(() => {
@@ -145,19 +147,10 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						alignItems: 'center'
 					}}
 				>
-					<Chip
-						label={otcState.redeemLogicState.typeId}
-						variant="outlined"
-						color="secondary"
-						size="small"
-						sx={{ marginX: '3px', textTransform: 'capitalize' }}
-					/>
+					<StatusBadge label={otcState.redeemLogicAccount.state.getTypeLabel()} mode={'info'} />
 
-					<Tooltip title={'Contract payoff: ' + _.startCase(otcState.redeemLogicState.typeId)} placement="right">
-						<HelpIcon fontSize="small" onClick={handleDocumentationClick} className={styles.notionHelp} />
-					</Tooltip>
 					<div style={{ flex: 1 }} />
-					<ContractStatusBadge status={otcState.getContractStatus()} />
+					<ContractStatusBadge status={otcState.contractStatus} />
 				</Box>
 
 				{/* + + + + + + + + + + + + +  */}
@@ -167,26 +160,15 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						width: '100%',
 						display: 'flex',
 						justifyContent: 'center',
-						alignItems: 'center'
+						alignItems: 'center',
+						my: 1
 					}}
 				>
-					<Chip
-						label={otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'}
-						variant="outlined"
-						color={otcState.isBuyerFunded() ? 'success' : 'error'}
-						size="small"
-						sx={{ margin: '6px', textTransform: 'capitalize' }}
-					/>
+					<StatusBadge label={otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'} mode={otcState.isBuyerFunded() ? 'success' : 'error'} />
 
 					<div style={{ flex: 1 }} />
 
-					<Chip
-						label={otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'}
-						variant="outlined"
-						color={otcState.isSellerFunded() ? 'success' : 'error'}
-						size="small"
-						sx={{ margin: '6px', textTransform: 'capitalize' }}
-					/>
+					<StatusBadge label={otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'} mode={otcState.isSellerFunded() ? 'success' : 'error'} />
 				</Box>
 				<hr />
 
@@ -194,10 +176,10 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* TITLE AND SYMBOL */}
 				<Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
 					<Stack direction="row" sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-						<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
+						<b>{otcState.redeemLogicAccount.state.getTypeLabel().toUpperCase()}</b>
 						<Tooltip title="" placement="right">
-							<IconButton aria-label="close" color="inherit" size="small" onClick={handleDocumentationClick}>
-								<QuestionMarkIcon fontSize="inherit" />
+							<IconButton size="small" color="inherit" onClick={handleDocumentationClick} disableRipple={true}>
+								<ArrowOutwardIcon sx={{ width: '15px' }} />
 							</IconButton>
 						</Tooltip>
 					</Stack>
@@ -209,7 +191,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* DETAILS */}
 				<div className={styles.content}>
 					{otcState.settleExecuted &&
-						otcState.redeemLogicState.settlementPricesDescription.map((priceAtSet, i) => (
+						otcState.redeemLogicAccount.state.settlementPricesDescription.map((priceAtSet, i) => (
 							<div key={i} className={styles.column}>
 								<p>{priceAtSet}</p>
 								<p>{formatWithDecimalDigits(otcState.pricesAtSettlement[i])}</p>
@@ -218,20 +200,20 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 					{!otcState.settleExecuted &&
 						livePriceIsInitialized &&
-						otcState.redeemLogicState.rateFeedsDescription.map((rateFeedDescr, i) => (
+						otcState.redeemLogicAccount.state.rateFeedsDescription.map((rateFeedDescr, i) => (
 							<div key={i} className={styles.column}>
 								<p>{rateFeedDescr}</p>
 								<p>{formatWithDecimalDigits(livePricesValue[i])}</p>
 							</div>
 						))}
 
-					{otcState.redeemLogicState.pluginDetails.map((c) => (
+					{otcState.redeemLogicAccount.state.pluginDetails.map((c) => (
 						<div key={c.label} className={styles.column}>
 							<p>
 								{c.label}
 								{c.tooltip && (
 									<Tooltip title={c.tooltip} placement="right">
-										<HelpIcon fontSize="small" sx={{ marginX: '3px', textTransform: 'capitalize' }} />
+										<HelpIcon fontSize="small" sx={{ width: '15px' }} />
 									</Tooltip>
 								)}
 							</p>
@@ -260,7 +242,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<Chip label="LONG" variant="outlined" color="success" size="small" />
+								<StatusBadge label="LONG" mode="success" />
 							</p>
 						</div>
 					)}
@@ -269,7 +251,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<Chip label="SHORT" variant="outlined" color="error" size="small" />
+								<StatusBadge label="SHORT" mode="error" />
 							</p>
 						</div>
 					)}
@@ -285,7 +267,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						alignItems: 'center'
 					}}
 				>
-					<b>Collateral</b>
+					<b>Collateral {reserveTokenInfo?.name ?? ''}</b>
 				</Box>
 				<Box
 					sx={{
@@ -307,25 +289,21 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 							<b>PnL</b>
 						</Box>
 
-						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
 							<Box sx={{ margin: '6px', textAlign: 'center' }}>
 								Long
 								<br />
-								<Chip
+								<NumericBadge
 									label={`${formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
-									variant="outlined"
-									color={otcState.getPnlBuyer(livePricesValue) > 0 ? 'success' : 'error'}
-									size="small"
+									mode={otcState.getPnlBuyer(livePricesValue) > 0 ? 'success' : 'error'}
 								/>
 							</Box>
 							<Box sx={{ margin: '6px', textAlign: 'center' }}>
 								Short
 								<br />
-								<Chip
+								<NumericBadge
 									label={`${formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
-									variant="outlined"
-									color={otcState.getPnlSeller(livePricesValue) > 0 ? 'success' : 'error'}
-									size="small"
+									mode={otcState.getPnlSeller(livePricesValue) > 0 ? 'success' : 'error'}
 								/>
 							</Box>
 						</Box>

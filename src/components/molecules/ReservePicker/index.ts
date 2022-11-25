@@ -1,1 +1,2 @@
-export { default } from './ReservePicker';
+export { ReservePicker } from './ReservePicker';
+export type { ReservePickerInput } from './ReservePicker';

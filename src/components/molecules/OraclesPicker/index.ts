@@ -1,1 +1,2 @@
-export { default } from './OraclesPicker';
+export { OraclesPicker } from './OraclesPicker';
+export type { OraclesPickerInput } from './OraclesPicker';

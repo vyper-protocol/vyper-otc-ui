@@ -1,9 +1,9 @@
 import { Box, Switch, FormControlLabel, FormGroup, TextField } from '@mui/material';
-import { RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 
-type ParamsPickerInput = {
+export type ParamsPickerInput = {
 	// redeem logic plugin of the contract
-	redeemLogicPluginType: RedeemLogicPluginTypeIds;
+	redeemLogicPluginType: RLPluginTypeIds;
 
 	strike: number;
 
@@ -21,7 +21,7 @@ type ParamsPickerInput = {
 	setIsCall: (val: boolean) => void;
 };
 
-const ParamsPicker = ({ redeemLogicPluginType, strike, setStrike, notional, setNotional, isCall, setIsCall }: ParamsPickerInput) => {
+export const ParamsPicker = ({ redeemLogicPluginType, strike, setStrike, notional, setNotional, isCall, setIsCall }: ParamsPickerInput) => {
 	// setStrikeToDefaultValue
 	return (
 		<Box sx={{ marginY: 2 }}>
@@ -59,5 +59,3 @@ const ParamsPicker = ({ redeemLogicPluginType, strike, setStrike, notional, setN
 		</Box>
 	);
 };
-
-export default ParamsPicker;

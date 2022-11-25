@@ -648,6 +648,64 @@
 			]
 		},
 		{
+			"name": "crankPopV2",
+			"accounts": [
+				{
+					"name": "crank",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "oracleQueue",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "queueAuthority",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "programState",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "payoutWallet",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "tokenProgram",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "crankDataBuffer",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "queueDataBuffer",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "mint",
+					"isMut": false,
+					"isSigner": false
+				}
+			],
+			"args": [
+				{
+					"name": "params",
+					"type": {
+						"defined": "CrankPopParamsV2"
+					}
+				}
+			]
+		},
+		{
 			"name": "crankPush",
 			"accounts": [
 				{
@@ -1558,6 +1616,29 @@
 					"name": "params",
 					"type": {
 						"defined": "VrfRequestRandomnessParams"
+					}
+				}
+			]
+		},
+		{
+			"name": "vrfSetCallback",
+			"accounts": [
+				{
+					"name": "vrf",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "authority",
+					"isMut": false,
+					"isSigner": true
+				}
+			],
+			"args": [
+				{
+					"name": "params",
+					"type": {
+						"defined": "VrfSetCallbackParams"
 					}
 				}
 			]
@@ -2705,6 +2786,44 @@
 			}
 		},
 		{
+			"name": "CrankPopParamsV2",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "stateBump",
+						"type": "u8"
+					},
+					{
+						"name": "leaseBumps",
+						"type": "bytes"
+					},
+					{
+						"name": "permissionBumps",
+						"type": "bytes"
+					},
+					{
+						"name": "nonce",
+						"type": {
+							"option": "u32"
+						}
+					},
+					{
+						"name": "failOpenOnAccountMismatch",
+						"type": {
+							"option": "bool"
+						}
+					},
+					{
+						"name": "popIdx",
+						"type": {
+							"option": "u32"
+						}
+					}
+				]
+			}
+		},
+		{
 			"name": "CrankPushParams",
 			"type": {
 				"kind": "struct",
@@ -2768,10 +2887,6 @@
 					{
 						"name": "data",
 						"type": "bytes"
-					},
-					{
-						"name": "size",
-						"type": "u32"
 					},
 					{
 						"name": "chunkIdx",
@@ -3236,6 +3351,20 @@
 					{
 						"name": "stateBump",
 						"type": "u8"
+					}
+				]
+			}
+		},
+		{
+			"name": "VrfSetCallbackParams",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "callback",
+						"type": {
+							"defined": "Callback"
+						}
 					}
 				]
 			}
@@ -4174,20 +4303,10 @@
 						"name": "InvalidPublicKey"
 					},
 					{
-						"name": "SerializationError",
-						"fields": [
-							{
-								"defined": "bincode::Error"
-							}
-						]
+						"name": "SerializationError"
 					},
 					{
-						"name": "DeserializationError",
-						"fields": [
-							{
-								"defined": "bincode::Error"
-							}
-						]
+						"name": "DeserializationError"
 					},
 					{
 						"name": "InvalidDataError"

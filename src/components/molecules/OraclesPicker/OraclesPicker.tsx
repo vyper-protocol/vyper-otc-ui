@@ -1,76 +1,157 @@
-import { Box, Autocomplete, TextField, Grid, Typography } from '@mui/material';
+import { useState } from 'react';
+
+import { Box, Stack, Autocomplete, TextField, Typography, Alert } from '@mui/material';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OracleDetail } from 'models/OracleDetail';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
+import { getRateExplorer } from 'utils/oraclesExplorerHelper';
 
-type OraclesPickerInput = {
-	// set callback, sets the rate plugin type and the main rate puybey
+type OraclePickerInput = {
+	// label of the oracle
+	rateLabel: string;
+
+	// rates allowed
+	options: OracleDetail[];
+
+	// a rate plugin object
+	ratePlugin: OracleDetail;
+
+	// set callback, sets the rate plugin type
 	// eslint-disable-next-line no-unused-vars
-	setRateMain: (rateType: RatePluginTypeIds, pubkey: string) => void;
-
-	// set callback, sets the secondary rate puybey
-	// eslint-disable-next-line no-unused-vars
-	setRate2: (pubkey: string) => void;
-
-	// rate plugin of the contract
-	ratePluginType: RatePluginTypeIds;
-
-	// redeem logic plugin of the contract
-	redeemLogicPluginType: RedeemLogicPluginTypeIds;
+	setRatePlugin: (rate: OracleDetail) => void;
 };
 
-// TODO allow arbitrary oracle ids
+export type OraclesPickerInput = {
+	// main rate plugin object
+	ratePlugin1: OracleDetail;
 
-const OraclesPicker = ({ setRateMain, setRate2, ratePluginType, redeemLogicPluginType }: OraclesPickerInput) => {
+	// set callback, sets the rate plugin type and the main rate puybey
+	// eslint-disable-next-line no-unused-vars
+	setRatePlugin1: (rate: OracleDetail) => void;
+
+	// secondary rate plugin object
+	ratePlugin2: OracleDetail;
+
+	// set callback, sets the rate plugin type and the main rate puybey
+	// eslint-disable-next-line no-unused-vars
+	setRatePlugin2: (rate: OracleDetail) => void;
+
+	// redeem logic plugin of the contract
+	redeemLogicPluginType: RLPluginTypeIds;
+};
+
+const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OraclePickerInput) => {
+	const { connection } = useConnection();
+	const currentCluster = getCurrentCluster();
+	const [value, setValue] = useState<string | OracleDetail>('');
+	const [label, setLabel] = useState(<></>);
+
+	async function getOracleInfo(oracle: string): Promise<['pyth' | 'switchboard', string]> {
+		let publicKey;
+		try {
+			publicKey = new PublicKey(oracle);
+		} catch {
+			return [undefined, undefined];
+		}
+
+		let result: any = await RatePythState.GetProductPrice(connection, currentCluster, publicKey);
+		if (result[0]) return ['pyth', result[0].symbol];
+
+		result = await RateSwitchboardState.LoadAggregatorData(connection, publicKey);
+		if (result) return ['switchboard', String.fromCharCode(...result.name)];
+
+		return [undefined, undefined];
+	}
+
 	return (
-		<Box sx={{ marginY: 2 }}>
-			{/* <b>{redeemLogic === 'settled_forward' ? 'SELECT UNDERLYINGS' : 'SELECT UNDERLYING'}</b> */}
-			<Grid container spacing={2}>
-				<Grid item xs={6}>
-					<Autocomplete
-						sx={{ width: 300, marginY: 2 }}
-						autoHighlight
-						selectOnFocus
-						clearOnBlur
-						handleHomeEndKeys
-						disableClearable
-						getOptionLabel={(oracle: OracleDetail) => oracle.title}
-						renderOption={(props, option: OracleDetail) => (
-							<Box component="li" {...props}>
-								<Typography align="left">{option.title}</Typography>
-								<Typography sx={{ color: 'grey', ml: 1, fontSize: '0.7em' }} align="right">
-									{option.type.toUpperCase()}
+		<>
+			<Autocomplete
+				sx={{ width: 300, marginY: 2 }}
+				autoHighlight
+				selectOnFocus
+				clearOnBlur
+				handleHomeEndKeys
+				disableClearable
+				freeSolo={currentCluster === 'devnet'}
+				value={value}
+				onInputChange={async (_, oracle: string, reason: string) => {
+					if (reason !== 'input') return;
+
+					const [ratePluginType, symbol] = await getOracleInfo(oracle);
+					if (ratePluginType) {
+						setRatePlugin({
+							type: ratePluginType,
+							cluster: currentCluster,
+							pubkey: oracle,
+							title: symbol,
+							baseCurrency: '',
+							quoteCurrency: '',
+							explorerUrl: getRateExplorer(ratePluginType)
+						});
+						setLabel(
+							<Box sx={{ paddingX: '16px', paddingY: '6px' }}>
+								<Typography component="span">{symbol}</Typography>
+								<Typography component="span" sx={{ color: 'grey', ml: 1, fontSize: '0.7em' }}>
+									{ratePluginType.toUpperCase()}
 								</Typography>
 							</Box>
-						)}
-						options={getOracles()}
-						renderInput={(params) => <TextField {...params} label="Oracle #1" />}
-						onChange={(_, oracle: OracleDetail) => setRateMain(oracle.type, oracle.pubkey)}
-					/>
-				</Grid>
-				<Grid item xs={6}>
-					{(redeemLogicPluginType as RedeemLogicPluginTypeIds) === 'settled_forward' && (
-						<Autocomplete
-							sx={{ width: 300, alignItems: 'center', marginY: 2 }}
-							disableClearable
-							getOptionLabel={(oracle: OracleDetail) => oracle.title}
-							renderOption={(props, option: OracleDetail) => (
-								<Box component="li" {...props}>
-									<Typography align="left">{option.title}</Typography>
-									<Typography sx={{ color: 'grey', ml: 1, fontSize: '0.7em' }} align="right">
-										{option.type.toUpperCase()}
-									</Typography>
-								</Box>
-							)}
-							options={getOraclesByType(ratePluginType)}
-							renderInput={(params) => <TextField {...params} label="Oracle #2" />}
-							onChange={(_, oracle: OracleDetail) => setRate2(oracle.pubkey)}
-						/>
-					)}
-				</Grid>
-			</Grid>
-		</Box>
+						);
+					} else {
+						setLabel(
+							<Box sx={{ paddingY: '6px' }}>
+								<Alert severity="error">The name / public key is not a recognized oracle.</Alert>
+							</Box>
+						);
+					}
+					setValue(oracle);
+				}}
+				getOptionLabel={(oracle: string | OracleDetail) => (typeof oracle === 'string' ? oracle : oracle.title)}
+				renderOption={(props, option: OracleDetail) => (
+					<Box component="li" {...props}>
+						<Typography align="left">{option.title}</Typography>
+						<Typography sx={{ color: 'grey', ml: 1, fontSize: '0.7em' }} align="right">
+							{option.type.toUpperCase()}
+						</Typography>
+					</Box>
+				)}
+				options={options}
+				renderInput={(params) => (
+					<>
+						<TextField {...params} label={rateLabel} />
+						{label}
+					</>
+				)}
+				onChange={async (_, oracle: OracleDetail | string) => {
+					if (typeof oracle === 'object') {
+						setRatePlugin(oracle);
+						setLabel(<></>);
+						setValue(oracle);
+					}
+				}}
+			/>
+			<a href={ratePlugin.explorerUrl} target="_blank" rel="noopener noreferrer">
+				<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
+			</a>
+		</>
 	);
 };
 
-export default OraclesPicker;
+// TODO Generalize to list of oracles, rendered based on redeemLogicPluginType
+export const OraclesPicker = ({ ratePlugin1, setRatePlugin1, ratePlugin2, setRatePlugin2, redeemLogicPluginType }: OraclesPickerInput) => {
+	return (
+		<Box sx={{ marginY: 2 }}>
+			<Stack spacing={2}>
+				<OraclePicker rateLabel={'Oracle #1'} options={getOracles()} ratePlugin={ratePlugin1} setRatePlugin={setRatePlugin1} />
+
+				{(redeemLogicPluginType as RLPluginTypeIds) === 'settled_forward' && (
+					<OraclePicker rateLabel={'Oracle #2'} options={getOraclesByType(ratePlugin1.type)} ratePlugin={ratePlugin2} setRatePlugin={setRatePlugin2} />
+				)}
+			</Stack>
+		</Box>
+	);
+};

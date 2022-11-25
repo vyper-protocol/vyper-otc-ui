@@ -6,7 +6,8 @@
 			"pubkey": "8SXvChNYFhRq4EZuZvnhjrB3jJRQCv4k3P4W6hesH3Ee",
 			"title": "BTC/USD",
 			"baseCurrency": "BTC",
-			"quoteCurrency": "USD"
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://switchboard.xyz/explorer/3/8SXvChNYFhRq4EZuZvnhjrB3jJRQCv4k3P4W6hesH3Ee"
 		},
 		{
 			"type": "switchboard",
@@ -14,15 +15,26 @@
 			"pubkey": "7Y3nWv5B2rLiDBsNpkfXqa4cbJqszJos2sZVutF8R3FE",
 			"title": "Solend cUSDC",
 			"baseCurrency": "cUSDC",
-			"quoteCurrency": "USDC"
+			"quoteCurrency": "USDC",
+			"explorerUrl": "https://switchboard.xyz/explorer/3/7Y3nWv5B2rLiDBsNpkfXqa4cbJqszJos2sZVutF8R3FE"
 		},
 		{
 			"type": "pyth",
 			"cluster": "devnet",
 			"pubkey": "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix",
-			"title": "SOL/USD3",
+			"title": "SOL/USD",
 			"baseCurrency": "SOL",
-			"quoteCurrency": "USD"
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=devnet"
+		},
+		{
+			"type": "pyth",
+			"cluster": "mainnet-beta",
+			"pubkey": "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG",
+			"title": "SOL/USD",
+			"baseCurrency": "SOL",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=mainnet-beta"
 		},
 		{
 			"type": "pyth",
@@ -30,15 +42,17 @@
 			"pubkey": "FVb5h1VmHPfVb1RfqZckchq18GxRv4iKt8T4eVTQAqdz",
 			"title": "AVAX/USD",
 			"baseCurrency": "AVAX",
-			"quoteCurrency": "USD"
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-avax-usd?cluster=devnet"
 		},
 		{
 			"type": "pyth",
 			"cluster": "devnet",
 			"pubkey": "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J",
 			"title": "BTC/USD",
-			"baseCurrency": "BCT",
-			"quoteCurrency": "USD"
+			"baseCurrency": "BTC",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=devnet"
 		},
 		{
 			"type": "pyth",
@@ -46,23 +60,26 @@
 			"pubkey": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
 			"title": "ETH/USD",
 			"baseCurrency": "ETH",
-			"quoteCurrency": "USD"
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=mainnet-beta"
 		},
 		{
-			"type": "switchboard",
-			"cluster": "devnet",
-			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
-			"title": "SOL/USD",
-			"baseCurrency": "SOL",
-			"quoteCurrency": "USD"
+			"type": "pyth",
+			"cluster": "mainnet-beta",
+			"pubkey": "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD",
+			"title": "USDC/USD",
+			"baseCurrency": "USDC",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdc-usd?cluster=mainnet-beta"
 		},
 		{
-			"type": "switchboard",
-			"cluster": "devnet",
-			"pubkey": "GvDMxPzN1sCj7L26YDK2HnMRXEQmQ2aemov8YBtPS7vR",
-			"title": "SOL/USD2",
-			"baseCurrency": "SOL",
-			"quoteCurrency": "USD"
+			"type": "pyth",
+			"cluster": "mainnet-beta",
+			"pubkey": "3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL",
+			"title": "USDT/USD",
+			"baseCurrency": "USDT",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=mainnet-beta"
 		},
 		{
 			"type": "switchboard",
@@ -70,7 +87,26 @@
 			"pubkey": "C6BciZWyhZRbjE1XdwAsYP2PZRErnDUdGChW1tKBV9wH",
 			"title": "Deribit.DVOL_BTC",
 			"baseCurrency": "",
-			"quoteCurrency": ""
+			"quoteCurrency": "",
+			"explorerUrl": "https://switchboard.xyz/explorer/2/C6BciZWyhZRbjE1XdwAsYP2PZRErnDUdGChW1tKBV9wH"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "9LNYQZLJG5DAyeACCTzBFG6H3sDhehP5xtYLdhrZtQkA",
+			"title": "stSOL/USD",
+			"baseCurrency": "stSOL",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://staging.switchboard.xyz/explorer/2/9LNYQZLJG5DAyeACCTzBFG6H3sDhehP5xtYLdhrZtQkA"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "mainnet-beta",
+			"pubkey": "CUgoqwiQ4wCt6Tthkrgx5saAEpLBjPCdHshVa4Pbfcx2",
+			"title": "SRM/USD",
+			"baseCurrency": "SRM",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://switchboard.xyz/explorer/3/CUgoqwiQ4wCt6Tthkrgx5saAEpLBjPCdHshVa4Pbfcx2"
 		}
 	]
 }

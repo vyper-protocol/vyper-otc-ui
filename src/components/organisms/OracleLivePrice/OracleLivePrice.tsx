@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@mui/material';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 type OracleLivePriceInput = {

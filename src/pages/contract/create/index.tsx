@@ -2,27 +2,25 @@
 /* eslint-disable no-console */
 import { useContext, useEffect, useState } from 'react';
 
-import { LoadingButton } from '@mui/lab';
-import { FormControlLabel, FormGroup, Switch, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import ExpiryPicker from 'components/molecules/ExpiryPicker';
 import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
-import OraclesPicker from 'components/molecules/OraclesPicker';
-import ParamsPicker from 'components/molecules/ParamsPicker';
-import PayoffPicker from 'components/molecules/PayoffPicker';
-import ReservePicker from 'components/molecules/ReservePicker';
+import CreateContractFlow from 'components/organisms/CreateContractFlow';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
-import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
-import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import useContractStore from 'store/useContractStore';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -46,7 +44,9 @@ const CreateContractPage = () => {
 		process.env.NODE_ENV === 'development' ? false : contractData?.sendNotification !== undefined ? contractData.sendNotification : true
 	);
 
-	const [reserveMint, setReserveMint] = useState(contractData?.reserveMint ? contractData.reserveMint : '');
+	// USDC in mainnet, devUSD in devnet
+	const defaultMint = currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+	const [reserveMint, setReserveMint] = useState(getMintByPubkey(defaultMint));
 
 	// assume deposit always starts open
 	// eslint-disable-next-line no-unused-vars
@@ -70,9 +70,9 @@ const CreateContractPage = () => {
 		contractData?.rateOption?.rateAccounts.length > 1 ? contractData.rateOption.rateAccounts[1] : 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'
 	);
 
-	const [notional, setNotional] = useState(contractData?.redeemLogicOption?.notional ? contractData.redeemLogicOption.notional : 1);
-	const [strike, setStrike] = useState(contractData?.redeemLogicOption?.strike ? contractData.redeemLogicOption.strike : 0);
-	const [isCall, setIsCall] = useState(contractData?.redeemLogicOption?.isCall ? contractData.redeemLogicOption.isCall : true);
+	const [notional, setNotional] = useState(1);
+	const [strike, setStrike] = useState(0);
+	const [isCall, setIsCall] = useState(true);
 
 	const setRateMain = (rateType: RatePluginTypeIds, rateValue1: string) => {
 		setRatePluginType(rateType);
@@ -80,18 +80,22 @@ const CreateContractPage = () => {
 	};
 
 	const setStrikeToDefaultValue = async () => {
+		let price = 0;
 		try {
-			if (ratePluginType === 'pyth') {
-				const [, price] = await RatePythPlugin.GetProductPrice(connection, currentCluster, new PublicKey(rate1));
-				setStrike(price?.price ?? 0);
+			if (ratePlugin1.type === 'pyth') {
+				const [, priceData] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
+				price = priceData?.price ?? 0;
 			}
-			if (ratePluginType === 'switchboard') {
-				const [, price] = await RateSwitchboardPlugin.LoadAggregatorData(connection, new PublicKey(rate1));
-				setStrike(price ?? 0);
+			if (ratePlugin1.type === 'switchboard') {
+				// TODO fix fetching issue
+				const priceData = await RateSwitchboardState.GetLatestPrice(connection, new PublicKey(ratePlugin1.pubkey));
+				price = priceData ?? 0;
 			}
-		} catch {
-			setStrike(0);
+		} catch (e) {
+			// setStrike(0);
+			console.error('err: ', e);
 		}
+		setStrike(formatWithDecimalDigits(price));
 	};
 
 	useEffect(() => {
@@ -99,16 +103,16 @@ const CreateContractPage = () => {
 			setStrikeToDefaultValue();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ratePluginType, rate1]);
+	}, [ratePlugin1.type, ratePlugin1.pubkey]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
 			setIsLoading(true);
 
 			const rateAccounts: PublicKey[] = [];
-			rateAccounts.push(new PublicKey(rate1));
+			rateAccounts.push(new PublicKey(ratePlugin1.pubkey));
 			if (redeemLogicPluginType === 'settled_forward') {
-				rateAccounts.push(new PublicKey(rate2));
+				rateAccounts.push(new PublicKey(ratePlugin2.pubkey));
 			}
 
 			let redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
@@ -147,14 +151,14 @@ const CreateContractPage = () => {
 			}
 
 			const initParams: OtcInitializationParams = {
-				reserveMint: new PublicKey(reserveMint),
+				reserveMint: new PublicKey(reserveMint.pubkey),
 				depositStart,
 				depositEnd,
 				settleStart,
 				seniorDepositAmount,
 				juniorDepositAmount,
 				rateOption: {
-					ratePluginType,
+					ratePluginType: ratePlugin1.type,
 					rateAccounts
 				},
 				redeemLogicOption,
@@ -179,52 +183,37 @@ const CreateContractPage = () => {
 	return (
 		<Layout>
 			<NonAuditedDisclaimer />
-			<Box sx={{ width: '75vh', alignItems: 'center' }}>
-				<PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />
-
-				<hr />
-
-				<ParamsPicker
+			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
+				<CreateContractFlow
 					redeemLogicPluginType={redeemLogicPluginType}
+					setRedeemLogicPluginType={setRedeemLogicPluginType}
 					strike={strike}
 					setStrike={setStrike}
 					notional={notional}
 					setNotional={setNotional}
 					isCall={isCall}
 					setIsCall={setIsCall}
-				/>
-
-				<hr />
-
-				<OraclesPicker setRateMain={setRateMain} setRate2={setRate2} ratePluginType={ratePluginType} redeemLogicPluginType={redeemLogicPluginType} />
-
-				<hr />
-
-				<ReservePicker
+					ratePlugin1={ratePlugin1}
+					setRatePlugin1={setRatePlugin1}
+					ratePlugin2={ratePlugin2}
+					setRatePlugin2={setRatePlugin2}
 					seniorDepositAmount={seniorDepositAmount}
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
+					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
+					depositEnd={depositEnd}
+					setDepositEnd={setDepositEnd}
+					settleStart={settleStart}
+					setSettleStart={setSettleStart}
+					saveOnDatabase={saveOnDatabase}
+					setSaveOnDatabase={setSaveOnDatabase}
+					sendNotification={sendNotification}
+					setSendNotification={setSendNotification}
+					isLoading={isLoading}
+					onCreateContractButtonClick={onCreateContractButtonClick}
 				/>
-
-				<hr />
-
-				<ExpiryPicker depositEnd={depositEnd} setDepositEnd={setDepositEnd} settleStart={settleStart} setSettleStart={setSettleStart} />
-
-				{process.env.NODE_ENV === 'development' && (
-					<FormGroup>
-						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
-						<FormControlLabel
-							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
-							label="Send notification"
-						/>
-					</FormGroup>
-				)}
-
-				<LoadingButton sx={{ mt: 1, mr: 1 }} variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
-					{wallet.connected ? 'Create Contract' : 'Connect Wallet'}
-				</LoadingButton>
 			</Box>
 		</Layout>
 	);

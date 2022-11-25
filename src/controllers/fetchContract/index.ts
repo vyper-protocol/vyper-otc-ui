@@ -16,12 +16,16 @@ import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { DbOtcState } from 'models/DbOtcState';
-import { RatePythPlugin } from 'models/plugins/rate/RatePythPlugin';
-import RateSwitchboardPlugin from 'models/plugins/rate/RateSwitchboardPlugin';
-import { RedeemLogicDigitalPlugin } from 'models/plugins/redeemLogic/RedeemLogicDigitalPlugin';
-import { RedeemLogicForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicForwardPlugin';
-import { RedeemLogicSettledForwardPlugin } from 'models/plugins/redeemLogic/RedeemLogicSettledForwardPlugin';
-import { RedeemLogicVanillaOptionPlugin } from 'models/plugins/redeemLogic/RedeemLogicVanillaOptionPlugin';
+import { AbsRateState } from 'models/plugins/rate/AbsRateState';
+import { RateAccount } from 'models/plugins/rate/RateAccount';
+import { RatePythState } from 'models/plugins/rate/RatePythState';
+import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
+import { AbsRLState } from 'models/plugins/redeemLogic/AbsRLState';
+import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
+import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
+import { RLAccount } from 'models/plugins/redeemLogic/RLAccount';
+import { RLSettledForward } from 'models/plugins/redeemLogic/settledForward/RLSettledForward';
+import { RLVanillaOption } from 'models/plugins/redeemLogic/vanillaOption/RLVanillaOption';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -41,7 +45,7 @@ export const fetchContract = async (connection: Connection, otcStateAddress: Pub
 				if (res.error) throw Error(res.error.message);
 				if (res.data.length !== 1) throw Error('entry not found');
 
-				dbOtcStateResult = DbOtcState.fromSupabaseSelectRes(res.data[0]);
+				dbOtcStateResult = DbOtcState.createFromDBData(res.data[0]);
 			} catch {}
 		}
 
@@ -121,10 +125,12 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 		res.sellerWallet = unpackAccount(taInfo.pubkey, taInfo.data).owner;
 	}
 
-	// * * * * * * * * * * * * * * * * * * * * * * *
-	// RATE PLUGIN
-	// * * * * * * * * * * * * * * * * * * * * * * *
+	/** * * * * * * * * * * * * * * * * * * * * * * *
+	 * RATE PLUGIN
+	 *
+	 */
 
+	let rateProgramState: AbsRateState = undefined;
 	if (trancheConfigAccountInfo.rateProgram.equals(new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID))) {
 		// * * * * * * * * * * * * * * * * * * * * * * *
 		// SWITCHBOARD
@@ -137,15 +143,10 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.rateProgramState));
 			const rateStateAccountInfo = rateSwitchboardProgram.coder.accounts.decode<IdlAccounts<RateSwitchboard>['rateState']>('rateState', c.data.data);
-			const rateState = new RateSwitchboardPlugin(
-				trancheConfigAccountInfo.rateProgram,
-				trancheConfigAccountInfo.rateProgramState,
-				// @ts-ignore
-				rateStateAccountInfo.switchboardAggregators.filter((a) => a)
-			);
 
-			await rateState.loadData(connection);
-			res.rateState = rateState;
+			// @ts-ignore
+			rateProgramState = new RateSwitchboardState(rateStateAccountInfo.switchboardAggregators.filter((a) => a));
+			await (rateProgramState as RateSwitchboardState).loadData(connection);
 		} catch (err) {
 			console.error(err);
 		}
@@ -161,14 +162,10 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const c = multipleAccountInfos.find((k) => k.pubkey.equals(trancheConfigAccountInfo.rateProgramState));
 			const rateStateAccountInfo = ratePythProgram.coder.accounts.decode<IdlAccounts<RatePyth>['rateState']>('rateState', c.data.data);
-			const rateState = new RatePythPlugin(
-				trancheConfigAccountInfo.rateProgram,
-				trancheConfigAccountInfo.rateProgramState,
-				// @ts-ignore
-				rateStateAccountInfo.pythOracles.filter((a) => a)
-			);
-			await rateState.loadData(connection);
-			res.rateState = rateState;
+
+			// @ts-ignore
+			rateProgramState = new RatePythState(rateStateAccountInfo.pythOracles.filter((a) => a));
+			await (rateProgramState as RatePythState).loadData(connection);
 		} catch (err) {
 			console.error(err);
 		}
@@ -176,9 +173,17 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 		throw Error('rate plugin not supported: ' + trancheConfigAccountInfo.rateProgram);
 	}
 
-	// * * * * * * * * * * * * * * * * * * * * * * *
-	// REDEEM LOGIC PLUGIN
-	// * * * * * * * * * * * * * * * * * * * * * * *
+	res.rateAccount = new RateAccount(trancheConfigAccountInfo.rateProgram, trancheConfigAccountInfo.rateProgramState, rateProgramState);
+
+	/** * * * * * * * * * * * * * * * * * * * * * * *
+	 * REDEEM LOGIC PLUGIN
+	 *
+	 * In this cases we're fetching data from the chain, we have no concept of RL plugin subtypes, we'll use the default type
+	 *
+	 */
+
+	let redeemLogicProgramState: AbsRLState = undefined;
+
 	if (trancheConfigAccountInfo.redeemLogicProgram.equals(new PublicKey(PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID))) {
 		// * * * * * * * * * * * * * * * * * * * * * * *
 		// FORWARD
@@ -200,14 +205,8 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 			const isLinear = redeemLogicAccountInfo.isLinear;
 			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
-			const redeemLogicState = new RedeemLogicForwardPlugin(
-				trancheConfigAccountInfo.redeemLogicProgram,
-				trancheConfigAccountInfo.redeemLogicProgramState,
-				strike,
-				isLinear,
-				notional
-			);
-			res.redeemLogicState = redeemLogicState;
+
+			redeemLogicProgramState = new RLForward(strike, isLinear, notional);
 		} catch (err) {
 			console.error(err);
 		}
@@ -233,15 +232,8 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 			const isLinear = redeemLogicAccountInfo.isLinear;
 			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
 			const isStandard = redeemLogicAccountInfo.isStandard;
-			const redeemLogicState = new RedeemLogicSettledForwardPlugin(
-				trancheConfigAccountInfo.redeemLogicProgram,
-				trancheConfigAccountInfo.redeemLogicProgramState,
-				strike,
-				isLinear,
-				notional,
-				isStandard
-			);
-			res.redeemLogicState = redeemLogicState;
+
+			redeemLogicProgramState = new RLSettledForward(strike, isLinear, notional, isStandard);
 		} catch (err) {
 			console.error(err);
 		}
@@ -265,13 +257,8 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 			const isCall = redeemLogicAccountInfo.isCall;
-			const redeemLogicState = new RedeemLogicDigitalPlugin(
-				trancheConfigAccountInfo.redeemLogicProgram,
-				trancheConfigAccountInfo.redeemLogicProgramState,
-				strike,
-				isCall
-			);
-			res.redeemLogicState = redeemLogicState;
+
+			redeemLogicProgramState = new RLDigital(strike, isCall);
 		} catch (err) {
 			console.error(err);
 		}
@@ -297,21 +284,20 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
 			const isCall = redeemLogicAccountInfo.isCall;
 			const isLinear = redeemLogicAccountInfo.isLinear;
-			const redeemLogicState = new RedeemLogicVanillaOptionPlugin(
-				trancheConfigAccountInfo.redeemLogicProgram,
-				trancheConfigAccountInfo.redeemLogicProgramState,
-				strike,
-				notional,
-				isCall,
-				isLinear
-			);
-			res.redeemLogicState = redeemLogicState;
+
+			redeemLogicProgramState = new RLVanillaOption(strike, notional, isCall, isLinear);
 		} catch (err) {
 			console.error(err);
 		}
 	} else {
 		throw Error('redeem logic plugin not supported: ' + trancheConfigAccountInfo.redeemLogicProgram);
 	}
+
+	res.redeemLogicAccount = new RLAccount(
+		trancheConfigAccountInfo.redeemLogicProgram,
+		trancheConfigAccountInfo.redeemLogicProgramState,
+		redeemLogicProgramState
+	);
 
 	return res;
 }
@@ -331,8 +317,8 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	res.buyerDepositAmount = data.buyerDepositAmount;
 	res.sellerDepositAmount = data.sellerDepositAmount;
 
-	res.redeemLogicState = data.redeemLogicState.clone();
-	res.rateState = data.rateState.clone();
+	res.redeemLogicAccount = data.redeemLogicAccount.clone();
+	res.rateAccount = data.rateAccount.clone();
 	res.reserveTokenInfo = await fetchTokenInfo(res.reserveMint);
 
 	// first fetch
@@ -341,7 +327,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	firstFetch_pubkeys.push(data.publickey);
 	firstFetch_pubkeys.push(data.vyperCoreTrancheConfig);
 	firstFetch_pubkeys.push(data.reserveMint);
-	firstFetch_pubkeys.push(...data.rateState.accountsRequiredForRefresh);
+	firstFetch_pubkeys.push(...data.rateAccount.state.accountsRequiredForRefresh);
 
 	const firstFetch_accountsData = await getMultipleAccountsInfo(connection, firstFetch_pubkeys);
 
@@ -391,19 +377,21 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	// RATE PLUGIN
 	// * * * * * * * * * * * * * * * * * * * * * * *
 
-	if (res.rateState.typeId === 'switchboard') {
+	if (res.rateAccount.state.typeId === 'switchboard') {
 		// * * * * * * * * * * * * * * * * * * * * * * *
 		// SWITCHBOARD
 
-		await (res.rateState as RateSwitchboardPlugin).loadData(connection);
-	} else if (res.rateState.typeId === 'pyth') {
+		await (res.rateAccount.state as RateSwitchboardState).loadData(connection);
+	} else if (res.rateAccount.state.typeId === 'pyth') {
 		// * * * * * * * * * * * * * * * * * * * * * * *
 		// PYTH
 
-		await (res.rateState as RatePythPlugin).loadData(connection);
+		await (res.rateAccount.state as RatePythState).loadData(connection);
 	} else {
-		throw Error('rate plugin not supported: ' + res.rateState.typeId);
+		throw Error('rate plugin not supported: ' + res.rateAccount.state.typeId);
 	}
+
+	// TODO missing redeem logic subtype support
 
 	return res;
 }
