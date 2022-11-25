@@ -84,26 +84,25 @@ export const ReservePicker = ({
 
 			setIsLoading(true);
 
-			await fetchTokenInfo(pubkey).then(
-				(mintTokenInfo) => {
-					setIsLoading(false);
-					if (mintTokenInfo) {
-						// mint found on-chain
-						setReserveMint(getMintFromTokenInfo(mintTokenInfo));
-						setReserveError(false);
-						setExternal({ isExternal: true, token: mintTokenInfo });
-					} else {
-						// unknown mint, throw error
-						setReserveError(true);
-						setExternal({ isExternal: false });
-					}
-				},
-				() => {
-					// fetch failed, throw error
+			try {
+				const mintTokenInfo = await fetchTokenInfo(pubkey);
+				if (mintTokenInfo) {
+					// mint found on-chain
+					setReserveMint(getMintFromTokenInfo(mintTokenInfo));
+					setReserveError(false);
+					setExternal({ isExternal: true, token: mintTokenInfo });
+				} else {
+					// unknown mint, throw error
 					setReserveError(true);
 					setExternal({ isExternal: false });
 				}
-			);
+			} catch (err) {
+				// fetch failed, throw error
+				setReserveError(true);
+				setExternal({ isExternal: false });
+			} finally {
+				setIsLoading(false);
+			}
 		}
 	};
 
