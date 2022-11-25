@@ -13,20 +13,27 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { OracleDetail } from 'models/OracleDetail';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import useContractStore from 'store/useContractStore';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
-import useContractStore from 'store/useContractStore';
+import { getRateExplorer } from 'utils/oraclesExplorerHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 const CreateContractPage = () => {
 	const { contractData } = useContractStore();
+	console.log('contractData: ', contractData);
+
 	const contractStore = useContractStore();
+	useEffect(() => {
+		contractStore.delete();
+	}, []);
 
 	const currentCluster = getCurrentCluster();
 	const { connection } = useConnection();
@@ -57,27 +64,42 @@ const CreateContractPage = () => {
 	const [seniorDepositAmount, setSeniorDepositAmount] = useState(contractData?.seniorDepositAmount ? contractData.seniorDepositAmount : 100);
 	const [juniorDepositAmount, setJuniorDepositAmount] = useState(contractData?.juniorDepositAmount ? contractData.juniorDepositAmount : 100);
 
-	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RedeemLogicPluginTypeIds>(
+	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RLPluginTypeIds>(
 		contractData?.redeemLogicOption?.redeemLogicPluginType ? contractData.redeemLogicOption.redeemLogicPluginType : 'forward'
 	);
-	const [ratePluginType, setRatePluginType] = useState<RatePluginTypeIds>(
-		contractData?.rateOption?.ratePluginType ? contractData.rateOption.ratePluginType : 'pyth'
+
+	// pyth SOL/USD
+	const tempDefaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
+	const defaultOracle1 = contractData?.rateOption?.rateAccounts.length > 0 ? contractData.rateOption.rateAccounts[0].toBase58() : tempDefaultOracle;
+	const defaultOracle2 = contractData?.rateOption?.rateAccounts.length > 1 ? contractData.rateOption.rateAccounts[1].toBase58() : tempDefaultOracle;
+
+	const [ratePlugin1, setRatePlugin1] = useState(
+		getOracleByPubkey(defaultOracle1) ??
+			({
+				type: contractData.rateOption.ratePluginType,
+				pubkey: defaultOracle1,
+				title: 'NA',
+				explorerUrl: getRateExplorer(contractData.rateOption.ratePluginType),
+				quoteCurrency: '',
+				baseCurrency: ''
+			} as OracleDetail)
 	);
-	const [rate1, setRate1] = useState(
-		contractData?.rateOption?.rateAccounts.length > 0 ? contractData.rateOption.rateAccounts[0] : 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'
-	);
-	const [rate2, setRate2] = useState(
-		contractData?.rateOption?.rateAccounts.length > 1 ? contractData.rateOption.rateAccounts[1] : 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'
+	console.log('ratePlugin1: ', ratePlugin1);
+	const [ratePlugin2, setRatePlugin2] = useState(
+		getOracleByPubkey(defaultOracle2) ??
+			({
+				type: contractData.rateOption.ratePluginType,
+				pubkey: defaultOracle2,
+				title: 'NA',
+				explorerUrl: getRateExplorer(contractData.rateOption.ratePluginType),
+				quoteCurrency: '',
+				baseCurrency: ''
+			} as OracleDetail)
 	);
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
 	const [isCall, setIsCall] = useState(true);
-
-	const setRateMain = (rateType: RatePluginTypeIds, rateValue1: string) => {
-		setRatePluginType(rateType);
-		setRate1(rateValue1);
-	};
 
 	const setStrikeToDefaultValue = async () => {
 		let price = 0;
@@ -175,7 +197,6 @@ const CreateContractPage = () => {
 			// eslint-disable-next-line no-console
 			console.error(err);
 		} finally {
-			contractStore.delete();
 			setIsLoading(false);
 		}
 	};

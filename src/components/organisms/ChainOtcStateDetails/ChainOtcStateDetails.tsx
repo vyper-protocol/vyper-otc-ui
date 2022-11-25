@@ -56,12 +56,13 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 			depositEnd: otcState.depositExpirationAt,
 			settleStart: otcState.settleAvailableFromAt,
 			redeemLogicOption: {
-				redeemLogicPluginType: otcState.redeemLogicState.typeId,
-				...otcState.redeemLogicState.getPluginDataObj()
+				redeemLogicPluginType: otcState.redeemLogicAccount.state.stateType.type,
+				...otcState.redeemLogicAccount.state.getPluginDataObj()
 			},
 			rateOption: {
-				ratePluginType: otcState.rateState.typeId,
-				rateAccounts: otcState.rateState.accountsRequiredForRefresh
+				ratePluginType: otcState.rateAccount.state.typeId,
+				// TODO extract this information in a clearer way
+				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh
 			},
 			saveOnDatabase: true,
 			sendNotification: true
