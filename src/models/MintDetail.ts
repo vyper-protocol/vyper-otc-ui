@@ -4,5 +4,5 @@ export type MintDetail = {
 	cluster: Cluster;
 	pubkey: string;
 	title: string;
-	isStable: boolean;
+	isStable?: boolean;
 };

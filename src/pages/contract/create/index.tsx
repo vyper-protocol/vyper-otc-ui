@@ -13,12 +13,13 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { OracleDetail } from 'models/OracleDetail';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -35,7 +36,9 @@ const CreateContractPage = () => {
 	const [saveOnDatabase, setSaveOnDatabase] = useState(process.env.NODE_ENV === 'development' ? false : true);
 	const [sendNotification, setSendNotification] = useState(process.env.NODE_ENV === 'development' ? false : true);
 
-	const [reserveMint, setReserveMint] = useState('');
+	// USDC in mainnet, devUSD in devnet
+	const defaultMint = currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+	const [reserveMint, setReserveMint] = useState(getMintByPubkey(defaultMint));
 
 	// assume deposit always starts open
 	// eslint-disable-next-line no-unused-vars
@@ -51,27 +54,30 @@ const CreateContractPage = () => {
 	// pyth SOL/USD
 	const defaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
 
-	const [ratePlugin1, setRatePlugin1] = useState<OracleDetail>(getOracleByPubkey(defaultOracle));
-	const [ratePlugin2, setRatePlugin2] = useState<OracleDetail>(getOracleByPubkey(defaultOracle));
+	const [ratePlugin1, setRatePlugin1] = useState(getOracleByPubkey(defaultOracle));
+	const [ratePlugin2, setRatePlugin2] = useState(getOracleByPubkey(defaultOracle));
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
 	const [isCall, setIsCall] = useState(true);
 
 	const setStrikeToDefaultValue = async () => {
+		let price = 0;
 		try {
 			if (ratePlugin1.type === 'pyth') {
-				const [, price] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
-				setStrike(price?.price ?? 0);
+				const [, priceData] = await RatePythState.GetProductPrice(connection, currentCluster, new PublicKey(ratePlugin1.pubkey));
+				price = priceData?.price ?? 0;
 			}
 			if (ratePlugin1.type === 'switchboard') {
 				// TODO fix fetching issue
-				const [, price] = await RateSwitchboardState.LoadAggregatorData(connection, new PublicKey(ratePlugin1.pubkey));
-				setStrike(price ?? 0);
+				const priceData = await RateSwitchboardState.GetLatestPrice(connection, new PublicKey(ratePlugin1.pubkey));
+				price = priceData ?? 0;
 			}
-		} catch {
-			setStrike(0);
+		} catch (e) {
+			// setStrike(0);
+			console.error('err: ', e);
 		}
+		setStrike(formatWithDecimalDigits(price));
 	};
 
 	useEffect(() => {
@@ -125,7 +131,7 @@ const CreateContractPage = () => {
 			}
 
 			const initParams: OtcInitializationParams = {
-				reserveMint: new PublicKey(reserveMint),
+				reserveMint: new PublicKey(reserveMint.pubkey),
 				depositStart,
 				depositEnd,
 				settleStart,
@@ -174,6 +180,7 @@ const CreateContractPage = () => {
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
+					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
 					depositEnd={depositEnd}
 					setDepositEnd={setDepositEnd}

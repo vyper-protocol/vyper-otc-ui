@@ -1,16 +1,30 @@
 import { useState } from 'react';
 
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Autocomplete, TextField, Grid, Typography, Alert, Fab } from '@mui/material';
+import { Box, Stack, Autocomplete, TextField, Typography, Alert } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OracleDetail } from 'models/OracleDetail';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
+import { getRateExplorer } from 'utils/oraclesExplorerHelper';
+
+type OraclePickerInput = {
+	// label of the oracle
+	rateLabel: string;
+
+	// rates allowed
+	options: OracleDetail[];
+
+	// a rate plugin object
+	ratePlugin: OracleDetail;
+
+	// set callback, sets the rate plugin type
+	// eslint-disable-next-line no-unused-vars
+	setRatePlugin: (rate: OracleDetail) => void;
+};
 
 export type OraclesPickerInput = {
 	// main rate plugin object
@@ -31,7 +45,7 @@ export type OraclesPickerInput = {
 	redeemLogicPluginType: RLPluginTypeIds;
 };
 
-const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
+const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OraclePickerInput) => {
 	const { connection } = useConnection();
 	const currentCluster = getCurrentCluster();
 	const [value, setValue] = useState<string | OracleDetail>('');
@@ -75,7 +89,9 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 							cluster: currentCluster,
 							pubkey: oracle,
 							title: symbol,
-							explorerUrl: getExplorerLink(oracle, { explorer: 'solscan', type: 'account', cluster: currentCluster })
+							baseCurrency: '',
+							quoteCurrency: '',
+							explorerUrl: getRateExplorer(ratePluginType)
 						});
 						setLabel(
 							<Box sx={{ paddingX: '16px', paddingY: '6px' }}>
@@ -103,10 +119,10 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 						</Typography>
 					</Box>
 				)}
-				options={oracles}
+				options={options}
 				renderInput={(params) => (
 					<>
-						<TextField {...params} label="Oracle #1" />
+						<TextField {...params} label={rateLabel} />
 						{label}
 					</>
 				)}
@@ -118,29 +134,24 @@ const OraclePicker = ({ ratePlugin, setRatePlugin, oracles }) => {
 					}
 				}}
 			/>
-			<Fab sx={{ marginX: 2, boxShadow: 2 }} color="default" size="small">
-				<a href={ratePlugin.explorerUrl} target="_blank" rel="noopener noreferrer">
-					<SearchIcon />
-				</a>
-			</Fab>
+			<a href={ratePlugin.explorerUrl} target="_blank" rel="noopener noreferrer">
+				<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
+			</a>
 		</>
 	);
 };
 
+// TODO Generalize to list of oracles, rendered based on redeemLogicPluginType
 export const OraclesPicker = ({ ratePlugin1, setRatePlugin1, ratePlugin2, setRatePlugin2, redeemLogicPluginType }: OraclesPickerInput) => {
 	return (
 		<Box sx={{ marginY: 2 }}>
-			{/* <b>{redeemLogic === 'settled_forward' ? 'SELECT UNDERLYINGS' : 'SELECT UNDERLYING'}</b> */}
-			<Grid container spacing={2}>
-				<Grid item xs={6}>
-					<OraclePicker ratePlugin={ratePlugin1} setRatePlugin={setRatePlugin1} oracles={getOracles()} />
-				</Grid>
-				<Grid item xs={6}>
-					{(redeemLogicPluginType as RLPluginTypeIds) === 'settled_forward' && (
-						<OraclePicker ratePlugin={ratePlugin2} setRatePlugin={setRatePlugin2} oracles={getOraclesByType(ratePlugin1.type)} />
-					)}
-				</Grid>
-			</Grid>
+			<Stack spacing={2}>
+				<OraclePicker rateLabel={'Oracle #1'} options={getOracles()} ratePlugin={ratePlugin1} setRatePlugin={setRatePlugin1} />
+
+				{(redeemLogicPluginType as RLPluginTypeIds) === 'settled_forward' && (
+					<OraclePicker rateLabel={'Oracle #2'} options={getOraclesByType(ratePlugin1.type)} ratePlugin={ratePlugin2} setRatePlugin={setRatePlugin2} />
+				)}
+			</Stack>
 		</Box>
 	);
 };
