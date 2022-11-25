@@ -1,0 +1,38 @@
+{
+	"templates": [
+		{
+			"payoff": "forward",
+			"expiry": "monthly",
+			"underlying": "SOL/USD",
+			"imgPath": "/sol-logo.png",
+			"rateId": "pyth",
+			"pubkey": "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"
+		},
+		{
+			"payoff": "digital",
+			"type": "call",
+			"expiry": "weekly",
+			"underlying": "BTC/USD",
+			"imgPath": "/btc-logo.png",
+			"rateId": "pyth",
+			"pubkey": "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J"
+		},
+		{
+			"payoff": "vanilla option",
+			"type": "put",
+			"expiry": "weekly",
+			"underlying": "ETH/USD",
+			"imgPath": "/eth-logo.png",
+			"rateId": "pyth",
+			"pubkey": "EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw"
+		},
+		{
+			"payoff": "depeg",
+			"expiry": "quarterly",
+			"underlying": "USDT/USD",
+			"imgPath": "/usdt-logo.png",
+			"rateId": "pyth",
+			"pubkey": "38xoQ4oeJCBrcVvca2cGk7iV1dAfrmTR1kmhSCJQ8Jto"
+		}
+	]
+}
