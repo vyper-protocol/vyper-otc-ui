@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, CircularProgress } from '@mui/material';
-import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem, GridSortModel } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -11,7 +11,7 @@ import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
-import { FetchContractsParams, SupabaseColumnOrder } from 'controllers/fetchContracts/FetchContractsParams';
+import { cleanParams, FetchContractsParams, fromSortModel, QueryParams, toSortModel, transformParams } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState } from 'models/ChainOtcState';
 import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
 import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
@@ -28,62 +28,12 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
-export type QueryParams = {
-	page?: number;
-	limit?: number;
-	sort?: SupabaseColumnOrder[];
-};
-
 type Props = {
 	query: QueryParams;
+	count: number;
 };
 
-const fromSortModel = (model: GridSortModel): SupabaseColumnOrder[] => {
-	return model.filter((m) => ['asc', 'desc'].includes(m.sort)).map((m) => [m.field, m.sort]);
-};
-
-const toSortModel = (sort: SupabaseColumnOrder[]): GridSortModel => {
-	return sort.map((s) => ({
-		field: s[0],
-		sort: s[1]
-	}));
-};
-
-const transformSortParams = (orders: SupabaseColumnOrder[]): string => {
-	return orders.reduce((accumulator, current, i) => {
-		accumulator += accumulator + current[0] + ' ' + current[1];
-		if (i !== orders.length - 1) {
-			accumulator += ',';
-		}
-
-		return accumulator;
-	}, '');
-};
-
-const transformParams = (params: QueryParams): { [key: string]: string } => {
-	const transformedParams = Object.entries(params).reduce((acc, [key, value]) => {
-		if (value !== undefined) {
-			acc[key] = key === 'sort' ? transformSortParams(value as SupabaseColumnOrder[]) : value;
-		}
-
-		return acc;
-	}, {});
-
-	return transformedParams;
-};
-
-const cleanParams = (params: { [key: string]: string }): { [key: string]: string } => {
-	return Object.entries(params).reduce((acc, [key, value]) => {
-		acc[key] = value;
-		if (!value) {
-			delete acc[key];
-		}
-
-		return acc;
-	}, {});
-};
-
-const ExplorerContractDataGrid = ({ query }: Props) => {
+const ExplorerContractDataGrid = ({ query, count }: Props) => {
 	const { page = 1, limit = 25, sort } = query;
 
 	const { connection } = useConnection();
@@ -110,10 +60,10 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 	useEffect(() => {
 		setContractsLoading(true);
 		setContracts([]);
-		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster()))
+		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), query))
 			.then((c) => setContracts(c))
 			.finally(() => setContractsLoading(false));
-	}, [connection]);
+	}, [connection, query]);
 
 	const columns: GridColumns<ChainOtcState> = [
 		{
@@ -307,17 +257,19 @@ const ExplorerContractDataGrid = ({ query }: Props) => {
 				<Box sx={{ maxWidth: 1600, width: '90%' }}>
 					<DataGrid
 						pagination
+						autoHeight
 						paginationMode="server"
+						filterMode="server"
 						page={page - 1}
 						pageSize={limit}
+						getRowId={(row) => row.publickey.toBase58()}
+						rows={contracts}
+						rowCount={count}
+						columns={columns}
+						sortModel={sort ? toSortModel(sort) : []}
 						// Material UI page starts from 0
 						onPageChange={(newPage) => updateQueryParams({ page: newPage + 1 })}
 						onPageSizeChange={(newLimit) => updateQueryParams({ limit: newLimit })}
-						autoHeight
-						getRowId={(row) => row.publickey.toBase58()}
-						rows={contracts}
-						columns={columns}
-						sortModel={sort ? toSortModel(sort) : []}
 						onSortModelChange={(newSortModel) => updateQueryParams({ sort: fromSortModel(newSortModel) })}
 					/>
 				</Box>
