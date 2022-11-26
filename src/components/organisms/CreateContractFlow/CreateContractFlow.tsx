@@ -3,14 +3,15 @@ import { useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { ExpiryPicker, ExpiryPickerInput } from 'components/molecules/ExpiryPicker';
-import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesPicker';
-import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
-import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
+import { ExpiryPicker } from 'components/molecules/ExpiryPicker';
+import { OraclesPicker } from 'components/molecules/OraclesPicker';
+import { PayoffPicker } from 'components/molecules/PayoffPicker';
 import { PreviewModal } from 'components/molecules/PreviewModal';
-import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
+import { ReservePicker } from 'components/molecules/ReservePicker';
+import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 
 type StepElement = {
 	title: string;
@@ -19,72 +20,36 @@ type StepElement = {
 	error: boolean;
 };
 
-type ContractLifecycleInput = {
-	// save contract on off-chain db
-	saveOnDatabase: boolean;
+type CreateContractFlowInput = {
+	// contract init params state
+	contractInitParams: OtcInitializationParams;
 
-	// eslint-disable-next-line no-unused-vars
-	setSaveOnDatabase: (val: boolean) => void;
-
-	// trigger notif flow
-	sendNotification: boolean;
-
-	// eslint-disable-next-line no-unused-vars
-	setSendNotification: (val: boolean) => void;
+	// on contract init params state change
+	onContractInitParamsChange: (newVal: OtcInitializationParams) => void;
 
 	// loading during contract creation
 	isLoading: boolean;
 
 	// on-chain contract create callback
 	onCreateContractButtonClick: () => Promise<void>;
+
+	initialStep?: number;
 };
 
-// TODO: add PreviewModalInput with OtcInitializationParams['redeemLogicOption']
-type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
-
 const CreateContractFlow = ({
-	redeemLogicPluginType,
-	setRedeemLogicPluginType,
-	strike,
-	setStrike,
-	notional,
-	setNotional,
-	isCall,
-	setIsCall,
-	ratePlugin1,
-	setRatePlugin1,
-	ratePlugin2,
-	setRatePlugin2,
-	seniorDepositAmount,
-	setSeniorDepositAmount,
-	juniorDepositAmount,
-	setJuniorDepositAmount,
-	reserveMint,
-	setReserveMint,
-	depositEnd,
-	setDepositEnd,
-	settleStart,
-	setSettleStart,
-	saveOnDatabase,
-	setSaveOnDatabase,
-	sendNotification,
-	setSendNotification,
+	contractInitParams,
+	onContractInitParamsChange,
 	isLoading,
-	onCreateContractButtonClick
+	onCreateContractButtonClick,
+	initialStep
 }: CreateContractFlowInput) => {
 	const wallet = useWallet();
 
-	const [activeStep, setActiveStep] = useState(0);
+	const [activeStep, setActiveStep] = useState(initialStep ?? 0);
 	const [openPreview, setOpenPreview] = useState(false);
 	const handleOpenPreview = () => setOpenPreview(true);
 	const handleClosePreview = () => setOpenPreview(false);
 
-	const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
-		redeemLogicPluginType,
-		strike,
-		notional,
-		isCall
-	};
 	const [expiryError, setExpiryError] = useState(false);
 	const [reserveError, setReserveError] = useState(false);
 
@@ -94,7 +59,20 @@ const CreateContractFlow = ({
 		{
 			title: 'payoff',
 			description: 'Select the payoff of your contract from the list available',
-			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />,
+			content: (
+				<PayoffPicker
+					redeemLogicPluginType={contractInitParams.redeemLogicOption.redeemLogicPluginType}
+					setRedeemLogicPluginType={(newRedeemLogicType) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							redeemLogicOption: {
+								...contractInitParams.redeemLogicOption,
+								redeemLogicPluginType: newRedeemLogicType
+							}
+						})
+					}
+				/>
+			),
 			error: false
 		},
 		{
@@ -102,11 +80,27 @@ const CreateContractFlow = ({
 			description: 'Select the underlying of the contract',
 			content: (
 				<OraclesPicker
-					ratePlugin1={ratePlugin1}
-					setRatePlugin1={setRatePlugin1}
-					ratePlugin2={ratePlugin2}
-					setRatePlugin2={setRatePlugin2}
-					redeemLogicPluginType={redeemLogicPluginType}
+					oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
+					ratePluginType={contractInitParams.rateOption.ratePluginType}
+					setRatePluginType={(newRateType: RatePluginTypeIds) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							rateOption: {
+								...contractInitParams.rateOption,
+								ratePluginType: newRateType
+							}
+						})
+					}
+					rateAccounts={contractInitParams.rateOption.rateAccounts}
+					setRateAccounts={(newRateAccount) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							rateOption: {
+								...contractInitParams.rateOption,
+								rateAccounts: newRateAccount
+							}
+						})
+					}
 				/>
 			),
 			error: false
@@ -115,14 +109,14 @@ const CreateContractFlow = ({
 			title: 'contract parameters',
 			description: 'Select the parameters of the contract',
 			content: (
-				<ParamsPicker
-					redeemLogicPluginType={redeemLogicPluginType}
-					strike={strike}
-					setStrike={setStrike}
-					notional={notional}
-					setNotional={setNotional}
-					isCall={isCall}
-					setIsCall={setIsCall}
+				<RLParamsPicker
+					redeemLogicOptions={contractInitParams.redeemLogicOption}
+					setRedeemLogicOptions={(newVal) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							redeemLogicOption: newVal
+						})
+					}
 				/>
 			),
 			error: false
@@ -134,12 +128,27 @@ const CreateContractFlow = ({
 			}`,
 			content: (
 				<ReservePicker
-					seniorDepositAmount={seniorDepositAmount}
-					setSeniorDepositAmount={setSeniorDepositAmount}
-					juniorDepositAmount={juniorDepositAmount}
-					setJuniorDepositAmount={setJuniorDepositAmount}
-					reserveMint={reserveMint}
-					setReserveMint={setReserveMint}
+					seniorDepositAmount={contractInitParams.seniorDepositAmount}
+					setSeniorDepositAmount={(newVal) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							seniorDepositAmount: newVal
+						})
+					}
+					juniorDepositAmount={contractInitParams.juniorDepositAmount}
+					setJuniorDepositAmount={(newVal) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							juniorDepositAmount: newVal
+						})
+					}
+					reserveMint={contractInitParams.reserveMint}
+					setReserveMint={(newVal) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							reserveMint: newVal
+						})
+					}
 					reserveError={reserveError}
 					setReserveError={setReserveError}
 				/>
@@ -151,10 +160,20 @@ const CreateContractFlow = ({
 			description: 'Select the deposit expiry and contract expiry',
 			content: (
 				<ExpiryPicker
-					depositEnd={depositEnd}
-					setDepositEnd={setDepositEnd}
-					settleStart={settleStart}
-					setSettleStart={setSettleStart}
+					depositEnd={contractInitParams.depositEnd}
+					setDepositEnd={(newVal) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							depositEnd: newVal
+						})
+					}
+					settleStart={contractInitParams.settleStart}
+					setSettleStart={(newVal) =>
+						onContractInitParamsChange({
+							...contractInitParams,
+							settleStart: newVal
+						})
+					}
 					expiryError={expiryError}
 					setExpiryError={setExpiryError}
 				/>
@@ -221,23 +240,45 @@ const CreateContractFlow = ({
 				<Box>
 					<Button onClick={handleReset}>Reset</Button>
 					<FormGroup>
-						<FormControlLabel control={<Switch checked={saveOnDatabase} onChange={(e) => setSaveOnDatabase(e.target.checked)} />} label="Save on database" />
 						<FormControlLabel
-							control={<Switch checked={sendNotification} onChange={(e) => setSendNotification(e.target.checked)} />}
+							control={
+								<Switch
+									checked={contractInitParams.saveOnDatabase}
+									onChange={(e) =>
+										onContractInitParamsChange({
+											...contractInitParams,
+											saveOnDatabase: e.target.checked
+										})
+									}
+								/>
+							}
+							label="Save on database"
+						/>
+						<FormControlLabel
+							control={
+								<Switch
+									checked={contractInitParams.sendNotification}
+									onChange={(e) =>
+										onContractInitParamsChange({
+											...contractInitParams,
+											sendNotification: e.target.checked
+										})
+									}
+								/>
+							}
 							label="Send notification"
 						/>
 					</FormGroup>
 				</Box>
 			)}
 			<PreviewModal
-				redeemLogicOption={redeemLogicOption}
-				depositEnd={depositEnd}
-				settleStart={settleStart}
-				ratePlugin1={ratePlugin1}
-				ratePlugin2={ratePlugin2}
-				seniorDepositAmount={seniorDepositAmount}
-				juniorDepositAmount={juniorDepositAmount}
-				reserveMint={reserveMint}
+				redeemLogicOption={contractInitParams.redeemLogicOption}
+				rateOption={contractInitParams.rateOption}
+				depositEnd={contractInitParams.depositEnd}
+				settleStart={contractInitParams.settleStart}
+				seniorDepositAmount={contractInitParams.seniorDepositAmount}
+				juniorDepositAmount={contractInitParams.juniorDepositAmount}
+				reserveMint={contractInitParams.reserveMint}
 				open={openPreview}
 				handleClose={handleClosePreview}
 				actionProps={

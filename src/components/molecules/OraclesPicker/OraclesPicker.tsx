@@ -5,10 +5,10 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OracleDetail } from 'models/OracleDetail';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
-import { getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
+import { getOracleByPubkey, getOracles, getOraclesByType } from 'utils/oracleDatasetHelper';
 import { getRateExplorer } from 'utils/oraclesExplorerHelper';
 
 type OraclePickerInput = {
@@ -24,25 +24,6 @@ type OraclePickerInput = {
 	// set callback, sets the rate plugin type
 	// eslint-disable-next-line no-unused-vars
 	setRatePlugin: (rate: OracleDetail) => void;
-};
-
-export type OraclesPickerInput = {
-	// main rate plugin object
-	ratePlugin1: OracleDetail;
-
-	// set callback, sets the rate plugin type and the main rate puybey
-	// eslint-disable-next-line no-unused-vars
-	setRatePlugin1: (rate: OracleDetail) => void;
-
-	// secondary rate plugin object
-	ratePlugin2: OracleDetail;
-
-	// set callback, sets the rate plugin type and the main rate puybey
-	// eslint-disable-next-line no-unused-vars
-	setRatePlugin2: (rate: OracleDetail) => void;
-
-	// redeem logic plugin of the contract
-	redeemLogicPluginType: RLPluginTypeIds;
 };
 
 const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OraclePickerInput) => {
@@ -141,15 +122,38 @@ const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OracleP
 	);
 };
 
+export type OraclesPickerInput = {
+	oracleRequired: 'single' | 'double';
+	ratePluginType: RatePluginTypeIds;
+	setRatePluginType: (newVal: RatePluginTypeIds) => void;
+	rateAccounts: PublicKey[];
+	setRateAccounts: (newVal: PublicKey[]) => void;
+};
+
 // TODO Generalize to list of oracles, rendered based on redeemLogicPluginType
-export const OraclesPicker = ({ ratePlugin1, setRatePlugin1, ratePlugin2, setRatePlugin2, redeemLogicPluginType }: OraclesPickerInput) => {
+export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType, setRatePluginType, rateAccounts, setRateAccounts }: OraclesPickerInput) => {
+	// improve safety on accessing rateAccounts
+
 	return (
 		<Box sx={{ marginY: 2 }}>
 			<Stack spacing={2}>
-				<OraclePicker rateLabel={'Oracle #1'} options={getOracles()} ratePlugin={ratePlugin1} setRatePlugin={setRatePlugin1} />
+				<OraclePicker
+					rateLabel={'Oracle #1'}
+					options={getOracles()}
+					ratePlugin={getOracleByPubkey(rateAccounts[0])}
+					setRatePlugin={(newVal) => {
+						setRatePluginType(newVal.type);
+						setRateAccounts([new PublicKey(newVal.pubkey), rateAccounts[1]]);
+					}}
+				/>
 
-				{(redeemLogicPluginType as RLPluginTypeIds) === 'settled_forward' && (
-					<OraclePicker rateLabel={'Oracle #2'} options={getOraclesByType(ratePlugin1.type)} ratePlugin={ratePlugin2} setRatePlugin={setRatePlugin2} />
+				{oraclesRequired === 'double' && (
+					<OraclePicker
+						rateLabel={'Oracle #2'}
+						options={getOraclesByType(ratePluginType)}
+						ratePlugin={getOracleByPubkey(rateAccounts[1])}
+						setRatePlugin={(newVal) => setRateAccounts([rateAccounts[0], new PublicKey(newVal.pubkey)])}
+					/>
 				)}
 			</Stack>
 		</Box>

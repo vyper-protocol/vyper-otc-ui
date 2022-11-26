@@ -21,7 +21,7 @@ export function getMintByTitle(symbol: string): MintDetail {
 	return getMints().find(({ title }) => title === symbol);
 }
 
-// TODO: TokenInfo and MintDetail overlap, we should merge the two types
-export function getMintFromTokenInfo(token: TokenInfo): MintDetail {
-	return { cluster: getCurrentCluster(), pubkey: token.address, title: token.symbol };
-}
+// // TODO: TokenInfo and MintDetail overlap, we should merge the two types
+// export function getMintFromTokenInfo(token: TokenInfo): MintDetail {
+// 	return { cluster: getCurrentCluster(), pubkey: token.address, title: token.symbol };
+// }
