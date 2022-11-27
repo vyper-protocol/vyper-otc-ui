@@ -5,8 +5,7 @@
 			"expiry": "monthly",
 			"underlying": "SOL/USD",
 			"imgPath": "/sol-logo.png",
-			"rateId": "pyth",
-			"pubkey": "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"
+			"rateId": "pyth"
 		},
 		{
 			"payoff": "digital",
@@ -14,8 +13,7 @@
 			"expiry": "weekly",
 			"underlying": "BTC/USD",
 			"imgPath": "/btc-logo.png",
-			"rateId": "pyth",
-			"pubkey": "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J"
+			"rateId": "pyth"
 		},
 		{
 			"payoff": "vanilla option",
@@ -23,16 +21,14 @@
 			"expiry": "weekly",
 			"underlying": "ETH/USD",
 			"imgPath": "/eth-logo.png",
-			"rateId": "pyth",
-			"pubkey": "EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw"
+			"rateId": "pyth"
 		},
 		{
 			"payoff": "depeg",
 			"expiry": "quarterly",
 			"underlying": "USDT/USD",
 			"imgPath": "/usdt-logo.png",
-			"rateId": "pyth",
-			"pubkey": "38xoQ4oeJCBrcVvca2cGk7iV1dAfrmTR1kmhSCJQ8Jto"
+			"rateId": "pyth"
 		}
 	]
 }

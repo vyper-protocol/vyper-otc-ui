@@ -57,11 +57,29 @@
 		{
 			"type": "pyth",
 			"cluster": "mainnet-beta",
+			"pubkey": "GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU",
+			"title": "BTC/USD",
+			"baseCurrency": "BTC",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=mainnet-beta"
+		},
+		{
+			"type": "pyth",
+			"cluster": "mainnet-beta",
 			"pubkey": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
 			"title": "ETH/USD",
 			"baseCurrency": "ETH",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=mainnet-beta"
+		},
+		{
+			"type": "pyth",
+			"cluster": "devnet",
+			"pubkey": "EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw",
+			"title": "ETH/USD",
+			"baseCurrency": "ETH",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=devnet"
 		},
 		{
 			"type": "pyth",
@@ -82,11 +100,20 @@
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=mainnet-beta"
 		},
 		{
+			"type": "pyth",
+			"cluster": "devnet",
+			"pubkey": "38xoQ4oeJCBrcVvca2cGk7iV1dAfrmTR1kmhSCJQ8Jto",
+			"title": "USDT/USD",
+			"baseCurrency": "USDT",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=devnet"
+		},
+		{
 			"type": "switchboard",
 			"cluster": "devnet",
 			"pubkey": "C6BciZWyhZRbjE1XdwAsYP2PZRErnDUdGChW1tKBV9wH",
 			"title": "Deribit.DVOL_BTC",
-			"baseCurrency": "",
+			"baseCurrency": "VEGA",
 			"quoteCurrency": "",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/C6BciZWyhZRbjE1XdwAsYP2PZRErnDUdGChW1tKBV9wH"
 		},
