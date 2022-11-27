@@ -7,7 +7,7 @@ export type OracleDetail = {
 	cluster: Cluster;
 	pubkey: string;
 	title: string | undefined;
-	baseCurrency: string | undefined;
-	quoteCurrency: string | undefined;
+	baseCurrency?: string | undefined;
+	quoteCurrency?: string | undefined;
 	explorerUrl: string | undefined;
 };
