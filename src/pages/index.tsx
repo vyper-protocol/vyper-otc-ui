@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { Skeleton, Stack } from '@mui/material';
 import cn from 'classnames';
 import TemplateGrid from 'components/organisms/TemplateGrid';
@@ -5,7 +7,6 @@ import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
 import { useGetPlatformStatsQuery } from 'hooks/useGetPlatformStatsQuery';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
 import { getOraclesNumber } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -27,7 +28,7 @@ const Home = () => {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		if (stats?.data?.numberOfContracts && stats?.data?.numberOfLiveContracts) {
+		if (stats?.data) {
 			setIsLoading(false);
 		}
 	}, [stats]);
