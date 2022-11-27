@@ -20,8 +20,10 @@ export const selectContracts = async (params: FetchContractsParams): Promise<DbO
 	params.gt.forEach((f) => query.gt(f.column, f.value));
 	params.lt.forEach((f) => query.lt(f.column, f.value));
 	params.eq.forEach((f) => query.eq(f.column, f.value));
-	params.order.forEach(([cols, order]) => {
-		query.order(cols, { ascending: order === 'asc' });
+	params.neq.forEach((f) => query.neq(f.column, f.value));
+	params.in.forEach((f) => query.in(f.column, f.value));
+	params.order.forEach(([col, order]) => {
+		query.order(col, { ascending: order === 'asc' });
 	});
 
 	// filter for fetching only supported plugins in the UI

@@ -20,16 +20,16 @@ export const countContracts = async (params: FetchContractsParams): Promise<numb
 	params.gt.forEach((f) => query.gt(f.column, f.value));
 	params.lt.forEach((f) => query.lt(f.column, f.value));
 	params.eq.forEach((f) => query.eq(f.column, f.value));
-	params.order.forEach(([cols, order]) => {
-		query.order(cols, { ascending: order === 'asc' });
-	});
+	params.in.forEach((f) => query.in(f.column, f.value));
 
 	// filter for fetching only supported plugins in the UI
 	query.in('redeem_logic_plugin_type', AVAILABLE_RL_TYPES as any);
 	query.in('rate_plugin_type', AVAILABLE_RATE_TYPES as any);
 
 	const res = await query;
-	if (res.error) throw Error(res.error.message);
+	if (res.error) {
+		throw Error(res.error.message);
+	}
 
 	return res.count;
 };

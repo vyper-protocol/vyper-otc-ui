@@ -5,7 +5,8 @@ import { countContracts } from 'api/supabase/countContracts';
 import ExplorerContractDataGrid, { QueryParams } from 'components/organisms/ExplorerContractDataGrid';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import Layout from 'components/templates/Layout';
-import { FetchContractsParams, SupabaseColumnOrder } from 'controllers/fetchContracts/FetchContractsParams';
+import { ExplorerFilter, FetchContractsParams, SupabaseColumnOrder, parseExplorerFilterOperator } from 'controllers/fetchContracts/FetchContractsParams';
+import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
 import { useRouter } from 'next/router';
 
 const ExplorerPage = () => {
@@ -15,7 +16,7 @@ const ExplorerPage = () => {
 	const [query, setQuery] = useState<QueryParams>({});
 	const [count, setCount] = useState<number | null>(null);
 
-	const initializeContracts = useCallback(async (q: { [key: string]: string | string[] }) => {
+	const initializeContracts = useCallback((q: { [key: string]: string | string[] }) => {
 		const sort: SupabaseColumnOrder[] = [];
 		if (q.sort && typeof q.sort === 'string') {
 			for (const val of q.sort.split(',')) {
@@ -26,17 +27,88 @@ const ExplorerPage = () => {
 			}
 		}
 
+		const filter: ExplorerFilter[] = [];
+
+		// TODO: refactor to avoid code duplication
+		if (typeof q['redeemLogicState.typeId'] === 'string') {
+			const values = q['redeemLogicState.typeId'].split(' ');
+			if (values.length === 2) {
+				const [value, operator] = values;
+
+				const rlTypes = value.split(',');
+				if (rlTypes.every((rlType) => AVAILABLE_RL_TYPES.includes(rlType))) {
+					const filterOperator = parseExplorerFilterOperator(operator);
+					if (filterOperator !== undefined) {
+						filter.push({ key: 'redeemLogicState.typeId', operator: filterOperator, value: rlTypes.length > 1 ? rlTypes : rlTypes[0] });
+					}
+				}
+			}
+		}
+
+		if (typeof q['redeemLogicState.notional'] === 'string') {
+			const values = q['redeemLogicState.notional'].split(' ');
+			if (values.length === 2) {
+				const [value, operator] = values;
+
+				const notionals = value.split(',').map((val) => parseInt(val, 10));
+				const filterOperator = parseExplorerFilterOperator(operator);
+				if (filterOperator !== undefined && !notionals.some((notional) => isNaN(notional))) {
+					filter.push({ key: 'redeemLogicState.notional', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+				}
+			}
+		}
+
+		if (typeof q['redeemLogicState.strike'] === 'string') {
+			const values = q['redeemLogicState.strike'].split(' ');
+			if (values.length === 2) {
+				const [value, operator] = values;
+
+				const notionals = value.split(',').map((val) => parseInt(val, 10));
+				const filterOperator = parseExplorerFilterOperator(operator);
+				if (filterOperator !== undefined && !notionals.some((notional) => isNaN(notional))) {
+					filter.push({ key: 'redeemLogicState.strike', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+				}
+			}
+		}
+
+		if (typeof q['redeemLogicState.strike'] === 'string') {
+			const values = q['redeemLogicState.strike'].split(' ');
+			if (values.length === 2) {
+				const [value, operator] = values;
+
+				const notionals = value.split(',').map((val) => parseInt(val, 10));
+				const filterOperator = parseExplorerFilterOperator(operator);
+				if (filterOperator !== undefined && !notionals.some((notional) => isNaN(notional))) {
+					filter.push({ key: 'redeemLogicState.strike', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+				}
+			}
+		}
+
+		if (typeof q['settleAvailableFromAt'] === 'string') {
+			const values = q['settleAvailableFromAt'].split(' ');
+			if (values.length === 2) {
+				const [value, operator] = values;
+
+				const notionals = value.split(',').map((val) => new Date(val).toUTCString());
+				const filterOperator = parseExplorerFilterOperator(operator);
+				if (filterOperator !== undefined) {
+					filter.push({ key: 'settleAvailableFromAt', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+				}
+			}
+		}
+
 		const updatedQuery: QueryParams = {
 			sort,
+			filter,
 			page: q.page && typeof q.page === 'string' ? parseInt(q.page, 10) : undefined,
 			limit: q.limit && typeof q.limit === 'string' ? parseInt(q.limit, 10) : undefined
 		};
 
-		const updatedCount = await countContracts(FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), updatedQuery, true));
-
-		setQuery(updatedQuery);
-		setCount(updatedCount);
-		setLoading(false);
+		const countContractsParams = FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), updatedQuery, true);
+		countContracts(countContractsParams)
+			.then((updatedCount) => setCount(updatedCount))
+			.then(() => setQuery(updatedQuery))
+			.finally(() => setLoading(false));
 	}, []);
 
 	useEffect(() => {
@@ -45,7 +117,6 @@ const ExplorerPage = () => {
 		}
 	}, [router.isReady, router.query, initializeContracts]);
 
-	// TODO: show spinner for the fallback condition instead of null
 	return <Layout withSearch>{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : <CircularProgress />}</Layout>;
 };
 

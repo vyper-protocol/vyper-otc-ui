@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, CircularProgress } from '@mui/material';
-import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem, GridFilterModel } from '@mui/x-data-grid';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -11,7 +11,16 @@ import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import PublicKeyLink from 'components/molecules/PublicKeyLink';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import fetchContracts from 'controllers/fetchContracts';
-import { cleanParams, FetchContractsParams, fromSortModel, QueryParams, toSortModel, transformParams } from 'controllers/fetchContracts/FetchContractsParams';
+import {
+	cleanParams,
+	FetchContractsParams,
+	fromFilterModel,
+	fromSortModel,
+	QueryParams,
+	toFilterModel,
+	toSortModel,
+	transformParams
+} from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState } from 'models/ChainOtcState';
 import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
 import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
@@ -34,33 +43,37 @@ type Props = {
 };
 
 const ExplorerContractDataGrid = ({ query, count }: Props) => {
-	const { page = 1, limit = 25, sort } = query;
+	const { page = 1, limit = 25, sort, filter } = query;
 
 	const { connection } = useConnection();
 	const router = useRouter();
 
 	const [contractsLoading, setContractsLoading] = useState(false);
 	const [contracts, setContracts] = useState<ChainOtcState[]>([]);
+	const [filterModel, setFilterModel] = useState<GridFilterModel | null>(filter ? toFilterModel(filter) : null);
 
 	const updateQueryParams = useCallback(
-		(updatedQueryParams: QueryParams) => {
-			const updatedQuery = cleanParams({
-				...transformParams(query),
-				...transformParams(updatedQueryParams)
-			});
+		(updatedQueryParams: QueryParams, resetPagination?: boolean) => {
+			const updatedQuery = cleanParams(transformParams(updatedQueryParams));
+
+			if (resetPagination) {
+				updatedQuery.page = '1';
+			}
 
 			router.push({
 				pathname: '/explorer',
 				query: updatedQuery
 			});
 		},
-		[query, router]
+		[router]
 	);
 
 	useEffect(() => {
 		setContractsLoading(true);
 		setContracts([]);
-		fetchContracts(connection, FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), query))
+
+		const fetchContractsParams = FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), query);
+		fetchContracts(connection, fetchContractsParams)
 			.then((c) => setContracts(c))
 			.finally(() => setContractsLoading(false));
 	}, [connection, query]);
@@ -70,11 +83,11 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			type: 'singleSelect',
 			field: 'redeemLogicState.typeId',
 			headerName: 'Instrument',
-			filterable: true,
 			flex: 1,
 			minWidth: 150,
-			sortable: false,
 			valueOptions: AVAILABLE_RL_TYPES as any,
+			sortable: true,
+			filterable: true,
 			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
 			valueGetter: (params) => {
 				return (params.row as ChainOtcState).redeemLogicAccount.state.getTypeLabel();
@@ -86,6 +99,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			headerName: 'Underlying',
 			flex: 1,
 			minWidth: 150,
+			sortable: false,
+			filterable: false,
 			valueGetter: (params) => {
 				return params.row.rateAccount.state.title;
 			}
@@ -96,6 +111,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			headerName: 'Size',
 			flex: 1,
 			minWidth: 100,
+			sortable: true,
+			filterable: true,
 			valueGetter: (params) => {
 				const rlState = params.row.redeemLogicAccount.state;
 				switch (rlState.stateType.type as RLPluginTypeIds) {
@@ -118,6 +135,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			headerName: 'Strike',
 			flex: 1,
 			minWidth: 100,
+			sortable: true,
+			filterable: true,
 			valueGetter: (params) => {
 				const rlState = params.row.redeemLogicAccount.state;
 				switch (rlState.stateType.type as RLPluginTypeIds) {
@@ -138,6 +157,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			type: 'number',
 			field: 'rateState.aggregatorLastValue',
 			headerName: 'Current Price',
+			sortable: false,
+			filterable: false,
 			renderCell: (params: GridRenderCellParams<any>) => (
 				<OracleLivePrice
 					oracleType={(params.row as ChainOtcState).rateAccount.state.typeId}
@@ -145,8 +166,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 				/>
 			),
 			flex: 1,
-			minWidth: 125,
-			sortable: false
+			minWidth: 125
 		},
 		{
 			field: 'settleAvailableFromAt',
@@ -162,8 +182,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			type: 'boolean',
 			field: 'buyerFunded',
 			headerName: 'Long funded',
-			sortable: true,
-			filterable: true,
+			sortable: false,
+			filterable: false,
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
@@ -174,8 +194,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			type: 'boolean',
 			field: 'sellerFunded',
 			headerName: 'Short funded',
-			sortable: true,
-			filterable: true,
+			sortable: false,
+			filterable: false,
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
@@ -185,8 +205,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		{
 			field: 'buyerWallet',
 			headerName: 'Buyer wallet',
-			sortable: true,
-			filterable: true,
+			sortable: false,
+			filterable: false,
 			flex: 1,
 			minWidth: 50,
 			renderCell: (params) => {
@@ -197,8 +217,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		{
 			field: 'sellerWallet',
 			headerName: 'Seller wallet',
-			sortable: true,
-			filterable: true,
+			sortable: false,
+			filterable: false,
 			flex: 1,
 			minWidth: 50,
 			renderCell: (params) => {
@@ -211,10 +231,10 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			valueOptions: AVAILABLE_CONTRACT_STATUS_IDS as any,
 			field: 'contractStatus',
 			headerName: 'Status',
-			sortable: true,
-			filterable: true,
 			flex: 1,
 			minWidth: 100,
+			sortable: false,
+			filterable: false,
 			renderCell: (params) => {
 				return <ContractStatusBadge status={params.row.contractStatus} />;
 			}
@@ -260,17 +280,21 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 						autoHeight
 						paginationMode="server"
 						filterMode="server"
+						sortingMode="server"
 						page={page - 1}
 						pageSize={limit}
 						getRowId={(row) => row.publickey.toBase58()}
 						rows={contracts}
 						rowCount={count}
 						columns={columns}
-						sortModel={sort ? toSortModel(sort) : []}
+						filterModel={filterModel}
+						sortModel={sort ? toSortModel(sort) : undefined}
 						// Material UI page starts from 0
+						onPreferencePanelClose={() => updateQueryParams({ filter: fromFilterModel(filterModel) }, true)}
 						onPageChange={(newPage) => updateQueryParams({ page: newPage + 1 })}
 						onPageSizeChange={(newLimit) => updateQueryParams({ limit: newLimit })}
-						onSortModelChange={(newSortModel) => updateQueryParams({ sort: fromSortModel(newSortModel) })}
+						onSortModelChange={(newSortModel) => updateQueryParams({ sort: fromSortModel(newSortModel) }, true)}
+						onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
 					/>
 				</Box>
 			)}
