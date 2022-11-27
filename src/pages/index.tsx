@@ -1,12 +1,15 @@
-import { Box, Stack } from '@mui/material';
+import { Skeleton, Stack } from '@mui/material';
 import cn from 'classnames';
 import TemplateGrid from 'components/organisms/TemplateGrid';
 import Layout from 'components/templates/Layout';
+import resources from 'configs/resources.json';
+import { useGetPlatformStatsQuery } from 'hooks/useGetPlatformStatsQuery';
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import { getOraclesNumber } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './index.module.scss';
-import resources from 'configs/resources.json';
 
 const Home = () => {
 	const telegram = resources.socialMedias.find((s) => {
@@ -16,6 +19,18 @@ const Home = () => {
 	const github = resources.socialMedias.find((s) => {
 		return s.name === 'GitHub';
 	});
+
+	const stats = useGetPlatformStatsQuery();
+
+	const skeleton = <Skeleton variant="rectangular" width={80} height={20} />;
+
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		if (stats?.data?.numberOfContracts && stats?.data?.numberOfLiveContracts) {
+			setIsLoading(false);
+		}
+	}, [stats]);
 
 	return (
 		<>
@@ -42,19 +57,20 @@ const Home = () => {
 					<div className={styles.stats_container}>
 						<div className={styles.stats_group}>
 							<div className={cn(styles.stat, styles.first)}>
-								<div className={styles.value}>650+</div>
+								<div className={styles.value}>{isLoading ? skeleton : stats?.data?.numberOfContracts}</div>
 								<div className={styles.title}>Contract created</div>
 							</div>
 							<div className={cn(styles.stat, styles.second)}>
-								<div className={styles.value}>$250k</div>
-								<div className={styles.title}>Notional traded</div>
+								<div className={styles.value}>{isLoading ? skeleton : stats?.data?.numberOfLiveContracts}</div>
+								<div className={styles.title}>Live trades</div>
 							</div>
 							<div className={cn(styles.stat, styles.third)}>
-								<div className={styles.value}>$20k</div>
+								{/* TODO: add collateral to stats */}
+								<div className={styles.value}>{isLoading ? skeleton : '$10k+'}</div>
 								<div className={styles.title}>Collateral traded</div>
 							</div>
 							<div className={cn(styles.stat, styles.fourth)}>
-								<div className={styles.value}>30+</div>
+								<div className={styles.value}>{isLoading ? skeleton : getOraclesNumber()}</div>
 								<div className={styles.title}>Assets supported</div>
 							</div>
 						</div>
