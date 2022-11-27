@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { ExpiryPicker } from 'components/molecules/ExpiryPicker';
 import { OraclesPicker } from 'components/molecules/OraclesPicker';
 import { PayoffPicker } from 'components/molecules/PayoffPicker';
@@ -10,8 +10,7 @@ import { PreviewModal } from 'components/molecules/PreviewModal';
 import { ReservePicker } from 'components/molecules/ReservePicker';
 import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 
 type StepElement = {
 	title: string;
@@ -25,7 +24,7 @@ type CreateContractFlowInput = {
 	contractInitParams: OtcInitializationParams;
 
 	// on contract init params state change
-	onContractInitParamsChange: (newVal: OtcInitializationParams) => void;
+	onContractInitParamsChange: (value: SetStateAction<OtcInitializationParams>) => void;
 
 	// loading during contract creation
 	isLoading: boolean;
@@ -44,6 +43,7 @@ const CreateContractFlow = ({
 	initialStep
 }: CreateContractFlowInput) => {
 	const wallet = useWallet();
+	const { connection } = useConnection();
 
 	const [activeStep, setActiveStep] = useState(initialStep ?? 0);
 	const [openPreview, setOpenPreview] = useState(false);
@@ -63,13 +63,13 @@ const CreateContractFlow = ({
 				<PayoffPicker
 					redeemLogicPluginType={contractInitParams.redeemLogicOption.redeemLogicPluginType}
 					setRedeemLogicPluginType={(newRedeemLogicType) =>
-						onContractInitParamsChange({
-							...contractInitParams,
+						onContractInitParamsChange((prevValue) => ({
+							...prevValue,
 							redeemLogicOption: {
-								...contractInitParams.redeemLogicOption,
+								...prevValue.redeemLogicOption,
 								redeemLogicPluginType: newRedeemLogicType
 							}
-						})
+						}))
 					}
 				/>
 			),
@@ -82,25 +82,20 @@ const CreateContractFlow = ({
 				<OraclesPicker
 					oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
 					ratePluginType={contractInitParams.rateOption.ratePluginType}
-					setRatePluginType={(newRateType: RatePluginTypeIds) =>
-						onContractInitParamsChange({
-							...contractInitParams,
-							rateOption: {
-								...contractInitParams.rateOption,
-								ratePluginType: newRateType
-							}
-						})
-					}
 					rateAccounts={contractInitParams.rateOption.rateAccounts}
-					setRateAccounts={(newRateAccount) =>
-						onContractInitParamsChange({
-							...contractInitParams,
+					setRateAccounts={(newRateType, newRateAccounts) => {
+						onContractInitParamsChange((prevValue) => ({
+							...prevValue,
 							rateOption: {
-								...contractInitParams.rateOption,
-								rateAccounts: newRateAccount
+								...prevValue.rateOption,
+								ratePluginType: newRateType,
+								rateAccounts: newRateAccounts
 							}
-						})
-					}
+						}));
+						getPriceForStrike(newRateType, newRateAccounts, connection, getCurrentCluster()).then((newStrike) => {
+							onContractInitParamsChange((prevValue) => ({ ...prevValue, redeemLogicOption: { ...prevValue.redeemLogicOption, strike: newStrike } }));
+						});
+					}}
 				/>
 			),
 			error: false
@@ -112,10 +107,10 @@ const CreateContractFlow = ({
 				<RLParamsPicker
 					redeemLogicOptions={contractInitParams.redeemLogicOption}
 					setRedeemLogicOptions={(newVal) =>
-						onContractInitParamsChange({
+						onContractInitParamsChange((prevValue) => ({
 							...contractInitParams,
 							redeemLogicOption: newVal
-						})
+						}))
 					}
 				/>
 			),
@@ -130,24 +125,24 @@ const CreateContractFlow = ({
 				<ReservePicker
 					seniorDepositAmount={contractInitParams.seniorDepositAmount}
 					setSeniorDepositAmount={(newVal) =>
-						onContractInitParamsChange({
+						onContractInitParamsChange((prevVal) => ({
 							...contractInitParams,
 							seniorDepositAmount: newVal
-						})
+						}))
 					}
 					juniorDepositAmount={contractInitParams.juniorDepositAmount}
 					setJuniorDepositAmount={(newVal) =>
-						onContractInitParamsChange({
+						onContractInitParamsChange((prevVal) => ({
 							...contractInitParams,
 							juniorDepositAmount: newVal
-						})
+						}))
 					}
 					reserveMint={contractInitParams.reserveMint}
 					setReserveMint={(newVal) =>
-						onContractInitParamsChange({
+						onContractInitParamsChange((prevVal) => ({
 							...contractInitParams,
 							reserveMint: newVal
-						})
+						}))
 					}
 					reserveError={reserveError}
 					setReserveError={setReserveError}
@@ -162,17 +157,17 @@ const CreateContractFlow = ({
 				<ExpiryPicker
 					depositEnd={contractInitParams.depositEnd}
 					setDepositEnd={(newVal) =>
-						onContractInitParamsChange({
+						onContractInitParamsChange((prevVal) => ({
 							...contractInitParams,
 							depositEnd: newVal
-						})
+						}))
 					}
 					settleStart={contractInitParams.settleStart}
 					setSettleStart={(newVal) =>
-						onContractInitParamsChange({
+						onContractInitParamsChange((prevVal) => ({
 							...contractInitParams,
 							settleStart: newVal
-						})
+						}))
 					}
 					expiryError={expiryError}
 					setExpiryError={setExpiryError}

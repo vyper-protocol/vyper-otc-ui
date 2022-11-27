@@ -24,10 +24,10 @@ export type ReservePickerInput = {
 	setJuniorDepositAmount: (value: number) => void;
 
 	// collateral mint
-	reserveMint: PublicKey;
+	reserveMint: string;
 
 	// eslint-disable-next-line no-unused-vars
-	setReserveMint: (mint: PublicKey) => void;
+	setReserveMint: (mint: string) => void;
 };
 
 type ReservePickerProps = ReservePickerInput & {
@@ -117,7 +117,7 @@ export const ReservePicker = ({
 					clearOnBlur
 					handleHomeEndKeys
 					freeSolo={getCurrentCluster() === 'devnet'}
-					value={reserveMint.toBase58()}
+					value={reserveMint}
 					onInputChange={async (_, input: string, reason: string) => {
 						if (reason !== 'input') return;
 						if (getCurrentCluster() === 'devnet') {
@@ -136,7 +136,7 @@ export const ReservePicker = ({
 					}}
 				/>
 				<a
-					href={getExplorerLink(reserveMint.toBase58(), { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					href={getExplorerLink(reserveMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
 					target="_blank"
 					rel="noopener noreferrer"
 				>

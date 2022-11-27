@@ -29,7 +29,7 @@ type OraclePickerInput = {
 const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OraclePickerInput) => {
 	const { connection } = useConnection();
 	const currentCluster = getCurrentCluster();
-	const [value, setValue] = useState<string | OracleDetail>('');
+	const [value, setValue] = useState<string | OracleDetail>(ratePlugin);
 	const [label, setLabel] = useState(<></>);
 
 	async function getOracleInfo(oracle: string): Promise<['pyth' | 'switchboard', string]> {
@@ -115,7 +115,7 @@ const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OracleP
 					}
 				}}
 			/>
-			<a href={ratePlugin.explorerUrl} target="_blank" rel="noopener noreferrer">
+			<a href={ratePlugin?.explorerUrl ?? '#'} target="_blank" rel="noopener noreferrer">
 				<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
 			</a>
 		</>
@@ -125,13 +125,12 @@ const OraclePicker = ({ rateLabel, options, ratePlugin, setRatePlugin }: OracleP
 export type OraclesPickerInput = {
 	oracleRequired: 'single' | 'double';
 	ratePluginType: RatePluginTypeIds;
-	setRatePluginType: (newVal: RatePluginTypeIds) => void;
-	rateAccounts: PublicKey[];
-	setRateAccounts: (newVal: PublicKey[]) => void;
+	rateAccounts: string[];
+	setRateAccounts: (newType: RatePluginTypeIds, newVal: string[]) => void;
 };
 
 // TODO Generalize to list of oracles, rendered based on redeemLogicPluginType
-export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType, setRatePluginType, rateAccounts, setRateAccounts }: OraclesPickerInput) => {
+export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType, rateAccounts, setRateAccounts }: OraclesPickerInput) => {
 	// improve safety on accessing rateAccounts
 
 	return (
@@ -142,8 +141,7 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 					options={getOracles()}
 					ratePlugin={getOracleByPubkey(rateAccounts[0])}
 					setRatePlugin={(newVal) => {
-						setRatePluginType(newVal.type);
-						setRateAccounts([new PublicKey(newVal.pubkey), rateAccounts[1]]);
+						setRateAccounts(newVal.type, [newVal.pubkey, rateAccounts[1]]);
 					}}
 				/>
 
@@ -152,7 +150,7 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 						rateLabel={'Oracle #2'}
 						options={getOraclesByType(ratePluginType)}
 						ratePlugin={getOracleByPubkey(rateAccounts[1])}
-						setRatePlugin={(newVal) => setRateAccounts([rateAccounts[0], new PublicKey(newVal.pubkey)])}
+						setRatePlugin={(newVal) => setRateAccounts(newVal.type, [(rateAccounts[0], newVal.pubkey)])}
 					/>
 				)}
 			</Stack>

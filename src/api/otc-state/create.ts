@@ -21,7 +21,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
-	const reserveMintInfo = await getMint(provider.connection, params.reserveMint);
+	const reserveMintInfo = await getMint(provider.connection, new PublicKey(params.reserveMint));
 
 	const otcState = Keypair.generate();
 	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
@@ -42,7 +42,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			})
 			.remainingAccounts(
 				params.rateOption.rateAccounts.map((c) => {
-					return { pubkey: c, isSigner: false, isWritable: false };
+					return { pubkey: new PublicKey(c), isSigner: false, isWritable: false };
 				})
 			)
 			.signers([ratePluginState])
@@ -59,7 +59,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			})
 			.remainingAccounts(
 				params.rateOption.rateAccounts.map((c) => {
-					return { pubkey: c, isSigner: false, isWritable: false };
+					return { pubkey: new PublicKey(c), isSigner: false, isWritable: false };
 				})
 			)
 			.signers([ratePluginState])
@@ -152,7 +152,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(
 		provider,
 		vyperCoreProgram,
-		params.reserveMint,
+		new PublicKey(params.reserveMint),
 		rateProgramPublicKey,
 		ratePluginState.publicKey,
 		redeemLogicProgramPublicKey,

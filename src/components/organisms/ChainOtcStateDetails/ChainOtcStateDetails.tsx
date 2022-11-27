@@ -49,7 +49,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const cloneContract = () => {
 		create({
-			reserveMint: otcState.reserveMint,
+			reserveMint: otcState.reserveMint.toBase58(),
 			seniorDepositAmount: otcState.buyerDepositAmount,
 			juniorDepositAmount: otcState.sellerDepositAmount,
 			depositStart: otcState.depositAvailableFrom,
@@ -62,7 +62,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 			rateOption: {
 				ratePluginType: otcState.rateAccount.state.typeId,
 				// TODO extract this information in a clearer way
-				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh
+				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh.map((c) => c.toBase58())
 			},
 			saveOnDatabase: true,
 			sendNotification: true

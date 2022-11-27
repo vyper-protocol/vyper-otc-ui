@@ -1,4 +1,3 @@
-import { PublicKey } from '@solana/web3.js';
 import Modal from 'components/atoms/Modal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -28,7 +27,7 @@ export type PreviewModalInput = {
 	juniorDepositAmount: number;
 
 	// collateral mint
-	reserveMint: PublicKey;
+	reserveMint: string;
 
 	// open state of the modal
 	open: boolean;
@@ -60,14 +59,14 @@ export const PreviewModal = ({
 				You are creating a <span className={styles.highlight}>{redeemLogicPluginType}</span>{' '}
 				{redeemLogicPluginType === 'vanilla_option' ||
 					(redeemLogicPluginType === 'digital' && <span className={styles.highlight}>{isCall ? 'CALL' : 'PUT'}</span>)}{' '}
-				contract on <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[0]).title}</span> with strike{' '}
+				contract on <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[0])?.title}</span> with strike{' '}
 				<span className={styles.highlight}>{formatWithDecimalDigits(strike, 6)}</span>
 				{redeemLogicPluginType !== 'digital' && (
 					<span>
 						{' '}
 						{'and notional'}{' '}
 						<span className={styles.highlightNoCap}>
-							{formatWithDecimalDigits(notional, 4)} {getOracleByPubkey(rateOption.rateAccounts[0]).baseCurrency}
+							{formatWithDecimalDigits(notional, 4)} {getOracleByPubkey(rateOption.rateAccounts[0])?.baseCurrency}
 						</span>
 					</span>
 				)}
@@ -75,7 +74,7 @@ export const PreviewModal = ({
 				{redeemLogicPluginType === 'settled_forward' && (
 					<span>
 						{' '}
-						The contract will be settled using <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[1]).title}.</span>
+						The contract will be settled using <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[1])?.title}.</span>
 					</span>
 				)}{' '}
 			</p>
@@ -90,7 +89,7 @@ export const PreviewModal = ({
 				)}
 				{!reserveMint && (
 					<span>
-						an unknown token, with token mint <span className={styles.highlight}>{shortenString(reserveMint.toBase58())}</span>.
+						an unknown token, with token mint <span className={styles.highlight}>{shortenString(reserveMint)}</span>.
 					</span>
 				)}{' '}
 				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
