@@ -9,6 +9,7 @@ import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPick
 import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
 import { PreviewModal } from 'components/molecules/PreviewModal';
 import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 
 type StepElement = {
@@ -85,6 +86,7 @@ const CreateContractFlow = ({
 		isCall
 	};
 	const [expiryError, setExpiryError] = useState(false);
+	const [reserveError, setReserveError] = useState(false);
 
 	// TODO fill other errors
 
@@ -127,7 +129,9 @@ const CreateContractFlow = ({
 		},
 		{
 			title: 'collateral',
-			description: 'Select the token mint to be used as collateral for the contract',
+			description: `Select the token to be used as collateral for the contract${
+				getCurrentCluster() === 'devnet' ? '. You can also input your token of choice' : ''
+			}`,
 			content: (
 				<ReservePicker
 					seniorDepositAmount={seniorDepositAmount}
@@ -136,9 +140,11 @@ const CreateContractFlow = ({
 					setJuniorDepositAmount={setJuniorDepositAmount}
 					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
+					reserveError={reserveError}
+					setReserveError={setReserveError}
 				/>
 			),
-			error: false
+			error: reserveError
 		},
 		{
 			title: 'expiry',

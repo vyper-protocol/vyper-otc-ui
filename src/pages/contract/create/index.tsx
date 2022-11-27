@@ -13,17 +13,28 @@ import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { OracleDetail } from 'models/OracleDetail';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import useContractStore from 'store/useContractStore';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
+import { getRateExplorer } from 'utils/oraclesExplorerHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 const CreateContractPage = () => {
+	const { contractData } = useContractStore();
+	console.log('contractData: ', contractData);
+
+	const contractStore = useContractStore();
+	useEffect(() => {
+		contractStore.delete();
+	}, []);
+
 	const currentCluster = getCurrentCluster();
 	const { connection } = useConnection();
 	const wallet = useWallet();
@@ -33,8 +44,12 @@ const CreateContractPage = () => {
 	const txHandler = useContext(TxHandlerContext);
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [saveOnDatabase, setSaveOnDatabase] = useState(process.env.NODE_ENV === 'development' ? false : true);
-	const [sendNotification, setSendNotification] = useState(process.env.NODE_ENV === 'development' ? false : true);
+	const [saveOnDatabase, setSaveOnDatabase] = useState(
+		process.env.NODE_ENV === 'development' ? false : contractData?.saveOnDatabase !== undefined ? contractData.saveOnDatabase : true
+	);
+	const [sendNotification, setSendNotification] = useState(
+		process.env.NODE_ENV === 'development' ? false : contractData?.sendNotification !== undefined ? contractData.sendNotification : true
+	);
 
 	// USDC in mainnet, devUSD in devnet
 	const defaultMint = currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
@@ -42,20 +57,45 @@ const CreateContractPage = () => {
 
 	// assume deposit always starts open
 	// eslint-disable-next-line no-unused-vars
-	const [depositStart, setDepositStart] = useState(moment().add(-60, 'minutes').toDate().getTime());
-	const [depositEnd, setDepositEnd] = useState(moment().add(5, 'minutes').toDate().getTime());
-	const [settleStart, setSettleStart] = useState(moment().add(15, 'minutes').toDate().getTime());
+	const [depositStart, setDepositStart] = useState(contractData?.depositStart ? contractData.depositStart : moment().add(-60, 'minutes').toDate().getTime());
+	const [depositEnd, setDepositEnd] = useState(contractData?.depositEnd ? contractData.depositEnd : moment().add(5, 'minutes').toDate().getTime());
+	const [settleStart, setSettleStart] = useState(contractData?.settleStart ? contractData.settleStart : moment().add(15, 'minutes').toDate().getTime());
 
-	const [seniorDepositAmount, setSeniorDepositAmount] = useState(100);
-	const [juniorDepositAmount, setJuniorDepositAmount] = useState(100);
+	const [seniorDepositAmount, setSeniorDepositAmount] = useState(contractData?.seniorDepositAmount ? contractData.seniorDepositAmount : 100);
+	const [juniorDepositAmount, setJuniorDepositAmount] = useState(contractData?.juniorDepositAmount ? contractData.juniorDepositAmount : 100);
 
-	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RLPluginTypeIds>('forward');
+	const [redeemLogicPluginType, setRedeemLogicPluginType] = useState<RLPluginTypeIds>(
+		contractData?.redeemLogicOption?.redeemLogicPluginType ? contractData.redeemLogicOption.redeemLogicPluginType : 'forward'
+	);
 
 	// pyth SOL/USD
-	const defaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
+	const tempDefaultOracle = currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG';
+	const defaultOracle1 = contractData?.rateOption?.rateAccounts.length > 0 ? contractData.rateOption.rateAccounts[0].toBase58() : tempDefaultOracle;
+	const defaultOracle2 = contractData?.rateOption?.rateAccounts.length > 1 ? contractData.rateOption.rateAccounts[1].toBase58() : tempDefaultOracle;
 
-	const [ratePlugin1, setRatePlugin1] = useState(getOracleByPubkey(defaultOracle));
-	const [ratePlugin2, setRatePlugin2] = useState(getOracleByPubkey(defaultOracle));
+	const [ratePlugin1, setRatePlugin1] = useState(
+		getOracleByPubkey(defaultOracle1) ??
+			({
+				type: contractData.rateOption.ratePluginType,
+				pubkey: defaultOracle1,
+				title: 'NA',
+				explorerUrl: getRateExplorer(contractData.rateOption.ratePluginType),
+				quoteCurrency: '',
+				baseCurrency: ''
+			} as OracleDetail)
+	);
+	console.log('ratePlugin1: ', ratePlugin1);
+	const [ratePlugin2, setRatePlugin2] = useState(
+		getOracleByPubkey(defaultOracle2) ??
+			({
+				type: contractData.rateOption.ratePluginType,
+				pubkey: defaultOracle2,
+				title: 'NA',
+				explorerUrl: getRateExplorer(contractData.rateOption.ratePluginType),
+				quoteCurrency: '',
+				baseCurrency: ''
+			} as OracleDetail)
+	);
 
 	const [notional, setNotional] = useState(1);
 	const [strike, setStrike] = useState(0);
@@ -81,7 +121,9 @@ const CreateContractPage = () => {
 	};
 
 	useEffect(() => {
-		setStrikeToDefaultValue();
+		if (!contractData?.redeemLogicOption?.strike) {
+			setStrikeToDefaultValue();
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ratePlugin1.type, ratePlugin1.pubkey]);
 

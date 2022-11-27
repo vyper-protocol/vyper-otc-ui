@@ -82,7 +82,8 @@ export class RateSwitchboardState extends AbsRateState {
 			program: switchboardProgram,
 			publicKey: switchboardAggregator
 		});
-		return (await aggregatorAccount.getLatestValue()).toNumber();
+		const latestValue = await aggregatorAccount.getLatestValue();
+		return latestValue?.toNumber() ?? 0;
 	}
 
 	static async DecodePriceFromAccountInfo(connection: Connection, accountInfo: AccountInfo<Buffer>): Promise<number> {
@@ -92,7 +93,8 @@ export class RateSwitchboardState extends AbsRateState {
 			publicKey: PublicKey.unique()
 		});
 		const data = AggregatorAccount.decode(switchboardProgram, accountInfo);
-		return (await aggregatorAccount.getLatestValue(data)).toNumber();
+		const latestValue = await aggregatorAccount.getLatestValue(data);
+		return latestValue?.toNumber() ?? 0;
 	}
 
 	// get pubkeysForLivePrice(): { label: string; pubkey: PublicKey }[] {

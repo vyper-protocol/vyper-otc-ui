@@ -47,7 +47,7 @@ const fetchTokenInfoFromSolanaProviderUsingMint = async (mint: PublicKey): Promi
 	try {
 		const tokenListProvider = new TokenListProvider();
 		const tokenListContainer = await tokenListProvider.resolve();
-		const tokenInfoList = tokenListContainer.getList();
+		const tokenInfoList = tokenListContainer.filterByClusterSlug(getCurrentCluster()).getList();
 		const res = tokenInfoList.find((c) => {
 			return c.address === mint.toBase58();
 		});
@@ -67,7 +67,7 @@ const fetchTokenInfoFromSolanaProviderUsingSymbol = async (symbol: string): Prom
 	try {
 		const tokenListProvider = new TokenListProvider();
 		const tokenListContainer = await tokenListProvider.resolve();
-		const tokenInfoList = tokenListContainer.getList();
+		const tokenInfoList = tokenListContainer.filterByClusterSlug(getCurrentCluster()).getList();
 		const res = tokenInfoList.find((c) => {
 			return c.symbol === symbol;
 		});

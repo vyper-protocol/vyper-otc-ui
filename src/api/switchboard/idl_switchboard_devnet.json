@@ -312,6 +312,44 @@
 			]
 		},
 		{
+			"name": "aggregatorSetResolutionMode",
+			"accounts": [
+				{
+					"name": "aggregator",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "authority",
+					"isMut": false,
+					"isSigner": true
+				},
+				{
+					"name": "slidingWindow",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "payer",
+					"isMut": true,
+					"isSigner": true
+				},
+				{
+					"name": "systemProgram",
+					"isMut": false,
+					"isSigner": false
+				}
+			],
+			"args": [
+				{
+					"name": "params",
+					"type": {
+						"defined": "AggregatorSetResolutionModeParams"
+					}
+				}
+			]
+		},
+		{
 			"name": "aggregatorSetHistoryBuffer",
 			"accounts": [
 				{
@@ -643,6 +681,64 @@
 					"name": "params",
 					"type": {
 						"defined": "CrankPopParams"
+					}
+				}
+			]
+		},
+		{
+			"name": "crankPopV2",
+			"accounts": [
+				{
+					"name": "crank",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "oracleQueue",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "queueAuthority",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "programState",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "payoutWallet",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "tokenProgram",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "crankDataBuffer",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "queueDataBuffer",
+					"isMut": false,
+					"isSigner": false
+				},
+				{
+					"name": "mint",
+					"isMut": false,
+					"isSigner": false
+				}
+			],
+			"args": [
+				{
+					"name": "params",
+					"type": {
+						"defined": "CrankPopParamsV2"
 					}
 				}
 			]
@@ -1780,9 +1876,44 @@
 						"type": "i64"
 					},
 					{
+						"name": "resolutionMode",
+						"type": {
+							"defined": "AggregatorResolutionMode"
+						}
+					},
+					{
 						"name": "ebuf",
 						"type": {
-							"array": ["u8", 139]
+							"array": ["u8", 138]
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "SlidingResultAccountData",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "data",
+						"type": {
+							"array": [
+								{
+									"defined": "SlidingWindowElement"
+								},
+								16
+							]
+						}
+					},
+					{
+						"name": "bump",
+						"type": "u8"
+					},
+					{
+						"name": "ebuf",
+						"type": {
+							"array": ["u8", 512]
 						}
 					}
 				]
@@ -2588,6 +2719,18 @@
 			}
 		},
 		{
+			"name": "AggregatorSetResolutionModeParams",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "mode",
+						"type": "u8"
+					}
+				]
+			}
+		},
+		{
 			"name": "AggregatorSetUpdateIntervalParams",
 			"type": {
 				"kind": "struct",
@@ -2697,6 +2840,38 @@
 		},
 		{
 			"name": "CrankPopParams",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "stateBump",
+						"type": "u8"
+					},
+					{
+						"name": "leaseBumps",
+						"type": "bytes"
+					},
+					{
+						"name": "permissionBumps",
+						"type": "bytes"
+					},
+					{
+						"name": "nonce",
+						"type": {
+							"option": "u32"
+						}
+					},
+					{
+						"name": "failOpenOnAccountMismatch",
+						"type": {
+							"option": "bool"
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "CrankPopParamsV2",
 			"type": {
 				"kind": "struct",
 				"fields": [
@@ -3500,6 +3675,32 @@
 			}
 		},
 		{
+			"name": "SlidingWindowElement",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "oracleKey",
+						"type": "publicKey"
+					},
+					{
+						"name": "value",
+						"type": {
+							"defined": "SwitchboardDecimal"
+						}
+					},
+					{
+						"name": "slot",
+						"type": "u64"
+					},
+					{
+						"name": "timestamp",
+						"type": "i64"
+					}
+				]
+			}
+		},
+		{
 			"name": "AggregatorRound",
 			"type": {
 				"kind": "struct",
@@ -4213,23 +4414,27 @@
 						"name": "InvalidPublicKey"
 					},
 					{
-						"name": "SerializationError",
-						"fields": [
-							{
-								"defined": "bincode::Error"
-							}
-						]
+						"name": "SerializationError"
 					},
 					{
-						"name": "DeserializationError",
-						"fields": [
-							{
-								"defined": "bincode::Error"
-							}
-						]
+						"name": "DeserializationError"
 					},
 					{
 						"name": "InvalidDataError"
+					}
+				]
+			}
+		},
+		{
+			"name": "AggregatorResolutionMode",
+			"type": {
+				"kind": "enum",
+				"variants": [
+					{
+						"name": "ModeRoundResolution"
+					},
+					{
+						"name": "ModeSlidingResolution"
 					}
 				]
 			}
@@ -5275,6 +5480,11 @@
 			"code": 6089,
 			"name": "BufferRelayerIllegalRoundOpenCall",
 			"msg": "BufferRelayer round open called too early."
+		},
+		{
+			"code": 6090,
+			"name": "InvalidSliderAccount",
+			"msg": "Invalid slider account."
 		}
 	]
 }

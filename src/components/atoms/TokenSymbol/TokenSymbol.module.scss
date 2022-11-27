@@ -1,0 +1,15 @@
+.container {
+	display: inline-flex;
+	align-items: center;
+
+	.symbol {
+		font-weight: 600;
+	}
+
+	.coin {
+		margin-left: var(--space-4);
+		border-radius: var(--border-radius-extend);
+		width: 18px;
+		height: 18px;
+	}
+}
