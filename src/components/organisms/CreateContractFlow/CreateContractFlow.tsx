@@ -7,12 +7,16 @@ import { ExpiryPicker, ExpiryPickerInput } from 'components/molecules/ExpiryPick
 import { OraclesPicker, OraclesPickerInput } from 'components/molecules/OraclesPicker';
 import { ParamsPicker, ParamsPickerInput } from 'components/molecules/ParamsPicker';
 import { PayoffPicker, PayoffPickerInput } from 'components/molecules/PayoffPicker';
+import { PreviewModal } from 'components/molecules/PreviewModal';
 import { ReservePicker, ReservePickerInput } from 'components/molecules/ReservePicker';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 
 type StepElement = {
 	title: string;
 	description: string;
 	content: JSX.Element;
+	error: boolean;
 };
 
 type ContractLifecycleInput = {
@@ -35,6 +39,7 @@ type ContractLifecycleInput = {
 	onCreateContractButtonClick: () => Promise<void>;
 };
 
+// TODO: add PreviewModalInput with OtcInitializationParams['redeemLogicOption']
 type CreateContractFlowInput = OraclesPickerInput & ParamsPickerInput & ReservePickerInput & ExpiryPickerInput & PayoffPickerInput & ContractLifecycleInput;
 
 const CreateContractFlow = ({
@@ -54,6 +59,7 @@ const CreateContractFlow = ({
 	setSeniorDepositAmount,
 	juniorDepositAmount,
 	setJuniorDepositAmount,
+	reserveMint,
 	setReserveMint,
 	depositEnd,
 	setDepositEnd,
@@ -66,14 +72,30 @@ const CreateContractFlow = ({
 	isLoading,
 	onCreateContractButtonClick
 }: CreateContractFlowInput) => {
-	const [activeStep, setActiveStep] = useState(0);
 	const wallet = useWallet();
+
+	const [activeStep, setActiveStep] = useState(0);
+	const [openPreview, setOpenPreview] = useState(false);
+	const handleOpenPreview = () => setOpenPreview(true);
+	const handleClosePreview = () => setOpenPreview(false);
+
+	const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
+		redeemLogicPluginType,
+		strike,
+		notional,
+		isCall
+	};
+	const [expiryError, setExpiryError] = useState(false);
+	const [reserveError, setReserveError] = useState(false);
+
+	// TODO fill other errors
 
 	const steps: StepElement[] = [
 		{
 			title: 'payoff',
 			description: 'Select the payoff of your contract from the list available',
-			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />
+			content: <PayoffPicker redeemLogicPluginType={redeemLogicPluginType} setRedeemLogicPluginType={setRedeemLogicPluginType} />,
+			error: false
 		},
 		{
 			title: 'underlying',
@@ -86,7 +108,8 @@ const CreateContractFlow = ({
 					setRatePlugin2={setRatePlugin2}
 					redeemLogicPluginType={redeemLogicPluginType}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'contract parameters',
@@ -101,25 +124,42 @@ const CreateContractFlow = ({
 					isCall={isCall}
 					setIsCall={setIsCall}
 				/>
-			)
+			),
+			error: false
 		},
 		{
 			title: 'collateral',
-			description: 'Select the token mint to be used as collateral for the contract',
+			description: `Select the token to be used as collateral for the contract${
+				getCurrentCluster() === 'devnet' ? '. You can also input your token of choice' : ''
+			}`,
 			content: (
 				<ReservePicker
 					seniorDepositAmount={seniorDepositAmount}
 					setSeniorDepositAmount={setSeniorDepositAmount}
 					juniorDepositAmount={juniorDepositAmount}
 					setJuniorDepositAmount={setJuniorDepositAmount}
+					reserveMint={reserveMint}
 					setReserveMint={setReserveMint}
+					reserveError={reserveError}
+					setReserveError={setReserveError}
 				/>
-			)
+			),
+			error: reserveError
 		},
 		{
 			title: 'expiry',
 			description: 'Select the deposit expiry and contract expiry',
-			content: <ExpiryPicker depositEnd={depositEnd} setDepositEnd={setDepositEnd} settleStart={settleStart} setSettleStart={setSettleStart} />
+			content: (
+				<ExpiryPicker
+					depositEnd={depositEnd}
+					setDepositEnd={setDepositEnd}
+					settleStart={settleStart}
+					setSettleStart={setSettleStart}
+					expiryError={expiryError}
+					setExpiryError={setExpiryError}
+				/>
+			),
+			error: expiryError
 		}
 	];
 
@@ -140,32 +180,30 @@ const CreateContractFlow = ({
 			<Stepper activeStep={activeStep} orientation="vertical" connector={null}>
 				{steps.map((step: StepElement, i: number) => (
 					<Step key={step.title} sx={{ width: '100%' }}>
-						{/* <Box sx={{ display: 'inline-flex' }}> */}
 						<Stack direction="row">
 							<Box sx={{ width: '40%', flexDirection: 'column', justifyContent: 'space-between' }}>
 								<Box sx={{ my: 2 }}>
-									<StepLabel>
+									<StepLabel error={step.error}>
 										<b>{step.title.toUpperCase()}</b>
 									</StepLabel>
 									{activeStep >= i && <Typography sx={{ fontWeight: 'light' }}>{step.description}</Typography>}
 								</Box>
 								{i === activeStep && (
-									<Box>
+									<Box sx={{ display: 'flex' }}>
 										<Button disabled={i === 0} onClick={handleBack} sx={{ mt: 1, mr: 1 }}>
 											Back
 										</Button>
 										{i === steps.length - 1 ? (
-											<LoadingButton
+											<Button
 												sx={{ mt: 1, mr: 1 }}
 												variant="contained"
-												loading={isLoading}
-												disabled={!wallet.connected}
-												onClick={onCreateContractButtonClick}
+												disabled={!wallet.connected || openPreview || steps.some(({ error }) => error)}
+												onClick={handleOpenPreview}
 											>
-												{wallet.connected ? 'Create Contract' : 'Connect Wallet'}
-											</LoadingButton>
+												{wallet.connected ? 'Preview' : 'Connect Wallet'}
+											</Button>
 										) : (
-											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }}>
+											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }} disabled={step.error}>
 												Next
 											</Button>
 										)}
@@ -191,6 +229,23 @@ const CreateContractFlow = ({
 					</FormGroup>
 				</Box>
 			)}
+			<PreviewModal
+				redeemLogicOption={redeemLogicOption}
+				depositEnd={depositEnd}
+				settleStart={settleStart}
+				ratePlugin1={ratePlugin1}
+				ratePlugin2={ratePlugin2}
+				seniorDepositAmount={seniorDepositAmount}
+				juniorDepositAmount={juniorDepositAmount}
+				reserveMint={reserveMint}
+				open={openPreview}
+				handleClose={handleClosePreview}
+				actionProps={
+					<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
+					</LoadingButton>
+				}
+			/>
 		</Box>
 	);
 };

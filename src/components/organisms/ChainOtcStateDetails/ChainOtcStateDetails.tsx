@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
-import { Tooltip, Box, IconButton, Stack } from '@mui/material';
+import { Tooltip, Box, IconButton, Stack, Button, Menu, MenuItem } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import NumericBadge from 'components/atoms/NumericBadge';
@@ -14,8 +15,11 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 // eslint-disable-next-line no-unused-vars
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
+// import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
+import useContractStore from 'store/useContractStore';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
-import { getRedeemLogicDocumentionLink } from 'utils/urlBuilder';
+import { getRedeemLogicDocumentionLink } from 'utils/redeemLogicMetadataHelper';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -31,6 +35,46 @@ export type ChainOtcStateDetailsInput = {
 
 const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	const wallet = useWallet();
+	const router = useRouter();
+
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const openMoreIcon = Boolean(anchorEl);
+	const moreIconClick = (event: MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const moreIconClose = () => {
+		setAnchorEl(null);
+	};
+
+	const { create } = useContractStore();
+
+	const cloneContract = () => {
+		create({
+			reserveMint: otcState.reserveMint,
+			seniorDepositAmount: otcState.buyerDepositAmount,
+			juniorDepositAmount: otcState.sellerDepositAmount,
+			depositStart: otcState.depositAvailableFrom,
+			depositEnd: otcState.depositExpirationAt,
+			settleStart: otcState.settleAvailableFromAt,
+			redeemLogicOption: {
+				redeemLogicPluginType: otcState.redeemLogicAccount.state.stateType.type,
+				...otcState.redeemLogicAccount.state.getPluginDataObj()
+			},
+			rateOption: {
+				ratePluginType: otcState.rateAccount.state.typeId,
+				// TODO extract this information in a clearer way
+				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh
+			},
+			saveOnDatabase: true,
+			sendNotification: true
+		});
+		router.push('/contract/create');
+	};
+
+	const cloneContractHandler = () => {
+		moreIconClose();
+		cloneContract();
+	};
 
 	const [showSimulator, setShowSimulator] = useState(false);
 
@@ -42,7 +86,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	// };
 
 	const handleDocumentationClick = () => {
-		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicState.typeId));
+		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.stateType.type));
 	};
 
 	const handleToggle = () => {
@@ -56,8 +100,8 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		isInitialized: livePriceIsInitialized,
 		removeListener
 	} = useOracleLivePrice(
-		otcState.rateState.typeId,
-		otcState.rateState.livePriceAccounts.map((c) => c.toBase58())
+		otcState.rateAccount.state.typeId,
+		otcState.rateAccount.state.livePriceAccounts.map((c) => c.toBase58())
 	);
 
 	useEffect(() => {
@@ -84,6 +128,28 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					</span>
 				</Box>
 
+				<span
+					className={styles.menuOpener}
+					id="menuOpener"
+					aria-controls={open ? 'menu' : undefined}
+					aria-haspopup="true"
+					aria-expanded={open ? 'true' : undefined}
+					onClick={moreIconClick}
+				>
+					<MoreVertIcon fontSize="small" />
+				</span>
+				<Menu
+					id="menu"
+					anchorEl={anchorEl}
+					open={openMoreIcon}
+					onClose={moreIconClose}
+					MenuListProps={{
+						'aria-labelledby': 'menuOpener'
+					}}
+				>
+					<MenuItem onClick={cloneContractHandler}>Clone</MenuItem>
+				</Menu>
+
 				{/* + + + + + + + + + + + + +  */}
 				{/* PLUGIN USED */}
 				<Box
@@ -93,7 +159,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						alignItems: 'center'
 					}}
 				>
-					<StatusBadge label={otcState.rateState.typeId} mode={'info'} />
+					<StatusBadge label={otcState.redeemLogicAccount.state.getTypeLabel()} mode={'info'} />
 
 					<div style={{ flex: 1 }} />
 					<ContractStatusBadge status={otcState.contractStatus} />
@@ -122,7 +188,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* TITLE AND SYMBOL */}
 				<Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
 					<Stack direction="row" sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-						<b>{otcState.redeemLogicState.typeId.toUpperCase()}</b>
+						<b>{otcState.redeemLogicAccount.state.getTypeLabel().toUpperCase()}</b>
 						<Tooltip title="" placement="right">
 							<IconButton size="small" color="inherit" onClick={handleDocumentationClick} disableRipple={true}>
 								<ArrowOutwardIcon sx={{ width: '15px' }} />
@@ -137,7 +203,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				{/* DETAILS */}
 				<div className={styles.content}>
 					{otcState.settleExecuted &&
-						otcState.redeemLogicState.settlementPricesDescription.map((priceAtSet, i) => (
+						otcState.redeemLogicAccount.state.settlementPricesDescription.map((priceAtSet, i) => (
 							<div key={i} className={styles.column}>
 								<p>{priceAtSet}</p>
 								<p>{formatWithDecimalDigits(otcState.pricesAtSettlement[i])}</p>
@@ -146,14 +212,14 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 					{!otcState.settleExecuted &&
 						livePriceIsInitialized &&
-						otcState.redeemLogicState.rateFeedsDescription.map((rateFeedDescr, i) => (
+						otcState.redeemLogicAccount.state.rateFeedsDescription.map((rateFeedDescr, i) => (
 							<div key={i} className={styles.column}>
 								<p>{rateFeedDescr}</p>
 								<p>{formatWithDecimalDigits(livePricesValue[i])}</p>
 							</div>
 						))}
 
-					{otcState.redeemLogicState.pluginDetails.map((c) => (
+					{otcState.redeemLogicAccount.state.pluginDetails.map((c) => (
 						<div key={c.label} className={styles.column}>
 							<p>
 								{c.label}

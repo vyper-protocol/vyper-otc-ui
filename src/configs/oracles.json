@@ -50,7 +50,7 @@
 			"cluster": "devnet",
 			"pubkey": "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J",
 			"title": "BTC/USD",
-			"baseCurrency": "BCT",
+			"baseCurrency": "BTC",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=devnet"
 		},
