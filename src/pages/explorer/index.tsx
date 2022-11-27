@@ -2,10 +2,16 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { CircularProgress } from '@mui/material';
 import { countContracts } from 'api/supabase/countContracts';
-import ExplorerContractDataGrid, { QueryParams } from 'components/organisms/ExplorerContractDataGrid';
+import ExplorerContractDataGrid from 'components/organisms/ExplorerContractDataGrid';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import Layout from 'components/templates/Layout';
-import { ExplorerFilter, FetchContractsParams, SupabaseColumnOrder, parseExplorerFilterOperator } from 'controllers/fetchContracts/FetchContractsParams';
+import {
+	ExplorerFilter,
+	FetchContractsParams,
+	SupabaseColumnOrder,
+	parseExplorerFilterOperator,
+	QueryParams
+} from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
 import { useRouter } from 'next/router';
 
@@ -76,10 +82,10 @@ const ExplorerPage = () => {
 			if (values.length === 2) {
 				const [value, operator] = values;
 
-				const notionals = value.split(',').map((val) => parseInt(val, 10));
+				const strikes = value.split(',').map((val) => parseInt(val, 10));
 				const filterOperator = parseExplorerFilterOperator(operator);
-				if (filterOperator !== undefined && !notionals.some((notional) => isNaN(notional))) {
-					filter.push({ key: 'redeemLogicState.strike', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+				if (filterOperator !== undefined && !strikes.some((strike) => isNaN(strike))) {
+					filter.push({ key: 'redeemLogicState.strike', operator: filterOperator, value: strikes.length > 1 ? strikes : strikes[0] });
 				}
 			}
 		}
@@ -89,10 +95,10 @@ const ExplorerPage = () => {
 			if (values.length === 2) {
 				const [value, operator] = values;
 
-				const notionals = value.split(',').map((val) => new Date(val).toUTCString());
+				const dates = value.split(',').map((val) => new Date(val).toUTCString());
 				const filterOperator = parseExplorerFilterOperator(operator);
 				if (filterOperator !== undefined) {
-					filter.push({ key: 'settleAvailableFromAt', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+					filter.push({ key: 'settleAvailableFromAt', operator: filterOperator, value: dates.length > 1 ? dates : dates[0] });
 				}
 			}
 		}
