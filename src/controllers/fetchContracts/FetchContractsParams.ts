@@ -202,7 +202,7 @@ export const transformParams = (params: QueryParams): { [key: string]: string } 
 					if ((Array.isArray(filter.value) && filter.value.length > 0) || (!Array.isArray(filter.value) && filter.value !== undefined)) {
 						acc[filter.key] = filter.value + ' ' + filter.operator;
 					} else {
-						delete acc[filter.key];
+						acc[filter.key] = '';
 					}
 				}
 			} else {

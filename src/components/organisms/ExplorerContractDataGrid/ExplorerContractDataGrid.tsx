@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, CircularProgress } from '@mui/material';
-import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem, GridFilterModel } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem, GridFilterModel, GridSortModel } from '@mui/x-data-grid';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -43,30 +43,36 @@ type Props = {
 };
 
 const ExplorerContractDataGrid = ({ query, count }: Props) => {
-	const { page = 1, limit = 25, sort, filter } = query;
+	const { page, limit, sort, filter } = query;
 
 	const { connection } = useConnection();
 	const router = useRouter();
 
 	const [contractsLoading, setContractsLoading] = useState(false);
 	const [contracts, setContracts] = useState<ChainOtcState[]>([]);
+
+	const [explorerPage, setExplorerPage] = useState(page || 1);
+	const [explorerLimit, setExplorerLimit] = useState(limit || 25);
 	const [filterModel, setFilterModel] = useState<GridFilterModel | null>(filter ? toFilterModel(filter) : null);
+	const [sortModel, setSortModel] = useState<GridSortModel | null>(sort ? toSortModel(sort) : null);
 
-	const updateQueryParams = useCallback(
-		(updatedQueryParams: QueryParams, resetPagination?: boolean) => {
-			const updatedQuery = cleanParams(transformParams(updatedQueryParams));
+	const explorerPageRef = useRef(true);
+	const explorerStateRef = useRef(true);
 
-			if (resetPagination) {
-				updatedQuery.page = '1';
-			}
+	const updateQueryParams = useCallback(() => {
+		const updatedQueryParams = transformParams({
+			filter: fromFilterModel(filterModel),
+			sort: fromSortModel(sortModel),
+			page: explorerPage,
+			limit: explorerLimit
+		});
+		const updatedQuery = cleanParams(updatedQueryParams);
 
-			router.push({
-				pathname: '/explorer',
-				query: updatedQuery
-			});
-		},
-		[router]
-	);
+		router.push({
+			pathname: '/explorer',
+			query: updatedQuery
+		});
+	}, [router, explorerPage, explorerLimit, filterModel, sortModel]);
 
 	useEffect(() => {
 		setContractsLoading(true);
@@ -77,6 +83,33 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			.then((c) => setContracts(c))
 			.finally(() => setContractsLoading(false));
 	}, [connection, query]);
+
+	useEffect(() => {
+		if (explorerPageRef.current) {
+			explorerPageRef.current = false;
+			return;
+		}
+
+		// When explorer page is updated, update the query params
+		updateQueryParams();
+		// eslint-disable-next-line
+	}, [explorerPage]);
+
+	useEffect(() => {
+		if (explorerStateRef.current) {
+			explorerStateRef.current = false;
+			return;
+		}
+
+		setExplorerPage((prevPage) => {
+			if (prevPage === 1) {
+				updateQueryParams();
+			}
+
+			return 1;
+		});
+		// eslint-disable-next-line
+	}, [explorerLimit, sortModel]);
 
 	const columns: GridColumns<ChainOtcState> = [
 		{
@@ -281,20 +314,26 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 						paginationMode="server"
 						filterMode="server"
 						sortingMode="server"
-						page={page - 1}
-						pageSize={limit}
+						page={explorerPage - 1}
+						pageSize={explorerLimit}
 						getRowId={(row) => row.publickey.toBase58()}
 						rows={contracts}
 						rowCount={count}
 						columns={columns}
 						filterModel={filterModel}
-						sortModel={sort ? toSortModel(sort) : undefined}
+						sortModel={sortModel}
 						// Material UI page starts from 0
-						onPreferencePanelClose={() => updateQueryParams({ filter: fromFilterModel(filterModel) }, true)}
-						onPageChange={(newPage) => updateQueryParams({ page: newPage + 1 })}
-						onPageSizeChange={(newLimit) => updateQueryParams({ limit: newLimit })}
-						onSortModelChange={(newSortModel) => updateQueryParams({ sort: fromSortModel(newSortModel) }, true)}
+						onPreferencePanelClose={() => {
+							if (explorerPage === 1) {
+								updateQueryParams();
+							} else {
+								setExplorerPage(1);
+							}
+						}}
+						onPageChange={(newPage) => setExplorerPage(newPage + 1)}
+						onPageSizeChange={(newLimit) => setExplorerLimit(newLimit)}
 						onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
+						onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
 					/>
 				</Box>
 			)}
