@@ -4,7 +4,6 @@ import { useContext, useState } from 'react';
 import { Alert, AlertTitle, Box, Button, CircularProgress, FormControlLabel, FormGroup, Slider, Stack, Switch, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';

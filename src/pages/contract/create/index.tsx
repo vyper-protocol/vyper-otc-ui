@@ -13,12 +13,9 @@ import Layout from 'components/templates/Layout';
 import createContract from 'controllers/createContract';
 import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import moment from 'moment';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import * as UrlBuilder from 'utils/urlBuilder';
-
-const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 const CreateContractPage = () => {
 	const contractStore = useContractStore();
@@ -94,7 +91,6 @@ const CreateContractPage = () => {
 		<Layout>
 			<NonAuditedDisclaimer />
 			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
-				<DynamicReactJson src={initParams} />
 				<CreateContractFlow
 					initialStep={isPresentTempData ? 4 : 0}
 					contractInitParams={initParams}

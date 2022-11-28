@@ -25,33 +25,39 @@ type OraclePickerInput = {
 	setRatePlugin: (type: RatePluginTypeIds, pubkey: string) => void;
 };
 
-async function getOracleDetail(connection: Connection, cluster: Cluster, pubkey: string): Promise<OracleDetail> {
+async function getOracleDetail(connection: Connection, cluster: Cluster, pubkey: string): Promise<[OracleDetail, boolean]> {
 	try {
 		const localData = getOracleByPubkey(pubkey);
-		if (localData) return localData;
+		if (localData) return [localData, false];
 
 		const publicKey = new PublicKey(pubkey);
 
 		const [productData] = await RatePythState.GetProductPrice(connection, cluster, publicKey);
 		if (productData) {
-			return {
-				type: 'pyth',
-				title: productData.symbol,
-				cluster,
-				explorerUrl: getRateExplorer('pyth'),
-				pubkey
-			};
+			return [
+				{
+					type: 'pyth',
+					title: productData.symbol,
+					cluster,
+					explorerUrl: getRateExplorer('pyth'),
+					pubkey
+				},
+				true
+			];
 		}
 
 		const aggregatorData = await RateSwitchboardState.LoadAggregatorData(connection, publicKey);
 		if (aggregatorData) {
-			return {
-				type: 'switchboard',
-				title: String.fromCharCode(...aggregatorData.name),
-				cluster,
-				explorerUrl: getRateExplorer('switchboard'),
-				pubkey
-			};
+			return [
+				{
+					type: 'switchboard',
+					title: String.fromCharCode(...aggregatorData.name),
+					cluster,
+					explorerUrl: getRateExplorer('switchboard'),
+					pubkey
+				},
+				true
+			];
 		}
 
 		return undefined;
@@ -60,25 +66,25 @@ async function getOracleDetail(connection: Connection, cluster: Cluster, pubkey:
 	}
 }
 
-const OraclePicker = ({ rateLabel, options, pubkey, setRatePlugin }: OraclePickerInput) => {
-	console.log('rendered with ', pubkey);
-
+const OraclePicker = ({ rateLabel: renderInputTitle, options, pubkey, setRatePlugin }: OraclePickerInput) => {
 	const { connection } = useConnection();
 	const currentCluster = getCurrentCluster();
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [oracleDetail, setOracleDetail] = useState<OracleDetail>(undefined);
+	const [isExternal, setIsExternal] = useState(false);
+	const [oracleDetail, setOracleDetail] = useState<OracleDetail>(getOracleByPubkey(pubkey));
 	useEffect(() => {
 		getOracleDetail(connection, currentCluster, pubkey).then((v) => {
-			setOracleDetail(v);
+			setOracleDetail(v[0]);
+			setIsExternal(v[1]);
 		});
-	}, [pubkey]);
+	}, [connection, currentCluster, pubkey]);
 
 	const [label, setLabel] = useState(<></>);
 
 	return (
-		<>
+		<Stack direction="row" alignItems="center">
 			<Autocomplete
 				sx={{ width: 300, marginY: 2 }}
 				autoHighlight
@@ -87,18 +93,27 @@ const OraclePicker = ({ rateLabel, options, pubkey, setRatePlugin }: OraclePicke
 				handleHomeEndKeys
 				disableClearable
 				loading={isLoading}
+				options={options}
 				freeSolo={currentCluster === 'devnet'}
-				value={oracleDetail?.title}
+				value={oracleDetail}
+				onChange={async (_, val: OracleDetail | string) => {
+					if (typeof val === 'object') {
+						setRatePlugin((val as OracleDetail).type, (val as OracleDetail).pubkey);
+						setLabel(<></>);
+					}
+				}}
+				// inputValue={oracleDetail?.title}
 				onInputChange={async (_, val: string, reason: string) => {
 					if (reason !== 'input') return;
 
 					setIsLoading(true);
 					try {
-						console.log('onInputChange triggered: val=', val);
-						const res = await getOracleDetail(connection, currentCluster, val);
+						const [res, newIsExternal] = await getOracleDetail(connection, currentCluster, val);
 
 						if (res) {
 							setOracleDetail(res);
+							setIsExternal(newIsExternal);
+
 							setRatePlugin(res.type, res.pubkey);
 							setLabel(
 								<Box sx={{ paddingX: '16px', paddingY: '6px' }}>
@@ -119,7 +134,8 @@ const OraclePicker = ({ rateLabel, options, pubkey, setRatePlugin }: OraclePicke
 						setIsLoading(false);
 					}
 				}}
-				getOptionLabel={(oracle: string | OracleDetail) => (typeof oracle === 'string' ? oracle : oracle.title)}
+				// getOptionLabel={(oracle: string | OracleDetail) => (typeof oracle === 'string' ? oracle : oracle.title)}
+				getOptionLabel={(oracle: OracleDetail) => (isExternal ? oracle.pubkey : oracle.title)}
 				renderOption={(props, option: OracleDetail) => (
 					<Box component="li" {...props}>
 						<Typography align="left">{option.title}</Typography>
@@ -128,27 +144,19 @@ const OraclePicker = ({ rateLabel, options, pubkey, setRatePlugin }: OraclePicke
 						</Typography>
 					</Box>
 				)}
-				options={options}
 				renderInput={(params) => (
 					<>
-						<TextField {...params} label={rateLabel} />
+						<TextField {...params} label={renderInputTitle} />
 						{label}
 					</>
 				)}
-				onChange={async (_, val: OracleDetail | string) => {
-					console.log('onChange triggered: val=', val);
-					if (typeof val === 'object') {
-						setRatePlugin((val as OracleDetail).type, (val as OracleDetail).pubkey);
-						setLabel(<></>);
-					}
-				}}
 			/>
 			{oracleDetail?.explorerUrl && (
 				<a href={oracleDetail?.explorerUrl ?? '#'} target="_blank" rel="noopener noreferrer">
 					<Typography sx={{ textDecoration: 'underline', ml: 2 }}>View in explorer</Typography>
 				</a>
 			)}
-		</>
+		</Stack>
 	);
 };
 
@@ -181,7 +189,7 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 						options={getOraclesByType(ratePluginType)}
 						pubkey={rateAccounts[1]}
 						setRatePlugin={(newType, newPubkey) => {
-							setRateAccounts(newType, [newPubkey, rateAccounts[1]]);
+							setRateAccounts(newType, [rateAccounts[0], newPubkey]);
 						}}
 					/>
 				)}
