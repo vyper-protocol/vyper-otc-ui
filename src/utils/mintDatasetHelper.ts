@@ -2,7 +2,6 @@ import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import mintData from 'configs/mints.json';
 import { MintDetail } from 'models/MintDetail';
-import { TokenInfo } from 'models/TokenInfo';
 
 export function getMints(): MintDetail[] {
 	const mintList = mintData.mints as MintDetail[];
@@ -20,8 +19,3 @@ export function getMintByStable(): MintDetail[] {
 export function getMintByTitle(symbol: string): MintDetail {
 	return getMints().find(({ title }) => title === symbol);
 }
-
-// // TODO: TokenInfo and MintDetail overlap, we should merge the two types
-// export function getMintFromTokenInfo(token: TokenInfo): MintDetail {
-// 	return { cluster: getCurrentCluster(), pubkey: token.address, title: token.symbol };
-// }

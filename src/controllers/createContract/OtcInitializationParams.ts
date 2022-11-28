@@ -1,5 +1,5 @@
 import { Address, translateAddress } from '@project-serum/anchor';
-import { Cluster, Connection, PublicKey } from '@solana/web3.js';
+import { Cluster, Connection } from '@solana/web3.js';
 import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';

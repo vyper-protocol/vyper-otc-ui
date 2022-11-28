@@ -5,7 +5,6 @@ import { useContext, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
 import CreateContractFlow from 'components/organisms/CreateContractFlow';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
