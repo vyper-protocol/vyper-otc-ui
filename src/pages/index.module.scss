@@ -23,6 +23,7 @@
 .container {
 	width: 100vw;
 	align-items: center;
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 
 	.hero {
 		text-align: center;
@@ -35,7 +36,7 @@
 		.title {
 			font-size: var(--font-h1);
 			font-weight: 900;
-			font-family: monospace;
+			// // font-family: monospace;
 		}
 
 		.subtitle {
@@ -57,8 +58,8 @@
 			display: flex;
 			justify-content: center;
 			margin-top: 24px;
-			font-family: monospace;
-			font-size: 1.5em;
+			// font-family: monospace;
+			// font-size: 1.5em;
 
 			.button {
 				padding: 4px 12px;
@@ -102,12 +103,13 @@
 
 			.stat {
 				.value {
-					font-weight: 800;
-					font-size: 1.2rem;
+					font-weight: 650;
+					font-size: var(--font-h1);
+					// font-size: 4rem;
 				}
 
 				.title {
-					font-family: monospace;
+					// font-family: monospace;
 					font-size: larger;
 				}
 			}
@@ -152,7 +154,7 @@
 			.title {
 				font-size: 1.3rem;
 				font-weight: 600;
-				font-family: monospace;
+				// font-family: monospace;
 			}
 
 			.text {
@@ -162,7 +164,7 @@
 			.link {
 				margin-top: 16px;
 				text-transform: uppercase;
-				font-family: monospace;
+				// font-family: monospace;
 				text-align: right;
 				text-decoration: underline;
 			}
@@ -195,6 +197,7 @@
 
 		.title {
 			font-weight: 800;
+			font-size: var(--font-h5);
 		}
 	}
 }

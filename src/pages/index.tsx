@@ -42,7 +42,9 @@ const Home = () => {
 				<Stack spacing={24} className={styles.container}>
 					<div className={styles.hero}>
 						<div className={styles.title}>
-							Create and trade <span className={styles.glow}>OTC derivatives</span> in less than a minute
+							Create and trade <span className={styles.glow}>OTC derivatives</span>
+							<br />
+							in less than a minute
 						</div>
 						<div className={styles.subtitle}>Vyper allows anyone to trade a wide range of on-chain derivatives in a transparent and easy way</div>
 						<div className={styles.button_group}>
@@ -59,17 +61,17 @@ const Home = () => {
 						<div className={styles.stats_group}>
 							<div className={cn(styles.stat, styles.first)}>
 								<div className={styles.value}>{isLoading ? skeleton : stats?.data?.numberOfContracts}</div>
-								<div className={styles.title}>Contract created</div>
+								<div className={styles.title}>Contracts created</div>
 							</div>
 							<div className={cn(styles.stat, styles.second)}>
 								<div className={styles.value}>{isLoading ? skeleton : stats?.data?.numberOfLiveContracts}</div>
 								<div className={styles.title}>Live trades</div>
 							</div>
-							<div className={cn(styles.stat, styles.third)}>
-								{/* TODO: add collateral to stats */}
+							{/* <div className={cn(styles.stat, styles.third)}>
+								 TODO: add collateral to stats
 								<div className={styles.value}>{isLoading ? skeleton : '$10k+'}</div>
 								<div className={styles.title}>Collateral traded</div>
-							</div>
+							</div> */}
 							<div className={cn(styles.stat, styles.fourth)}>
 								<div className={styles.value}>{isLoading ? skeleton : getOraclesNumber()}</div>
 								<div className={styles.title}>Assets supported</div>
