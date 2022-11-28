@@ -14,12 +14,19 @@
 	.content {
 		color: var(--color-black);
 		font-size: var(--font-p-medium);
-		padding: var(--space-10);
+		padding: 10px 24px;
 	}
 
 	.actions {
-		padding: var(--space-16);
+		padding: 16px;
 		display: flex;
 		justify-content: flex-end;
+
+		* {
+			margin: {
+				left: 2px;
+				right: 2px;
+			}
+		}
 	}
 }

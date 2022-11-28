@@ -1,9 +1,10 @@
 import { MouseEvent, useEffect, useState } from 'react';
 
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
-import { Tooltip, Box, IconButton, Stack, Button, Menu, MenuItem } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ShareIcon from '@mui/icons-material/Share';
+import { Tooltip, Box, IconButton, Stack, Menu, MenuItem } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import NumericBadge from 'components/atoms/NumericBadge';
@@ -11,6 +12,7 @@ import StatusBadge from 'components/atoms/StatusBadge';
 import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
+import ShareModal from 'components/molecules/ShareModal';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 // eslint-disable-next-line no-unused-vars
 import _ from 'lodash';
@@ -27,7 +29,6 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
-import ShareModal from 'components/molecules/ShareModal';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: ChainOtcState;
@@ -110,6 +111,14 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		}
 	}, [otcState.settleExecuted, removeListener]);
 
+	const [openShare, setOpenShare] = useState(false);
+	const handleOpenShare = () => setOpenShare(true);
+	const handleCloseShare = () => setOpenShare(false);
+
+	const showPnlData = livePriceIsInitialized && otcState.isPnlAvailable();
+	const isBuyerConnected = otcState.buyerWallet && wallet?.publicKey?.toBase58() === otcState.buyerWallet?.toBase58();
+	const isSellerConnected = otcState.sellerWallet && wallet?.publicKey?.toBase58() === otcState.sellerWallet?.toBase58();
+
 	return (
 		<div className={styles.cards}>
 			<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
@@ -120,7 +129,11 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						justifyContent: 'space-between'
 					}}
 				>
-					<ShareModal />
+					{showPnlData && (isBuyerConnected || isSellerConnected) && (
+						<span className={styles.toggle} onClick={handleOpenShare}>
+							<ShareIcon fontSize="small" />
+						</span>
+					)}
 
 					<span className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }}>
 						Simulator
@@ -250,20 +263,11 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						</p>
 					</div>
 
-					{otcState.buyerWallet && wallet?.publicKey?.toBase58() === otcState.buyerWallet?.toBase58() && (
+					{(isBuyerConnected || isSellerConnected) && (
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<StatusBadge label="LONG" mode="success" />
-							</p>
-						</div>
-					)}
-
-					{otcState.sellerWallet && wallet?.publicKey?.toBase58() === otcState.sellerWallet?.toBase58() && (
-						<div className={styles.column}>
-							<p>Your side</p>
-							<p>
-								<StatusBadge label="SHORT" mode="error" />
+								<StatusBadge label={isBuyerConnected ? 'LONG' : 'SHORT'} mode={isBuyerConnected ? 'success' : 'error'} />
 							</p>
 						</div>
 					)}
@@ -295,7 +299,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				<hr />
 				{/* + + + + + + + + + + + + +  */}
 				{/* PnL */}
-				{livePriceIsInitialized && otcState.isPnlAvailable() && (
+				{showPnlData && (
 					<>
 						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 							<b>PnL</b>
@@ -332,6 +336,14 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 				</div>
 			</div>
 			<Simulator className={cn(styles.simulator, showSimulator ? styles.show : styles.hide)} />
+			<ShareModal
+				otcState={otcState}
+				livePricesValue={livePricesValue}
+				// TODO: add share for non connected wallets
+				pov={isBuyerConnected ? 'long' : 'short'}
+				open={openShare}
+				handleClose={handleCloseShare}
+			/>
 		</div>
 	);
 };
