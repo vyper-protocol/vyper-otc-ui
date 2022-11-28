@@ -66,7 +66,7 @@ export const ReservePicker = ({
 
 		if (mint) {
 			// pubkey is in mapped list
-			setReserveMint(new PublicKey(mint.pubkey));
+			setReserveMint(mint.pubkey);
 			setReserveError(false);
 			setExternal({ isExternal: false });
 		} else {
@@ -87,7 +87,7 @@ export const ReservePicker = ({
 				const mintTokenInfo = await fetchTokenInfo(pubkey);
 				if (mintTokenInfo) {
 					// mint found on-chain
-					setReserveMint(new PublicKey(mintTokenInfo.address));
+					setReserveMint(mintTokenInfo.address);
 					setReserveError(false);
 					setExternal({ isExternal: true, token: mintTokenInfo });
 				} else {
