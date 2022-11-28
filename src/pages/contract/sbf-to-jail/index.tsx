@@ -4,7 +4,6 @@ import { useContext, useState } from 'react';
 import { Alert, AlertTitle, Box, Button, CircularProgress, FormControlLabel, FormGroup, Slider, Stack, Switch, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
@@ -49,7 +48,7 @@ const CreateSbfJailContractPage = () => {
 			const settleStart = moment('2022-12-31 09:00:00Z').toDate().getTime();
 
 			const initParams: OtcInitializationParams = {
-				reserveMint: new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W'),
+				reserveMint: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
 				depositStart,
 				depositEnd,
 				settleStart,
@@ -57,7 +56,7 @@ const CreateSbfJailContractPage = () => {
 				juniorDepositAmount: 100,
 				rateOption: {
 					ratePluginType: 'switchboard',
-					rateAccounts: [new PublicKey('3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW')]
+					rateAccounts: ['3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW']
 				},
 				redeemLogicOption,
 				saveOnDatabase,

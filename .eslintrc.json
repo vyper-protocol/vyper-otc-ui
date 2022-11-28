@@ -72,7 +72,7 @@
 		],
 		"eqeqeq": 1,
 		"camelcase": 1,
-		"no-unused-vars": 1,
+		"no-unused-vars": ["warn", { "args": "none" }],
 		"dot-notation": 0,
 		"no-trailing-spaces": [2],
 		"no-var": 2,
