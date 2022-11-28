@@ -1,9 +1,9 @@
 import { MouseEvent, useEffect, useState } from 'react';
 
 import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
-import { Tooltip, Box, IconButton, Stack, Button, Menu, MenuItem } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Tooltip, Box, IconButton, Stack, Menu, MenuItem } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import NumericBadge from 'components/atoms/NumericBadge';
@@ -12,10 +12,7 @@ import CoinBadge from 'components/molecules/CoinBadge';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-// eslint-disable-next-line no-unused-vars
-import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
-// import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
@@ -49,7 +46,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 
 	const cloneContract = () => {
 		create({
-			reserveMint: otcState.reserveMint,
+			reserveMint: otcState.reserveMint.toBase58(),
 			seniorDepositAmount: otcState.buyerDepositAmount,
 			juniorDepositAmount: otcState.sellerDepositAmount,
 			depositStart: otcState.depositAvailableFrom,
@@ -62,7 +59,7 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 			rateOption: {
 				ratePluginType: otcState.rateAccount.state.typeId,
 				// TODO extract this information in a clearer way
-				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh
+				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh.map((c) => c.toBase58())
 			},
 			saveOnDatabase: true,
 			sendNotification: true

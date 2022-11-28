@@ -9,7 +9,7 @@ import TokenSymbol from 'components/atoms/TokenSymbol';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
 import { TokenInfo } from 'models/TokenInfo';
-import { getMintByPubkey, getMintByTitle, getMintFromTokenInfo, getMints } from 'utils/mintDatasetHelper';
+import { getMintByPubkey, getMintByTitle, getMints } from 'utils/mintDatasetHelper';
 
 // TODO: fix typing
 export type ReservePickerInput = {
@@ -24,10 +24,10 @@ export type ReservePickerInput = {
 	setJuniorDepositAmount: (value: number) => void;
 
 	// collateral mint
-	reserveMint: MintDetail;
+	reserveMint: string;
 
 	// eslint-disable-next-line no-unused-vars
-	setReserveMint: (mint: MintDetail) => void;
+	setReserveMint: (mint: string) => void;
 };
 
 type ReservePickerProps = ReservePickerInput & {
@@ -46,6 +46,8 @@ type ExternalType = {
 	token?: TokenInfo;
 };
 
+// FIXME
+
 export const ReservePicker = ({
 	seniorDepositAmount,
 	setSeniorDepositAmount,
@@ -56,7 +58,6 @@ export const ReservePicker = ({
 	reserveError,
 	setReserveError
 }: ReservePickerProps) => {
-	const [value, setValue] = useState(reserveMint.title);
 	const [external, setExternal] = useState<ExternalType>({ isExternal: false });
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -65,12 +66,10 @@ export const ReservePicker = ({
 
 		if (mint) {
 			// pubkey is in mapped list
-			setReserveMint(mint);
-			setValue(mint.title);
+			setReserveMint(mint.pubkey);
 			setReserveError(false);
 			setExternal({ isExternal: false });
 		} else {
-			setValue(input);
 			// pubkey isn't mapped, look for it on chain
 			let pubkey: PublicKey;
 			try {
@@ -88,7 +87,7 @@ export const ReservePicker = ({
 				const mintTokenInfo = await fetchTokenInfo(pubkey);
 				if (mintTokenInfo) {
 					// mint found on-chain
-					setReserveMint(getMintFromTokenInfo(mintTokenInfo));
+					setReserveMint(mintTokenInfo.address);
 					setReserveError(false);
 					setExternal({ isExternal: true, token: mintTokenInfo });
 				} else {
@@ -118,15 +117,15 @@ export const ReservePicker = ({
 					clearOnBlur
 					handleHomeEndKeys
 					freeSolo={getCurrentCluster() === 'devnet'}
-					value={value}
+					value={reserveMint}
 					onInputChange={async (_, input: string, reason: string) => {
 						if (reason !== 'input') return;
 						if (getCurrentCluster() === 'devnet') {
 							await handleInputChange(input);
 						}
 					}}
-					getOptionLabel={(mint: MintDetail | string) => (typeof mint === 'string' ? mint : mint.title)}
-					options={getMints()}
+					getOptionLabel={(mint: string) => getMintByPubkey(mint)?.title ?? mint}
+					options={getMints().map((c) => c.pubkey)}
 					renderInput={(params) => <TextField {...params} label={isLoading ? 'Loading' : 'Collateral mint'} />}
 					onChange={async (_, mintOrPubkey: MintDetail | string) => {
 						if (typeof mintOrPubkey === 'object') {
@@ -137,7 +136,7 @@ export const ReservePicker = ({
 					}}
 				/>
 				<a
-					href={getExplorerLink(reserveMint.pubkey, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					href={getExplorerLink(reserveMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
