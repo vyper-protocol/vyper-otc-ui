@@ -11,6 +11,7 @@ import { ReservePicker } from 'components/molecules/ReservePicker';
 import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import produce from 'immer';
 
 type StepElement = {
 	title: string;
@@ -63,13 +64,11 @@ const CreateContractFlow = ({
 				<PayoffPicker
 					redeemLogicPluginType={contractInitParams.redeemLogicOption.redeemLogicPluginType}
 					setRedeemLogicPluginType={(newRedeemLogicType) =>
-						onContractInitParamsChange((prevValue) => ({
-							...prevValue,
-							redeemLogicOption: {
-								...prevValue.redeemLogicOption,
-								redeemLogicPluginType: newRedeemLogicType
-							}
-						}))
+						onContractInitParamsChange((prevValue) =>
+							produce(prevValue, (draft) => {
+								draft.redeemLogicOption.redeemLogicPluginType = newRedeemLogicType;
+							})
+						)
 					}
 				/>
 			),
@@ -84,16 +83,18 @@ const CreateContractFlow = ({
 					ratePluginType={contractInitParams.rateOption.ratePluginType}
 					rateAccounts={contractInitParams.rateOption.rateAccounts}
 					setRateAccounts={(newRateType, newRateAccounts) => {
-						onContractInitParamsChange((prevValue) => ({
-							...prevValue,
-							rateOption: {
-								...prevValue.rateOption,
-								ratePluginType: newRateType,
-								rateAccounts: newRateAccounts
-							}
-						}));
+						onContractInitParamsChange((prevValue) =>
+							produce(prevValue, (draft) => {
+								draft.rateOption.ratePluginType = newRateType;
+								draft.rateOption.rateAccounts = newRateAccounts;
+							})
+						);
 						getPriceForStrike(newRateType, newRateAccounts, connection, getCurrentCluster()).then((newStrike) => {
-							onContractInitParamsChange((prevValue) => ({ ...prevValue, redeemLogicOption: { ...prevValue.redeemLogicOption, strike: newStrike } }));
+							onContractInitParamsChange((prevValue) =>
+								produce(prevValue, (draft) => {
+									draft.redeemLogicOption.strike = newStrike;
+								})
+							);
 						});
 					}}
 				/>
@@ -107,10 +108,11 @@ const CreateContractFlow = ({
 				<RLParamsPicker
 					redeemLogicOptions={contractInitParams.redeemLogicOption}
 					setRedeemLogicOptions={(newVal) =>
-						onContractInitParamsChange((prevValue) => ({
-							...contractInitParams,
-							redeemLogicOption: newVal
-						}))
+						onContractInitParamsChange((prevValue) =>
+							produce(prevValue, (draft) => {
+								draft.redeemLogicOption = newVal;
+							})
+						)
 					}
 				/>
 			),
@@ -125,24 +127,27 @@ const CreateContractFlow = ({
 				<ReservePicker
 					seniorDepositAmount={contractInitParams.seniorDepositAmount}
 					setSeniorDepositAmount={(newVal) =>
-						onContractInitParamsChange((prevVal) => ({
-							...contractInitParams,
-							seniorDepositAmount: newVal
-						}))
+						onContractInitParamsChange((prevVal) =>
+							produce(prevVal, (draft) => {
+								draft.seniorDepositAmount = newVal;
+							})
+						)
 					}
 					juniorDepositAmount={contractInitParams.juniorDepositAmount}
 					setJuniorDepositAmount={(newVal) =>
-						onContractInitParamsChange((prevVal) => ({
-							...contractInitParams,
-							juniorDepositAmount: newVal
-						}))
+						onContractInitParamsChange((prevVal) =>
+							produce(prevVal, (draft) => {
+								draft.juniorDepositAmount = newVal;
+							})
+						)
 					}
 					reserveMint={contractInitParams.reserveMint}
 					setReserveMint={(newVal) =>
-						onContractInitParamsChange((prevVal) => ({
-							...contractInitParams,
-							reserveMint: newVal
-						}))
+						onContractInitParamsChange((prevVal) =>
+							produce(prevVal, (draft) => {
+								draft.reserveMint = newVal;
+							})
+						)
 					}
 					reserveError={reserveError}
 					setReserveError={setReserveError}
@@ -157,17 +162,19 @@ const CreateContractFlow = ({
 				<ExpiryPicker
 					depositEnd={contractInitParams.depositEnd}
 					setDepositEnd={(newVal) =>
-						onContractInitParamsChange((prevVal) => ({
-							...contractInitParams,
-							depositEnd: newVal
-						}))
+						onContractInitParamsChange((prevVal) =>
+							produce(prevVal, (draft) => {
+								draft.depositEnd = newVal;
+							})
+						)
 					}
 					settleStart={contractInitParams.settleStart}
 					setSettleStart={(newVal) =>
-						onContractInitParamsChange((prevVal) => ({
-							...contractInitParams,
-							settleStart: newVal
-						}))
+						onContractInitParamsChange((prevVal) =>
+							produce(prevVal, (draft) => {
+								draft.settleStart = newVal;
+							})
+						)
 					}
 					expiryError={expiryError}
 					setExpiryError={setExpiryError}
