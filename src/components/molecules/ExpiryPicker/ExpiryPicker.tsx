@@ -77,7 +77,7 @@ export const ExpiryPicker = ({ depositEnd, setDepositEnd, settleStart, setSettle
 				{/* <Button onClick={() => setOpen(true)}>open alert</Button> */}
 			</Grid>
 			<Grid item xs={6}>
-				<DateTimePickerComp title="Deposit Expiry" value={depositEnd} onChange={setDepositEnd} pillars={depositPillar} />
+				<DateTimePickerComp title="Deposit Window" value={depositEnd} onChange={setDepositEnd} pillars={depositPillar} />
 			</Grid>
 			<Grid item xs={6}>
 				<DateTimePickerComp title="Contract Expiry" value={settleStart} onChange={setSettleStart} pillars={expiryPillars} />

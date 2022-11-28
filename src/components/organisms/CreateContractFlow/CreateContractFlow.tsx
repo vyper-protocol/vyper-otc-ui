@@ -148,7 +148,7 @@ const CreateContractFlow = ({
 		},
 		{
 			title: 'expiry',
-			description: 'Select the deposit expiry and contract expiry',
+			description: 'Select the deposit window and contract expiry',
 			content: (
 				<ExpiryPicker
 					depositEnd={depositEnd}
