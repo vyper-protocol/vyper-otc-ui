@@ -75,10 +75,15 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, pubkey, setRatePlu
 	const [isExternal, setIsExternal] = useState(false);
 	const [oracleDetail, setOracleDetail] = useState<OracleDetail>(getOracleByPubkey(pubkey));
 	useEffect(() => {
-		getOracleDetail(connection, currentCluster, pubkey).then((v) => {
-			setOracleDetail(v[0]);
-			setIsExternal(v[1]);
-		});
+		setIsLoading(true);
+		getOracleDetail(connection, currentCluster, pubkey)
+			.then((v) => {
+				setOracleDetail(v[0]);
+				setIsExternal(v[1]);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
 	}, [connection, currentCluster, pubkey]);
 
 	const [label, setLabel] = useState(<></>);
@@ -135,7 +140,7 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, pubkey, setRatePlu
 					}
 				}}
 				// getOptionLabel={(oracle: string | OracleDetail) => (typeof oracle === 'string' ? oracle : oracle.title)}
-				getOptionLabel={(oracle: OracleDetail) => (isExternal ? oracle.pubkey : oracle.title)}
+				getOptionLabel={(oracle: OracleDetail) => (isLoading ? 'Loading...' : isExternal ? oracle.pubkey : oracle.title)}
 				renderOption={(props, option: OracleDetail) => (
 					<Box component="li" {...props}>
 						<Typography align="left">{option.title}</Typography>
