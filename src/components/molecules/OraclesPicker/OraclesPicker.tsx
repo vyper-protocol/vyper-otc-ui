@@ -4,6 +4,7 @@ import { Box, Stack, Autocomplete, TextField, Typography, Alert } from '@mui/mat
 import { useConnection } from '@solana/wallet-adapter-react';
 import { Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import _ from 'lodash';
 import { OracleDetail } from 'models/OracleDetail';
 import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
@@ -101,14 +102,14 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, pubkey, setRatePlu
 				options={options}
 				freeSolo={currentCluster === 'devnet'}
 				value={oracleDetail}
-				onChange={async (_, val: OracleDetail | string) => {
+				onChange={async (e, val: OracleDetail | string) => {
 					if (typeof val === 'object') {
 						setRatePlugin((val as OracleDetail).type, (val as OracleDetail).pubkey);
 						setLabel(<></>);
 					}
 				}}
 				// inputValue={oracleDetail?.title}
-				onInputChange={async (_, val: string, reason: string) => {
+				onInputChange={async (e, val: string, reason: string) => {
 					if (reason !== 'input') return;
 
 					setIsLoading(true);
@@ -181,7 +182,7 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 			<Stack spacing={2}>
 				<OraclePicker
 					rateLabel={'Oracle #1'}
-					options={getOracles()}
+					options={_.sortBy(getOracles(), ['title'], ['asc'])}
 					pubkey={rateAccounts[0]}
 					setRatePlugin={(newType, newPubkey) => {
 						setRateAccounts(newType, [newPubkey, rateAccounts[1]]);
@@ -191,7 +192,7 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 				{oraclesRequired === 'double' && (
 					<OraclePicker
 						rateLabel={'Oracle #2'}
-						options={getOraclesByType(ratePluginType)}
+						options={_.sortBy(getOraclesByType(ratePluginType), ['title'], ['asc'])}
 						pubkey={rateAccounts[1]}
 						setRatePlugin={(newType, newPubkey) => {
 							setRateAccounts(newType, [rateAccounts[0], newPubkey]);
