@@ -1,0 +1,83 @@
+// refactor styles with base.css
+
+.container {
+	.card:hover {
+		box-shadow: 0px 0px 32px 6px rgba(117, 117, 117, 0.5);
+		filter: grayscale(0%);
+		cursor: pointer;
+	}
+
+	.card {
+		background: linear-gradient(110deg, #020142f5 12%, rgba(66, 56, 74, 0.37) 115.39%);
+		width: 285px;
+		height: 285px;
+		padding: 20px;
+		margin: 16px;
+		border-radius: 16px;
+		transition: all 0.1s ease-in;
+		font-family: monospace;
+		filter: grayscale(45%);
+
+		.badgeContainer {
+			width: 100%;
+			display: inline-flex;
+			opacity: 0.8;
+
+			.badge {
+				text-align: center;
+				margin: 2px 4px;
+				padding: 4px 8px;
+				font-weight: 400;
+				text-transform: uppercase;
+				color: var(--color-black-800);
+				color: beige;
+				font-weight: 500;
+				border-radius: 6px;
+				font-size: small;
+				color: rgb(255, 255, 255);
+			}
+
+			.payoff {
+				background-color: rgba(138, 46, 97);
+			}
+
+			.expiry {
+				background-color: rgba(112, 92, 26);
+			}
+
+			.type {
+				background-color: rgb(42, 141, 158);
+			}
+		}
+
+		.logoContainer {
+			display: flex;
+			justify-content: center;
+			margin-top: 16px;
+
+			.logo {
+				filter: drop-shadow(8px 8px 8px #222);
+				width: 65%;
+				height: 65%;
+			}
+		}
+
+		.infoContainer {
+			margin-top: 8px;
+			color: white;
+			font-size: large;
+			display: inline-flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+
+			.symbol {
+				font-weight: 600;
+			}
+			.price {
+				font-weight: 400;
+				font-size: 80%;
+			}
+		}
+	}
+}

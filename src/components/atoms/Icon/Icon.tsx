@@ -1,6 +1,6 @@
 import { IconBaseProps } from 'react-icons';
 import { AiFillWarning } from 'react-icons/ai';
-import { FaDiscord, FaGithub, FaGlobe, FaMedium, FaTwitter, FaTelegram } from 'react-icons/fa';
+import { FaDiscord, FaGithub, FaGlobe, FaMedium, FaTwitter, FaTelegramPlane } from 'react-icons/fa';
 import { MdArticle } from 'react-icons/md';
 
 const ICONS_MAP = {
@@ -9,7 +9,7 @@ const ICONS_MAP = {
 	FaGlobe: FaGlobe,
 	FaMedium: FaMedium,
 	FaTwitter: FaTwitter,
-	FaTelegram: FaTelegram,
+	FaTelegramPlane: FaTelegramPlane,
 	MdArticle: MdArticle,
 	AiFillWarning: AiFillWarning
 };

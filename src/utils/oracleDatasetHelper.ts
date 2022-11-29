@@ -2,17 +2,25 @@ import { PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import oraclesData from 'configs/oracles.json';
 import { OracleDetail } from 'models/OracleDetail';
-import { RatePluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 
 export function getOracles(): OracleDetail[] {
 	const oraclesList = oraclesData.oracles as OracleDetail[];
 	return oraclesList.filter(({ cluster }) => cluster === getCurrentCluster());
 }
 
-export function getOracleByPubkey(val: PublicKey): OracleDetail | undefined {
-	return getOracles().find(({ pubkey }) => pubkey === val.toBase58());
+export function getOracleByPubkey(val: PublicKey | string): OracleDetail | undefined {
+	return getOracles().find(({ pubkey }) => pubkey === (typeof val === 'string' ? val : val.toBase58()));
 }
 
 export function getOraclesByType(val: RatePluginTypeIds): OracleDetail[] {
 	return getOracles().filter(({ type }) => type === val);
+}
+
+export function getOraclesByTitle(rateTitle: string, rateId: RatePluginTypeIds): OracleDetail | undefined {
+	return getOracles().find(({ type, title }) => type === rateId && title === rateTitle);
+}
+
+export function getOraclesNumber(): number {
+	return getOracles().length;
 }

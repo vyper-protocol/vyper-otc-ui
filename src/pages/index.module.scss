@@ -1,27 +1,228 @@
-.text_wrapper {
-	text-align: center;
-}
-
-.subtext {
-	padding-top: 10vh;
-
-	p,
-	a {
-		font-size: 1.9rem;
-		line-height: 2rem;
+@mixin glow($color) {
+	box-shadow: 0 0 5px #fff, 0 0 5px #fff, 0 0 20px $color, 0 0 10px $color, inset 0 0 1.3rem $color;
+	> .link {
+		color: $color;
 	}
 }
 
-.title {
-	padding: 15vh 0;
+@mixin glow-button($color) {
+	border-color: $color;
+	transition: 0.5s;
 
-	h2 {
-		letter-spacing: var(--space-10);
+	&:hover {
+		background: $color;
+		color: #fff;
+		box-shadow: 0 0 5px $color, 0 0 25px $color, 0 0 50px $color, 0 0 75px $color;
+		opacity: 0.8;
+	}
+}
+
+@mixin glow-text($color) {
+}
+
+.container {
+	width: 100vw;
+	align-items: center;
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+	.hero {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 60%;
+		margin-top: 20vh;
+
+		.title {
+			font-size: var(--font-h1);
+			font-weight: 900;
+			// // font-family: monospace;
+		}
+
+		.subtitle {
+			font-size: var(--font-p-large);
+			font-weight: 600;
+			width: 80%;
+		}
+
+		.glow {
+			background: linear-gradient(100deg, #f50606 0%, #0011ff 52.92%, #a490d3 100%);
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			font-weight: 900;
+			font-size: 1.05em;
+			background-color: yellow;
+		}
+
+		.button_group {
+			display: flex;
+			justify-content: center;
+			margin-top: 24px;
+			// font-family: monospace;
+			// font-size: 1.5em;
+
+			.button {
+				padding: 4px 12px;
+				margin: 8px 12px;
+				font-size: larger;
+				border-radius: 8px;
+				background: rgba(255, 255, 255, 0.44);
+				box-shadow: 0 4px 4px 2px rgba(0, 0, 0, 0.05);
+				backdrop-filter: blur(7.5px);
+				-webkit-backdrop-filter: blur(7.5px);
+				border: 1px solid rgba(0, 0, 0, 0.747);
+			}
+
+			.first {
+				@include glow-button(#cc0303);
+			}
+
+			.second {
+				@include glow-button(#1b03f4);
+			}
+		}
 	}
 
-	p {
-		margin: 0;
-		font-size: 2rem;
-		line-height: 3rem;
+	.stats_container {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+
+		background: rgba(226, 223, 223, 0.27);
+		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+		backdrop-filter: blur(5.2px);
+		-webkit-backdrop-filter: blur(5.2px);
+		border: 1px solid rgba(176, 167, 167, 0.69);
+
+		.stats_group {
+			padding: 24px;
+			display: flex;
+			justify-content: space-around;
+			width: 60%;
+			height: 100%;
+
+			.stat {
+				.value {
+					font-weight: 650;
+					font-size: var(--font-h1);
+					// font-size: 4rem;
+				}
+
+				.title {
+					// font-family: monospace;
+					font-size: larger;
+				}
+			}
+
+			// .first {
+			// 	@include glow-text(#1b03f4);
+			// }
+
+			// .second {
+			// 	@include glow-text(#03bcf4);
+			// }
+
+			// .third {
+			// 	@include glow-text(#f4035f);
+			// }
+
+			// .fourth {
+			// 	@include glow-text(#1d4403);
+			// }
+		}
+	}
+
+	.features_group {
+		display: flex;
+		justify-content: space-around;
+		width: 60%;
+
+		.feature {
+			padding: 24px;
+			margin: 0px 24px;
+			width: 40%;
+			text-align: justify;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+			color: #000000;
+
+			border: 2px solid #fff;
+
+			border-radius: 16px;
+
+			.title {
+				font-size: 1.3rem;
+				font-weight: 600;
+				// font-family: monospace;
+			}
+
+			.text {
+				font-size: 1.03rem;
+			}
+
+			.link {
+				margin-top: 16px;
+				text-transform: uppercase;
+				// font-family: monospace;
+				text-align: right;
+				text-decoration: underline;
+			}
+		}
+
+		$alpha: 0.75;
+
+		.first {
+			@include glow(rgba(17, 1, 156, $alpha));
+		}
+
+		.second {
+			@include glow(rgba(3, 188, 244, $alpha));
+		}
+
+		.third {
+			@include glow(rgba(244, 3, 95, $alpha));
+		}
+
+		.fourth {
+			@include glow(rgba(67, 160, 5, $alpha));
+		}
+	}
+
+	.templates {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		.title {
+			font-weight: 800;
+			font-size: var(--font-h5);
+		}
+	}
+}
+
+@media (max-width: 725px) {
+	.container {
+		.stats_container {
+			.stats_group {
+				flex-direction: column;
+			}
+		}
+
+		.features_group {
+			flex-direction: column;
+			width: 100%;
+			align-items: center;
+
+			.feature {
+				margin-bottom: 32px;
+				width: 50%;
+			}
+		}
+
+		.templates {
+			display: none;
+		}
 	}
 }

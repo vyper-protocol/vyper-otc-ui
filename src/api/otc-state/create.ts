@@ -11,7 +11,8 @@ import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from '
 import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { RatePluginTypeIds, RedeemLogicPluginTypeIds } from 'models/plugins/AbsPlugin';
+import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -20,7 +21,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
-	const reserveMintInfo = await getMint(provider.connection, params.reserveMint);
+	const reserveMintInfo = await getMint(provider.connection, new PublicKey(params.reserveMint));
 
 	const otcState = Keypair.generate();
 	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
@@ -41,7 +42,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			})
 			.remainingAccounts(
 				params.rateOption.rateAccounts.map((c) => {
-					return { pubkey: c, isSigner: false, isWritable: false };
+					return { pubkey: new PublicKey(c), isSigner: false, isWritable: false };
 				})
 			)
 			.signers([ratePluginState])
@@ -58,7 +59,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 			})
 			.remainingAccounts(
 				params.rateOption.rateAccounts.map((c) => {
-					return { pubkey: c, isSigner: false, isWritable: false };
+					return { pubkey: new PublicKey(c), isSigner: false, isWritable: false };
 				})
 			)
 			.signers([ratePluginState])
@@ -72,7 +73,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RedeemLogicPluginTypeIds;
+	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RLPluginTypeIds;
 
 	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
@@ -151,7 +152,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(
 		provider,
 		vyperCoreProgram,
-		params.reserveMint,
+		new PublicKey(params.reserveMint),
 		rateProgramPublicKey,
 		ratePluginState.publicKey,
 		redeemLogicProgramPublicKey,

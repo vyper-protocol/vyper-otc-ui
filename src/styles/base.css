@@ -16,10 +16,17 @@
 	--color-primary: #191c32;
 	--color-secondary: #76c3e2;
 
-	--color-info: #3366ff;
-	--color-success: #52bd95;
-	--color-warning: #ffb020;
-	--color-error: #d14343;
+	--color-info: #3e1f69;
+	--color-info-light: #8a56d341;
+
+	--color-success: #3a582f;
+	--color-success-light: #a0d39249;
+
+	--color-warning: #9b7631;
+	--color-warning-light: #e7c68877;
+
+	--color-error: #b63131;
+	--color-error-light: #db9b9b63;
 
 	--color-background: #f3f5f6;
 	--color-fill-container: #ebeff1;
@@ -29,7 +36,7 @@
 	--border-radius-base: 8px;
 	--border-radius-extend: 10px;
 
-	--font-h1: 46px;
+	--font-h1: 60px;
 	--font-h2: 40px;
 	--font-h3: 36px;
 	--font-h4: 32px;

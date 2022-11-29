@@ -7,21 +7,9 @@
 			"isStable": true
 		},
 		{
-			"cluster": "mainnet-beta",
-			"pubkey": "So11111111111111111111111111111111111111112",
-			"title": "wSOL",
-			"isStable": false
-		},
-		{
-			"cluster": "mainnet-beta",
-			"pubkey": "11111111111111111111111111111111",
-			"title": "SOL",
-			"isStable": false
-		},
-		{
 			"cluster": "devnet",
 			"pubkey": "7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W",
-			"title": "fake USDC",
+			"title": "devUSD",
 			"isStable": true
 		}
 	]
