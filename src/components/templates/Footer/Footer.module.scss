@@ -46,3 +46,11 @@
 		color: #0088cc;
 	}
 }
+
+@media (max-width: 725px) {
+	.footer {
+		.join {
+			display: none;
+		}
+	}
+}

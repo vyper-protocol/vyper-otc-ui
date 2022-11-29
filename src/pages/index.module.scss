@@ -201,3 +201,28 @@
 		}
 	}
 }
+
+@media (max-width: 725px) {
+	.container {
+		.stats_container {
+			.stats_group {
+				flex-direction: column;
+			}
+		}
+
+		.features_group {
+			flex-direction: column;
+			width: 100%;
+			align-items: center;
+
+			.feature {
+				margin-bottom: 32px;
+				width: 50%;
+			}
+		}
+
+		.templates {
+			display: none;
+		}
+	}
+}
