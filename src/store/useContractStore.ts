@@ -15,7 +15,7 @@ const useContractStore = create<CloneContractStore>()(
 			create: (data) => set(() => ({ contractData: data })),
 			delete: () => set((state) => omit(state, ['contractData']), true)
 		}),
-		{ enabled: process.env.NODE_ENV === 'development' ? true : false }
+		{ enabled: process.env.NODE_ENV === 'development' }
 	)
 );
 

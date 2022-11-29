@@ -4,7 +4,7 @@ import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getMint, getMultipleAccounts, unpackAccount, unpackMint } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
-import { fetchTokenInfo } from 'api/next-api/fetchTokenInfo';
+import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
@@ -77,7 +77,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.vyperCoreTrancheConfig = accountInfo.vyperTrancheConfig;
 	res.reserveMint = trancheConfigAccountInfo.reserveMint;
 	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
-	res.reserveTokenInfo = await fetchTokenInfo(trancheConfigAccountInfo.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfoCached(trancheConfigAccountInfo.reserveMint);
 	res.programBuyerTA = accountInfo.otcSeniorReserveTokenAccount;
 	res.programSellerTA = accountInfo.otcJuniorReserveTokenAccount;
 
@@ -319,7 +319,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	res.redeemLogicAccount = data.redeemLogicAccount.clone();
 	res.rateAccount = data.rateAccount.clone();
-	res.reserveTokenInfo = await fetchTokenInfo(res.reserveMint);
+	res.reserveTokenInfo = await fetchTokenInfoCached(res.reserveMint);
 
 	// first fetch
 
