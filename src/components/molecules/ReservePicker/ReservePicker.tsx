@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box, Autocomplete, TextField, Typography } from '@mui/material';
 import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
-import { fetchTokenInfo } from 'api/next-api/fetchTokenInfo';
+import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import MessageAlert from 'components/atoms/MessageAlert';
 import TokenSymbol from 'components/atoms/TokenSymbol';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -84,7 +84,7 @@ export const ReservePicker = ({
 			setIsLoading(true);
 
 			try {
-				const mintTokenInfo = await fetchTokenInfo(pubkey);
+				const mintTokenInfo = await fetchTokenInfoCached(pubkey);
 				if (mintTokenInfo) {
 					// mint found on-chain
 					setReserveMint(mintTokenInfo.address);
