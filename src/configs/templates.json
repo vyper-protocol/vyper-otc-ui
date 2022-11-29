@@ -50,6 +50,58 @@
 			"imgPath": "/usdt-logo.png",
 			"rateId": "pyth",
 			"description": "put"
+		},
+
+		{
+			"cluster": "mainnet-beta",
+			"reserveMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+			"buyerDepositAmount": 100,
+			"sellerDepositAmount": 100,
+			"payoff": "forward",
+			"payoffData": { "notional": 1, "isLinear": "true" },
+			"expiry": "monthly",
+			"underlying": "SOL/USD",
+			"imgPath": "/sol-logo.png",
+			"rateId": "pyth"
+		},
+		{
+			"cluster": "mainnet-beta",
+			"reserveMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+			"buyerDepositAmount": 50,
+			"sellerDepositAmount": 100,
+			"payoff": "digital",
+			"payoffData": { "isCall": true },
+			"expiry": "weekly",
+			"underlying": "BTC/USD",
+			"imgPath": "/btc-logo.png",
+			"rateId": "pyth",
+			"description": "call"
+		},
+		{
+			"cluster": "mainnet-beta",
+			"reserveMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+			"buyerDepositAmount": 30,
+			"sellerDepositAmount": 100,
+			"payoff": "vanilla_option",
+			"payoffData": { "notional": 1, "isCall": false, "isLinear": "true" },
+			"expiry": "weekly",
+			"underlying": "ETH/USD",
+			"imgPath": "/eth-logo.png",
+			"rateId": "pyth",
+			"description": "put"
+		},
+		{
+			"cluster": "mainnet-beta",
+			"reserveMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+			"buyerDepositAmount": 10,
+			"sellerDepositAmount": 100,
+			"payoff": "vanilla_option",
+			"payoffData": { "notional": 1, "isCall": false, "isLinear": "true" },
+			"expiry": "quarterly",
+			"underlying": "USDT/USD",
+			"imgPath": "/usdt-logo.png",
+			"rateId": "pyth",
+			"description": "put"
 		}
 	]
 }
