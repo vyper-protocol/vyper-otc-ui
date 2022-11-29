@@ -1,7 +1,8 @@
+import produce from 'immer';
+import omit from 'lodash-es/omit';
 import { TokenInfo } from 'models/TokenInfo';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import omit from 'lodash-es/omit';
 
 interface CacheStore {
 	tokenInfos: TokenInfo[];
@@ -14,7 +15,12 @@ const useTokenInfoStore = create<CacheStore>()(
 		persist(
 			(set) => ({
 				tokenInfos: [],
-				addTokenInfo: (newTokenInfo: TokenInfo) => set((state) => ({ tokenInfos: [...state.tokenInfos, newTokenInfo] })),
+				addTokenInfo: (newTokenInfo: TokenInfo) =>
+					set((state) =>
+						produce(state, (draft) => {
+							draft.tokenInfos.push(newTokenInfo);
+						})
+					),
 				removeAllTokenInfo: () => set((state) => omit(state, ['contractData']), true)
 			}),
 			{
