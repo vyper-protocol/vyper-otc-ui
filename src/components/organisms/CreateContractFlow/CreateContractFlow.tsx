@@ -203,12 +203,12 @@ const CreateContractFlow = ({
 					<Step key={step.title} sx={{ width: '100%' }}>
 						<Stack direction="row">
 							<Box sx={{ width: '40%', flexDirection: 'column', justifyContent: 'space-between' }}>
-								<Box sx={{ my: 2 }}>
+								<div>
 									<StepLabel error={step.error}>
 										<b>{step.title.toUpperCase()}</b>
 									</StepLabel>
 									{activeStep >= i && <Typography sx={{ fontWeight: 'light' }}>{step.description}</Typography>}
-								</Box>
+								</div>
 								{i === activeStep && (
 									<Box sx={{ display: 'flex' }}>
 										<Button disabled={i === 0} onClick={handleBack} sx={{ mt: 1, mr: 1 }}>
@@ -231,7 +231,7 @@ const CreateContractFlow = ({
 									</Box>
 								)}
 							</Box>
-							<StepContent sx={{ width: '90%' }} TransitionProps={{ in: activeStep >= i }}>
+							<StepContent sx={{ width: '90%', pb: 4, mb: 2 }} TransitionProps={{ in: activeStep >= i }}>
 								{step.content}
 							</StepContent>
 						</Stack>
