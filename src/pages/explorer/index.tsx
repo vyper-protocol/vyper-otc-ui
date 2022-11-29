@@ -10,7 +10,8 @@ import {
 	FetchContractsParams,
 	SupabaseColumnOrder,
 	parseExplorerFilterOperator,
-	QueryParams
+	QueryParams,
+	fromExplorerQueryParams
 } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
 import { useRouter } from 'next/router';
@@ -29,15 +30,15 @@ const ExplorerPage = () => {
 				const [column, order] = val.split(' ');
 				if (order !== 'asc' && order !== 'desc') return;
 
-				sort.push([column, order]);
+				sort.push([fromExplorerQueryParams(column), order]);
 			}
 		}
 
 		const filter: ExplorerFilter[] = [];
 
 		// TODO: refactor to avoid code duplication
-		if (typeof q['redeemLogicState.typeId'] === 'string') {
-			const values = q['redeemLogicState.typeId'].split(' ');
+		if (typeof q['payoff'] === 'string') {
+			const values = q['payoff'].split(' ');
 			if (values.length === 2) {
 				const [value, operator] = values;
 
@@ -45,60 +46,47 @@ const ExplorerPage = () => {
 				if (rlTypes.every((rlType) => AVAILABLE_RL_TYPES.includes(rlType))) {
 					const filterOperator = parseExplorerFilterOperator(operator);
 					if (filterOperator !== undefined) {
-						filter.push({ key: 'redeemLogicState.typeId', operator: filterOperator, value: rlTypes.length > 1 ? rlTypes : rlTypes[0] });
+						filter.push({ key: fromExplorerQueryParams('payoff'), operator: filterOperator, value: rlTypes.length > 1 ? rlTypes : rlTypes[0] });
 					}
 				}
 			}
 		}
 
-		if (typeof q['redeemLogicState.notional'] === 'string') {
-			const values = q['redeemLogicState.notional'].split(' ');
+		if (typeof q['notional'] === 'string') {
+			const values = q['notional'].split(' ');
 			if (values.length === 2) {
 				const [value, operator] = values;
 
 				const notionals = value.split(',').map((val) => parseInt(val, 10));
 				const filterOperator = parseExplorerFilterOperator(operator);
 				if (filterOperator !== undefined && !notionals.some((notional) => isNaN(notional))) {
-					filter.push({ key: 'redeemLogicState.notional', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
+					filter.push({ key: fromExplorerQueryParams('notional'), operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
 				}
 			}
 		}
 
-		if (typeof q['redeemLogicState.strike'] === 'string') {
-			const values = q['redeemLogicState.strike'].split(' ');
-			if (values.length === 2) {
-				const [value, operator] = values;
-
-				const notionals = value.split(',').map((val) => parseInt(val, 10));
-				const filterOperator = parseExplorerFilterOperator(operator);
-				if (filterOperator !== undefined && !notionals.some((notional) => isNaN(notional))) {
-					filter.push({ key: 'redeemLogicState.strike', operator: filterOperator, value: notionals.length > 1 ? notionals : notionals[0] });
-				}
-			}
-		}
-
-		if (typeof q['redeemLogicState.strike'] === 'string') {
-			const values = q['redeemLogicState.strike'].split(' ');
+		if (typeof q['strike'] === 'string') {
+			const values = q['strike'].split(' ');
 			if (values.length === 2) {
 				const [value, operator] = values;
 
 				const strikes = value.split(',').map((val) => parseInt(val, 10));
 				const filterOperator = parseExplorerFilterOperator(operator);
 				if (filterOperator !== undefined && !strikes.some((strike) => isNaN(strike))) {
-					filter.push({ key: 'redeemLogicState.strike', operator: filterOperator, value: strikes.length > 1 ? strikes : strikes[0] });
+					filter.push({ key: fromExplorerQueryParams('strike'), operator: filterOperator, value: strikes.length > 1 ? strikes : strikes[0] });
 				}
 			}
 		}
 
-		if (typeof q['settleAvailableFromAt'] === 'string') {
-			const values = q['settleAvailableFromAt'].split(' ');
+		if (typeof q['expiry'] === 'string') {
+			const values = q['expiry'].split(' ');
 			if (values.length === 2) {
 				const [value, operator] = values;
 
 				const dates = value.split(',').map((val) => new Date(val).toUTCString());
 				const filterOperator = parseExplorerFilterOperator(operator);
 				if (filterOperator !== undefined) {
-					filter.push({ key: 'settleAvailableFromAt', operator: filterOperator, value: dates.length > 1 ? dates : dates[0] });
+					filter.push({ key: fromExplorerQueryParams('expiry'), operator: filterOperator, value: dates.length > 1 ? dates : dates[0] });
 				}
 			}
 		}

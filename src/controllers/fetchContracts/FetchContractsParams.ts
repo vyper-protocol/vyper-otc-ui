@@ -30,6 +30,40 @@ export type QueryParams = {
 	filter?: ExplorerFilter[];
 };
 
+/**
+ * Convert from query param keys to data grid fields
+ */
+export const fromExplorerQueryParams = (key: string): string | undefined => {
+	if (key === 'payoff') {
+		return 'redeemLogicState.typeId';
+	} else if (key === 'notional') {
+		return 'redeemLogicState.notional';
+	} else if (key === 'strike') {
+		return 'redeemLogicState.strike';
+	} else if (key === 'expiry') {
+		return 'settleAvailableFromAt';
+	}
+
+	return undefined;
+};
+
+/**
+ * Convert from data grid fields to explorer query param keys
+ */
+export const toExplorerQueryParams = (field: string): string | undefined => {
+	if (field === 'redeemLogicState.typeId') {
+		return 'payoff';
+	} else if (field === 'redeemLogicState.notional') {
+		return 'notional';
+	} else if (field === 'redeemLogicState.strike') {
+		return 'strike';
+	} else if (field === 'settleAvailableFromAt') {
+		return 'expiry';
+	}
+
+	return undefined;
+};
+
 export const parseExplorerFilterOperator = (operator: string): ExplorerFilterOperator | undefined => {
 	if (operator === 'is') {
 		return ExplorerFilterOperator.Is;
@@ -105,7 +139,7 @@ export const fromFilterModel = (model: GridFilterModel): ExplorerFilter[] => {
 		}
 
 		return {
-			key: item.columnField,
+			key: toExplorerQueryParams(item.columnField),
 			value: item.value,
 			operator
 		};
@@ -170,7 +204,7 @@ export const toFilterModel = (filter: ExplorerFilter[]): GridFilterModel => {
 };
 
 export const fromSortModel = (model: GridSortModel): SupabaseColumnOrder[] => {
-	return model.filter((m) => ['asc', 'desc'].includes(m.sort)).map((m) => [m.field, m.sort]);
+	return model.filter((m) => ['asc', 'desc'].includes(m.sort)).map((m) => [toExplorerQueryParams(m.field), m.sort]);
 };
 
 export const toSortModel = (sort: SupabaseColumnOrder[]): GridSortModel => {
