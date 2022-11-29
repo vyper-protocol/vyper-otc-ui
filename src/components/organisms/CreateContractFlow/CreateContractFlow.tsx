@@ -76,7 +76,7 @@ const CreateContractFlow = ({
 		},
 		{
 			title: 'underlying',
-			description: 'Select the underlying of the contract',
+			description: `Select the underlying of the contract${getCurrentCluster() === 'devnet' ? '. You can also input your oracle of choice' : ''}`,
 			content: (
 				<OraclesPicker
 					oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
