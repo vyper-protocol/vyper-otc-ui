@@ -16,3 +16,11 @@ export function getOracleByPubkey(val: PublicKey | string): OracleDetail | undef
 export function getOraclesByType(val: RatePluginTypeIds): OracleDetail[] {
 	return getOracles().filter(({ type }) => type === val);
 }
+
+export function getOraclesByTitle(rateTitle: string, rateId: RatePluginTypeIds): OracleDetail | undefined {
+	return getOracles().find(({ type, title }) => type === rateId && title === rateTitle);
+}
+
+export function getOraclesNumber(): number {
+	return getOracles().length;
+}
