@@ -34,7 +34,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 
 	const handleOnPriceChange = (newValue: string, i: number) => {
 		const pricesValueClone = _.clone(prices);
-		pricesValueClone[i] = parseInt(newValue);
+		pricesValueClone[i] = +newValue;
 		setPrices(pricesValueClone);
 	};
 
@@ -44,7 +44,16 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 			{rateStateQuery?.data.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
 					<p>{c}:</p>
-					<TextField type="number" size="small" sx={{ width: '70%' }} value={prices[i]} onChange={(e) => handleOnPriceChange(e.target.value, i)} />
+					<TextField
+						type="number"
+						size="small"
+						onFocus={(event) => {
+							event.target.select();
+						}}
+						sx={{ width: '70%' }}
+						value={prices[i]}
+						onChange={(e) => handleOnPriceChange(e.target.value, i)}
+					/>
 				</div>
 			))}
 
