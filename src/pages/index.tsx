@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Skeleton, Stack } from '@mui/material';
 import cn from 'classnames';
+import FrequentlyAskedQuestions from 'components/organisms/FrequentlyAskedQuestions';
 import TemplateGrid from 'components/organisms/TemplateGrid';
 import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
@@ -116,6 +117,9 @@ const Home = () => {
 					<div className={styles.templates}>
 						<div className={styles.title}>Start from a template contract</div>
 						<TemplateGrid />
+					</div>
+					<div>
+						<FrequentlyAskedQuestions></FrequentlyAskedQuestions>
 					</div>
 				</Stack>
 			</Layout>
