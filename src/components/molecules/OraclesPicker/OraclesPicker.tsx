@@ -185,7 +185,9 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 					options={_.sortBy(getOracles(), ['title'], ['asc'])}
 					pubkey={rateAccounts[0]}
 					setRatePlugin={(newType, newPubkey) => {
-						setRateAccounts(newType, [newPubkey, rateAccounts[1]]);
+						const n = _.clone(rateAccounts);
+						n.splice(0, 1, newPubkey);
+						setRateAccounts(newType, n);
 					}}
 				/>
 
@@ -195,7 +197,9 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 						options={_.sortBy(getOraclesByType(ratePluginType), ['title'], ['asc'])}
 						pubkey={rateAccounts[1]}
 						setRatePlugin={(newType, newPubkey) => {
-							setRateAccounts(newType, [rateAccounts[0], newPubkey]);
+							const n = _.clone(rateAccounts);
+							n.splice(1, 1, newPubkey);
+							setRateAccounts(newType, n);
 						}}
 					/>
 				)}
