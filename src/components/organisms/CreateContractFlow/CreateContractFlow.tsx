@@ -52,6 +52,7 @@ const CreateContractFlow = ({
 	const handleClosePreview = () => setOpenPreview(false);
 
 	const [expiryError, setExpiryError] = useState(false);
+	const [oracleError, setOracleError] = useState(false);
 	const [reserveError, setReserveError] = useState(false);
 
 	// TODO fill other errors
@@ -97,9 +98,11 @@ const CreateContractFlow = ({
 							);
 						});
 					}}
+					payoffId={contractInitParams.redeemLogicOption.redeemLogicPluginType}
+					setOracleError={setOracleError}
 				/>
 			),
-			error: false
+			error: oracleError
 		},
 		{
 			title: 'contract parameters',
