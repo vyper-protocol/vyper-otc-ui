@@ -227,15 +227,6 @@
 		},
 		{
 			"type": "pyth",
-			"title": "USDT/USD",
-			"cluster": "devnet",
-			"baseCurrency": "USDT",
-			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=devnet",
-			"pubkey": "38xoQ4oeJCBrcVvca2cGk7iV1dAfrmTR1kmhSCJQ8Jto"
-		},
-		{
-			"type": "pyth",
 			"title": "XAU/USD",
 			"cluster": "devnet",
 			"baseCurrency": "XAU",
