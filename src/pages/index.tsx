@@ -42,7 +42,8 @@ const Home = () => {
 				<Stack spacing={24} className={styles.container}>
 					<div className={styles.hero}>
 						<div className={styles.title}>
-							Create and trade <span className={styles.glow}>OTC derivatives</span>
+							Create and trade
+							<br /> <span className={styles.glow}>OTC derivatives</span>
 							<br />
 							in less than a minute
 						</div>
