@@ -6,9 +6,12 @@ import * as Sentry from '@sentry/nextjs';
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
+const LIVE_ENVIRONMENT = process.env.NEXT_PUBLIC_LIVE_ENVIRONMENT || process.env.VERCEL_ENV || 'prod';
+const NETWORK_CLUSTER = process.env.NEXT_PUBLIC_CLUSTER || 'mainnet-beta';
+
 Sentry.init({
-	environment: 'production',
-	dsn: SENTRY_DSN || 'https://a6c38d54a7254bf98d23b06b807886fb@o4503970802565120.ingest.sentry.io/4503970803810304',
+	environment: `${LIVE_ENVIRONMENT}_${NETWORK_CLUSTER}`,
+	dsn: SENTRY_DSN,
 	// Adjust this value in production, or use tracesSampler for greater control
 	tracesSampleRate: 1.0
 	// ...
