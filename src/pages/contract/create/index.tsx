@@ -17,6 +17,9 @@ import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import * as UrlBuilder from 'utils/urlBuilder';
 
+// import dynamic from 'next/dynamic';
+// const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
+
 const CreateContractPage = () => {
 	const contractStore = useContractStore();
 	const currentCluster = getCurrentCluster();
@@ -45,8 +48,8 @@ const CreateContractPage = () => {
 		rateOption: {
 			ratePluginType: 'pyth',
 			rateAccounts: [
-				currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG',
 				currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG'
+				// currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG'
 			]
 		},
 
@@ -91,6 +94,7 @@ const CreateContractPage = () => {
 		<Layout>
 			<NonAuditedDisclaimer />
 			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
+				{/* <DynamicReactJson src={initParams} /> */}
 				<CreateContractFlow
 					initialStep={isPresentTempData ? 4 : 0}
 					contractInitParams={initParams}
