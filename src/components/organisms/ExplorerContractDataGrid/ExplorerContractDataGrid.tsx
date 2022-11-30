@@ -304,9 +304,9 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 
 	return (
 		<>
-			{contractsLoading && <CircularProgress />}
-
-			{contracts.length > 0 && (
+			{contractsLoading ? (
+				<CircularProgress />
+			) : (
 				<Box sx={{ maxWidth: 1600, width: '90%' }}>
 					<DataGrid
 						pagination

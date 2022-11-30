@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { CircularProgress } from '@mui/material';
 import { countContracts } from 'api/supabase/countContracts';
 import ExplorerContractDataGrid from 'components/organisms/ExplorerContractDataGrid';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -111,7 +110,7 @@ const ExplorerPage = () => {
 		}
 	}, [router.isReady, router.query, initializeContracts]);
 
-	return <Layout withSearch>{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : <CircularProgress />}</Layout>;
+	return <Layout withSearch>{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : null}</Layout>;
 };
 
 export default ExplorerPage;
