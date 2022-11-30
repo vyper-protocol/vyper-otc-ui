@@ -1,5 +1,5 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
 
 export type PayoffPickerInput = {
@@ -27,13 +27,17 @@ const buildDescription = (rateId: RLPluginTypeIds) => {
 	);
 };
 
-export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => (
-	<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
-		<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
-			{AVAILABLE_RL_TYPES.map((plugin) => (
-				<Tab label={plugin} key={plugin} value={plugin} />
-			))}
-		</Tabs>
-		{buildDescription(redeemLogicPluginType)}
-	</Box>
-);
+export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
+	const uiRLTypes: RLPluginTypeIds[] = ['forward', 'vanilla_option', 'digital'];
+
+	return (
+		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
+			<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
+				{uiRLTypes.map((plugin) => (
+					<Tab label={plugin} key={plugin} value={plugin} />
+				))}
+			</Tabs>
+			{buildDescription(redeemLogicPluginType)}
+		</Box>
+	);
+};
