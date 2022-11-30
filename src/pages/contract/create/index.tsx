@@ -42,7 +42,8 @@ const CreateContractPage = () => {
 			redeemLogicPluginType: 'forward',
 			notional: 1,
 			strike: 0,
-			isCall: true
+			isCall: true,
+			isLinear: true
 		},
 
 		rateOption: {

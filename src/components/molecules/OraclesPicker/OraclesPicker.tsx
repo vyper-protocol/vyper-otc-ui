@@ -20,7 +20,7 @@ type OraclePickerInput = {
 	options: OracleDetail[];
 
 	// rate account pubkey
-	pubkey: string;
+	pubkey?: string;
 
 	// set callback, sets the rate plugin type
 	setRatePlugin: (type: RatePluginTypeIds, pubkey: string) => void;
@@ -74,17 +74,19 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, pubkey, setRatePlu
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [isExternal, setIsExternal] = useState(false);
-	const [oracleDetail, setOracleDetail] = useState<OracleDetail>(getOracleByPubkey(pubkey));
+	const [oracleDetail, setOracleDetail] = useState<OracleDetail>(pubkey ? getOracleByPubkey(pubkey) : undefined);
 	useEffect(() => {
-		setIsLoading(true);
-		getOracleDetail(connection, currentCluster, pubkey)
-			.then((v) => {
-				setOracleDetail(v[0]);
-				setIsExternal(v[1]);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			});
+		if (pubkey) {
+			setIsLoading(true);
+			getOracleDetail(connection, currentCluster, pubkey)
+				.then((v) => {
+					setOracleDetail(v[0]);
+					setIsExternal(v[1]);
+				})
+				.finally(() => {
+					setIsLoading(false);
+				});
+		}
 	}, [connection, currentCluster, pubkey]);
 
 	const [label, setLabel] = useState(<></>);
@@ -181,6 +183,7 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 		<Box sx={{ marginY: 2 }}>
 			<Stack spacing={2}>
 				<OraclePicker
+					key="oracle_1"
 					rateLabel={'Oracle #1'}
 					options={_.sortBy(getOracles(), ['title'], ['asc'])}
 					pubkey={rateAccounts[0]}
@@ -193,9 +196,10 @@ export const OraclesPicker = ({ oracleRequired: oraclesRequired, ratePluginType,
 
 				{oraclesRequired === 'double' && (
 					<OraclePicker
+						key="oracle_2"
 						rateLabel={'Oracle #2'}
 						options={_.sortBy(getOraclesByType(ratePluginType), ['title'], ['asc'])}
-						pubkey={rateAccounts[1]}
+						pubkey={rateAccounts[1] ?? undefined}
 						setRatePlugin={(newType, newPubkey) => {
 							const n = _.clone(rateAccounts);
 							n.splice(1, 1, newPubkey);
