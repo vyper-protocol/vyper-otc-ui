@@ -227,7 +227,9 @@ export const OraclesPicker = ({
 					oracleDetail={firstOracleDetail}
 					setOracleDetail={(oracle) => {
 						setFirstOracleDetail(oracle);
-						setRateAccounts(oracle.type, [oracle.pubkey, rateAccounts[1]]);
+						const n = _.clone(rateAccounts);
+						n.splice(0, 1, oracle.pubkey);
+						setRateAccounts(oracle.type, n);
 					}}
 					rateError={ratesError[0]}
 					setRateError={(newError) => setRatesError([newError, ratesError[1]])}
@@ -240,7 +242,9 @@ export const OraclesPicker = ({
 						oracleDetail={secondOracleDetail}
 						setOracleDetail={(oracle) => {
 							setSecondtOracleDetail(oracle);
-							setRateAccounts(oracle.type, [rateAccounts[0], oracle.pubkey]);
+							const n = _.clone(rateAccounts);
+							n.splice(1, 1, oracle.pubkey);
+							setRateAccounts(oracle.type, n);
 						}}
 						rateError={ratesError[1]}
 						setRateError={(newError) => setRatesError([ratesError[0], newError])}
