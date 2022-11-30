@@ -222,6 +222,7 @@ export const OraclesPicker = ({
 		<Box sx={{ marginY: 2 }}>
 			<Stack spacing={2}>
 				<OraclePicker
+					key="oracle_1"
 					rateLabel={'Oracle #1'}
 					options={_.sortBy(getOracles(), ['title'], ['asc'])}
 					oracleDetail={firstOracleDetail}
@@ -237,6 +238,7 @@ export const OraclesPicker = ({
 
 				{oraclesRequired === 'double' && (
 					<OraclePicker
+						key="oracle_2"
 						rateLabel={'Oracle #2'}
 						options={_.sortBy(getOraclesByType(ratePluginType), ['title'], ['asc'])}
 						oracleDetail={secondOracleDetail}

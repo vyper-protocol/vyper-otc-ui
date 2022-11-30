@@ -71,7 +71,7 @@ export const PreviewModal = ({
 					</span>
 				)}
 				{'.'}{' '}
-				{redeemLogicPluginType === 'settled_forward' && (
+				{redeemLogicPluginType === 'settled_forward' && rateOption.rateAccounts.length > 1 && (
 					<span>
 						{' '}
 						The contract will be settled using <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[1])?.title}.</span>

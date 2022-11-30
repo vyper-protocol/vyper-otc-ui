@@ -54,6 +54,17 @@ export type TemplateCardProps = {
 	underlying: string;
 	imgPath: string;
 };
+
+function createCompletePayoffData(payoffData: any): { notional: number; isLinear: boolean; isStandard: boolean; isCall: boolean } {
+	return {
+		notional: 1,
+		isCall: true,
+		isLinear: true,
+		isStandard: true,
+		...payoffData
+	};
+}
+
 export const TemplateCard = ({
 	description,
 	reserveMint,
@@ -84,7 +95,7 @@ export const TemplateCard = ({
 			settleStart: convertExpiry(expiry),
 			redeemLogicOption: {
 				redeemLogicPluginType: payoff,
-				...payoffData,
+				...createCompletePayoffData(payoffData),
 				strike: price
 			},
 			rateOption: {
