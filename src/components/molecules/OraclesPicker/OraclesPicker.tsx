@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Box, Stack, Autocomplete, TextField, Typography, CircularProgress } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { Cluster, Connection, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import MessageAlert from 'components/atoms/MessageAlert';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import _ from 'lodash';
@@ -10,8 +10,7 @@ import { OracleDetail } from 'models/OracleDetail';
 import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
-import { getOracleByPubkey, getOracles, getOraclesByType, getOraclesByTitle } from 'utils/oracleDatasetHelper';
+import { getOracleByPubkey, getOracles, getOraclesByTitle } from 'utils/oracleDatasetHelper';
 import { getRateExplorer } from 'utils/oraclesExplorerHelper';
 
 type OraclePickerInput = {
@@ -22,49 +21,39 @@ type OraclePickerInput = {
 	options: OracleDetail[];
 
 	// rate account pubkey
-	oracleDetail: OracleDetail;
+	rateAccount: string;
 
 	// set callback, sets the rate
-	setOracleDetail: (oracle: OracleDetail) => void;
+	setRateAccount: (newPubkey: string, newType: RatePluginTypeIds) => void;
 
 	rateError: boolean;
 
 	setRateError: (error: boolean) => void;
 };
 
-async function getOracleDetail(connection: Connection, cluster: Cluster, pubkey: PublicKey): Promise<OracleDetail> {
-	const [productData] = await RatePythState.GetProductPrice(connection, cluster, pubkey);
-	if (productData) {
-		return {
-			type: 'pyth',
-			title: productData.symbol,
-			cluster,
-			explorerUrl: getRateExplorer('pyth'),
-			pubkey: pubkey.toBase58()
-		};
-	}
-
-	const aggregatorData = await RateSwitchboardState.LoadAggregatorData(connection, pubkey);
-	if (aggregatorData) {
-		return {
-			type: 'switchboard',
-			title: String.fromCharCode(...aggregatorData.name),
-			cluster,
-			explorerUrl: getRateExplorer('switchboard'),
-			pubkey: pubkey.toBase58()
-		};
-	}
-
-	return undefined;
-}
-
-const OraclePicker = ({ rateLabel: renderInputTitle, options, oracleDetail, setOracleDetail, rateError, setRateError }: OraclePickerInput) => {
+const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRateAccount, rateError, setRateError }: OraclePickerInput) => {
 	const { connection } = useConnection();
 	const currentCluster = getCurrentCluster();
 
-	const [value, setValue] = useState(oracleDetail.title);
+	const [oracleDetail, setOracleDetail] = useState(getOracleByPubkey(rateAccount));
+	const [value, setValue] = useState('');
+
 	const [isLoading, setIsLoading] = useState(false);
 	const [isExternal, setIsExternal] = useState(false);
+
+	const handleOracleDetail = (oracle: OracleDetail) => {
+		setRateAccount(oracle.pubkey, oracle.type);
+		setOracleDetail(oracle);
+	};
+
+	// needed in case change is not triggered by input, e.g. when loading a template
+	useEffect(() => {
+		const rate = getOracleByPubkey(rateAccount) || getOraclesByTitle(rateAccount, 'pyth') || getOraclesByTitle(rateAccount, 'switchboard');
+
+		if (rate) {
+			setValue(rate.title);
+		}
+	}, [rateAccount]);
 
 	const handleInputChange = async (input: string) => {
 		setIsLoading(true);
@@ -73,20 +62,42 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, oracleDetail, setO
 
 		if (rate) {
 			// pubkey is in mapped list
-			setOracleDetail(rate);
-			setValue(rate.title);
+			handleOracleDetail(rate);
 			setRateError(false);
 			setIsExternal(false);
 		} else {
 			// pubkey isn't mapped, look for it on chain
-			setValue(input);
 			let pubkey: PublicKey;
+			setValue(input);
 			try {
 				pubkey = new PublicKey(input);
-				const oracleInfo = await getOracleDetail(connection, currentCluster, pubkey);
+				let oracleInfo: OracleDetail;
+
+				const [productData] = await RatePythState.GetProductPrice(connection, currentCluster, pubkey);
+				if (productData) {
+					oracleInfo = {
+						type: 'pyth',
+						title: productData.symbol,
+						cluster: currentCluster,
+						explorerUrl: getRateExplorer('pyth'),
+						pubkey: pubkey.toBase58()
+					};
+				} else {
+					const aggregatorData = await RateSwitchboardState.LoadAggregatorData(connection, pubkey);
+					if (aggregatorData) {
+						oracleInfo = {
+							type: 'switchboard',
+							title: String.fromCharCode(...aggregatorData.name),
+							cluster: currentCluster,
+							explorerUrl: getRateExplorer('switchboard'),
+							pubkey: pubkey.toBase58()
+						};
+					}
+				}
+
 				if (oracleInfo) {
 					// oracle found on-chain
-					setOracleDetail(oracleInfo);
+					handleOracleDetail(oracleInfo);
 					setRateError(false);
 					setIsExternal(true);
 				} else {
@@ -176,7 +187,7 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, oracleDetail, setO
 					<MessageAlert message={'Found external oracle: '} severity={'info'}>
 						{oracleDetail?.title}
 					</MessageAlert>
-					<MessageAlert message={'Please use extra care when using external oracles.'} severity={'info'} />
+					<MessageAlert message={'Please use extra care when using external oracles'} severity={'info'} />
 				</div>
 			)}
 		</Box>
@@ -184,39 +195,30 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, oracleDetail, setO
 };
 
 export type OraclesPickerInput = {
-	oracleRequired: 'single' | 'double';
-	ratePluginType: RatePluginTypeIds;
+	// oracleRequired: 'single' | 'double';
+	// ratePluginType: RatePluginTypeIds;
 	rateAccounts: string[];
 	setRateAccounts: (newType: RatePluginTypeIds, newVal: string[]) => void;
-	payoffId: RLPluginTypeIds;
+	oracleError: boolean;
 	setOracleError: (error: boolean) => void;
 };
 
 // TODO: Generalize to list of oracles, rendered based on redeemLogicPluginType
-export const OraclesPicker = ({
-	oracleRequired: oraclesRequired,
-	ratePluginType,
-	rateAccounts,
-	setRateAccounts,
-	payoffId,
-	setOracleError
-}: OraclesPickerInput) => {
+export const OraclesPicker = ({ rateAccounts, setRateAccounts, oracleError, setOracleError }: OraclesPickerInput) => {
 	// improve safety on accessing rateAccounts
 
-	const [ratesError, setRatesError] = useState([false, false]);
-
-	const [firstOracleDetail, setFirstOracleDetail] = useState(getOracleByPubkey(rateAccounts[0]));
-	const [secondOracleDetail, setSecondtOracleDetail] = useState(getOracleByPubkey(rateAccounts[1]));
+	// const [ratesError, setRatesError] = useState([false, false]);
 
 	// TODO: move the payoff check upstream, tricky since as of now we pass only the pubkeys and a single oracle type
 	// TODO: separate error for invalid input vs error for invalid oracle types
-	useEffect(() => {
-		if (ratesError.some((v) => v) || (payoffId === 'settled_forward' && firstOracleDetail.type !== secondOracleDetail.type)) {
-			setOracleError(true);
-		} else {
-			setOracleError(false);
-		}
-	});
+
+	// useEffect(() => {
+	// 	if (ratesError.some((v) => v) || (payoffId === 'settled_forward' && firstOracleDetail.type !== secondOracleDetail.type)) {
+	// 		setOracleError(true);
+	// 	} else {
+	// 		setOracleError(false);
+	// 	}
+	// });
 
 	return (
 		<Box sx={{ marginY: 2 }}>
@@ -225,33 +227,31 @@ export const OraclesPicker = ({
 					key="oracle_1"
 					rateLabel={'Oracle #1'}
 					options={_.sortBy(getOracles(), ['title'], ['asc'])}
-					oracleDetail={firstOracleDetail}
-					setOracleDetail={(oracle) => {
-						setFirstOracleDetail(oracle);
+					rateAccount={rateAccounts[0]}
+					setRateAccount={(newPubkey, newType) => {
 						const n = _.clone(rateAccounts);
-						n.splice(0, 1, oracle.pubkey);
-						setRateAccounts(oracle.type, n);
+						n.splice(0, 1, newPubkey);
+						setRateAccounts(newType, n);
 					}}
-					rateError={ratesError[0]}
-					setRateError={(newError) => setRatesError([newError, ratesError[1]])}
+					rateError={oracleError}
+					setRateError={setOracleError}
 				/>
 
-				{oraclesRequired === 'double' && (
+				{/* {oraclesRequired === 'double' && (
 					<OraclePicker
 						key="oracle_2"
 						rateLabel={'Oracle #2'}
 						options={_.sortBy(getOraclesByType(ratePluginType), ['title'], ['asc'])}
-						oracleDetail={secondOracleDetail}
-						setOracleDetail={(oracle) => {
-							setSecondtOracleDetail(oracle);
+						rateAccount={rateAccounts[1]}
+						setRateAccount={(newPubkey, newType) => {
 							const n = _.clone(rateAccounts);
-							n.splice(1, 1, oracle.pubkey);
-							setRateAccounts(oracle.type, n);
+							n.splice(1, 1, newPubkey);
+							setRateAccounts(newType, n);
 						}}
 						rateError={ratesError[1]}
 						setRateError={(newError) => setRatesError([ratesError[0], newError])}
 					/>
-				)}
+				)} */}
 			</Stack>
 		</Box>
 	);

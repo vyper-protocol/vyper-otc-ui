@@ -86,8 +86,8 @@ const CreateContractFlow = ({
 			description: `Select the underlying of the contract${getCurrentCluster() === 'devnet' ? '. You can also input your oracle of choice' : ''}`,
 			content: (
 				<OraclesPicker
-					oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
-					ratePluginType={contractInitParams.rateOption.ratePluginType}
+					// oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
+					// ratePluginType={contractInitParams.rateOption.ratePluginType}
 					rateAccounts={contractInitParams.rateOption.rateAccounts}
 					setRateAccounts={(newRateType, newRateAccounts) => {
 						onContractInitParamsChange((prevValue) =>
@@ -104,7 +104,7 @@ const CreateContractFlow = ({
 							);
 						});
 					}}
-					payoffId={contractInitParams.redeemLogicOption.redeemLogicPluginType}
+					oracleError={oracleError}
 					setOracleError={setOracleError}
 				/>
 			),
