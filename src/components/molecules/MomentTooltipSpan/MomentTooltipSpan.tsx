@@ -11,7 +11,7 @@ type MomentTooltipSpanInput = {
 
 const MomentTooltipSpan = ({ datetime, timeFormat }: MomentTooltipSpanInput) => {
 	return (
-		<Tooltip title={moment(datetime).format(timeFormat ?? 'D MMM yyyy hh:mm a')} placement="right">
+		<Tooltip arrow title={moment(datetime).format(timeFormat ?? 'DD MMM YYYY - hh:mm A')} placement="right">
 			<span>{moment(datetime).fromNow()}</span>
 		</Tooltip>
 	);

@@ -1,33 +1,33 @@
 .cards {
 	display: flex;
+	p {
+		font-weight: 600;
+	}
 
 	.box {
 		max-width: 620px;
 		width: 310px;
 		background-color: var(--color-white);
 		border-radius: var(--border-radius-extend);
-		padding: var(--space-20);
+		padding: 30px;
 
-		.toggle {
-			float: left;
-			margin-bottom: var(--space-8);
-			color: var(--color-text-disabled);
-			font-size: 14px;
+		.titleContainer {
+			display: flex;
+			justify-content: center;
+			text-align: center;
+			margin: 8px 0px;
 
-			svg {
-				margin-bottom: -4px;
-				margin-left: var(--space-4);
+			.title {
+				font-size: var(--font-h3);
+				font-weight: 700;
 			}
-		}
-		.toggle:hover {
-			cursor: pointer;
-			color: var(--color-primary);
 		}
 
 		.content {
 			p {
 				font-weight: 600;
 			}
+
 			.column {
 				display: flex;
 				justify-content: space-between;
@@ -35,7 +35,18 @@
 		}
 	}
 
-	/* Simulator */
+	.iconGroup {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.rotating {
+			-webkit-animation: spin 1s linear infinite;
+			-moz-animation: spin 1s linear infinite;
+			animation: spin 1s linear infinite;
+		}
+	}
+
 	.simulator {
 		border-top-right-radius: var(--space-10);
 		border-bottom-right-radius: var(--space-10);
@@ -45,15 +56,20 @@
 		border-top-right-radius: 0;
 	}
 
-	.hide {
-		display: none;
-	}
+	.grid {
+		margin-top: 8px;
+		display: flex;
+		align-items: center;
 
-	.show {
-		display: block;
-	}
+		.title {
+		}
 
-	/* ------------------ */
+		.value {
+			display: flex;
+			text-align: center;
+			justify-content: center;
+		}
+	}
 }
 
 .buttons {
@@ -61,12 +77,19 @@
 	margin-top: 20px;
 }
 
-.menuOpener {
-	float: right;
-	color: var(--color-text-disabled);
+@-moz-keyframes spin {
+	100% {
+		-moz-transform: rotate(-360deg);
+	}
 }
-
-.menuOpener:hover {
-	cursor: pointer;
-	color: var(--color-primary);
+@-webkit-keyframes spin {
+	100% {
+		-webkit-transform: rotate(-360deg);
+	}
+}
+@keyframes spin {
+	100% {
+		-webkit-transform: rotate(-360deg);
+		transform: rotate(-360deg);
+	}
 }
