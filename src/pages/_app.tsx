@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 /* eslint-disable prefer-const */
 import 'styles/base.css';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -12,6 +12,7 @@ import { PhantomWalletAdapter, SolflareWalletAdapter, SolletWalletAdapter } from
 import { OtcConnectionProvider } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerProvider } from 'components/providers/TxHandlerProvider';
 import ApplicationError from 'components/templates/ApplicationError';
+import { useRouter } from 'next/router';
 import Script from 'next/script';
 import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -33,9 +34,17 @@ const theme = createTheme({
 });
 
 const Application = ({ Component, pageProps }) => {
+	const router = useRouter();
+
 	const wallets = useMemo(() => {
 		return [new PhantomWalletAdapter(), new SolflareWalletAdapter(), new SolletWalletAdapter()];
 	}, []);
+
+	useEffect(() => {
+		if (router.isReady && router.asPath === '/explorer') {
+			router.replace('/explorer?expiry=2022-11-23T00%3A00+after&page=1&limit=25');
+		}
+	}, [router]);
 
 	return (
 		<>
