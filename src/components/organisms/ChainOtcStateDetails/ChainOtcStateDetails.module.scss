@@ -1,18 +1,18 @@
 .cards {
 	display: flex;
+
 	p {
 		font-weight: 600;
 	}
 
 	.box {
-		width: 350px;
+		display: table;
 		background-color: var(--color-white);
 		border-radius: var(--border-radius-extend);
+		width: 350px;
 		padding: 30px;
 
 		.titleContainer {
-			display: flex;
-			justify-content: center;
 			text-align: center;
 			margin: 8px 0px;
 
