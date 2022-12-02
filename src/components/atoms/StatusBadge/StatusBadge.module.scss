@@ -8,26 +8,31 @@
 	align-items: center;
 
 	.dark {
+		cursor: inherit;
 		color: var(--color-black-800);
 		background-color: var(--color-black-300);
 	}
 
 	.info {
+		cursor: inherit;
 		color: var(--color-info);
 		background-color: var(--color-info-light);
 	}
 
 	.success {
+		cursor: inherit;
 		color: var(--color-success);
 		background-color: var(--color-success-light);
 	}
 
 	.warning {
+		cursor: inherit;
 		color: var(--color-warning);
 		background-color: var(--color-warning-light);
 	}
 
 	.error {
+		cursor: inherit;
 		color: var(--color-error);
 		background-color: var(--color-error-light);
 	}

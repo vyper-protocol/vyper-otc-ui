@@ -1,0 +1,9 @@
+.icon {
+	margin-bottom: var(--space-8);
+	color: var(--color-text-disabled);
+
+	&:hover {
+		cursor: pointer;
+		color: var(--color-primary);
+	}
+}
