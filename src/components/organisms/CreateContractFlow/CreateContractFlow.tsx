@@ -52,6 +52,7 @@ const CreateContractFlow = ({
 	const handleClosePreview = () => setOpenPreview(false);
 
 	const [expiryError, setExpiryError] = useState(false);
+	const [oracleError, setOracleError] = useState(false);
 	const [reserveError, setReserveError] = useState(false);
 
 	// TODO fill other errors
@@ -85,8 +86,8 @@ const CreateContractFlow = ({
 			description: `Select the underlying of the contract${getCurrentCluster() === 'devnet' ? '. You can also input your oracle of choice' : ''}`,
 			content: (
 				<OraclesPicker
-					oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
-					ratePluginType={contractInitParams.rateOption.ratePluginType}
+					// oracleRequired={contractInitParams.redeemLogicOption.redeemLogicPluginType === 'settled_forward' ? 'double' : 'single'}
+					// ratePluginType={contractInitParams.rateOption.ratePluginType}
 					rateAccounts={contractInitParams.rateOption.rateAccounts}
 					setRateAccounts={(newRateType, newRateAccounts) => {
 						onContractInitParamsChange((prevValue) =>
@@ -103,9 +104,11 @@ const CreateContractFlow = ({
 							);
 						});
 					}}
+					oracleError={oracleError}
+					setOracleError={setOracleError}
 				/>
 			),
-			error: false
+			error: oracleError
 		},
 		{
 			title: 'contract parameters',
