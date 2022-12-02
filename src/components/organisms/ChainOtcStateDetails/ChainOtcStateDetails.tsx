@@ -1,14 +1,17 @@
-import { MouseEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { InsertChartOutlined as ToggleSimulator, Help as HelpIcon } from '@mui/icons-material';
-import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Tooltip, Box, IconButton, Stack, Menu, MenuItem } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import LoopIcon from '@mui/icons-material/Loop';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import { Tooltip, Box, Grid, Collapse } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
-import NumericBadge from 'components/atoms/NumericBadge';
+import BooleanBadge from 'components/atoms/BooleanBadge';
+import ClickableIcon from 'components/atoms/ClickableIcon';
+import LoadingValue from 'components/atoms/LoadingValue';
 import StatusBadge from 'components/atoms/StatusBadge';
-import CoinBadge from 'components/molecules/CoinBadge';
+import TokenSymbol from 'components/atoms/TokenSymbol';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
@@ -16,6 +19,7 @@ import { ChainOtcState } from 'models/ChainOtcState';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
+import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import { getRedeemLogicDocumentionLink } from 'utils/redeemLogicMetadataHelper';
 
 import ClaimButton from '../actionButtons/ClaimButton';
@@ -27,20 +31,13 @@ import styles from './ChainOtcStateDetails.module.scss';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: ChainOtcState;
+	isFetching: boolean;
+	onRefetchClick: () => void;
 };
 
-const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
+const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtcStateDetailsInput) => {
 	const wallet = useWallet();
 	const router = useRouter();
-
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-	const openMoreIcon = Boolean(anchorEl);
-	const moreIconClick = (event: MouseEvent<HTMLButtonElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-	const moreIconClose = () => {
-		setAnchorEl(null);
-	};
 
 	const { create } = useContractStore();
 
@@ -67,11 +64,6 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		router.push('/contract/create');
 	};
 
-	const cloneContractHandler = () => {
-		moreIconClose();
-		cloneContract();
-	};
-
 	const [showSimulator, setShowSimulator] = useState(false);
 
 	// const handleAddressClick = (e) => {
@@ -80,14 +72,6 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 	// 		autoClose: 2000
 	// 	});
 	// };
-
-	const handleDocumentationClick = () => {
-		window.open(getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.stateType.type));
-	};
-
-	const handleToggle = () => {
-		setShowSimulator(!showSimulator);
-	};
 
 	const reserveTokenInfo = otcState.reserveTokenInfo;
 
@@ -106,93 +90,62 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 		}
 	}, [otcState.settleExecuted, removeListener]);
 
+	const oracleInfo = getOracleByPubkey(otcState.rateAccount.state.accountsRequiredForRefresh[0].toBase58());
+	const isUsdQuote = oracleInfo?.quoteCurrency === 'USD';
+	const quoteCcy = oracleInfo?.baseCurrency;
+
 	return (
 		<div className={styles.cards}>
 			<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
-				<span className={styles.toggle} onClick={handleToggle} style={{ color: showSimulator && 'var(--color-primary)' }}>
-					Simulator
-					<ToggleSimulator fontSize="small" />
-				</span>
+				<div className={styles.iconGroup}>
+					<Box role="span" sx={{ display: 'inline-flex' }}>
+						<ContractStatusBadge status={otcState.contractStatus} />
+						<Tooltip title={'Open docs'} arrow placement="bottom">
+							<a href={getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.stateType.type)} target="_blank" rel="noopener noreferrer">
+								<StatusBadge label={otcState.redeemLogicAccount.state.getTypeLabel()} mode="info" />
+							</a>
+						</Tooltip>
+					</Box>
+					<span>
+						<ClickableIcon onClick={onRefetchClick} label={'Refresh'} clickedLabel={'Refreshing...'}>
+							<LoopIcon className={cn(isFetching && styles.rotating)} fontSize="small" sx={{ mx: 0.5 }} />
+						</ClickableIcon>
 
-				<span
-					className={styles.menuOpener}
-					id="menuOpener"
-					aria-controls={open ? 'menu' : undefined}
-					aria-haspopup="true"
-					aria-expanded={open ? 'true' : undefined}
-					onClick={moreIconClick}
-				>
-					<MoreVertIcon fontSize="small" />
-				</span>
-				<Menu
-					id="menu"
-					anchorEl={anchorEl}
-					open={openMoreIcon}
-					onClose={moreIconClose}
-					MenuListProps={{
-						'aria-labelledby': 'menuOpener'
-					}}
-				>
-					<MenuItem onClick={cloneContractHandler}>Clone</MenuItem>
-				</Menu>
-
-				{/* + + + + + + + + + + + + +  */}
-				{/* PLUGIN USED */}
-				<Box
-					sx={{
-						width: '100%',
-						display: 'flex',
-						alignItems: 'center'
-					}}
-				>
-					<StatusBadge label={otcState.redeemLogicAccount.state.getTypeLabel()} mode={'info'} />
-
-					<div style={{ flex: 1 }} />
-					<ContractStatusBadge status={otcState.contractStatus} />
-				</Box>
-
-				{/* + + + + + + + + + + + + +  */}
-				{/* FUNDED SIDES */}
-				<Box
-					sx={{
-						width: '100%',
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						my: 1
-					}}
-				>
-					<StatusBadge label={otcState.isBuyerFunded() ? 'Long Funded' : 'Long unfunded'} mode={otcState.isBuyerFunded() ? 'success' : 'error'} />
-
-					<div style={{ flex: 1 }} />
-
-					<StatusBadge label={otcState.isSellerFunded() ? 'Short Funded' : 'Short unfunded'} mode={otcState.isSellerFunded() ? 'success' : 'error'} />
-				</Box>
-				<hr />
+						<ClickableIcon onClick={cloneContract} label={'Clone contract'} clickedLabel={'Cloning...'}>
+							<ContentCopyIcon fontSize="small" sx={{ mx: 0.5 }} />
+						</ClickableIcon>
+						<ClickableIcon
+							onClick={() => {
+								setShowSimulator(!showSimulator);
+							}}
+							label={showSimulator ? 'Close simulator' : 'Open simulator'}
+						>
+							<QueryStatsIcon fontSize="small" sx={{ mx: 0.5 }} />
+						</ClickableIcon>
+					</span>
+				</div>
 
 				{/* + + + + + + + + + + + + +  */}
 				{/* TITLE AND SYMBOL */}
-				<Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-					<Stack direction="row" sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-						<b>{otcState.redeemLogicAccount.state.getTypeLabel().toUpperCase()}</b>
-						<Tooltip title="" placement="right">
-							<IconButton size="small" color="inherit" onClick={handleDocumentationClick} disableRipple={true}>
-								<ArrowOutwardIcon sx={{ width: '15px' }} />
-							</IconButton>
-						</Tooltip>
-					</Stack>
-					<h5>{otcState.getContractTitle()}</h5>
-				</Stack>
+				<div className={styles.titleContainer}>
+					<LoadingValue isLoading={isFetching}>
+						<div className={styles.title}>{otcState.getContractTitle()}</div>
+					</LoadingValue>
+				</div>
+
 				<hr />
 
-				{/* + + + + + + + + + + + + +  */}
-				{/* DETAILS */}
 				<div className={styles.content}>
 					{otcState.settleExecuted &&
 						otcState.redeemLogicAccount.state.settlementPricesDescription.map((priceAtSet, i) => (
 							<div key={i} className={styles.column}>
 								<p>{priceAtSet}</p>
-								<p>{formatWithDecimalDigits(otcState.pricesAtSettlement[i])}</p>
+								<LoadingValue isLoading={isFetching}>
+									<p>
+										{isUsdQuote ? '$ ' : ''}
+										{formatWithDecimalDigits(otcState.pricesAtSettlement[i])}
+									</p>
+								</LoadingValue>
 							</div>
 						))}
 
@@ -201,39 +154,55 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 						otcState.redeemLogicAccount.state.rateFeedsDescription.map((rateFeedDescr, i) => (
 							<div key={i} className={styles.column}>
 								<p>{rateFeedDescr}</p>
-								<p>{formatWithDecimalDigits(livePricesValue[i])}</p>
+								<LoadingValue isLoading={isFetching}>
+									<p>
+										{isUsdQuote ? '$' : ''}
+										{formatWithDecimalDigits(livePricesValue[i])}
+									</p>
+								</LoadingValue>
 							</div>
 						))}
 
 					{otcState.redeemLogicAccount.state.pluginDetails.map((c) => (
 						<div key={c.label} className={styles.column}>
 							<p>
-								{c.label}
-								{c.tooltip && (
-									<Tooltip title={c.tooltip} placement="right">
-										<HelpIcon fontSize="small" sx={{ width: '15px' }} />
-									</Tooltip>
-								)}
+								<Box sx={{ display: 'inline-flex' }}>
+									{c.label}
+									{c.tooltip && (
+										<Tooltip role="span" title={c.tooltip} placement="right">
+											<HelpOutlineOutlinedIcon fontSize="small" sx={{ ml: 0.25, width: '14px' }} />
+										</Tooltip>
+									)}
+								</Box>
 							</p>
-							<p>{typeof c.value === 'number' ? formatWithDecimalDigits(c.value) : c.value}</p>
+							<LoadingValue isLoading={isFetching}>
+								<p>
+									{c.label.toLowerCase() === 'strike' && isUsdQuote ? '$' : ''}
+									{typeof c.value === 'number' ? formatWithDecimalDigits(c.value) : c.value}
+									{c.label.toLowerCase() === 'size' && quoteCcy ? ` ${quoteCcy}` : ''}
+								</p>
+							</LoadingValue>
 						</div>
 					))}
 
 					{!otcState.isDepositExpired() && !otcState.areBothSidesFunded() && (
 						<div className={styles.column}>
 							<p>Deposit expiry</p>
-							<p>
-								<MomentTooltipSpan datetime={otcState.depositExpirationAt} />
-							</p>
+							<LoadingValue isLoading={isFetching}>
+								<p>
+									<MomentTooltipSpan datetime={otcState.depositExpirationAt} />
+								</p>
+							</LoadingValue>
 						</div>
 					)}
 
 					<div className={styles.column}>
 						<p>Expiry</p>
-
-						<p>
-							<MomentTooltipSpan datetime={otcState.settleAvailableFromAt} />
-						</p>
+						<LoadingValue isLoading={isFetching}>
+							<p>
+								<MomentTooltipSpan datetime={otcState.settleAvailableFromAt} />
+							</p>
+						</LoadingValue>
 					</div>
 
 					{otcState.buyerWallet && wallet?.publicKey?.toBase58() === otcState.buyerWallet?.toBase58() && (
@@ -255,58 +224,75 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					)}
 				</div>
 				<hr />
-				{/* + + + + + + + + + + + + +  */}
-				{/* COLLATERAL AMOUNTS */}
+
 				<Box
 					sx={{
 						width: '100%',
 						display: 'flex',
+						flexDirection: 'column',
 						justifyContent: 'center',
 						alignItems: 'center'
 					}}
 				>
-					<b>Collateral {reserveTokenInfo?.name ?? ''}</b>
-				</Box>
-				<Box
-					sx={{
-						width: '100%',
-						display: 'flex',
-						justifyContent: 'space-evenly',
-						alignItems: 'center'
-					}}
-				>
-					<CoinBadge title="Long" amount={otcState.buyerDepositAmount} token={reserveTokenInfo} />
-					<CoinBadge title="Short" amount={otcState.sellerDepositAmount} token={reserveTokenInfo} />
-				</Box>
-				<hr />
-				{/* + + + + + + + + + + + + +  */}
-				{/* PnL */}
-				{livePriceIsInitialized && otcState.isPnlAvailable() && (
-					<>
-						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-							<b>PnL</b>
-						</Box>
+					<b>Collateral: {reserveTokenInfo && <TokenSymbol token={reserveTokenInfo} />}</b>
 
-						<Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
-							<Box sx={{ margin: '6px', textAlign: 'center' }}>
-								Long
-								<br />
-								<NumericBadge
-									label={`${formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
-									mode={otcState.getPnlBuyer(livePricesValue) > 0 ? 'success' : 'error'}
-								/>
-							</Box>
-							<Box sx={{ margin: '6px', textAlign: 'center' }}>
-								Short
-								<br />
-								<NumericBadge
-									label={`${formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue))} ${reserveTokenInfo?.symbol ?? ''}`}
-									mode={otcState.getPnlSeller(livePricesValue) > 0 ? 'success' : 'error'}
-								/>
-							</Box>
-						</Box>
-					</>
-				)}
+					<Grid container spacing={0.5} className={styles.grid}>
+						<Grid className={styles.title} item xs={4}></Grid>
+						<Grid className={styles.value} item xs={4}>
+							<StatusBadge label="LONG" mode="success" />
+						</Grid>
+						<Grid className={styles.value} item xs={4}>
+							<StatusBadge label="SHORT" mode="error" />
+						</Grid>
+
+						<Grid className={styles.title} item xs={4}>
+							<p className={styles.column}>Funded</p>
+						</Grid>
+						<Grid className={styles.value} item xs={4}>
+							<LoadingValue isLoading={isFetching}>
+								<BooleanBadge success={otcState.isBuyerFunded()} />
+							</LoadingValue>
+						</Grid>
+						<Grid className={styles.value} item xs={4}>
+							<LoadingValue isLoading={isFetching}>
+								<BooleanBadge success={otcState.isSellerFunded()} />
+							</LoadingValue>
+						</Grid>
+
+						<Grid className={styles.title} item xs={4}>
+							<p className={styles.column}>{otcState.areBothSidesFunded() ? 'Deposited' : 'Required'}</p>
+						</Grid>
+						<Grid className={styles.value} item xs={4}>
+							<LoadingValue isLoading={isFetching}>
+								{/* TODO: fix decimal digits ref #380 */}
+								<p>{otcState.buyerDepositAmount.toFixed(2).toString()}</p>
+							</LoadingValue>
+						</Grid>
+						<Grid className={styles.value} item xs={4}>
+							<LoadingValue isLoading={isFetching}>
+								<p>{otcState.sellerDepositAmount.toFixed(2).toString()}</p>
+							</LoadingValue>
+						</Grid>
+						{livePriceIsInitialized && otcState.isPnlAvailable() && (
+							<>
+								<Grid className={styles.title} item xs={4}>
+									<p className={styles.column}>{otcState.settleExecuted ? 'Final PnL' : 'Current PnL'}</p>
+								</Grid>
+								<Grid className={styles.value} item xs={4}>
+									<LoadingValue isLoading={isFetching}>
+										<p>{formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue)).toFixed(2).toString()}</p>
+									</LoadingValue>
+								</Grid>
+								<Grid className={styles.value} item xs={4}>
+									<LoadingValue isLoading={isFetching}>
+										<p>{formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue)).toFixed(2).toString()}</p>
+									</LoadingValue>
+								</Grid>
+							</>
+						)}
+					</Grid>
+				</Box>
+
 				<div className={styles.buttons}>
 					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={true} />
 					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={false} />
@@ -317,7 +303,9 @@ const ChainOtcStateDetails = ({ otcState }: ChainOtcStateDetailsInput) => {
 					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={false} />
 				</div>
 			</div>
-			<Simulator className={cn(styles.simulator, showSimulator ? styles.show : styles.hide)} />
+			<Collapse in={showSimulator} orientation={'horizontal'}>
+				<Simulator className={styles.simulator} />
+			</Collapse>
 		</div>
 	);
 };

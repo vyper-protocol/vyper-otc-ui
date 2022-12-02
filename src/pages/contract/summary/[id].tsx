@@ -29,7 +29,15 @@ const SummaryPageId = () => {
 
 				{loadingSpinner && <CircularProgress />}
 
-				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && <ChainOtcStateDetails otcState={rateStateQuery?.data} />}
+				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
+					<ChainOtcStateDetails
+						otcState={rateStateQuery?.data}
+						isFetching={rateStateQuery.isFetching}
+						onRefetchClick={() => {
+							rateStateQuery.refetch();
+						}}
+					/>
+				)}
 			</Box>
 		</Layout>
 	);

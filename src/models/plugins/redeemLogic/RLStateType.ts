@@ -1,4 +1,4 @@
-export const AVAILABLE_RL_TYPES = ['forward', 'settled_forward', 'digital', 'vanilla_option'] as const;
+export const AVAILABLE_RL_TYPES = ['forward', 'settled_forward', 'digital', 'vanilla_option'];
 export type RLPluginTypeIds = typeof AVAILABLE_RL_TYPES[number];
 
 export class RLStateType {

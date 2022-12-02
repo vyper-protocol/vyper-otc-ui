@@ -49,11 +49,25 @@ export class RLSettledForward extends AbsRLState {
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RLSettledForward.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike);
+		return RLSettledForward.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike, this.isLinear, this.isStandard);
 	}
 
-	static getPnlExtended(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number, notional: number, strike: number): [number, number] {
-		const buyerPnl = Math.max(Math.min(notional * (prices[0] - strike) * prices[1], sellerDepositAmount), -buyerDepositAmount);
+	static getPnlExtended(
+		prices: number[],
+		buyerDepositAmount: number,
+		sellerDepositAmount: number,
+		notional: number,
+		strike: number,
+		isLinear: boolean,
+		isStandard: boolean
+	): [number, number] {
+		const buyerPnl = Math.max(
+			Math.min(
+				((notional * (prices[0] - strike)) / (isLinear ? 1 : prices[0])) * (isStandard || prices[1] === 0 ? prices[1] : 1 / prices[1]),
+				sellerDepositAmount
+			),
+			-buyerDepositAmount
+		);
 		const sellerPnl = -1 * buyerPnl;
 		return [buyerPnl, sellerPnl];
 	}

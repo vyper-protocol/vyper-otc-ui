@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Skeleton, Stack } from '@mui/material';
 import cn from 'classnames';
+import FrequentlyAskedQuestions from 'components/organisms/FrequentlyAskedQuestions';
 import TemplateGrid from 'components/organisms/TemplateGrid';
 import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
@@ -42,7 +43,8 @@ const Home = () => {
 				<Stack spacing={24} className={styles.container}>
 					<div className={styles.hero}>
 						<div className={styles.title}>
-							Create and trade <span className={styles.glow}>OTC derivatives</span>
+							Create and trade
+							<br /> <span className={styles.glow}>OTC derivatives</span>
 							<br />
 							in less than a minute
 						</div>
@@ -116,6 +118,9 @@ const Home = () => {
 					<div className={styles.templates}>
 						<div className={styles.title}>Start from a template contract</div>
 						<TemplateGrid />
+					</div>
+					<div>
+						<FrequentlyAskedQuestions></FrequentlyAskedQuestions>
 					</div>
 				</Stack>
 			</Layout>

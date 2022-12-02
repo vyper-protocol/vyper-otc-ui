@@ -1,34 +1,57 @@
-.button {
-	width: 100% !important;
-	height: var(--space-40) !important;
-	font-size: var(--font-p) !important;
-	font-weight: 600 !important;
-	border-radius: 0 !important;
-	color: var(--color-white) !important;
+@mixin glow-button($color) {
+	background: $color;
+	border-color: $color;
+	transition: 0.25s;
+
+	&:hover {
+		filter: brightness(120%);
+		background: $color;
+		color: #fff;
+		// box-shadow: 0 0 5px $color, 0 0 15px $color, 0 0 30px $color, 0 0 5px $color;
+		opacity: 0.8;
+	}
 }
 
-.success {
-	background-color: var(--color-success) !important;
-	border-color: var(--color-success) !important;
-}
+.container {
+	width: 100%;
+	margin: 4px;
 
-.error {
-	background-color: var(--color-error) !important;
-	border-color: var(--color-error) !important;
-}
+	.button {
+		width: 100%;
+		height: var(--space-40);
+		font-size: var(--font-p);
+		font-weight: 600;
+		border-radius: 10px;
 
-.info {
-	background-color: var(--color-primary) !important;
-	border-color: var(--color-primary) !important;
-}
+		color: var(--color-white);
+	}
 
-.disabled {
-	background-color: var(--color-black-400) !important;
-	border-color: var(--color-black-400) !important;
-	color: var(--color-black-700) !important;
-}
+	.success {
+		@include glow-button(rgb(79, 182, 48));
+	}
 
-.progress {
-	margin-right: 0.75rem;
-	color: var(--color-black-500) !important;
+	.error {
+		@include glow-button(rgb(211, 21, 21));
+	}
+
+	.info {
+		@include glow-button(var(--color-primary));
+	}
+
+	.disabled {
+		background-color: var(--color-black-400);
+		border-color: var(--color-black-400);
+		color: var(--color-black-700);
+	}
+
+	.disabled:hover {
+		background-color: var(--color-black-400);
+		border-color: var(--color-black-400);
+		color: var(--color-black-700);
+	}
+
+	.progress {
+		margin-right: 0.75rem;
+		color: var(--color-black-500);
+	}
 }
