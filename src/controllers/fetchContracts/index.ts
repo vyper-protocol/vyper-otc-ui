@@ -123,6 +123,7 @@ const fetchContracts = async (connection: Connection, params: FetchContractsPara
 	}
 
 	console.groupEnd();
+
 	return res;
 };
 
