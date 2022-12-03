@@ -5,6 +5,8 @@ import { useContext, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
+import { buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import NonAuditedDisclaimer from 'components/molecules/NonAuditedDisclaimer';
 import CreateContractFlow from 'components/organisms/CreateContractFlow';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
@@ -73,13 +75,22 @@ const CreateContractPage = () => {
 	}, []);
 
 	const [isLoading, setIsLoading] = useState(false);
+	let otcPublicKey: PublicKey;
 
 	const onCreateContractButtonClick = async () => {
 		try {
 			setIsLoading(true);
 
 			// create contract
-			const otcPublicKey = await createContract(provider, txHandler, initParams);
+			otcPublicKey = await createContract(provider, txHandler, initParams);
+
+			// send sns notif
+			const contractURL = UrlBuilder.buildFullUrl(currentCluster, UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
+			const notification = buildCreateContractMessage(initParams, currentCluster, contractURL);
+			// console.log(notification);
+			if (initParams.sendNotification) {
+				sendSnsPublisherNotification(currentCluster, notification);
+			}
 
 			// Create contract URL
 			router.push(UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
