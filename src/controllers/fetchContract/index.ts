@@ -366,7 +366,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
 
 	res.programBuyerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcSeniorReserveTokenAccount)).amount);
-	res.programSellerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcSeniorReserveTokenAccount)).amount);
+	res.programSellerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcJuniorReserveTokenAccount)).amount);
 
 	res.buyerTA = currentOtcStateAccount.seniorSideBeneficiary;
 	if (res.buyerTA) res.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(res.buyerTA)).owner;
