@@ -92,6 +92,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 
 	const oracleInfo = getOracleByPubkey(otcState.rateAccount.state.accountsRequiredForRefresh[0].toBase58());
 	const isUsdQuote = oracleInfo?.quoteCurrency === 'USD';
+	const quoteCcy = oracleInfo?.baseCurrency;
 
 	return (
 		<div className={styles.cards}>
@@ -178,7 +179,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								<p>
 									{c.label.toLowerCase() === 'strike' && isUsdQuote ? '$' : ''}
 									{typeof c.value === 'number' ? formatWithDecimalDigits(c.value) : c.value}
-									{c.label.toLowerCase() === 'size' && <span>{' ' + oracleInfo?.baseCurrency ?? ''}</span>}
+									{c.label.toLowerCase() === 'size' && quoteCcy ? ` ${quoteCcy}` : ''}
 								</p>
 							</LoadingValue>
 						</div>

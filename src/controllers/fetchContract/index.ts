@@ -6,6 +6,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
+import { syncContractFromChain as syncContractDynamicData } from 'api/supabase/syncContractData';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
 import { RedeemLogicDigital, IDL as RedeemLogicDigitalIDL } from 'idls/redeem_logic_digital';
@@ -31,7 +32,12 @@ import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 import PROGRAMS from '../../configs/programs.json';
 import { ChainOtcState } from '../../models/ChainOtcState';
 
-export const fetchContract = async (connection: Connection, otcStateAddress: PublicKey, skipDbCheck: boolean = false): Promise<ChainOtcState> => {
+export const fetchContract = async (
+	connection: Connection,
+	otcStateAddress: PublicKey,
+	skipDbCheck: boolean = false,
+	syncDynamicDataOnFetch: boolean = true
+): Promise<ChainOtcState> => {
 	console.group('CONTROLLER: fetchContract');
 	const controllerStartMark = performance.mark('controller_start');
 
@@ -55,6 +61,10 @@ export const fetchContract = async (connection: Connection, otcStateAddress: Pub
 			chainOtcResult = await fetchContractWithNoDbInfo(connection, otcStateAddress);
 		} else {
 			chainOtcResult = await fetchChainOtcStateFromDbInfo(connection, dbOtcStateResult);
+		}
+
+		if (syncDynamicDataOnFetch && chainOtcResult) {
+			syncContractDynamicData(chainOtcResult);
 		}
 	} finally {
 		console.groupEnd();
@@ -366,7 +376,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	const secondFetch_accountsData = await getMultipleAccounts(connection, secondFetch_unionPubkeys);
 
 	res.programBuyerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcSeniorReserveTokenAccount)).amount);
-	res.programSellerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcSeniorReserveTokenAccount)).amount);
+	res.programSellerTAAmount = Number(secondFetch_accountsData.find((c) => c.address.equals(currentOtcStateAccount.otcJuniorReserveTokenAccount)).amount);
 
 	res.buyerTA = currentOtcStateAccount.seniorSideBeneficiary;
 	if (res.buyerTA) res.buyerWallet = secondFetch_accountsData.find((c) => c.address.equals(res.buyerTA)).owner;
