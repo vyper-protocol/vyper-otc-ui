@@ -404,6 +404,15 @@
 			"cluster": "mainnet-beta",
 			"explorerUrl": "https://switchboard.xyz/explorer/3/WMW5xc3HypXwTnPesyUT49uLsyHwNURsWAEk39onKuk",
 			"pubkey": "WMW5xc3HypXwTnPesyUT49uLsyHwNURsWAEk39onKuk"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW",
+			"title": "SBF-TO-JAIL",
+			"baseCurrency": "",
+			"quoteCurrency": "",
+			"explorerUrl": "https://switchboard.xyz/explorer/2/3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW"
 		}
 	]
 }
