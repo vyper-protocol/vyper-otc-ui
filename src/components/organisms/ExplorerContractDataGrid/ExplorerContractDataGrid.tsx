@@ -2,7 +2,17 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, CircularProgress } from '@mui/material';
-import { DataGrid, GridColumns, GridRowParams, GridRenderCellParams, GridActionsCellItem, GridFilterModel, GridSortModel } from '@mui/x-data-grid';
+import {
+	DataGrid,
+	GridColumns,
+	GridRowParams,
+	GridRenderCellParams,
+	GridActionsCellItem,
+	GridFilterModel,
+	GridSortModel,
+	getGridStringOperators,
+	getGridSingleSelectOperators
+} from '@mui/x-data-grid';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -21,7 +31,8 @@ import {
 	toSortModel,
 	transformParams
 } from 'controllers/fetchContracts/FetchContractsParams';
-import { AVAILABLE_CONTRACT_STATUS_IDS, ChainOtcState } from 'models/ChainOtcState';
+import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/ChainOtcState';
+import { DbOtcState } from 'models/DbOtcState';
 import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
 import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
 import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
@@ -49,7 +60,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 	const router = useRouter();
 
 	const [contractsLoading, setContractsLoading] = useState(false);
-	const [contracts, setContracts] = useState<ChainOtcState[]>([]);
+	const [contracts, setContracts] = useState<DbOtcState[]>([]);
 
 	const [explorerPage, setExplorerPage] = useState(page || 1);
 	const [explorerLimit, setExplorerLimit] = useState(limit || 25);
@@ -78,8 +89,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		setContractsLoading(true);
 		setContracts([]);
 
-		const fetchContractsParams = FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), query);
-		fetchContracts(connection, fetchContractsParams)
+		const fetchContractsParams = FetchContractsParams.build(getCurrentCluster(), query);
+		fetchContracts(fetchContractsParams)
 			.then((c) => setContracts(c))
 			.finally(() => setContractsLoading(false));
 	}, [connection, query]);
@@ -111,7 +122,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		// eslint-disable-next-line
 	}, [explorerLimit, sortModel]);
 
-	const columns: GridColumns<ChainOtcState> = [
+	const columns: GridColumns<DbOtcState> = [
 		{
 			type: 'singleSelect',
 			field: 'redeemLogicState.typeId',
@@ -123,20 +134,22 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: true,
 			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
 			valueGetter: (params) => {
-				return (params.row as ChainOtcState).redeemLogicAccount.state.getTypeLabel();
-			}
+				return (params.row as DbOtcState).redeemLogicAccount.state.getTypeLabel();
+			},
+			filterOperators: getGridSingleSelectOperators().filter((op) => op.value === 'isAnyOf')
 		},
 		{
 			type: 'string',
-			field: 'rateState.title',
+			field: 'underlying',
 			headerName: 'Underlying',
 			flex: 1,
 			minWidth: 150,
-			sortable: false,
-			filterable: false,
+			sortable: true,
+			filterable: true,
 			valueGetter: (params) => {
-				return params.row.rateAccount.state.title;
-			}
+				return params.row.dynamicData?.title ?? 'NA';
+			},
+			filterOperators: getGridStringOperators().filter((op) => op.value === 'equals')
 		},
 		{
 			type: 'number',
@@ -194,8 +207,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: false,
 			renderCell: (params: GridRenderCellParams<any>) => (
 				<OracleLivePrice
-					oracleType={(params.row as ChainOtcState).rateAccount.state.typeId}
-					pubkey={(params.row as ChainOtcState).rateAccount.state.livePriceAccounts[0].toBase58()}
+					oracleType={(params.row as DbOtcState).rateAccount.state.typeId}
+					pubkey={(params.row as DbOtcState).rateAccount.state.livePriceAccounts[0].toBase58()}
 				/>
 			),
 			flex: 1,
@@ -212,11 +225,21 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			minWidth: 100
 		},
 		{
+			field: 'createdAt',
+			type: 'dateTime',
+			headerName: 'Created at',
+			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			sortable: true,
+			filterable: true,
+			flex: 1,
+			minWidth: 100
+		},
+		{
 			type: 'boolean',
 			field: 'buyerFunded',
 			headerName: 'Long funded',
-			sortable: false,
-			filterable: false,
+			sortable: true,
+			filterable: true,
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
@@ -227,8 +250,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			type: 'boolean',
 			field: 'sellerFunded',
 			headerName: 'Short funded',
-			sortable: false,
-			filterable: false,
+			sortable: true,
+			filterable: true,
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
@@ -238,26 +261,28 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		{
 			field: 'buyerWallet',
 			headerName: 'Buyer wallet',
-			sortable: false,
-			filterable: false,
+			sortable: true,
+			filterable: true,
 			flex: 1,
 			minWidth: 50,
 			renderCell: (params) => {
-				if (!params.row.buyerWallet) return <></>;
-				return <PublicKeyLink address={params.row.buyerWallet?.toBase58()} />;
-			}
+				if (!params.row.dynamicData?.buyerWallet) return <></>;
+				return <PublicKeyLink address={params.row.dynamicData?.buyerWallet} />;
+			},
+			filterOperators: getGridStringOperators().filter((op) => op.value === 'equals' || op.value === 'isAnyOf')
 		},
 		{
 			field: 'sellerWallet',
 			headerName: 'Seller wallet',
-			sortable: false,
-			filterable: false,
+			sortable: true,
+			filterable: true,
 			flex: 1,
 			minWidth: 50,
 			renderCell: (params) => {
-				if (!params.row.sellerWallet) return <></>;
-				return <PublicKeyLink address={params.row.sellerWallet?.toBase58()} />;
-			}
+				if (!params.row.dynamicData?.sellerWallet) return <></>;
+				return <PublicKeyLink address={params.row.dynamicData?.sellerWallet} />;
+			},
+			filterOperators: getGridStringOperators().filter((op) => op.value === 'equals' || op.value === 'isAnyOf')
 		},
 		{
 			type: 'singleSelect',

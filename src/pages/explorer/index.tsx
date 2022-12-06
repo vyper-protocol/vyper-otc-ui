@@ -10,7 +10,8 @@ import {
 	SupabaseColumnOrder,
 	parseExplorerFilterOperator,
 	QueryParams,
-	fromExplorerQueryParams
+	fromExplorerQueryParams,
+	ExplorerFilterOperator
 } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
 import { useRouter } from 'next/router';
@@ -90,6 +91,33 @@ const ExplorerPage = () => {
 			}
 		}
 
+		['underlying', 'buyerWallet', 'sellerWallet'].forEach((k) => {
+			if (typeof q[k] === 'string') {
+				const values = (q[k] as string).split(' ');
+				if (values.length === 2) {
+					const [value, operator] = values;
+					const filterOperator = parseExplorerFilterOperator(operator);
+					if (filterOperator !== undefined && value) {
+						if (filterOperator === ExplorerFilterOperator.In) {
+							filter.push({ key: fromExplorerQueryParams(k), operator: filterOperator, value: value.split(',') });
+						} else {
+							filter.push({ key: fromExplorerQueryParams(k), operator: filterOperator, value });
+						}
+					}
+				}
+			}
+		});
+
+		['buyerFunded', 'sellerFunded'].forEach((k) => {
+			if (typeof q[k] === 'string') {
+				const values = (q[k] as string).split(' ');
+				if (values.length === 2 && values[1] === 'is') {
+					const op = values[0] === 'true' ? ExplorerFilterOperator.IsNot : ExplorerFilterOperator.Is;
+					filter.push({ key: fromExplorerQueryParams(k), operator: op, value: null });
+				}
+			}
+		});
+
 		const updatedQuery: QueryParams = {
 			sort,
 			filter,
@@ -97,7 +125,7 @@ const ExplorerPage = () => {
 			limit: q.limit && typeof q.limit === 'string' ? parseInt(q.limit, 10) : undefined
 		};
 
-		const countContractsParams = FetchContractsParams.buildNotExpiredContractsQuery(getCurrentCluster(), updatedQuery, true);
+		const countContractsParams = FetchContractsParams.build(getCurrentCluster(), updatedQuery, true);
 		countContracts(countContractsParams)
 			.then((updatedCount) => setCount(updatedCount))
 			.then(() => setQuery(updatedQuery))

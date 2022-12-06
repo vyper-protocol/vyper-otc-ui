@@ -11,6 +11,7 @@ import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
+import { DbOtcState } from 'models/DbOtcState';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
@@ -18,7 +19,19 @@ import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
 
-const fetchContracts = async (connection: Connection, params: FetchContractsParams): Promise<ChainOtcState[]> => {
+const fetchContracts = async (params: FetchContractsParams): Promise<DbOtcState[]> => {
+	// console.group('CONTROLLER: fetch contracts, params: ', params);
+	try {
+		const res = await supabaseSelectContracts(params);
+		return res;
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
+	// console.groupEnd();
+};
+
+const fetchContractsFromChain = async (connection: Connection, params: FetchContractsParams): Promise<ChainOtcState[]> => {
 	console.group('CONTROLLER: fetch contracts');
 
 	const dbEntries = await supabaseSelectContracts(params);
