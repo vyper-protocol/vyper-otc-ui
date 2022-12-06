@@ -133,7 +133,14 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 							await handleInputChange(input);
 						}
 					}}
-					options={options}
+					options={_.sortBy(options, ['category'], ['asc']) as OracleDetail[]}
+					groupBy={(oracleOrPubkey: OracleDetail | string) => {
+						if (typeof oracleOrPubkey === 'object') {
+							return oracleOrPubkey.category ?? 'Other';
+						} else {
+							return 'Other';
+						}
+					}}
 					getOptionLabel={(oracleOrPubkey: OracleDetail | string) => {
 						if (typeof oracleOrPubkey === 'object') {
 							return oracleOrPubkey.title;

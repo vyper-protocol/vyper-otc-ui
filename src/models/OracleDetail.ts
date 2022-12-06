@@ -10,4 +10,5 @@ export type OracleDetail = {
 	baseCurrency?: string | undefined;
 	quoteCurrency?: string | undefined;
 	explorerUrl: string | undefined;
+	category?: string | undefined;
 };
