@@ -7,7 +7,8 @@
 			"title": "BTC/USD",
 			"baseCurrency": "BTC",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://switchboard.xyz/explorer/3/8SXvChNYFhRq4EZuZvnhjrB3jJRQCv4k3P4W6hesH3Ee"
+			"explorerUrl": "https://switchboard.xyz/explorer/3/8SXvChNYFhRq4EZuZvnhjrB3jJRQCv4k3P4W6hesH3Ee",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -25,7 +26,8 @@
 			"title": "SOL/USD",
 			"baseCurrency": "SOL",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=devnet"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=devnet",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -34,7 +36,8 @@
 			"title": "SOL/USD",
 			"baseCurrency": "SOL",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=mainnet-beta"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-sol-usd?cluster=mainnet-beta",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -43,7 +46,8 @@
 			"title": "AVAX/USD",
 			"baseCurrency": "AVAX",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-avax-usd?cluster=devnet"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-avax-usd?cluster=devnet",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -52,7 +56,8 @@
 			"title": "BTC/USD",
 			"baseCurrency": "BTC",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=devnet"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=devnet",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -61,7 +66,8 @@
 			"title": "BTC/USD",
 			"baseCurrency": "BTC",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=mainnet-beta"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-btc-usd?cluster=mainnet-beta",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -70,7 +76,8 @@
 			"title": "ETH/USD",
 			"baseCurrency": "ETH",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=mainnet-beta"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=mainnet-beta",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -79,7 +86,8 @@
 			"title": "ETH/USD",
 			"baseCurrency": "ETH",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=devnet"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-eth-usd?cluster=devnet",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -88,7 +96,8 @@
 			"title": "USDC/USD",
 			"baseCurrency": "USDC",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdc-usd?cluster=mainnet-beta"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdc-usd?cluster=mainnet-beta",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -97,7 +106,8 @@
 			"title": "USDT/USD",
 			"baseCurrency": "USDT",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=mainnet-beta"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=mainnet-beta",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -106,7 +116,8 @@
 			"title": "USDT/USD",
 			"baseCurrency": "USDT",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=devnet"
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-usdt-usd?cluster=devnet",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -133,7 +144,8 @@
 			"baseCurrency": "AAVE",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-aave-usd?cluster=devnet",
-			"pubkey": "FT7Cup6ZiFDF14uhFD3kYS3URMCf2RZ4iwfNEVUgndHW"
+			"pubkey": "FT7Cup6ZiFDF14uhFD3kYS3URMCf2RZ4iwfNEVUgndHW",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -142,7 +154,8 @@
 			"baseCurrency": "APE",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ape-usd?cluster=devnet",
-			"pubkey": "EfnLcrwxCgwALc5vXr4cwPZMVcmotZAuqmHa8afG8zJe"
+			"pubkey": "EfnLcrwxCgwALc5vXr4cwPZMVcmotZAuqmHa8afG8zJe",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -151,7 +164,8 @@
 			"baseCurrency": "BNB",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-bnb-usd?cluster=devnet",
-			"pubkey": "GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b"
+			"pubkey": "GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -160,7 +174,8 @@
 			"baseCurrency": "DOGE",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-doge-usd?cluster=devnet",
-			"pubkey": "4L6YhY8VvUgmqG5MvJkUJATtzB2rFqdrJwQCmFLv4Jzy"
+			"pubkey": "4L6YhY8VvUgmqG5MvJkUJATtzB2rFqdrJwQCmFLv4Jzy",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -169,7 +184,8 @@
 			"baseCurrency": "EUR",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/fx-eur-usd?cluster=devnet",
-			"pubkey": "E36MyBbavhYKHVLWR79GiReNNnBDiHj6nWA7htbkNZbh"
+			"pubkey": "E36MyBbavhYKHVLWR79GiReNNnBDiHj6nWA7htbkNZbh",
+			"category": "FX"
 		},
 		{
 			"type": "pyth",
@@ -178,7 +194,8 @@
 			"baseCurrency": "FTT",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ftt-usd?cluster=devnet",
-			"pubkey": "6vivTRs5ZPeeXbjo7dfburfaYDWoXjBtdtuYgQRuGfu"
+			"pubkey": "6vivTRs5ZPeeXbjo7dfburfaYDWoXjBtdtuYgQRuGfu",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -187,7 +204,8 @@
 			"baseCurrency": "LAZIO",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-lazio-usd?cluster=devnet",
-			"pubkey": "3Jr1TrJjrit9KaGhSWvcWVw1u5Qbh6f213aTRUCjsFfZ"
+			"pubkey": "3Jr1TrJjrit9KaGhSWvcWVw1u5Qbh6f213aTRUCjsFfZ",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -196,7 +214,8 @@
 			"baseCurrency": "LTC",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ltc-usd?cluster=devnet",
-			"pubkey": "BLArYBCUYhdWiY8PCUTpvFE21iaJq85dvxLk9bYMobcU"
+			"pubkey": "BLArYBCUYhdWiY8PCUTpvFE21iaJq85dvxLk9bYMobcU",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -205,7 +224,8 @@
 			"baseCurrency": "NEAR",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-near-usd?cluster=devnet",
-			"pubkey": "3gnSbT7bhoTdGkFVZc1dW1PvjreWzpUNUD5ppXwv1N59"
+			"pubkey": "3gnSbT7bhoTdGkFVZc1dW1PvjreWzpUNUD5ppXwv1N59",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -214,7 +234,8 @@
 			"baseCurrency": "ORCA",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-orca-usd?cluster=devnet",
-			"pubkey": "A1WttWF7X3Rg6ZRpB2YQUFHCRh1kiXV8sKKLV3S9neJV"
+			"pubkey": "A1WttWF7X3Rg6ZRpB2YQUFHCRh1kiXV8sKKLV3S9neJV",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -223,7 +244,8 @@
 			"baseCurrency": "SRM",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-srm-usd?cluster=devnet",
-			"pubkey": "992moaMQKs32GKZ9dxi8keyM2bUmbrwBZpK4p2K6X5Vs"
+			"pubkey": "992moaMQKs32GKZ9dxi8keyM2bUmbrwBZpK4p2K6X5Vs",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -232,7 +254,8 @@
 			"baseCurrency": "XAU",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/metal-xau-usd?cluster=devnet",
-			"pubkey": "4GqTjGm686yihQ1m1YdTsSvfm4mNfadv6xskzgCYWNC5"
+			"pubkey": "4GqTjGm686yihQ1m1YdTsSvfm4mNfadv6xskzgCYWNC5",
+			"category": "Metal"
 		},
 		{
 			"type": "switchboard",
@@ -241,7 +264,8 @@
 			"baseCurrency": "XMR",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/Lk9PWt2Th6pmdzAJsPvzKzqwDYGTn2PerejJtg1mFsw",
-			"pubkey": "Lk9PWt2Th6pmdzAJsPvzKzqwDYGTn2PerejJtg1mFsw"
+			"pubkey": "Lk9PWt2Th6pmdzAJsPvzKzqwDYGTn2PerejJtg1mFsw",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -250,7 +274,8 @@
 			"baseCurrency": "STEP",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/CdvmFaR2m3cL2YuDg9cSb2m3nKZX26vyVoBbB8aNMWaj",
-			"pubkey": "CdvmFaR2m3cL2YuDg9cSb2m3nKZX26vyVoBbB8aNMWaj"
+			"pubkey": "CdvmFaR2m3cL2YuDg9cSb2m3nKZX26vyVoBbB8aNMWaj",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -259,7 +284,8 @@
 			"baseCurrency": "AAVE",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-aave-usd?cluster=mainnet-beta",
-			"pubkey": "3wDLxH34Yz8tGjwHszQ2MfzHwRoaQgKA32uq2bRpjJBW"
+			"pubkey": "3wDLxH34Yz8tGjwHszQ2MfzHwRoaQgKA32uq2bRpjJBW",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -268,7 +294,8 @@
 			"baseCurrency": "ADA",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ada-usd?cluster=mainnet-beta",
-			"pubkey": "3pyn4svBbxJ9Wnn3RVeafyLWfzie6yC5eTig2S62v9SC"
+			"pubkey": "3pyn4svBbxJ9Wnn3RVeafyLWfzie6yC5eTig2S62v9SC",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -277,7 +304,8 @@
 			"baseCurrency": "APT",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-apt-usd?cluster=mainnet-beta",
-			"pubkey": "FNNvb1AFDnDVPkocEri8mWbJ1952HQZtFLuwPiUjSJQ"
+			"pubkey": "FNNvb1AFDnDVPkocEri8mWbJ1952HQZtFLuwPiUjSJQ",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -286,7 +314,8 @@
 			"baseCurrency": "APE",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ape-usd?cluster=mainnet-beta",
-			"pubkey": "2TdKEvPTKpDtJo6pwxd79atZFQNWiSUT2T47nF9j5qFy"
+			"pubkey": "2TdKEvPTKpDtJo6pwxd79atZFQNWiSUT2T47nF9j5qFy",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -295,7 +324,8 @@
 			"baseCurrency": "BNB",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-bnb-usd?cluster=mainnet-beta",
-			"pubkey": "4CkQJBxhU8EZ2UjhigbtdaPbpTe6mqf811fipYBFbSYN"
+			"pubkey": "4CkQJBxhU8EZ2UjhigbtdaPbpTe6mqf811fipYBFbSYN",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -304,7 +334,8 @@
 			"baseCurrency": "EUR",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/fx-eur-usd?cluster=mainnet-beta",
-			"pubkey": "CQzPyC5xVhkuBfWFJiPCvPEnBshmRium4xxUxnX1ober"
+			"pubkey": "CQzPyC5xVhkuBfWFJiPCvPEnBshmRium4xxUxnX1ober",
+			"category": "FX"
 		},
 		{
 			"type": "pyth",
@@ -313,7 +344,8 @@
 			"baseCurrency": "FTT",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ftt-usd?cluster=mainnet-beta",
-			"pubkey": "8JPJJkmDScpcNmBRKGZuPuG2GYAveQgP3t5gFuMymwvF"
+			"pubkey": "8JPJJkmDScpcNmBRKGZuPuG2GYAveQgP3t5gFuMymwvF",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -322,7 +354,8 @@
 			"baseCurrency": "GBP",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/fx-gbp-usd?cluster=mainnet-beta",
-			"pubkey": "9wFA8FYZwvBbhE22uvYBZniTXi1KJiN8iNQsegkTWZqS"
+			"pubkey": "9wFA8FYZwvBbhE22uvYBZniTXi1KJiN8iNQsegkTWZqS",
+			"category": "FX"
 		},
 		{
 			"type": "pyth",
@@ -331,7 +364,8 @@
 			"baseCurrency": "GMT",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-gmt-usd?cluster=mainnet-beta",
-			"pubkey": "DZYZkJcFJThN9nZy4nK3hrHra1LaWeiyoZ9SMdLFEFpY"
+			"pubkey": "DZYZkJcFJThN9nZy4nK3hrHra1LaWeiyoZ9SMdLFEFpY",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -340,7 +374,8 @@
 			"baseCurrency": "LTC",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-ltc-usd?cluster=mainnet-beta",
-			"pubkey": "8RMnV1eD55iqUFJLMguPkYBkq8DCtx81XcmAja93LvRR"
+			"pubkey": "8RMnV1eD55iqUFJLMguPkYBkq8DCtx81XcmAja93LvRR",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -349,7 +384,8 @@
 			"baseCurrency": "SRM",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/crypto-srm-usd?cluster=mainnet-beta",
-			"pubkey": "3NBReDRTLKMQEKiLD5tGcx4kXbTf88b7f2xLS9UuGjym"
+			"pubkey": "3NBReDRTLKMQEKiLD5tGcx4kXbTf88b7f2xLS9UuGjym",
+			"category": "Crypto"
 		},
 		{
 			"type": "pyth",
@@ -358,7 +394,8 @@
 			"baseCurrency": "XAU",
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://pyth.network/price-feeds/metal-xau-usd?cluster=mainnet-beta",
-			"pubkey": "8y3WWjvmSmVGWVKH1rCA7VTRmuU7QbJ9axafSsBX5FcD"
+			"pubkey": "8y3WWjvmSmVGWVKH1rCA7VTRmuU7QbJ9axafSsBX5FcD",
+			"category": "Metal"
 		},
 		{
 			"type": "switchboard",
@@ -367,7 +404,8 @@
 			"quoteCurrency": "USD",
 			"cluster": "mainnet-beta",
 			"explorerUrl": "https://switchboard.xyz/explorer/3/Lk9PWt2Th6pmdzAJsPvzKzqwDYGTn2PerejJtg1mFsw",
-			"pubkey": "Lk9PWt2Th6pmdzAJsPvzKzqwDYGTn2PerejJtg1mFsw"
+			"pubkey": "Lk9PWt2Th6pmdzAJsPvzKzqwDYGTn2PerejJtg1mFsw",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -376,7 +414,8 @@
 			"quoteCurrency": "USD",
 			"cluster": "mainnet-beta",
 			"explorerUrl": "https://switchboard.xyz/explorer/3/C16HhW774WEr3cDwMBDhT4eD65y46vgk1B5j92cWA83e",
-			"pubkey": "C16HhW774WEr3cDwMBDhT4eD65y46vgk1B5j92cWA83e"
+			"pubkey": "C16HhW774WEr3cDwMBDhT4eD65y46vgk1B5j92cWA83e",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -385,7 +424,8 @@
 			"quoteCurrency": "USD",
 			"cluster": "mainnet-beta",
 			"explorerUrl": "https://switchboard.xyz/explorer/3/HeqreCR28Su4wPvzDFd4hkApi7XiGtWJxD4Q6EebtBCs",
-			"pubkey": "HeqreCR28Su4wPvzDFd4hkApi7XiGtWJxD4Q6EebtBCs"
+			"pubkey": "HeqreCR28Su4wPvzDFd4hkApi7XiGtWJxD4Q6EebtBCs",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -394,7 +434,8 @@
 			"quoteCurrency": "USD",
 			"cluster": "mainnet-beta",
 			"explorerUrl": "https://switchboard.xyz/explorer/3/EEj2j1CvsaPWsTof6ySv6Q79xR1erL9uo6coVokip5Rk",
-			"pubkey": "EEj2j1CvsaPWsTof6ySv6Q79xR1erL9uo6coVokip5Rk"
+			"pubkey": "EEj2j1CvsaPWsTof6ySv6Q79xR1erL9uo6coVokip5Rk",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
@@ -403,7 +444,8 @@
 			"quoteCurrency": "USD",
 			"cluster": "mainnet-beta",
 			"explorerUrl": "https://switchboard.xyz/explorer/3/WMW5xc3HypXwTnPesyUT49uLsyHwNURsWAEk39onKuk",
-			"pubkey": "WMW5xc3HypXwTnPesyUT49uLsyHwNURsWAEk39onKuk"
+			"pubkey": "WMW5xc3HypXwTnPesyUT49uLsyHwNURsWAEk39onKuk",
+			"category": "Crypto"
 		},
 		{
 			"type": "switchboard",
