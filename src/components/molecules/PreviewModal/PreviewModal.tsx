@@ -1,6 +1,11 @@
+import { useEffect, useState } from 'react';
+
+import { PublicKey } from '@solana/web3.js';
+import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import Modal from 'components/atoms/Modal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { MintDetail } from 'models/MintDetail';
 import moment from 'moment';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
@@ -53,6 +58,28 @@ export const PreviewModal = ({
 }: PreviewModalInput) => {
 	const { redeemLogicPluginType, strike, notional, isCall } = redeemLogicOption;
 
+	const [mintDetail, setMintDetail] = useState<MintDetail | undefined>(undefined);
+	useEffect(() => {
+		try {
+			const mint = getMintByPubkey(reserveMint);
+			if (mint) {
+				// pubkey is in mapped list
+				setMintDetail(mint);
+			} else {
+				// pubkey isn't mapped, look for it on chain
+				fetchTokenInfoCached(new PublicKey(reserveMint)).then((tokenInfo) => {
+					setMintDetail({
+						cluster: getCurrentCluster(),
+						pubkey: reserveMint,
+						title: tokenInfo.symbol
+					});
+				});
+			}
+		} catch {
+			setMintDetail(undefined);
+		}
+	}, [reserveMint]);
+
 	const PreviewDescription = (
 		<div className={styles.content}>
 			<p className={styles.description}>
@@ -84,7 +111,7 @@ export const PreviewModal = ({
 				The contract will be settled in{' '}
 				{reserveMint && (
 					<span>
-						<span className={styles.highlightNoCap}>{getMintByPubkey(reserveMint).title}</span>.
+						<span className={styles.highlightNoCap}>{mintDetail?.title}</span>.
 					</span>
 				)}
 				{!reserveMint && (
@@ -95,12 +122,12 @@ export const PreviewModal = ({
 				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{seniorDepositAmount}
-					{reserveMint && <span> {getMintByPubkey(reserveMint).title}</span>}
+					{reserveMint && <span> {mintDetail?.title}</span>}
 				</span>{' '}
 				while the <span className={styles.highlight}>short</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{juniorDepositAmount}
-					{reserveMint && <span> {getMintByPubkey(reserveMint).title}</span>}
+					{reserveMint && <span> {mintDetail?.title}</span>}
 				</span>
 				.
 			</p>

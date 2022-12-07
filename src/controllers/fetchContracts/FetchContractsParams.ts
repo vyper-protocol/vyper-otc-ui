@@ -44,7 +44,7 @@ export const fromExplorerQueryParams = (key: string): string | undefined => {
 		return 'settleAvailableFromAt';
 	}
 
-	return undefined;
+	return key;
 };
 
 /**
@@ -61,7 +61,7 @@ export const toExplorerQueryParams = (field: string): string | undefined => {
 		return 'expiry';
 	}
 
-	return undefined;
+	return field;
 };
 
 export const parseExplorerFilterOperator = (operator: string): ExplorerFilterOperator | undefined => {
@@ -93,6 +93,7 @@ export const parseExplorerFilterOperator = (operator: string): ExplorerFilterOpe
 		return ExplorerFilterOperator.OnOrBefore;
 	}
 
+	console.log(`operator: ${operator} not supported`);
 	return undefined;
 };
 
@@ -100,6 +101,9 @@ export const fromFilterModel = (model: GridFilterModel): ExplorerFilter[] => {
 	return model.items.map((item) => {
 		let operator: ExplorerFilterOperator | undefined;
 		switch (item.operatorValue) {
+			case 'equals':
+				operator = ExplorerFilterOperator.Eq;
+				break;
 			case 'is':
 				operator = ExplorerFilterOperator.Is;
 				break;
@@ -270,9 +274,21 @@ export const toSupabaseColumn = (key: string): string | null => {
 		return 'redeem_logic_plugin_data->strike';
 	} else if (key === 'settleAvailableFromAt') {
 		return 'settle_available_from';
+	} else if (key === 'createdAt') {
+		return 'created_at';
+	} else if (key === 'buyerWallet') {
+		return 'contracts_dynamic_data.buyer_wallet';
+	} else if (key === 'sellerWallet') {
+		return 'contracts_dynamic_data.seller_wallet';
+	} else if (key === 'buyerFunded') {
+		return 'contracts_dynamic_data.buyer_wallet';
+	} else if (key === 'sellerFunded') {
+		return 'contracts_dynamic_data.seller_wallet';
+	} else if (key === 'underlying') {
+		return 'contracts_dynamic_data.title';
 	}
 
-	return null;
+	return key;
 };
 
 export const toSupabaseValue = (column: string, value: any): any => {
@@ -299,19 +315,20 @@ export class FetchContractsParams {
 	gte: SupabaseColumnFilter[] = [];
 	gt: SupabaseColumnFilter[] = [];
 	eq: SupabaseColumnFilter[] = [];
+	is: SupabaseColumnFilter[] = [];
 	neq: SupabaseColumnFilter[] = [];
 	in: SupabaseColumnFilter[] = [];
 	order: SupabaseColumnOrder[] = [];
 	range: [number, number];
 
-	static buildNotExpiredContractsQuery(cluster: Cluster, query: QueryParams, isCountQuery?: boolean): FetchContractsParams {
+	static build(cluster: Cluster, query: QueryParams, isCountQuery?: boolean): FetchContractsParams {
 		const r = new FetchContractsParams();
 
-		const d = new Date();
-		d.setDate(d.getDate() - 5);
-		const nd = new Date(d);
+		// const d = new Date();
+		// d.setDate(d.getDate() - 5);
+		// const nd = new Date(d);
 
-		r.gte.push({ column: 'settle_available_from', value: nd.toUTCString() });
+		// r.gte.push({ column: 'settle_available_from', value: nd.toUTCString() });
 		r.eq.push({ column: 'cluster', value: cluster });
 
 		if (query.sort) {
@@ -324,6 +341,8 @@ export class FetchContractsParams {
 
 				switch (operator) {
 					case ExplorerFilterOperator.Is:
+						r.is.push({ column, value });
+						break;
 					case ExplorerFilterOperator.Eq:
 						r.eq.push({ column, value });
 						break;
