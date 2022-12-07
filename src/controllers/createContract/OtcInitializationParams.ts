@@ -19,8 +19,8 @@ export type OtcInitializationParams = {
 	aliasId: AliasTypeIds;
 
 	// TODO: extend to other redeem logic
-	redeemLogicOption: {
-		redeemLogicPluginType: PayoffTypeIds;
+	payoffOption: {
+		payoffId: PayoffTypeIds;
 		strike?: number;
 		notional?: number;
 		isLinear?: boolean;

@@ -18,9 +18,10 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { OtcContract } from 'models/OtcContract';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
+import { getSidesLabelShort } from 'utils/aliasHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
-import { getRedeemLogicDocumentionLink } from 'utils/redeemLogicMetadataHelper';
+import { getPayoffDocumentionLink } from 'utils/payoffMetadataHelper';
 
 import ClaimButton from '../actionButtons/ClaimButton';
 import DepositButton from '../actionButtons/DepositButton';
@@ -39,6 +40,11 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	const wallet = useWallet();
 	const router = useRouter();
 
+	const aliasId = otcState?.aliasId ?? otcState.chainData.redeemLogicAccount.state.payoffId;
+
+	const [longLabel, shortLabel] = getSidesLabelShort(aliasId);
+	// const isOption = isOptionAlias(aliasId);
+
 	const { create } = useContractStore();
 
 	const cloneContract = () => {
@@ -50,8 +56,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 			depositEnd: otcState.chainData.depositExpirationAt,
 			settleStart: otcState.chainData.settleAvailableFromAt,
 			aliasId: otcState.aliasId,
-			redeemLogicOption: {
-				redeemLogicPluginType: otcState.chainData.redeemLogicAccount.state.payoffId,
+			payoffOption: {
+				payoffId: otcState.chainData.redeemLogicAccount.state.payoffId,
 				...otcState.chainData.redeemLogicAccount.state.getPluginDataObj()
 			},
 			rateOption: {
@@ -102,8 +108,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					<Box role="span" sx={{ display: 'inline-flex' }}>
 						<ContractStatusBadge status={otcState.chainData.contractStatus} />
 						<Tooltip title={'Open docs'} arrow placement="bottom">
-							<a href={getRedeemLogicDocumentionLink(otcState.chainData.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
-								<StatusBadge label={otcState.aliasId} mode="info" />
+							<a href={getPayoffDocumentionLink(otcState.chainData.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
+								<StatusBadge label={aliasId} mode="info" />
 							</a>
 						</Tooltip>
 					</Box>
@@ -210,7 +216,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<StatusBadge label="LONG" mode="success" />
+								<StatusBadge label={longLabel} mode="success" />
 							</p>
 						</div>
 					)}
@@ -219,7 +225,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
-								<StatusBadge label="SHORT" mode="error" />
+								<StatusBadge label={shortLabel} mode="error" />
 							</p>
 						</div>
 					)}
@@ -240,10 +246,10 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					<Grid container spacing={0.5} className={styles.grid}>
 						<Grid className={styles.title} item xs={4}></Grid>
 						<Grid className={styles.value} item xs={4}>
-							<StatusBadge label="LONG" mode="success" />
+							<StatusBadge label={longLabel} mode="success" />
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
-							<StatusBadge label="SHORT" mode="error" />
+							<StatusBadge label={shortLabel} mode="error" />
 						</Grid>
 
 						<Grid className={styles.title} item xs={4}>

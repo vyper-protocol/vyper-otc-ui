@@ -14,27 +14,29 @@ export const AVAILABLE_PAYOFF_TYPE_IDS = ['forward', 'settled_forward', 'digital
 // type SettledForwardAliasTypeIs = 'settled_forward2';
 // const AVAILABLE_SETTLED_FORWARD_ALIAS_TYPE_IDS = ['settled_forward2'];
 
-// type DigitalAliasTypeIs = 'digital2';
-// const AVAILABLE_DIGITAL_ALIAS_TYPE_IDS = ['digital2'];
+type DigitalAliasTypeIds = 'digital option';
+const AVAILABLE_DIGITAL_ALIAS_TYPE_IDS = ['digital option'];
 
-// type VanillaOptionAliasTypeIs = 'vanilla_option2';
-// const AVAILABLE_VANILLA_OPTION_ALIAS_TYPE_IDS = ['vanilla_option2'];
+type VanillaOptionAliasTypeIds = 'vanilla option';
+const AVAILABLE_VANILLA_OPTION_ALIAS_TYPE_IDS = ['vanilla option'];
 
 // eslint-disable-next-line no-inline-comments
-export type AliasTypeIds = PayoffTypeIds /* | ForwardAliasTypeIs | SettledForwardAliasTypeIs | DigitalAliasTypeIs | VanillaOptionAliasTypeIs */;
+export type AliasTypeIds = PayoffTypeIds | DigitalAliasTypeIds | VanillaOptionAliasTypeIds;
+/* | ForwardAliasTypeIs | SettledForwardAliasTypeIs | DigitalAliasTypeIs | VanillaOptionAliasTypeIs */
+
 export const AVAILABLE_ALIAS_TYPE_IDS = [
-	...AVAILABLE_PAYOFF_TYPE_IDS
+	...AVAILABLE_PAYOFF_TYPE_IDS,
 	// ...AVAILABLE_FORWARD_ALIAS_TYPE_IDS
 	// ...AVAILABLE_SETTLED_FORWARD_ALIAS_TYPE_IDS,
-	// ...AVAILABLE_DIGITAL_ALIAS_TYPE_IDS,
-	// ...AVAILABLE_VANILLA_OPTION_ALIAS_TYPE_IDS
+	...AVAILABLE_DIGITAL_ALIAS_TYPE_IDS,
+	...AVAILABLE_VANILLA_OPTION_ALIAS_TYPE_IDS
 ];
 
-export function getPayoffTypeIdFromAlias(v: AliasTypeIds): PayoffTypeIds {
+export function getPayoffFromAlias(v: AliasTypeIds): PayoffTypeIds {
 	if (AVAILABLE_PAYOFF_TYPE_IDS.includes(v)) return v as PayoffTypeIds;
 
 	// if (AVAILABLE_FORWARD_ALIAS_TYPE_IDS.includes(v)) return 'forward';
 	// if (AVAILABLE_SETTLED_FORWARD_ALIAS_TYPE_IDS.includes(v)) return 'settled_forward';
-	// if (AVAILABLE_DIGITAL_ALIAS_TYPE_IDS.includes(v)) return 'digital';
-	// if (AVAILABLE_VANILLA_OPTION_ALIAS_TYPE_IDS.includes(v)) return 'vanilla_option';
+	if (AVAILABLE_DIGITAL_ALIAS_TYPE_IDS.includes(v)) return 'digital';
+	if (AVAILABLE_VANILLA_OPTION_ALIAS_TYPE_IDS.includes(v)) return 'vanilla_option';
 }

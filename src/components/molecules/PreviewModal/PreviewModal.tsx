@@ -5,8 +5,10 @@ import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import Modal from 'components/atoms/Modal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { AliasTypeIds } from 'models/common';
 import { MintDetail } from 'models/MintDetail';
 import moment from 'moment';
+import { isOptionAlias } from 'utils/aliasHelper';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -14,9 +16,12 @@ import { shortenString } from 'utils/stringHelpers';
 
 import styles from './PreviewModal.module.scss';
 
-export type PreviewModalInput = {
-	// redeem logic contract params
-	redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
+type PreviewModalProps = {
+	// alias of the contract
+	aliasId: AliasTypeIds;
+
+	// payoff contract params
+	payoffOption: OtcInitializationParams['payoffOption'];
 
 	// rate contract params
 	rateOption: OtcInitializationParams['rateOption'];
@@ -46,8 +51,22 @@ export type PreviewModalInput = {
 	actionProps: JSX.Element;
 };
 
+export const getSidesDescription = (aliasId: AliasTypeIds): [string, string] => {
+	switch (aliasId) {
+		case 'forward':
+			return ['long side', 'short side'];
+		case 'vanilla option':
+		case 'vanilla_option':
+		case 'digital':
+			return ['option buyer', 'option seller'];
+		default:
+			return ['long side', 'short side'];
+	}
+};
+
 export const PreviewModal = ({
-	redeemLogicOption,
+	aliasId,
+	payoffOption,
 	rateOption,
 	depositEnd,
 	settleStart,
@@ -57,8 +76,12 @@ export const PreviewModal = ({
 	open,
 	handleClose,
 	actionProps
-}: PreviewModalInput) => {
-	const { redeemLogicPluginType, strike, notional, isCall } = redeemLogicOption;
+}: PreviewModalProps) => {
+	const { payoffId, strike, notional, isCall } = payoffOption;
+
+	const [longDescription, shortDescription] = getSidesDescription(aliasId);
+	const isOption = isOptionAlias(aliasId);
+	const optionPart = aliasId.split(' ')[0];
 
 	const [mintDetail, setMintDetail] = useState<MintDetail | undefined>(undefined);
 	useEffect(() => {
@@ -85,12 +108,20 @@ export const PreviewModal = ({
 	const PreviewDescription = (
 		<div className={styles.content}>
 			<p className={styles.description}>
-				You are creating a <span className={styles.highlight}>{redeemLogicPluginType}</span>{' '}
-				{redeemLogicPluginType === 'vanilla_option' ||
-					(redeemLogicPluginType === 'digital' && <span className={styles.highlight}>{isCall ? 'CALL' : 'PUT'}</span>)}{' '}
+				You are creating a{' '}
+				{isOption ? (
+					<>
+						<span className={styles.highlight}>
+							{optionPart} {isCall ? 'CALL' : 'PUT'}
+							{' option'}
+						</span>
+					</>
+				) : (
+					<span className={styles.highlight}>{aliasId}</span>
+				)}{' '}
 				contract on <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[0])?.title}</span> with strike{' '}
 				<span className={styles.highlight}>{formatWithDecimalDigits(strike, 6)}</span>
-				{redeemLogicPluginType !== 'digital' && (
+				{payoffId !== 'digital' && (
 					<span>
 						{' '}
 						{'and notional'}{' '}
@@ -100,7 +131,7 @@ export const PreviewModal = ({
 					</span>
 				)}
 				{'.'}{' '}
-				{redeemLogicPluginType === 'settled_forward' && rateOption.rateAccounts.length > 1 && (
+				{payoffId === 'settled_forward' && rateOption.rateAccounts.length > 1 && (
 					<span>
 						{' '}
 						The contract will be settled using <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[1])?.title}.</span>
@@ -121,17 +152,18 @@ export const PreviewModal = ({
 						an unknown token, with token mint <span className={styles.highlight}>{shortenString(collateralMint)}</span>.
 					</span>
 				)}{' '}
-				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
+				The <span className={styles.highlight}>{longDescription}</span> will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{longDepositAmount}
 					{collateralMint && <span> {mintDetail?.title}</span>}
 				</span>{' '}
-				while the <span className={styles.highlight}>short</span> side will need to deposit{' '}
+				{isOption ? 'as premium ' : ''}
+				while the <span className={styles.highlight}>{shortDescription}</span> will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
 					{shortDepositAmount}
 					{collateralMint && <span> {mintDetail?.title}</span>}
 				</span>
-				.
+				{isOption ? ' as collateral' : ''}.
 			</p>
 			<p className={styles.description}>
 				The deposit period will end in <span className={styles.highlight}>{moment(depositEnd).fromNow(true)}</span> and the contract will expire in{' '}
@@ -156,3 +188,5 @@ export const PreviewModal = ({
 		</div>
 	);
 };
+
+export default PreviewModal;
