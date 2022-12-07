@@ -21,7 +21,7 @@ const ClaimButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLon
 	const [isDeposited, setIsDeposited] = useState(false);
 
 	useEffect(() => {
-		const programTokenAccount = isLong ? rateStateQuery.data.programBuyerTA : rateStateQuery.data.programSellerTA;
+		const programTokenAccount = isLong ? rateStateQuery.data.chainData.programBuyerTA : rateStateQuery.data.chainData.programSellerTA;
 		const subscriptionId = connection.onAccountChange(
 			programTokenAccount,
 			async (updatedAccountInfo) => {
@@ -33,7 +33,7 @@ const ClaimButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLon
 		return () => {
 			connection.removeAccountChangeListener(subscriptionId);
 		};
-	}, [connection, isLong, rateStateQuery.data.programBuyerTA, rateStateQuery.data.programSellerTA]);
+	}, [connection, isLong, rateStateQuery.data.chainData.programBuyerTA, rateStateQuery.data.chainData.programSellerTA]);
 
 	const onClaimClick = async () => {
 		try {
@@ -50,10 +50,10 @@ const ClaimButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLon
 	if (isDeposited) {
 		return <></>;
 	} else if (isLong) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimLongAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isClaimLongAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimShortAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isClaimShortAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

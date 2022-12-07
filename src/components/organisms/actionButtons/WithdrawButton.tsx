@@ -32,10 +32,10 @@ const WithdrawButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; is
 	};
 
 	if (isLong) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawLongAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isWithdrawLongAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawShortAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isWithdrawShortAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

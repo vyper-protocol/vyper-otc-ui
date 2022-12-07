@@ -15,7 +15,7 @@ import TokenSymbol from 'components/atoms/TokenSymbol';
 import ContractStatusBadge from 'components/molecules/ContractStatusBadge';
 import MomentTooltipSpan from 'components/molecules/MomentTooltipSpan';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import { ChainOtcState } from 'models/ChainOtcState';
+import { OtcContract } from 'models/OtcContract';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
@@ -30,7 +30,7 @@ import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
 
 export type ChainOtcStateDetailsInput = {
-	otcState: ChainOtcState;
+	otcState: OtcContract;
 	isFetching: boolean;
 	onRefetchClick: () => void;
 };
@@ -43,20 +43,21 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 
 	const cloneContract = () => {
 		create({
-			collateralMint: otcState.collateralMint.toBase58(),
-			longDepositAmount: otcState.buyerDepositAmount,
-			shortDepositAmount: otcState.sellerDepositAmount,
-			depositStart: otcState.depositAvailableFrom,
-			depositEnd: otcState.depositExpirationAt,
-			settleStart: otcState.settleAvailableFromAt,
+			collateralMint: otcState.chainData.collateralMint.toBase58(),
+			longDepositAmount: otcState.chainData.buyerDepositAmount,
+			shortDepositAmount: otcState.chainData.sellerDepositAmount,
+			depositStart: otcState.chainData.depositAvailableFrom,
+			depositEnd: otcState.chainData.depositExpirationAt,
+			settleStart: otcState.chainData.settleAvailableFromAt,
+			aliasId: otcState.alias,
 			redeemLogicOption: {
-				redeemLogicPluginType: otcState.redeemLogicAccount.state.payoffId,
-				...otcState.redeemLogicAccount.state.getPluginDataObj()
+				redeemLogicPluginType: otcState.chainData.redeemLogicAccount.state.payoffId,
+				...otcState.chainData.redeemLogicAccount.state.getPluginDataObj()
 			},
 			rateOption: {
-				ratePluginType: otcState.rateAccount.state.rateId,
+				ratePluginType: otcState.chainData.rateAccount.state.rateId,
 				// TODO extract this information in a clearer way
-				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh.map((c) => c.toBase58())
+				rateAccounts: otcState.chainData.rateAccount.state.accountsRequiredForRefresh.map((c) => c.toBase58())
 			},
 			saveOnDatabase: true,
 			sendNotification: true
@@ -73,24 +74,24 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	// 	});
 	// };
 
-	const collateralTokenInfo = otcState.collateralTokenInfo;
+	const collateralTokenInfo = otcState.chainData.collateralTokenInfo;
 
 	const {
 		pricesValue: livePricesValue,
 		isInitialized: livePriceIsInitialized,
 		removeListener
 	} = useOracleLivePrice(
-		otcState.rateAccount.state.rateId,
-		otcState.rateAccount.state.livePriceAccounts.map((c) => c.toBase58())
+		otcState.chainData.rateAccount.state.rateId,
+		otcState.chainData.rateAccount.state.livePriceAccounts.map((c) => c.toBase58())
 	);
 
 	useEffect(() => {
-		if (otcState.settleExecuted) {
+		if (otcState.chainData.settleExecuted) {
 			removeListener();
 		}
-	}, [otcState.settleExecuted, removeListener]);
+	}, [otcState.chainData.settleExecuted, removeListener]);
 
-	const oracleInfo = getOracleByPubkey(otcState.rateAccount.state.accountsRequiredForRefresh[0].toBase58());
+	const oracleInfo = getOracleByPubkey(otcState.chainData.rateAccount.state.accountsRequiredForRefresh[0].toBase58());
 	const isUsdQuote = oracleInfo?.quoteCurrency === 'USD';
 	const quoteCcy = oracleInfo?.baseCurrency;
 
@@ -99,10 +100,10 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 			<div className={cn(styles.box, showSimulator && styles.changeEdge)}>
 				<div className={styles.iconGroup}>
 					<Box role="span" sx={{ display: 'inline-flex' }}>
-						<ContractStatusBadge status={otcState.contractStatus} />
+						<ContractStatusBadge status={otcState.chainData.contractStatus} />
 						<Tooltip title={'Open docs'} arrow placement="bottom">
-							<a href={getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
-								<StatusBadge label={otcState.redeemLogicAccount.state.payoffId} mode="info" />
+							<a href={getRedeemLogicDocumentionLink(otcState.chainData.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
+								<StatusBadge label={otcState.alias} mode="info" />
 							</a>
 						</Tooltip>
 					</Box>
@@ -129,29 +130,29 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 				{/* TITLE AND SYMBOL */}
 				<div className={styles.titleContainer}>
 					<LoadingValue isLoading={isFetching}>
-						<div className={styles.title}>{otcState.getContractTitle()}</div>
+						<div className={styles.title}>{otcState.chainData.getContractTitle()}</div>
 					</LoadingValue>
 				</div>
 
 				<hr />
 
 				<div className={styles.content}>
-					{otcState.settleExecuted &&
-						otcState.redeemLogicAccount.state.settlementPricesDescription.map((priceAtSet, i) => (
+					{otcState.chainData.settleExecuted &&
+						otcState.chainData.redeemLogicAccount.state.settlementPricesDescription.map((priceAtSet, i) => (
 							<div key={i} className={styles.column}>
 								<p>{priceAtSet}</p>
 								<LoadingValue isLoading={isFetching}>
 									<p>
 										{isUsdQuote ? '$ ' : ''}
-										{formatWithDecimalDigits(otcState.pricesAtSettlement[i])}
+										{formatWithDecimalDigits(otcState.chainData.pricesAtSettlement[i])}
 									</p>
 								</LoadingValue>
 							</div>
 						))}
 
-					{!otcState.settleExecuted &&
+					{!otcState.chainData.settleExecuted &&
 						livePriceIsInitialized &&
-						otcState.redeemLogicAccount.state.rateFeedsDescription.map((rateFeedDescr, i) => (
+						otcState.chainData.redeemLogicAccount.state.rateFeedsDescription.map((rateFeedDescr, i) => (
 							<div key={i} className={styles.column}>
 								<p>{rateFeedDescr}</p>
 								<LoadingValue isLoading={isFetching}>
@@ -163,7 +164,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 							</div>
 						))}
 
-					{otcState.redeemLogicAccount.state.pluginDetails.map((c) => (
+					{otcState.chainData.redeemLogicAccount.state.pluginDetails.map((c) => (
 						<div key={c.label} className={styles.column}>
 							<p>
 								<Box sx={{ display: 'inline-flex' }}>
@@ -185,12 +186,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</div>
 					))}
 
-					{!otcState.isDepositExpired() && !otcState.areBothSidesFunded() && (
+					{!otcState.chainData.isDepositExpired() && !otcState.chainData.areBothSidesFunded() && (
 						<div className={styles.column}>
 							<p>Deposit expiry</p>
 							<LoadingValue isLoading={isFetching}>
 								<p>
-									<MomentTooltipSpan datetime={otcState.depositExpirationAt} />
+									<MomentTooltipSpan datetime={otcState.chainData.depositExpirationAt} />
 								</p>
 							</LoadingValue>
 						</div>
@@ -200,12 +201,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						<p>Expiry</p>
 						<LoadingValue isLoading={isFetching}>
 							<p>
-								<MomentTooltipSpan datetime={otcState.settleAvailableFromAt} />
+								<MomentTooltipSpan datetime={otcState.chainData.settleAvailableFromAt} />
 							</p>
 						</LoadingValue>
 					</div>
 
-					{otcState.buyerWallet && wallet?.publicKey?.toBase58() === otcState.buyerWallet?.toBase58() && (
+					{otcState.chainData.buyerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
@@ -214,7 +215,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</div>
 					)}
 
-					{otcState.sellerWallet && wallet?.publicKey?.toBase58() === otcState.sellerWallet?.toBase58() && (
+					{otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your side</p>
 							<p>
@@ -250,42 +251,42 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<BooleanBadge success={otcState.isLongFunded()} />
+								<BooleanBadge success={otcState.chainData.isLongFunded()} />
 							</LoadingValue>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<BooleanBadge success={otcState.isShortFunded()} />
+								<BooleanBadge success={otcState.chainData.isShortFunded()} />
 							</LoadingValue>
 						</Grid>
 
 						<Grid className={styles.title} item xs={4}>
-							<p className={styles.column}>{otcState.areBothSidesFunded() ? 'Deposited' : 'Required'}</p>
+							<p className={styles.column}>{otcState.chainData.areBothSidesFunded() ? 'Deposited' : 'Required'}</p>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
 								{/* TODO: fix decimal digits ref #380 */}
-								<p>{otcState.buyerDepositAmount.toFixed(2).toString()}</p>
+								<p>{otcState.chainData.buyerDepositAmount.toFixed(2).toString()}</p>
 							</LoadingValue>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<p>{otcState.sellerDepositAmount.toFixed(2).toString()}</p>
+								<p>{otcState.chainData.sellerDepositAmount.toFixed(2).toString()}</p>
 							</LoadingValue>
 						</Grid>
-						{livePriceIsInitialized && otcState.isPnlAvailable() && (
+						{livePriceIsInitialized && otcState.chainData.isPnlAvailable() && (
 							<>
 								<Grid className={styles.title} item xs={4}>
-									<p className={styles.column}>{otcState.settleExecuted ? 'Final PnL' : 'Current PnL'}</p>
+									<p className={styles.column}>{otcState.chainData.settleExecuted ? 'Final PnL' : 'Current PnL'}</p>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.getLongPnl(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.chainData.getLongPnl(livePricesValue)).toFixed(2).toString()}</p>
 									</LoadingValue>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.getShortPnl(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.chainData.getShortPnl(livePricesValue)).toFixed(2).toString()}</p>
 									</LoadingValue>
 								</Grid>
 							</>
@@ -294,13 +295,13 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 				</Box>
 
 				<div className={styles.buttons}>
-					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isLong={true} />
-					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isLong={false} />
-					<WithdrawButton otcStatePubkey={otcState.publickey.toBase58()} isLong={true} />
-					<WithdrawButton otcStatePubkey={otcState.publickey.toBase58()} isLong={false} />
-					<SettleButton otcStatePubkey={otcState.publickey.toBase58()} />
-					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isLong={true} />
-					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isLong={false} />
+					<DepositButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={true} />
+					<DepositButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={false} />
+					<WithdrawButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={true} />
+					<WithdrawButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={false} />
+					<SettleButton otcStatePubkey={otcState.chainData.publickey.toBase58()} />
+					<ClaimButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={true} />
+					<ClaimButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={false} />
 				</div>
 			</div>
 			<Collapse in={showSimulator} orientation={'horizontal'}>
