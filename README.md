@@ -8,7 +8,7 @@
 
 ## Live environments
 
-|                |                                                                  Netlify Build |        Description |                                                                           Link |
+|                |                                                                   Vercel Build |        Description |                                                                           Link |
 | -------------: | -----------------------------------------------------------------------------: | -----------------: | -----------------------------------------------------------------------------: |
 | `mainnet-prod` | ![Vercel](http://therealsujitk-vercel-badge.vercel.app/?app=vyper-otc-mainnet) | Mainnet Production |                           [otc.vyperprotocol.io](https://otc.vyperprotocol.io) |
 |  `devnet-prod` |  ![Vercel](http://therealsujitk-vercel-badge.vercel.app/?app=vyper-otc-devnet) |  Devnet Production |                 [demo.otc.vyperprotocol.io](https://demo.otc.vyperprotocol.io) |
