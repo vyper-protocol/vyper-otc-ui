@@ -33,8 +33,8 @@ const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isL
 
 	const checkTokenAmount = useCallback(async () => {
 		try {
-			const requiredAmount = isLong ? rateStateQuery.data.buyerDepositAmount : rateStateQuery.data.sellerDepositAmount;
-			const mintInfo = rateStateQuery.data.collateralMintInfo;
+			const requiredAmount = isLong ? rateStateQuery.data.chainData.buyerDepositAmount : rateStateQuery.data.chainData.sellerDepositAmount;
+			const mintInfo = rateStateQuery.data.chainData.collateralMintInfo;
 			const tokenAmount = await getTokenAmount(connection, wallet.publicKey, mintInfo.address);
 			if (tokenAmount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) setIsButtonDisabled(false);
 			else setIsButtonDisabled(true);
@@ -43,9 +43,9 @@ const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isL
 		}
 	}, [
 		isLong,
-		rateStateQuery.data.buyerDepositAmount,
-		rateStateQuery.data.sellerDepositAmount,
-		rateStateQuery.data.collateralMintInfo,
+		rateStateQuery.data.chainData.buyerDepositAmount,
+		rateStateQuery.data.chainData.sellerDepositAmount,
+		rateStateQuery.data.chainData.collateralMintInfo,
 		connection,
 		wallet.publicKey
 	]);
@@ -106,7 +106,7 @@ const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isL
 		} else {
 			try {
 				setIsLoading(true);
-				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, isLong, sendNotification);
+				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data.chainData, isLong, sendNotification);
 			} catch (err) {
 				console.log(err);
 			} finally {
@@ -117,10 +117,10 @@ const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isL
 	};
 
 	if (isLong) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositLongAvailable(wallet.publicKey)) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isDepositLongAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositShortAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isDepositShortAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

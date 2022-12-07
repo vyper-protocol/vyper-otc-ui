@@ -25,7 +25,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const onSettleClick = async () => {
 		try {
 			setIsLoading(true);
-			await settleContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, sendNotification);
+			await settleContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data.chainData, sendNotification);
 		} catch (err) {
 			console.log(err);
 		} finally {
@@ -34,7 +34,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 		}
 	};
 
-	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
+	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isSettlementAvailable()) {
 		return <></>;
 	}
 

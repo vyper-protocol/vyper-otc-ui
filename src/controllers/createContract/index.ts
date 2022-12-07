@@ -33,7 +33,8 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 				try {
 					// override commitment to go as fast as we can 🏎️
 					const conn = new Connection(provider.connection.rpcEndpoint, { commitment: 'processed' });
-					chainOtcState = await fetchContract(conn, otcPublicKey, true);
+					const { chainData } = await fetchContract(conn, otcPublicKey, true);
+					chainOtcState = chainData;
 				} catch {}
 
 				if (chainOtcState === undefined) {
@@ -49,7 +50,10 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 				throw Error('cannot fetch chain data yet');
 			} else {
 				console.log('saving contract on db');
-				await supabaseInsertContract(chainOtcState, provider.wallet.publicKey, cluster);
+				const createdBy = provider.wallet.publicKey;
+				const aliasId = initParams.aliasId ?? initParams.redeemLogicOption.redeemLogicPluginType;
+
+				await supabaseInsertContract(chainOtcState, createdBy, aliasId, cluster);
 			}
 		}
 

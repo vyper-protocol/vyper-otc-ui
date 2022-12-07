@@ -12,6 +12,7 @@ import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import produce from 'immer';
+import { getPayoffTypeIdFromAlias } from 'models/common';
 
 type StepElement = {
 	title: string;
@@ -63,15 +64,19 @@ const CreateContractFlow = ({
 			description: 'Select the payoff of your contract from the list available',
 			content: (
 				<PayoffPicker
-					redeemLogicPluginType={contractInitParams.redeemLogicOption.redeemLogicPluginType}
-					setRedeemLogicPluginType={(newRedeemLogicType) =>
+					aliasIdValue={contractInitParams.aliasId}
+					setAliasIdValue={(newAliasValue) =>
 						onContractInitParamsChange((prevValue) =>
 							produce(prevValue, (draft) => {
-								draft.redeemLogicOption.redeemLogicPluginType = newRedeemLogicType;
-								if (newRedeemLogicType === 'settled_forward' && draft.rateOption.rateAccounts.length === 1) {
+								const newPayoffId = getPayoffTypeIdFromAlias(newAliasValue);
+
+								draft.aliasId = newAliasValue;
+								draft.redeemLogicOption.redeemLogicPluginType = newPayoffId;
+
+								if (newPayoffId === 'settled_forward' && draft.rateOption.rateAccounts.length === 1) {
 									draft.rateOption.rateAccounts.push(draft.rateOption.rateAccounts[0]);
 								}
-								if (newRedeemLogicType !== 'settled_forward' && draft.rateOption.rateAccounts.length !== 1) {
+								if (newPayoffId !== 'settled_forward' && draft.rateOption.rateAccounts.length !== 1) {
 									draft.rateOption.rateAccounts.splice(1, draft.rateOption.rateAccounts.length - 1);
 								}
 							})

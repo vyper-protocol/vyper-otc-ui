@@ -38,6 +38,8 @@ const CreateContractPage = () => {
 		shortDepositAmount: 100,
 		longDepositAmount: 100,
 
+		aliasId: 'forward',
+
 		redeemLogicOption: {
 			redeemLogicPluginType: 'forward',
 			notional: 1,

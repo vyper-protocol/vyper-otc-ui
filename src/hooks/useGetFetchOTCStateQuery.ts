@@ -1,7 +1,7 @@
 import { Address } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { fetchContract } from 'controllers/fetchContract';
-import { ChainOtcState } from 'models/ChainOtcState';
+import { OtcContract } from 'models/OtcContract';
 import { useQuery, UseQueryResult } from 'react-query';
 
 /**
@@ -10,8 +10,8 @@ import { useQuery, UseQueryResult } from 'react-query';
  * @param otcState public key for the otc state
  * @returns query for the otc state
  */
-export const useGetFetchOTCStateQuery = (connection: Connection, otcState: Address): UseQueryResult<ChainOtcState> => {
-	return useQuery<ChainOtcState>(
+export const useGetFetchOTCStateQuery = (connection: Connection, otcState: Address): UseQueryResult<OtcContract> => {
+	return useQuery<OtcContract>(
 		['otc-state', otcState, connection.rpcEndpoint],
 		() => {
 			if (otcState !== undefined) return fetchContract(connection, new PublicKey(otcState));

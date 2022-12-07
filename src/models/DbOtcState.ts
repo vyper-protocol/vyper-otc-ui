@@ -57,7 +57,7 @@ export class DbOtcState extends AbsOtcState {
 		res.settleAvailableFromAt = new Date(data.settle_available_from).getTime();
 
 		if (data.contracts_metadata && data.contracts_metadata.length) {
-			res.metadata = new DbOtcStateMetadata(new PublicKey(data.contracts_metadata[0].created_by), data.contracts_metadata[0].metadata);
+			res.metadata = DbOtcStateMetadata.createFromDBData(data.contracts_metadata[0]);
 		}
 		if (data.contracts_dynamic_data && data.contracts_dynamic_data.length) {
 			res.dynamicData = DbOtcDynamicData.createFromDBData(data.contracts_dynamic_data[0]);

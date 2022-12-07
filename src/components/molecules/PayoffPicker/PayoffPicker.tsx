@@ -1,17 +1,20 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { PayoffTypeIds } from 'models/common';
+import { AliasTypeIds, getPayoffTypeIdFromAlias } from 'models/common';
 import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
 
 export type PayoffPickerInput = {
 	// redeem logic plugin of the contract
-	redeemLogicPluginType: PayoffTypeIds;
+	aliasIdValue: AliasTypeIds;
 
 	// set callback, sets the redeem logic plugin type and the main rate puybey
-	// eslint-disable-next-line no-unused-vars
-	setRedeemLogicPluginType: (redeemLogicPluginType: PayoffTypeIds) => void;
+	setAliasIdValue: (newAlias: AliasTypeIds) => void;
 };
 
-const buildDescription = (rateId: PayoffTypeIds) => {
+const buildDescription = (aliasId: AliasTypeIds) => {
+	// eventually we can specialize description for alias
+	// here we're using the parent payoff context
+	const rateId = getPayoffTypeIdFromAlias(aliasId);
+
 	return (
 		<Box sx={{ marginY: 2 }}>
 			<Typography>{getRedeemLogicDescription(rateId)}</Typography>
@@ -27,17 +30,17 @@ const buildDescription = (rateId: PayoffTypeIds) => {
 	);
 };
 
-export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
-	const uiRLTypes: PayoffTypeIds[] = ['forward', 'vanilla_option', 'digital'];
+export const PayoffPicker = ({ aliasIdValue, setAliasIdValue }: PayoffPickerInput) => {
+	const uiAliasIds: AliasTypeIds[] = ['forward', 'vanilla_option', 'digital'];
 
 	return (
 		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
-			<Tabs value={redeemLogicPluginType} onChange={(_, v) => setRedeemLogicPluginType(v)}>
-				{uiRLTypes.map((plugin) => (
+			<Tabs value={aliasIdValue} onChange={(_, v) => setAliasIdValue(v)}>
+				{uiAliasIds.map((plugin) => (
 					<Tab label={plugin} key={plugin} value={plugin} />
 				))}
 			</Tabs>
-			{buildDescription(redeemLogicPluginType)}
+			{buildDescription(aliasIdValue)}
 		</Box>
 	);
 };
