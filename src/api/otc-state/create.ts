@@ -176,8 +176,8 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const otcInitTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
 			.initialize({
-				seniorDepositAmount: new BN(params.seniorDepositAmount * 10 ** reserveMintInfo.decimals),
-				juniorDepositAmount: new BN(params.juniorDepositAmount * 10 ** reserveMintInfo.decimals),
+				seniorDepositAmount: new BN(params.longDepositAmount * 10 ** reserveMintInfo.decimals),
+				juniorDepositAmount: new BN(params.shortDepositAmount * 10 ** reserveMintInfo.decimals),
 				depositStart: new BN(params.depositStart / 1000),
 				depositEnd: new BN(params.depositEnd / 1000),
 				settleStart: new BN(params.settleStart / 1000),

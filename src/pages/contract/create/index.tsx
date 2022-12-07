@@ -35,8 +35,8 @@ const CreateContractPage = () => {
 		depositEnd: moment().add(5, 'minutes').toDate().getTime(),
 		settleStart: moment().add(15, 'minutes').toDate().getTime(),
 
-		juniorDepositAmount: 100,
-		seniorDepositAmount: 100,
+		shortDepositAmount: 100,
+		longDepositAmount: 100,
 
 		redeemLogicOption: {
 			redeemLogicPluginType: 'forward',
@@ -60,6 +60,7 @@ const CreateContractPage = () => {
 		sendNotification: process.env.NODE_ENV !== 'development'
 	});
 
+	// eslint-disable-next-line eqeqeq
 	const isPresentTempData = contractStore?.contractData != null;
 	useEffect(() => {
 		if (contractStore?.contractData) {

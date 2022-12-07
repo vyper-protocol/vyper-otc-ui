@@ -14,8 +14,8 @@ import { SNS_PUBLISHER_RPC_NAME, supabase } from './client';
 // TODO: improve access
 const buildBody = (
 	redeemLogicPluginType: PayoffTypeIds,
-	buyerDepositAmount: number,
-	sellerDepositAmount: number,
+	longDepositAmount: number,
+	shortDepositAmount: number,
 	reserveMint: string,
 	oracleInfo: OracleDetail,
 	strike?: number,
@@ -30,15 +30,15 @@ const buildBody = (
 		case 'forward':
 			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\n\nCollateral:\t${
 				mintInfo?.title ?? reserveMint
-			}\nLong:\t${buyerDepositAmount} ${mintInfo?.title ?? ''}\nShort:\t${sellerDepositAmount} ${mintInfo?.title ?? ''}`;
+			}\nLong:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nShort:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
 		case 'vanilla_option':
 			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
 				mintInfo?.title ?? reserveMint
-			}\nOption premium:\t${buyerDepositAmount} ${mintInfo?.title ?? ''}\nOption collateral:\t${sellerDepositAmount} ${mintInfo?.title ?? ''}`;
+			}\nOption premium:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nOption collateral:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
 		case 'digital':
 			return `\n\nStrike: ${strike.toPrecision(4)}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
 				mintInfo?.title ?? reserveMint
-			}\nOption premium:\t${buyerDepositAmount} ${mintInfo?.title ?? ''}\nMax payout:\t${sellerDepositAmount} ${mintInfo?.title ?? ''}`;
+			}\nOption premium:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nMax payout:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
 		default:
 			console.warn('Unsupported redeem logic');
 			return;
@@ -46,7 +46,14 @@ const buildBody = (
 };
 
 export const buildCreateContractMessage = (
-	{ redeemLogicOption, rateOption, reserveMint, settleStart, seniorDepositAmount, juniorDepositAmount }: OtcInitializationParams,
+	{
+		redeemLogicOption,
+		rateOption,
+		reserveMint,
+		settleStart,
+		longDepositAmount: longDepositAmount,
+		shortDepositAmount: juniorDepositAmount
+	}: OtcInitializationParams,
 	cluster: Cluster,
 	url: string
 ): string => {
@@ -58,7 +65,7 @@ export const buildCreateContractMessage = (
 
 	const body = buildBody(
 		redeemLogicOption.redeemLogicPluginType,
-		seniorDepositAmount,
+		longDepositAmount,
 		juniorDepositAmount,
 		reserveMint,
 		oracleInfo,
@@ -72,14 +79,14 @@ export const buildCreateContractMessage = (
 
 export const buildContractFundedMessage = (
 	{ redeemLogicAccount, rateAccount, publickey, depositExpirationAt, reserveMint, buyerDepositAmount, sellerDepositAmount }: ChainOtcState,
-	isBuyer: boolean,
+	isLong: boolean,
 	isSecondSide: boolean,
 	cluster: Cluster,
 	url: string
 ): string => {
 	const oracleInfo = getOracleByPubkey(rateAccount.state.accountsRequiredForRefresh[0]);
 
-	const header = `Contract ${abbreviateAddress(publickey.toBase58())} has been funded by the ${isBuyer ? 'LONG' : 'SHORT'} side${
+	const header = `Contract ${abbreviateAddress(publickey.toBase58())} has been funded by the ${isLong ? 'LONG' : 'SHORT'} side${
 		isSecondSide ? ' and is now live' : ''
 	}! ${cluster === 'devnet' ? '[DEVNET]' : ''}\n\nUnderlying:\t${oracleInfo.title}`;
 
@@ -104,7 +111,7 @@ export const buildContractFundedMessage = (
 		header +
 		body +
 		`\n\nExpiry:\t${moment(depositExpirationAt).utc().format('DD MMM YYYY - hh:mm A [UTC]')}\n\n${
-			isSecondSide ? 'May the odds be in your favor' : isBuyer ? 'SHORT here' : 'LONG here'
+			isSecondSide ? 'May the odds be in your favor' : isLong ? 'SHORT here' : 'LONG here'
 		}👇\n${url}`
 	);
 };

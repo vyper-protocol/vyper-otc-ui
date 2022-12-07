@@ -47,14 +47,14 @@ export class SettledForward extends AbsPayoffState {
 		return new SettledForward(this.strike, this.isLinear, this.notional, this.isStandard);
 	}
 
-	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return SettledForward.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike, this.isLinear, this.isStandard);
+	getPnl(prices: number[], longDepositAmount: number, shortDepositAmount: number): [number, number] {
+		return SettledForward.getPnlExtended(prices, longDepositAmount, shortDepositAmount, this.notional, this.strike, this.isLinear, this.isStandard);
 	}
 
 	static getPnlExtended(
 		prices: number[],
-		buyerDepositAmount: number,
-		sellerDepositAmount: number,
+		longDepositAmount: number,
+		shortDepositAmount: number,
 		notional: number,
 		strike: number,
 		isLinear: boolean,
@@ -63,9 +63,9 @@ export class SettledForward extends AbsPayoffState {
 		const buyerPnl = Math.max(
 			Math.min(
 				((notional * (prices[0] - strike)) / (isLinear ? 1 : prices[0])) * (isStandard || prices[1] === 0 ? prices[1] : 1 / prices[1]),
-				sellerDepositAmount
+				shortDepositAmount
 			),
-			-buyerDepositAmount
+			-longDepositAmount
 		);
 		const sellerPnl = -1 * buyerPnl;
 		return [buyerPnl, sellerPnl];

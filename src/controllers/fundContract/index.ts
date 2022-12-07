@@ -13,13 +13,13 @@ export const fundContract = async (
 	txHandler: TxHandler,
 	contractPublicKey: PublicKey,
 	otcState: ChainOtcState,
-	isBuyer: boolean,
+	isLong: boolean,
 	sendNotification: boolean
 ) => {
 	try {
-		console.group(`CONTROLLER: ${isBuyer ? 'long' : 'short'} contract`);
+		console.group(`CONTROLLER: ${isLong ? 'long' : 'short'} contract`);
 		console.log('create txs');
-		const txs = await deposit(provider, contractPublicKey, isBuyer);
+		const txs = await deposit(provider, contractPublicKey, isLong);
 
 		console.log('submit txs');
 		await txHandler.handleTxs(txs);
@@ -27,9 +27,9 @@ export const fundContract = async (
 		if (sendNotification) {
 			const cluster = getCurrentCluster();
 			const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(contractPublicKey.toBase58()));
-			const isSecondSide = (isBuyer && otcState.isSellerFunded()) || (!isBuyer && otcState.isBuyerFunded());
+			const isSecondSide = (isLong && otcState.isShortFunded()) || (!isLong && otcState.isLongFunded());
 
-			const notification = buildContractFundedMessage(otcState, isBuyer, isSecondSide, cluster, contractURL);
+			const notification = buildContractFundedMessage(otcState, isLong, isSecondSide, cluster, contractURL);
 			sendSnsPublisherNotification(cluster, notification);
 		}
 	} catch (err) {

@@ -46,19 +46,19 @@ export class Forward extends AbsPayoffState {
 		return new Forward(this.strike, this.isLinear, this.notional);
 	}
 
-	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return Forward.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.notional, this.strike, this.isLinear);
+	getPnl(prices: number[], longDepositAmount: number, shortDepositAmount: number): [number, number] {
+		return Forward.getPnlExtended(prices[0], longDepositAmount, shortDepositAmount, this.notional, this.strike, this.isLinear);
 	}
 
 	static getPnlExtended(
 		price: number,
-		buyerDepositAmount: number,
-		sellerDepositAmount: number,
+		longDepositAmount: number,
+		shortDepositAmount: number,
 		notional: number,
 		strike: number,
 		isLinear: boolean
 	): [number, number] {
-		const buyerPnl = Math.max(Math.min((notional * (price - strike)) / (isLinear ? 1 : price), sellerDepositAmount), -buyerDepositAmount);
+		const buyerPnl = Math.max(Math.min((notional * (price - strike)) / (isLinear ? 1 : price), shortDepositAmount), -longDepositAmount);
 		const sellerPnl = -1 * buyerPnl;
 		return [buyerPnl, sellerPnl];
 	}

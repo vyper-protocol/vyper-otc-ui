@@ -243,7 +243,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				return params.row.isBuyerFunded();
+				return params.row.isLongFunded();
 			}
 		},
 		{
@@ -255,7 +255,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				return params.row.isSellerFunded();
+				return params.row.isShortFunded();
 			}
 		},
 		{

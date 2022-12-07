@@ -23,11 +23,11 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
 	const tokenSymbol = rateStateQuery?.data?.reserveTokenInfo?.symbol ?? '';
 
-	const buyerPnl = formatWithDecimalDigits(
+	const longPnl = formatWithDecimalDigits(
 		rateStateQuery?.data?.redeemLogicAccount?.state.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[0],
 		4
 	);
-	const sellerPnl = formatWithDecimalDigits(
+	const shortPnl = formatWithDecimalDigits(
 		rateStateQuery?.data?.redeemLogicAccount?.state.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[1],
 		4
 	);
@@ -70,12 +70,12 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 				<div className={styles.center}>
 					Long
 					<br />
-					<NumericBadge label={buyerPnl + ' ' + tokenSymbol} mode={buyerPnl > 0 ? 'success' : 'error'} />
+					<NumericBadge label={longPnl + ' ' + tokenSymbol} mode={longPnl > 0 ? 'success' : 'error'} />
 				</div>
 				<div className={styles.center}>
 					Short
 					<br />
-					<NumericBadge label={sellerPnl + ' ' + tokenSymbol} mode={sellerPnl > 0 ? 'success' : 'error'} />
+					<NumericBadge label={shortPnl + ' ' + tokenSymbol} mode={shortPnl > 0 ? 'success' : 'error'} />
 				</div>
 			</div>
 

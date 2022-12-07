@@ -9,8 +9,8 @@ import { formatWithDecimalDigits } from 'utils/numberHelpers';
 export type OtcInitializationParams = {
 	reserveMint: string;
 
-	seniorDepositAmount: number;
-	juniorDepositAmount: number;
+	longDepositAmount: number;
+	shortDepositAmount: number;
 
 	depositStart: number;
 	depositEnd: number;

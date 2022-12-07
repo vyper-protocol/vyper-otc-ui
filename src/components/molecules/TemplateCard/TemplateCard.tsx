@@ -44,8 +44,8 @@ function convertExpiry(expiry: ExpiryType): number {
 export type TemplateCardProps = {
 	description?: string;
 	reserveMint: string;
-	buyerDepositAmount: number;
-	sellerDepositAmount: number;
+	longDepositAmount: number;
+	shortDepositAmount: number;
 	payoff: PayoffTypeIds;
 	payoffData: any;
 	expiry: ExpiryType;
@@ -67,8 +67,8 @@ function createCompletePayoffData(payoffData: any): { notional: number; isLinear
 export const TemplateCard = ({
 	description,
 	reserveMint,
-	buyerDepositAmount,
-	sellerDepositAmount,
+	longDepositAmount,
+	shortDepositAmount,
 	payoff,
 	payoffData,
 	expiry,
@@ -87,8 +87,8 @@ export const TemplateCard = ({
 
 		create({
 			reserveMint: reserveMint,
-			seniorDepositAmount: buyerDepositAmount,
-			juniorDepositAmount: sellerDepositAmount,
+			longDepositAmount,
+			shortDepositAmount,
 			depositStart: moment().add(-60, 'minutes').toDate().getTime(),
 			depositEnd: moment().add(15, 'minutes').toDate().getTime(),
 			settleStart: convertExpiry(expiry),

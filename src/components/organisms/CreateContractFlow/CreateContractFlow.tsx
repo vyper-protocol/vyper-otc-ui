@@ -134,19 +134,19 @@ const CreateContractFlow = ({
 			}`,
 			content: (
 				<ReservePicker
-					seniorDepositAmount={contractInitParams.seniorDepositAmount}
-					setSeniorDepositAmount={(newVal) =>
+					longDepositAmount={contractInitParams.longDepositAmount}
+					setLongDepositAmount={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
 							produce(prevVal, (draft) => {
-								draft.seniorDepositAmount = newVal;
+								draft.longDepositAmount = newVal;
 							})
 						)
 					}
-					juniorDepositAmount={contractInitParams.juniorDepositAmount}
-					setJuniorDepositAmount={(newVal) =>
+					shortDepositAmount={contractInitParams.shortDepositAmount}
+					setShortDepositAmount={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
 							produce(prevVal, (draft) => {
-								draft.juniorDepositAmount = newVal;
+								draft.shortDepositAmount = newVal;
 							})
 						)
 					}
@@ -287,8 +287,8 @@ const CreateContractFlow = ({
 				rateOption={contractInitParams.rateOption}
 				depositEnd={contractInitParams.depositEnd}
 				settleStart={contractInitParams.settleStart}
-				seniorDepositAmount={contractInitParams.seniorDepositAmount}
-				juniorDepositAmount={contractInitParams.juniorDepositAmount}
+				longDepositAmount={contractInitParams.longDepositAmount}
+				shortDepositAmount={contractInitParams.shortDepositAmount}
 				reserveMint={contractInitParams.reserveMint}
 				open={openPreview}
 				handleClose={handleClosePreview}

@@ -17,8 +17,8 @@ export const syncContractFromChain = async (otcState: ChainOtcState) => {
 			pricesAtSettlement1 = otcState.pricesAtSettlement[0];
 			if (otcState.pricesAtSettlement.length > 1) pricesAtSettlement2 = otcState.pricesAtSettlement[1];
 
-			pnlBuyer = otcState.getPnlBuyer(otcState.pricesAtSettlement);
-			pnlSeller = otcState.getPnlSeller(otcState.pricesAtSettlement);
+			pnlBuyer = otcState.getLongPnl(otcState.pricesAtSettlement);
+			pnlSeller = otcState.getShortPnl(otcState.pricesAtSettlement);
 		} catch {}
 	}
 

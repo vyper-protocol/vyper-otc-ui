@@ -72,7 +72,7 @@ const postDeposit = async (request, response) => {
 	const sender = new PublicKey(accountField);
 
 	const otcState = new PublicKey(request.query?.contract);
-	const isSeniorSide = request.query?.isBuyer === 'true';
+	const isLongSide = request.query?.isBuyer === 'true';
 
 	const provider = new AnchorProvider(connection, undefined, {});
 
@@ -151,7 +151,7 @@ const postDeposit = async (request, response) => {
 	tx.add(
 		await vyperOtcProgram.methods
 			.deposit({
-				isSeniorSide
+				isSeniorSide: isLongSide
 			})
 			.accounts({
 				userReserveTokenAccount: atokenAccount,

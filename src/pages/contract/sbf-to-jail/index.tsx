@@ -52,8 +52,8 @@ const CreateSbfJailContractPage = () => {
 				depositStart,
 				depositEnd,
 				settleStart,
-				seniorDepositAmount: longAmount,
-				juniorDepositAmount: 100,
+				longDepositAmount: longAmount,
+				shortDepositAmount: 100,
 				rateOption: {
 					ratePluginType: 'switchboard',
 					rateAccounts: ['3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW']

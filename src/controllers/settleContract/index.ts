@@ -28,8 +28,8 @@ export const settleContract = async (
 			const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(contractPublicKey.toBase58()));
 			const settlementPrices = otcState.pricesAtSettlement;
 
-			const pnlLong = otcState.getPnlBuyer(settlementPrices);
-			const pnlShort = otcState.getPnlSeller(settlementPrices);
+			const pnlLong = otcState.getLongPnl(settlementPrices);
+			const pnlShort = otcState.getShortPnl(settlementPrices);
 
 			const notification = buildContractSettledMessage(otcState, pnlLong, pnlShort, cluster, contractURL);
 			sendSnsPublisherNotification(cluster, notification);

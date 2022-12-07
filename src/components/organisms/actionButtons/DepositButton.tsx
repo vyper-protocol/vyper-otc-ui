@@ -17,12 +17,12 @@ import * as UrlBuilder from 'utils/urlBuilder';
 
 import PROGRAMS from '../../../configs/programs.json';
 
-const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLong: boolean }) => {
 	const router = useRouter();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
-	const isSeller = !isBuyer;
+	const isSeller = !isLong;
 
 	const sendNotification = process.env.NEXT_PUBLIC_LIVE_ENVIRONMENT === 'production';
 
@@ -33,7 +33,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 
 	const checkTokenAmount = useCallback(async () => {
 		try {
-			const requiredAmount = isBuyer ? rateStateQuery.data.buyerDepositAmount : rateStateQuery.data.sellerDepositAmount;
+			const requiredAmount = isLong ? rateStateQuery.data.buyerDepositAmount : rateStateQuery.data.sellerDepositAmount;
 			const mintInfo = rateStateQuery.data.reserveMintInfo;
 			const tokenAmount = await getTokenAmount(connection, wallet.publicKey, mintInfo.address);
 			if (tokenAmount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) setIsButtonDisabled(false);
@@ -42,7 +42,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 			console.error(err);
 		}
 	}, [
-		isBuyer,
+		isLong,
 		rateStateQuery.data.buyerDepositAmount,
 		rateStateQuery.data.sellerDepositAmount,
 		rateStateQuery.data.reserveMintInfo,
@@ -65,11 +65,8 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 				const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), new AnchorProvider(connection, undefined, {}));
 				const otcStateUpdate = vyperOtcProgram.coder.accounts.decode<IdlAccounts<VyperOtc>['otcState']>('otcState', updatedAccountInfo.data);
 
-				console.log('otcStateUpdate.seniorSideBeneficiary: ' + otcStateUpdate.seniorSideBeneficiary);
-				console.log('otcStateUpdate.juniorSideBeneficiary: ' + otcStateUpdate.juniorSideBeneficiary);
-
 				if (otcStateUpdate.seniorSideBeneficiary !== null) {
-					if (isBuyer) {
+					if (isLong) {
 						// buyer already take
 						setIsAvailable(false);
 					} else if (wallet?.publicKey) {
@@ -105,11 +102,11 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 
 	const onDepositClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		if (e.altKey) {
-			router.push(UrlBuilder.buildDepositQRCodeUrl(otcStatePubkey, isBuyer));
+			router.push(UrlBuilder.buildDepositQRCodeUrl(otcStatePubkey, isLong));
 		} else {
 			try {
 				setIsLoading(true);
-				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, isBuyer, sendNotification);
+				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, isLong, sendNotification);
 			} catch (err) {
 				console.log(err);
 			} finally {
@@ -119,11 +116,11 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		}
 	};
 
-	if (isBuyer) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositBuyerAvailable(wallet.publicKey)) {
+	if (isLong) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositLongAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositSellerAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isDepositShortAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 
@@ -134,8 +131,8 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		<Tooltip title={isButtonDisabled ? 'Not enough tokens' : ''}>
 			<div style={{ display: 'flex', flex: 1 }}>
 				<ButtonPill
-					mode={isButtonDisabled ? 'disabled' : isBuyer ? 'success' : 'error'}
-					text={isBuyer ? 'Long' : 'Short'}
+					mode={isButtonDisabled ? 'disabled' : isLong ? 'success' : 'error'}
+					text={isLong ? 'Long' : 'Short'}
 					onClick={onDepositClick}
 					loading={isLoading}
 					disabled={isButtonDisabled}

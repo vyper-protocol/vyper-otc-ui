@@ -13,20 +13,17 @@ import { getMintByPubkey, getMintByTitle, getMints } from 'utils/mintDatasetHelp
 
 // TODO: fix typing
 export type ReservePickerInput = {
-	seniorDepositAmount: number;
+	longDepositAmount: number;
 
-	// eslint-disable-next-line no-unused-vars
-	setSeniorDepositAmount: (value: number) => void;
+	setLongDepositAmount: (value: number) => void;
 
-	juniorDepositAmount: number;
+	shortDepositAmount: number;
 
-	// eslint-disable-next-line no-unused-vars
-	setJuniorDepositAmount: (value: number) => void;
+	setShortDepositAmount: (value: number) => void;
 
 	// collateral mint
 	reserveMint: string;
 
-	// eslint-disable-next-line no-unused-vars
 	setReserveMint: (mint: string) => void;
 };
 
@@ -49,10 +46,10 @@ type ExternalType = {
 // FIXME
 
 export const ReservePicker = ({
-	seniorDepositAmount,
-	setSeniorDepositAmount,
-	juniorDepositAmount,
-	setJuniorDepositAmount,
+	longDepositAmount,
+	setLongDepositAmount,
+	shortDepositAmount,
+	setShortDepositAmount,
 	reserveMint,
 	setReserveMint,
 	reserveError,
@@ -164,8 +161,8 @@ export const ReservePicker = ({
 					InputLabelProps={{
 						shrink: true
 					}}
-					value={seniorDepositAmount}
-					onChange={(e) => setSeniorDepositAmount(+e.target.value)}
+					value={longDepositAmount}
+					onChange={(e) => setLongDepositAmount(+e.target.value)}
 				/>
 
 				<TextField
@@ -176,8 +173,8 @@ export const ReservePicker = ({
 					InputLabelProps={{
 						shrink: true
 					}}
-					value={juniorDepositAmount}
-					onChange={(e) => setJuniorDepositAmount(+e.target.value)}
+					value={shortDepositAmount}
+					onChange={(e) => setShortDepositAmount(+e.target.value)}
 				/>
 			</Box>
 		</Box>

@@ -27,9 +27,11 @@ export type PreviewModalInput = {
 	// contract expiry expressed in ms
 	settleStart: number;
 
-	seniorDepositAmount: number;
+	// long deposit amount
+	longDepositAmount: number;
 
-	juniorDepositAmount: number;
+	// short deposit amount
+	shortDepositAmount: number;
 
 	// collateral mint
 	reserveMint: string;
@@ -49,8 +51,8 @@ export const PreviewModal = ({
 	rateOption,
 	depositEnd,
 	settleStart,
-	seniorDepositAmount,
-	juniorDepositAmount,
+	longDepositAmount,
+	shortDepositAmount,
 	reserveMint,
 	open,
 	handleClose,
@@ -121,12 +123,12 @@ export const PreviewModal = ({
 				)}{' '}
 				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
-					{seniorDepositAmount}
+					{longDepositAmount}
 					{reserveMint && <span> {mintDetail?.title}</span>}
 				</span>{' '}
 				while the <span className={styles.highlight}>short</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
-					{juniorDepositAmount}
+					{shortDepositAmount}
 					{reserveMint && <span> {mintDetail?.title}</span>}
 				</span>
 				.

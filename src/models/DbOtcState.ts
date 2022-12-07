@@ -14,12 +14,12 @@ export class DbOtcState extends AbsOtcState {
 	metadata: DbOtcStateMetadata;
 	dynamicData: DbOtcDynamicData;
 
-	isBuyerFunded(): boolean {
+	isLongFunded(): boolean {
 		if (this.dynamicData && this.dynamicData.buyerWallet) return true;
 		return false;
 	}
 
-	isSellerFunded(): boolean {
+	isShortFunded(): boolean {
 		if (this.dynamicData && this.dynamicData.sellerWallet) return true;
 		return false;
 	}
@@ -33,7 +33,7 @@ export class DbOtcState extends AbsOtcState {
 	}
 
 	areBothSidesFunded(): boolean {
-		return this.isBuyerFunded() && this.isSellerFunded();
+		return this.isLongFunded() && this.isShortFunded();
 	}
 
 	static createFromDBData(data: any): DbOtcState {

@@ -50,21 +50,21 @@ export class VanillaOption extends AbsPayoffState {
 		};
 	}
 
-	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return VanillaOption.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
+	getPnl(prices: number[], longDepositAmount: number, shortDepositAmount: number): [number, number] {
+		return VanillaOption.getPnlExtended(prices[0], longDepositAmount, shortDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
 	}
 
 	static getPnlExtended(
 		price: number,
-		buyerDepositAmount: number,
-		sellerDepositAmount: number,
+		longDepositAmount: number,
+		shortDepositAmount: number,
 		strike: number,
 		notional: number,
 		isCall: boolean,
 		isLinear: boolean
 	): [number, number] {
 		const payoff = price === 0 && !isLinear ? (!isCall || strike > 0 ? 0 : 1) : Math.max(0, isCall ? price - strike : strike - price) / (isLinear ? 1 : price);
-		const buyerPnl = -buyerDepositAmount + Math.min(sellerDepositAmount, notional * payoff);
+		const buyerPnl = -longDepositAmount + Math.min(shortDepositAmount, notional * payoff);
 		const sellerPnl = -buyerPnl;
 		return [buyerPnl, sellerPnl];
 	}
