@@ -5,33 +5,32 @@ import { deposit } from 'api/otc-state/deposit';
 import { buildContractFundedMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
+import { ChainOtcState } from 'models/ChainOtcState';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 export const fundContract = async (
 	provider: AnchorProvider,
 	txHandler: TxHandler,
 	contractPublicKey: PublicKey,
-	isSeniorSide: boolean,
-	sendNotification: boolean = false
+	otcState: ChainOtcState,
+	isBuyer: boolean,
+	sendNotification: boolean
 ) => {
 	try {
-		console.group(`CONTROLLER: ${isSeniorSide ? 'long' : 'short'} contract`);
+		console.group(`CONTROLLER: ${isBuyer ? 'long' : 'short'} contract`);
 		console.log('create txs');
-		const txs = await deposit(provider, contractPublicKey, isSeniorSide);
+		const txs = await deposit(provider, contractPublicKey, isBuyer);
 
 		console.log('submit txs');
 		await txHandler.handleTxs(txs);
 
-		const contractURL = UrlBuilder.buildContractSummaryUrl(contractPublicKey.toBase58());
-		const cluster = getCurrentCluster();
-
-		// send sns publish
 		if (sendNotification) {
-			console.log('send notification');
-			sendSnsPublisherNotification(
-				cluster,
-				buildContractFundedMessage(contractPublicKey.toBase58(), isSeniorSide, `https://otc.vyperprotocol.io${contractURL}`)
-			);
+			const cluster = getCurrentCluster();
+			const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(contractPublicKey.toBase58()));
+			const isSecondSide = (isBuyer && otcState.isSellerFunded()) || (!isBuyer && otcState.isBuyerFunded());
+
+			const notification = buildContractFundedMessage(otcState, isBuyer, isSecondSide, cluster, contractURL);
+			sendSnsPublisherNotification(cluster, notification);
 		}
 	} catch (err) {
 		console.error(err);

@@ -3,7 +3,7 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
-import { buildCreateContractMessage as buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
+import { buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
 import { fetchContract } from 'controllers/fetchContract';
@@ -54,22 +54,9 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 		}
 
 		if (initParams.sendNotification) {
-			if (!chainOtcState) {
-				chainOtcState = await fetchContract(provider.connection, otcPublicKey, true);
-			}
-
-			const contractURL = UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58());
-
-			// send sns publish
-			sendSnsPublisherNotification(
-				cluster,
-				buildCreateContractMessage(
-					chainOtcState.redeemLogicAccount.state,
-					chainOtcState.rateAccount.state,
-					chainOtcState.settleAvailableFromAt,
-					`https://otc.vyperprotocol.io${contractURL}`
-				)
-			);
+			const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
+			const notification = buildCreateContractMessage(initParams, cluster, contractURL);
+			sendSnsPublisherNotification(cluster, notification);
 		}
 	} catch (err) {
 		console.error(err);

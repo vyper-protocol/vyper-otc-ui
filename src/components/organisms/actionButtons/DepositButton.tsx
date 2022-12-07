@@ -24,6 +24,8 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	const txHandler = useContext(TxHandlerContext);
 	const isSeller = !isBuyer;
 
+	const sendNotification = process.env.NEXT_PUBLIC_LIVE_ENVIRONMENT === 'production';
+
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +109,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		} else {
 			try {
 				setIsLoading(true);
-				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), isBuyer);
+				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, isBuyer, sendNotification);
 			} catch (err) {
 				console.log(err);
 			} finally {
