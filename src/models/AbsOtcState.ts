@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
+import { PayoffAccount } from './plugins/payoff/PayoffAccount';
 import { RateAccount } from './plugins/rate/RateAccount';
-import { PayoffAccount } from './plugins/redeemLogic/PayoffAccount';
 
 export abstract class AbsOtcState {
 	/**

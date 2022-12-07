@@ -1,7 +1,7 @@
+import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { PayoffTypeIds } from '../../../common';
-import { AbsPayoffState } from '../AbsPayoffState';
+import { AbsPayoffState } from './AbsPayoffState';
 
 export class SettledForward extends AbsPayoffState {
 	constructor(public strike: number, public isLinear: boolean, public notional: number, public isStandard: boolean) {

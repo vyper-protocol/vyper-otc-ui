@@ -3,11 +3,11 @@ import { SetStateAction, useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { CollateralPicker } from 'components/molecules/CollateralPicker';
 import { ExpiryPicker } from 'components/molecules/ExpiryPicker';
 import { OraclesPicker } from 'components/molecules/OraclesPicker';
 import { PayoffPicker } from 'components/molecules/PayoffPicker';
 import { PreviewModal } from 'components/molecules/PreviewModal';
-import { ReservePicker } from 'components/molecules/ReservePicker';
 import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -133,7 +133,7 @@ const CreateContractFlow = ({
 				getCurrentCluster() === 'devnet' ? '. You can also input your token of choice' : ''
 			}`,
 			content: (
-				<ReservePicker
+				<CollateralPicker
 					longDepositAmount={contractInitParams.longDepositAmount}
 					setLongDepositAmount={(newVal) =>
 						onContractInitParamsChange((prevVal) =>

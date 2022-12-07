@@ -12,7 +12,7 @@ import { TokenInfo } from 'models/TokenInfo';
 import { getMintByPubkey, getMintByTitle, getMints } from 'utils/mintDatasetHelper';
 
 // TODO: fix typing
-export type ReservePickerInput = {
+export type CollateralPickerInput = {
 	longDepositAmount: number;
 
 	setLongDepositAmount: (value: number) => void;
@@ -27,7 +27,7 @@ export type ReservePickerInput = {
 	setCollateralMint: (mint: string) => void;
 };
 
-type ReservePickerProps = ReservePickerInput & {
+type CollateralPickerProps = CollateralPickerInput & {
 	// error in mint input
 	reserveError: boolean;
 
@@ -45,7 +45,7 @@ type ExternalType = {
 
 // FIXME
 
-export const ReservePicker = ({
+export const CollateralPicker = ({
 	longDepositAmount,
 	setLongDepositAmount,
 	shortDepositAmount,
@@ -54,7 +54,7 @@ export const ReservePicker = ({
 	setCollateralMint,
 	reserveError,
 	setReserveError
-}: ReservePickerProps) => {
+}: CollateralPickerProps) => {
 	const [external, setExternal] = useState<ExternalType>({ isExternal: false });
 	const [isLoading, setIsLoading] = useState(false);
 

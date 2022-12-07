@@ -1,7 +1,7 @@
+import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { PayoffTypeIds } from '../../../common';
-import { AbsPayoffState } from '../AbsPayoffState';
+import { AbsPayoffState } from './AbsPayoffState';
 
 export class VanillaOption extends AbsPayoffState {
 	constructor(public strike: number, public notional: number, public isCall: boolean, public isLinear: boolean) {

@@ -4,10 +4,10 @@ import { AbsOtcState } from './AbsOtcState';
 import { ContractStatusIds } from './ChainOtcState';
 import { DbOtcDynamicData } from './DbOtcDynamicData';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
+import { createPayoffStateFromDBData } from './plugins/payoff/createPayoffStateFromDBData';
+import { PayoffAccount } from './plugins/payoff/PayoffAccount';
 import { createRateStateFromDBData } from './plugins/rate/createRateStateFromDBData';
 import { RateAccount } from './plugins/rate/RateAccount';
-import { createPayoffStateFromDBData } from './plugins/redeemLogic/createRLStateFromDBData';
-import { PayoffAccount } from './plugins/redeemLogic/PayoffAccount';
 
 export class DbOtcState extends AbsOtcState {
 	cluster: Cluster;

@@ -34,10 +34,10 @@ import {
 import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/ChainOtcState';
 import { AVAILABLE_PAYOFF_TYPE_IDS, PayoffTypeIds } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
-import { Digital } from 'models/plugins/redeemLogic/digital/Digital';
-import { Forward } from 'models/plugins/redeemLogic/forward/Forward';
-import { SettledForward } from 'models/plugins/redeemLogic/settledForward/SettledForward';
-import { VanillaOption } from 'models/plugins/redeemLogic/vanillaOption/VanillaOption';
+import { Digital } from 'models/plugins/payoff/Digital';
+import { Forward } from 'models/plugins/payoff/Forward';
+import { SettledForward } from 'models/plugins/payoff/SettledForward';
+import { VanillaOption } from 'models/plugins/payoff/VanillaOption';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
