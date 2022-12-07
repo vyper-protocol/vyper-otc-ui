@@ -3,11 +3,11 @@ import { SetStateAction, useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { CollateralPicker } from 'components/molecules/CollateralPicker';
 import { ExpiryPicker } from 'components/molecules/ExpiryPicker';
 import { OraclesPicker } from 'components/molecules/OraclesPicker';
 import { PayoffPicker } from 'components/molecules/PayoffPicker';
 import { PreviewModal } from 'components/molecules/PreviewModal';
-import { ReservePicker } from 'components/molecules/ReservePicker';
 import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -133,28 +133,28 @@ const CreateContractFlow = ({
 				getCurrentCluster() === 'devnet' ? '. You can also input your token of choice' : ''
 			}`,
 			content: (
-				<ReservePicker
-					seniorDepositAmount={contractInitParams.seniorDepositAmount}
-					setSeniorDepositAmount={(newVal) =>
+				<CollateralPicker
+					longDepositAmount={contractInitParams.longDepositAmount}
+					setLongDepositAmount={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
 							produce(prevVal, (draft) => {
-								draft.seniorDepositAmount = newVal;
+								draft.longDepositAmount = newVal;
 							})
 						)
 					}
-					juniorDepositAmount={contractInitParams.juniorDepositAmount}
-					setJuniorDepositAmount={(newVal) =>
+					shortDepositAmount={contractInitParams.shortDepositAmount}
+					setShortDepositAmount={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
 							produce(prevVal, (draft) => {
-								draft.juniorDepositAmount = newVal;
+								draft.shortDepositAmount = newVal;
 							})
 						)
 					}
-					reserveMint={contractInitParams.reserveMint}
-					setReserveMint={(newVal) =>
+					collateralMint={contractInitParams.collateralMint}
+					setCollateralMint={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
 							produce(prevVal, (draft) => {
-								draft.reserveMint = newVal;
+								draft.collateralMint = newVal;
 							})
 						)
 					}
@@ -287,9 +287,9 @@ const CreateContractFlow = ({
 				rateOption={contractInitParams.rateOption}
 				depositEnd={contractInitParams.depositEnd}
 				settleStart={contractInitParams.settleStart}
-				seniorDepositAmount={contractInitParams.seniorDepositAmount}
-				juniorDepositAmount={contractInitParams.juniorDepositAmount}
-				reserveMint={contractInitParams.reserveMint}
+				longDepositAmount={contractInitParams.longDepositAmount}
+				shortDepositAmount={contractInitParams.shortDepositAmount}
+				collateralMint={contractInitParams.collateralMint}
 				open={openPreview}
 				handleClose={handleClosePreview}
 				actionProps={

@@ -2,11 +2,11 @@
 
 import { Skeleton } from '@mui/material';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RateTypeIds } from 'models/common';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 type OracleLivePriceInput = {
-	oracleType: RatePluginTypeIds;
+	oracleType: RateTypeIds;
 	pubkey: string;
 };
 

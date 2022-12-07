@@ -27,12 +27,14 @@ export type PreviewModalInput = {
 	// contract expiry expressed in ms
 	settleStart: number;
 
-	seniorDepositAmount: number;
+	// long deposit amount
+	longDepositAmount: number;
 
-	juniorDepositAmount: number;
+	// short deposit amount
+	shortDepositAmount: number;
 
 	// collateral mint
-	reserveMint: string;
+	collateralMint: string;
 
 	// open state of the modal
 	open: boolean;
@@ -49,9 +51,9 @@ export const PreviewModal = ({
 	rateOption,
 	depositEnd,
 	settleStart,
-	seniorDepositAmount,
-	juniorDepositAmount,
-	reserveMint,
+	longDepositAmount,
+	shortDepositAmount,
+	collateralMint,
 	open,
 	handleClose,
 	actionProps
@@ -61,16 +63,16 @@ export const PreviewModal = ({
 	const [mintDetail, setMintDetail] = useState<MintDetail | undefined>(undefined);
 	useEffect(() => {
 		try {
-			const mint = getMintByPubkey(reserveMint);
+			const mint = getMintByPubkey(collateralMint);
 			if (mint) {
 				// pubkey is in mapped list
 				setMintDetail(mint);
 			} else {
 				// pubkey isn't mapped, look for it on chain
-				fetchTokenInfoCached(new PublicKey(reserveMint)).then((tokenInfo) => {
+				fetchTokenInfoCached(new PublicKey(collateralMint)).then((tokenInfo) => {
 					setMintDetail({
 						cluster: getCurrentCluster(),
-						pubkey: reserveMint,
+						pubkey: collateralMint,
 						title: tokenInfo.symbol
 					});
 				});
@@ -78,7 +80,7 @@ export const PreviewModal = ({
 		} catch {
 			setMintDetail(undefined);
 		}
-	}, [reserveMint]);
+	}, [collateralMint]);
 
 	const PreviewDescription = (
 		<div className={styles.content}>
@@ -109,25 +111,25 @@ export const PreviewModal = ({
 			// TODO: load onchain data for unknwon mints , checks are not useful for now*/}
 			<p className={styles.description}>
 				The contract will be settled in{' '}
-				{reserveMint && (
+				{collateralMint && (
 					<span>
 						<span className={styles.highlightNoCap}>{mintDetail?.title}</span>.
 					</span>
 				)}
-				{!reserveMint && (
+				{!collateralMint && (
 					<span>
-						an unknown token, with token mint <span className={styles.highlight}>{shortenString(reserveMint)}</span>.
+						an unknown token, with token mint <span className={styles.highlight}>{shortenString(collateralMint)}</span>.
 					</span>
 				)}{' '}
 				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
-					{seniorDepositAmount}
-					{reserveMint && <span> {mintDetail?.title}</span>}
+					{longDepositAmount}
+					{collateralMint && <span> {mintDetail?.title}</span>}
 				</span>{' '}
 				while the <span className={styles.highlight}>short</span> side will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
-					{juniorDepositAmount}
-					{reserveMint && <span> {mintDetail?.title}</span>}
+					{shortDepositAmount}
+					{collateralMint && <span> {mintDetail?.title}</span>}
 				</span>
 				.
 			</p>

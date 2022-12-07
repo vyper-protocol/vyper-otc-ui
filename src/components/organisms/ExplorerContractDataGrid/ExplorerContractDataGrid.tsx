@@ -32,12 +32,12 @@ import {
 	transformParams
 } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/ChainOtcState';
+import { AVAILABLE_PAYOFF_TYPE_IDS, PayoffTypeIds } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
-import { RLDigital } from 'models/plugins/redeemLogic/digital/RLDigital';
-import { RLForward } from 'models/plugins/redeemLogic/forward/RLForward';
-import { AVAILABLE_RL_TYPES, RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
-import { RLSettledForward } from 'models/plugins/redeemLogic/settledForward/RLSettledForward';
-import { RLVanillaOption } from 'models/plugins/redeemLogic/vanillaOption/RLVanillaOption';
+import { Digital } from 'models/plugins/payoff/Digital';
+import { Forward } from 'models/plugins/payoff/Forward';
+import { SettledForward } from 'models/plugins/payoff/SettledForward';
+import { VanillaOption } from 'models/plugins/payoff/VanillaOption';
 import { useRouter } from 'next/router';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -129,12 +129,12 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			headerName: 'Instrument',
 			flex: 1,
 			minWidth: 150,
-			valueOptions: AVAILABLE_RL_TYPES as any,
+			valueOptions: AVAILABLE_PAYOFF_TYPE_IDS as any,
 			sortable: true,
 			filterable: true,
 			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
 			valueGetter: (params) => {
-				return (params.row as DbOtcState).redeemLogicAccount.state.getTypeLabel();
+				return (params.row as DbOtcState).redeemLogicAccount.state.payoffId;
 			},
 			filterOperators: getGridSingleSelectOperators().filter((op) => op.value === 'isAnyOf')
 		},
@@ -161,13 +161,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: true,
 			valueGetter: (params) => {
 				const rlState = params.row.redeemLogicAccount.state;
-				switch (rlState.stateType.type as RLPluginTypeIds) {
+				switch (rlState.payoffId as PayoffTypeIds) {
 					case 'forward':
-						return (rlState as RLForward).notional;
+						return (rlState as Forward).notional;
 					case 'settled_forward':
-						return (rlState as RLSettledForward).notional;
+						return (rlState as SettledForward).notional;
 					case 'vanilla_option':
-						return (rlState as RLVanillaOption).notional;
+						return (rlState as VanillaOption).notional;
 					// TODO: find common columns
 					case 'digital':
 					default:
@@ -185,15 +185,15 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: true,
 			valueGetter: (params) => {
 				const rlState = params.row.redeemLogicAccount.state;
-				switch (rlState.stateType.type as RLPluginTypeIds) {
+				switch (rlState.payoffId as PayoffTypeIds) {
 					case 'forward':
-						return (rlState as RLForward).strike;
+						return (rlState as Forward).strike;
 					case 'settled_forward':
-						return (rlState as RLSettledForward).strike;
+						return (rlState as SettledForward).strike;
 					case 'vanilla_option':
-						return (rlState as RLVanillaOption).strike;
+						return (rlState as VanillaOption).strike;
 					case 'digital':
-						return (rlState as RLDigital).strike;
+						return (rlState as Digital).strike;
 					default:
 						return '-';
 				}
@@ -207,7 +207,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: false,
 			renderCell: (params: GridRenderCellParams<any>) => (
 				<OracleLivePrice
-					oracleType={(params.row as DbOtcState).rateAccount.state.typeId}
+					oracleType={(params.row as DbOtcState).rateAccount.state.rateId}
 					pubkey={(params.row as DbOtcState).rateAccount.state.livePriceAccounts[0].toBase58()}
 				/>
 			),
@@ -243,7 +243,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				return params.row.isBuyerFunded();
+				return params.row.isLongFunded();
 			}
 		},
 		{
@@ -255,7 +255,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			flex: 1,
 			minWidth: 100,
 			valueGetter: (params) => {
-				return params.row.isSellerFunded();
+				return params.row.isShortFunded();
 			}
 		},
 		{

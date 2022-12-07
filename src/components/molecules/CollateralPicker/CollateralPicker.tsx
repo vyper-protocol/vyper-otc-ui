@@ -12,25 +12,22 @@ import { TokenInfo } from 'models/TokenInfo';
 import { getMintByPubkey, getMintByTitle, getMints } from 'utils/mintDatasetHelper';
 
 // TODO: fix typing
-export type ReservePickerInput = {
-	seniorDepositAmount: number;
+export type CollateralPickerInput = {
+	longDepositAmount: number;
 
-	// eslint-disable-next-line no-unused-vars
-	setSeniorDepositAmount: (value: number) => void;
+	setLongDepositAmount: (value: number) => void;
 
-	juniorDepositAmount: number;
+	shortDepositAmount: number;
 
-	// eslint-disable-next-line no-unused-vars
-	setJuniorDepositAmount: (value: number) => void;
+	setShortDepositAmount: (value: number) => void;
 
 	// collateral mint
-	reserveMint: string;
+	collateralMint: string;
 
-	// eslint-disable-next-line no-unused-vars
-	setReserveMint: (mint: string) => void;
+	setCollateralMint: (mint: string) => void;
 };
 
-type ReservePickerProps = ReservePickerInput & {
+type CollateralPickerProps = CollateralPickerInput & {
 	// error in mint input
 	reserveError: boolean;
 
@@ -48,16 +45,16 @@ type ExternalType = {
 
 // FIXME
 
-export const ReservePicker = ({
-	seniorDepositAmount,
-	setSeniorDepositAmount,
-	juniorDepositAmount,
-	setJuniorDepositAmount,
-	reserveMint,
-	setReserveMint,
+export const CollateralPicker = ({
+	longDepositAmount,
+	setLongDepositAmount,
+	shortDepositAmount,
+	setShortDepositAmount,
+	collateralMint,
+	setCollateralMint,
 	reserveError,
 	setReserveError
-}: ReservePickerProps) => {
+}: CollateralPickerProps) => {
 	const [external, setExternal] = useState<ExternalType>({ isExternal: false });
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -66,7 +63,7 @@ export const ReservePicker = ({
 
 		if (mint) {
 			// pubkey is in mapped list
-			setReserveMint(mint.pubkey);
+			setCollateralMint(mint.pubkey);
 			setReserveError(false);
 			setExternal({ isExternal: false });
 		} else {
@@ -87,7 +84,7 @@ export const ReservePicker = ({
 				const mintTokenInfo = await fetchTokenInfoCached(pubkey);
 				if (mintTokenInfo) {
 					// mint found on-chain
-					setReserveMint(mintTokenInfo.address);
+					setCollateralMint(mintTokenInfo.address);
 					setReserveError(false);
 					setExternal({ isExternal: true, token: mintTokenInfo });
 				} else {
@@ -117,7 +114,7 @@ export const ReservePicker = ({
 					clearOnBlur
 					handleHomeEndKeys
 					freeSolo={getCurrentCluster() === 'devnet'}
-					value={reserveMint}
+					value={collateralMint}
 					onInputChange={async (_, input: string, reason: string) => {
 						if (reason !== 'input') return;
 						if (getCurrentCluster() === 'devnet') {
@@ -136,7 +133,7 @@ export const ReservePicker = ({
 					}}
 				/>
 				<a
-					href={getExplorerLink(reserveMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					href={getExplorerLink(collateralMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -164,8 +161,8 @@ export const ReservePicker = ({
 					InputLabelProps={{
 						shrink: true
 					}}
-					value={seniorDepositAmount}
-					onChange={(e) => setSeniorDepositAmount(+e.target.value)}
+					value={longDepositAmount}
+					onChange={(e) => setLongDepositAmount(+e.target.value)}
 				/>
 
 				<TextField
@@ -176,8 +173,8 @@ export const ReservePicker = ({
 					InputLabelProps={{
 						shrink: true
 					}}
-					value={juniorDepositAmount}
-					onChange={(e) => setJuniorDepositAmount(+e.target.value)}
+					value={shortDepositAmount}
+					onChange={(e) => setShortDepositAmount(+e.target.value)}
 				/>
 			</Box>
 		</Box>

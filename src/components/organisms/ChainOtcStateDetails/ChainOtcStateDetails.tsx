@@ -43,18 +43,18 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 
 	const cloneContract = () => {
 		create({
-			reserveMint: otcState.reserveMint.toBase58(),
-			seniorDepositAmount: otcState.buyerDepositAmount,
-			juniorDepositAmount: otcState.sellerDepositAmount,
+			collateralMint: otcState.collateralMint.toBase58(),
+			longDepositAmount: otcState.buyerDepositAmount,
+			shortDepositAmount: otcState.sellerDepositAmount,
 			depositStart: otcState.depositAvailableFrom,
 			depositEnd: otcState.depositExpirationAt,
 			settleStart: otcState.settleAvailableFromAt,
 			redeemLogicOption: {
-				redeemLogicPluginType: otcState.redeemLogicAccount.state.stateType.type,
+				redeemLogicPluginType: otcState.redeemLogicAccount.state.payoffId,
 				...otcState.redeemLogicAccount.state.getPluginDataObj()
 			},
 			rateOption: {
-				ratePluginType: otcState.rateAccount.state.typeId,
+				ratePluginType: otcState.rateAccount.state.rateId,
 				// TODO extract this information in a clearer way
 				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh.map((c) => c.toBase58())
 			},
@@ -73,14 +73,14 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	// 	});
 	// };
 
-	const reserveTokenInfo = otcState.reserveTokenInfo;
+	const collateralTokenInfo = otcState.collateralTokenInfo;
 
 	const {
 		pricesValue: livePricesValue,
 		isInitialized: livePriceIsInitialized,
 		removeListener
 	} = useOracleLivePrice(
-		otcState.rateAccount.state.typeId,
+		otcState.rateAccount.state.rateId,
 		otcState.rateAccount.state.livePriceAccounts.map((c) => c.toBase58())
 	);
 
@@ -101,8 +101,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					<Box role="span" sx={{ display: 'inline-flex' }}>
 						<ContractStatusBadge status={otcState.contractStatus} />
 						<Tooltip title={'Open docs'} arrow placement="bottom">
-							<a href={getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.stateType.type)} target="_blank" rel="noopener noreferrer">
-								<StatusBadge label={otcState.redeemLogicAccount.state.getTypeLabel()} mode="info" />
+							<a href={getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
+								<StatusBadge label={otcState.redeemLogicAccount.state.payoffId} mode="info" />
 							</a>
 						</Tooltip>
 					</Box>
@@ -234,7 +234,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						alignItems: 'center'
 					}}
 				>
-					<b>Collateral: {reserveTokenInfo && <TokenSymbol token={reserveTokenInfo} />}</b>
+					<b>Collateral: {collateralTokenInfo && <TokenSymbol token={collateralTokenInfo} />}</b>
 
 					<Grid container spacing={0.5} className={styles.grid}>
 						<Grid className={styles.title} item xs={4}></Grid>
@@ -250,12 +250,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<BooleanBadge success={otcState.isBuyerFunded()} />
+								<BooleanBadge success={otcState.isLongFunded()} />
 							</LoadingValue>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<BooleanBadge success={otcState.isSellerFunded()} />
+								<BooleanBadge success={otcState.isShortFunded()} />
 							</LoadingValue>
 						</Grid>
 
@@ -280,12 +280,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.getPnlBuyer(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.getLongPnl(livePricesValue)).toFixed(2).toString()}</p>
 									</LoadingValue>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.getPnlSeller(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.getShortPnl(livePricesValue)).toFixed(2).toString()}</p>
 									</LoadingValue>
 								</Grid>
 							</>
@@ -294,13 +294,13 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 				</Box>
 
 				<div className={styles.buttons}>
-					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={true} />
-					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={false} />
-					<WithdrawButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={true} />
-					<WithdrawButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={false} />
+					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isLong={true} />
+					<DepositButton otcStatePubkey={otcState.publickey.toBase58()} isLong={false} />
+					<WithdrawButton otcStatePubkey={otcState.publickey.toBase58()} isLong={true} />
+					<WithdrawButton otcStatePubkey={otcState.publickey.toBase58()} isLong={false} />
 					<SettleButton otcStatePubkey={otcState.publickey.toBase58()} />
-					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={true} />
-					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isBuyer={false} />
+					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isLong={true} />
+					<ClaimButton otcStatePubkey={otcState.publickey.toBase58()} isLong={false} />
 				</div>
 			</div>
 			<Collapse in={showSimulator} orientation={'horizontal'}>

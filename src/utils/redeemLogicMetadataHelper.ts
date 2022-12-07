@@ -1,18 +1,18 @@
 import metadata from 'configs/redeemLogicMetadata.json';
+import { PayoffTypeIds } from 'models/common';
 import { MetadataDetails } from 'models/MetadataDetail';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 
-export function getRedeemLogicDocumentionLink(id: RLPluginTypeIds): string {
+export function getRedeemLogicDocumentionLink(id: PayoffTypeIds): string {
 	const data = metadata.redeemLogicMetadata as MetadataDetails;
 	return data[id].documentationLink;
 }
 
-export function getRedeemLogicSourceCodeLink(id: RLPluginTypeIds): string {
+export function getRedeemLogicSourceCodeLink(id: PayoffTypeIds): string {
 	const data = metadata.redeemLogicMetadata as MetadataDetails;
 	return data[id].sourceCodeLink;
 }
 
-export function getRedeemLogicDescription(id: RLPluginTypeIds): string {
+export function getRedeemLogicDescription(id: PayoffTypeIds): string {
 	const data = metadata.redeemLogicMetadata as MetadataDetails;
 	return data[id].description;
 }
