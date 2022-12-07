@@ -46,13 +46,15 @@ export const syncContractFromChain = async (otcState: ChainOtcState) => {
 	const { data: selectData, error: selectError } = await supabase
 		.from(CONTRACTS_DYNAMIC_DATA_TABLE_NAME)
 		.select('pubkey')
-		.eq('pubkey', otcState.publickey.toBase58());
+		.eq('pubkey', otcState.publickey.toBase58())
+		.maybeSingle();
+
 	if (selectError) {
 		console.error('error: ', selectError);
 		return;
 	}
 
-	if (selectData.length) {
+	if (selectData) {
 		console.log('update contract dynamic data for pubkey: ' + otcState.publickey.toBase58());
 		const { error } = await supabase.from(CONTRACTS_DYNAMIC_DATA_TABLE_NAME).update([contractDynamicData]).eq('pubkey', otcState.publickey.toBase58());
 		if (error) {
