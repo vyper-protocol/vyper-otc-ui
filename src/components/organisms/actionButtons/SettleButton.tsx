@@ -14,8 +14,9 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
 
-	// this shouldn't be here
-	// const sendNotification = true;
+	// settle notifs should be handled carefully
+	// const sendNotification = process.env.NEXT_PUBLIC_LIVE_ENVIRONMENT === 'production';
+	const sendNotification = false;
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
@@ -24,28 +25,12 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const onSettleClick = async () => {
 		try {
 			setIsLoading(true);
-			await settleContract(provider, txHandler, new PublicKey(otcStatePubkey));
+			await settleContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, sendNotification);
 		} catch (err) {
 			console.log(err);
 		} finally {
 			setIsLoading(false);
 			rateStateQuery.refetch();
-
-			// if (rateStateQuery?.data.settleExecuted && rateStateQuery?.data.pricesAtSettlement) {
-			// 	const cluster = getCurrentCluster();
-			// 	const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(otcStatePubkey));
-
-			// 	const settlementPrices = rateStateQuery?.data.pricesAtSettlement;
-
-			// 	const pnlLong = rateStateQuery?.data.getPnlBuyer(settlementPrices);
-			// 	const pnlShort = rateStateQuery?.data.getPnlSeller(settlementPrices);
-
-			// 	const notification = buildContractSettledMessage(rateStateQuery?.data, pnlLong, pnlShort, cluster, contractURL);
-			// 	console.log(notification);
-			// 	if (sendNotification) {
-			// 		// sendSnsPublisherNotification(currentCluster, notification);
-			// 	}
-			// }
 		}
 	};
 

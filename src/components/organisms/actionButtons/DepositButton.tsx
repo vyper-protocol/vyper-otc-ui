@@ -6,9 +6,7 @@ import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
 import { getAccount } from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { buildContractFundedMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import ButtonPill from 'components/atoms/ButtonPill';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { fundContract } from 'controllers/fundContract';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
@@ -26,8 +24,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 	const txHandler = useContext(TxHandlerContext);
 	const isSeller = !isBuyer;
 
-	// this shouldn't be here
-	const sendNotification = true;
+	const sendNotification = process.env.NEXT_PUBLIC_LIVE_ENVIRONMENT === 'production';
 
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
@@ -112,16 +109,7 @@ const DepositButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; is
 		} else {
 			try {
 				setIsLoading(true);
-				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), isBuyer);
-
-				const cluster = getCurrentCluster();
-				const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(otcStatePubkey));
-				const isSecondSide = (isBuyer && rateStateQuery?.data.isSellerFunded()) || (!isBuyer && rateStateQuery?.data.isBuyerFunded());
-
-				const notification = buildContractFundedMessage(rateStateQuery?.data, isBuyer, isSecondSide, cluster, contractURL);
-				if (sendNotification) {
-					sendSnsPublisherNotification(cluster, notification);
-				}
+				await fundContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data, isBuyer, sendNotification);
 			} catch (err) {
 				console.log(err);
 			} finally {

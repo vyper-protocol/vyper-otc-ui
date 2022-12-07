@@ -2,9 +2,20 @@
 import { AnchorProvider } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { deposit } from 'api/otc-state/deposit';
+import { buildContractFundedMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
+import { ChainOtcState } from 'models/ChainOtcState';
+import * as UrlBuilder from 'utils/urlBuilder';
 
-export const fundContract = async (provider: AnchorProvider, txHandler: TxHandler, contractPublicKey: PublicKey, isBuyer: boolean) => {
+export const fundContract = async (
+	provider: AnchorProvider,
+	txHandler: TxHandler,
+	contractPublicKey: PublicKey,
+	otcState: ChainOtcState,
+	isBuyer: boolean,
+	sendNotification: boolean
+) => {
 	try {
 		console.group(`CONTROLLER: ${isBuyer ? 'long' : 'short'} contract`);
 		console.log('create txs');
@@ -12,6 +23,15 @@ export const fundContract = async (provider: AnchorProvider, txHandler: TxHandle
 
 		console.log('submit txs');
 		await txHandler.handleTxs(txs);
+
+		if (sendNotification) {
+			const cluster = getCurrentCluster();
+			const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(contractPublicKey.toBase58()));
+			const isSecondSide = (isBuyer && otcState.isSellerFunded()) || (!isBuyer && otcState.isBuyerFunded());
+
+			const notification = buildContractFundedMessage(otcState, isBuyer, isSecondSide, cluster, contractURL);
+			sendSnsPublisherNotification(cluster, notification);
+		}
 	} catch (err) {
 		console.error(err);
 	} finally {
