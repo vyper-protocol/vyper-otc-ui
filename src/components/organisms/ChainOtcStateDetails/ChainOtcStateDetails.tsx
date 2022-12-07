@@ -49,7 +49,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 			depositStart: otcState.chainData.depositAvailableFrom,
 			depositEnd: otcState.chainData.depositExpirationAt,
 			settleStart: otcState.chainData.settleAvailableFromAt,
-			aliasId: otcState.alias,
+			aliasId: otcState.aliasId,
 			redeemLogicOption: {
 				redeemLogicPluginType: otcState.chainData.redeemLogicAccount.state.payoffId,
 				...otcState.chainData.redeemLogicAccount.state.getPluginDataObj()
@@ -103,7 +103,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						<ContractStatusBadge status={otcState.chainData.contractStatus} />
 						<Tooltip title={'Open docs'} arrow placement="bottom">
 							<a href={getRedeemLogicDocumentionLink(otcState.chainData.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
-								<StatusBadge label={otcState.alias} mode="info" />
+								<StatusBadge label={otcState.aliasId} mode="info" />
 							</a>
 						</Tooltip>
 					</Box>

@@ -54,6 +54,7 @@ const CreateSbfJailContractPage = () => {
 				settleStart,
 				longDepositAmount: longAmount,
 				shortDepositAmount: 100,
+				aliasId: 'digital',
 				rateOption: {
 					ratePluginType: 'switchboard',
 					rateAccounts: ['3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW']

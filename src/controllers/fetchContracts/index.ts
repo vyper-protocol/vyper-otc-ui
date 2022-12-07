@@ -1,22 +1,9 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
-import { AnchorProvider, IdlAccounts, Program } from '@project-serum/anchor';
-import { unpackAccount, unpackMint } from '@solana/spl-token';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { selectContracts as supabaseSelectContracts } from 'api/supabase/selectContracts';
-import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
-import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
-import { ChainOtcState } from 'models/ChainOtcState';
 import { DbOtcState } from 'models/DbOtcState';
-import { RatePythState } from 'models/plugins/rate/RatePythState';
-import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
-import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
-import PROGRAMS from '../../configs/programs.json';
 import { FetchContractsParams } from './FetchContractsParams';
 
 const fetchContracts = async (params: FetchContractsParams): Promise<DbOtcState[]> => {

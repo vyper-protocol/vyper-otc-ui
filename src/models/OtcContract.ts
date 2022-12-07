@@ -7,9 +7,9 @@ export class OtcContract {
 		//
 	}
 
-	get alias(): AliasTypeIds {
-		if (this.dbData && this.dbData.metadata && this.dbData.metadata.alias) {
-			return this.dbData.metadata.alias;
+	get aliasId(): AliasTypeIds {
+		if (this.dbData && this.dbData.metadata && this.dbData.metadata.aliasId) {
+			return this.dbData.metadata.aliasId;
 		}
 
 		return this.chainData.redeemLogicAccount.state.payoffId;

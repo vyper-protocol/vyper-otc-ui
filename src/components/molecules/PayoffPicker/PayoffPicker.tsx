@@ -1,13 +1,13 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { AliasTypeIds, getPayoffTypeIdFromAlias, PayoffTypeIds } from 'models/common';
+import { AliasTypeIds, getPayoffTypeIdFromAlias } from 'models/common';
 import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
 
 export type PayoffPickerInput = {
 	// redeem logic plugin of the contract
-	aliasValue: AliasTypeIds;
+	aliasIdValue: AliasTypeIds;
 
 	// set callback, sets the redeem logic plugin type and the main rate puybey
-	setAliasValue: (newAlias: AliasTypeIds) => void;
+	setAliasIdValue: (newAlias: AliasTypeIds) => void;
 };
 
 const buildDescription = (aliasId: AliasTypeIds) => {
@@ -30,17 +30,17 @@ const buildDescription = (aliasId: AliasTypeIds) => {
 	);
 };
 
-export const PayoffPicker = ({ aliasValue, setAliasValue }: PayoffPickerInput) => {
-	const uiRLTypes: AliasTypeIds[] = ['forward', 'forward2', 'vanilla_option', 'digital'];
+export const PayoffPicker = ({ aliasIdValue, setAliasIdValue }: PayoffPickerInput) => {
+	const uiAliasIds: AliasTypeIds[] = ['forward', 'vanilla_option', 'digital'];
 
 	return (
 		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
-			<Tabs value={aliasValue} onChange={(_, v) => setAliasValue(v)}>
-				{uiRLTypes.map((plugin) => (
+			<Tabs value={aliasIdValue} onChange={(_, v) => setAliasIdValue(v)}>
+				{uiAliasIds.map((plugin) => (
 					<Tab label={plugin} key={plugin} value={plugin} />
 				))}
 			</Tabs>
-			{buildDescription(aliasValue)}
+			{buildDescription(aliasIdValue)}
 		</Box>
 	);
 };

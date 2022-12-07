@@ -4,7 +4,7 @@ import cn from 'classnames';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import { RateTypeIds, PayoffTypeIds } from 'models/common';
+import { RateTypeIds, PayoffTypeIds, AliasTypeIds } from 'models/common';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
@@ -46,6 +46,7 @@ export type TemplateCardProps = {
 	collateralMint: string;
 	longDepositAmount: number;
 	shortDepositAmount: number;
+	aliasId: AliasTypeIds;
 	payoff: PayoffTypeIds;
 	payoffData: any;
 	expiry: ExpiryType;
@@ -69,6 +70,7 @@ export const TemplateCard = ({
 	collateralMint,
 	longDepositAmount,
 	shortDepositAmount,
+	aliasId,
 	payoff,
 	payoffData,
 	expiry,
@@ -92,6 +94,7 @@ export const TemplateCard = ({
 			depositStart: moment().add(-60, 'minutes').toDate().getTime(),
 			depositEnd: moment().add(15, 'minutes').toDate().getTime(),
 			settleStart: convertExpiry(expiry),
+			aliasId,
 			redeemLogicOption: {
 				redeemLogicPluginType: payoff,
 				...createCompletePayoffData(payoffData),

@@ -64,19 +64,19 @@ const CreateContractFlow = ({
 			description: 'Select the payoff of your contract from the list available',
 			content: (
 				<PayoffPicker
-					aliasValue={contractInitParams.aliasId}
-					setAliasValue={(newAliasValue) =>
+					aliasIdValue={contractInitParams.aliasId}
+					setAliasIdValue={(newAliasValue) =>
 						onContractInitParamsChange((prevValue) =>
 							produce(prevValue, (draft) => {
-								const newPayoffType = getPayoffTypeIdFromAlias(newAliasValue);
+								const newPayoffId = getPayoffTypeIdFromAlias(newAliasValue);
 
 								draft.aliasId = newAliasValue;
-								draft.redeemLogicOption.redeemLogicPluginType = newPayoffType;
+								draft.redeemLogicOption.redeemLogicPluginType = newPayoffId;
 
-								if (newPayoffType === 'settled_forward' && draft.rateOption.rateAccounts.length === 1) {
+								if (newPayoffId === 'settled_forward' && draft.rateOption.rateAccounts.length === 1) {
 									draft.rateOption.rateAccounts.push(draft.rateOption.rateAccounts[0]);
 								}
-								if (newPayoffType !== 'settled_forward' && draft.rateOption.rateAccounts.length !== 1) {
+								if (newPayoffId !== 'settled_forward' && draft.rateOption.rateAccounts.length !== 1) {
 									draft.rateOption.rateAccounts.splice(1, draft.rateOption.rateAccounts.length - 1);
 								}
 							})
