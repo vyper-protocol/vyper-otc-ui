@@ -6,7 +6,7 @@ import { AliasTypeIds } from 'models/common';
 
 import { CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
-export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy: PublicKey, alias: AliasTypeIds, cluster: Cluster, metadata: any = {}) => {
+export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy: PublicKey, aliasId: AliasTypeIds, cluster: Cluster, metadata: any = {}) => {
 	await supabase.from(CONTRACTS_TABLE_NAME).insert([
 		{
 			cluster: cluster,
@@ -36,7 +36,7 @@ export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy:
 		{
 			pubkey: otcState.publickey.toBase58(),
 			created_by: createdBy.toBase58(),
-			alias,
+			alias: aliasId,
 			metadata: metadata
 		}
 	]);
