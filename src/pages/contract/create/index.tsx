@@ -55,7 +55,7 @@ const CreateContractPage = () => {
 		},
 
 		// USDC in mainnet, devUSD in devnet
-		reserveMint: currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+		collateralMint: currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
 		saveOnDatabase: process.env.NODE_ENV !== 'development',
 		sendNotification: process.env.NODE_ENV !== 'development'
 	});

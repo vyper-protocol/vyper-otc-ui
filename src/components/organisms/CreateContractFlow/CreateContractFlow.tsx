@@ -150,11 +150,11 @@ const CreateContractFlow = ({
 							})
 						)
 					}
-					reserveMint={contractInitParams.reserveMint}
-					setReserveMint={(newVal) =>
+					collateralMint={contractInitParams.collateralMint}
+					setCollateralMint={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
 							produce(prevVal, (draft) => {
-								draft.reserveMint = newVal;
+								draft.collateralMint = newVal;
 							})
 						)
 					}
@@ -289,7 +289,7 @@ const CreateContractFlow = ({
 				settleStart={contractInitParams.settleStart}
 				longDepositAmount={contractInitParams.longDepositAmount}
 				shortDepositAmount={contractInitParams.shortDepositAmount}
-				reserveMint={contractInitParams.reserveMint}
+				collateralMint={contractInitParams.collateralMint}
 				open={openPreview}
 				handleClose={handleClosePreview}
 				actionProps={

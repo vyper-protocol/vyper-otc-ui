@@ -11,7 +11,7 @@ export const cloneContractFromChain = async (otcState: ChainOtcState, createdBy:
 			cluster: cluster,
 			pubkey: otcState.publickey.toBase58(),
 			tranche_config_pubkey: otcState.vyperCoreTrancheConfig.toBase58(),
-			reserve_mint: otcState.reserveMintInfo.address.toBase58(),
+			reserve_mint: otcState.collateralMintInfo.address.toBase58(),
 			created_at: new Date(otcState.createdAt),
 			deposit_available_from: new Date(otcState.depositAvailableFrom),
 			deposit_expiration_at: new Date(otcState.depositExpirationAt),

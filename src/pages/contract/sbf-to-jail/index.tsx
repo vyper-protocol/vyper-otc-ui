@@ -48,7 +48,7 @@ const CreateSbfJailContractPage = () => {
 			const settleStart = moment('2022-12-31 09:00:00Z').toDate().getTime();
 
 			const initParams: OtcInitializationParams = {
-				reserveMint: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
+				collateralMint: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
 				depositStart,
 				depositEnd,
 				settleStart,

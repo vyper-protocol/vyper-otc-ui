@@ -43,7 +43,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 
 	const cloneContract = () => {
 		create({
-			reserveMint: otcState.reserveMint.toBase58(),
+			collateralMint: otcState.collateralMint.toBase58(),
 			longDepositAmount: otcState.buyerDepositAmount,
 			shortDepositAmount: otcState.sellerDepositAmount,
 			depositStart: otcState.depositAvailableFrom,
@@ -73,7 +73,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	// 	});
 	// };
 
-	const reserveTokenInfo = otcState.reserveTokenInfo;
+	const collateralTokenInfo = otcState.collateralTokenInfo;
 
 	const {
 		pricesValue: livePricesValue,
@@ -234,7 +234,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						alignItems: 'center'
 					}}
 				>
-					<b>Collateral: {reserveTokenInfo && <TokenSymbol token={reserveTokenInfo} />}</b>
+					<b>Collateral: {collateralTokenInfo && <TokenSymbol token={collateralTokenInfo} />}</b>
 
 					<Grid container spacing={0.5} className={styles.grid}>
 						<Grid className={styles.title} item xs={4}></Grid>

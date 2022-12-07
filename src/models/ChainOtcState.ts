@@ -11,14 +11,14 @@ export type ContractStatusIds = typeof AVAILABLE_CONTRACT_STATUS_IDS[number];
 
 export class ChainOtcState extends AbsOtcState {
 	/**
-	 * Reserve mint info
+	 * Collateral mint info
 	 */
-	reserveMintInfo: Mint;
+	collateralMintInfo: Mint;
 
 	/**
-	 * Reserve token info
+	 * Collateral token info
 	 */
-	reserveTokenInfo?: TokenInfo;
+	collateralTokenInfo?: TokenInfo;
 
 	/**
 	 * Flag for the settlement execution

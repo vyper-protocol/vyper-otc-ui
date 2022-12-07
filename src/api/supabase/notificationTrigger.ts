@@ -16,28 +16,28 @@ const buildBody = (
 	redeemLogicPluginType: PayoffTypeIds,
 	longDepositAmount: number,
 	shortDepositAmount: number,
-	reserveMint: string,
+	collateralMint: string,
 	oracleInfo: OracleDetail,
 	strike?: number,
 	notional?: number,
 	isCall?: boolean
 ): string => {
-	const mintInfo = getMintByPubkey(reserveMint);
+	const mintInfo = getMintByPubkey(collateralMint);
 
 	// TODO: move this part to payoff classes
 	// TODO: improve access to redeemLogicOption
 	switch (redeemLogicPluginType as PayoffTypeIds) {
 		case 'forward':
 			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\n\nCollateral:\t${
-				mintInfo?.title ?? reserveMint
+				mintInfo?.title ?? collateralMint
 			}\nLong:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nShort:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
 		case 'vanilla_option':
 			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
-				mintInfo?.title ?? reserveMint
+				mintInfo?.title ?? collateralMint
 			}\nOption premium:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nOption collateral:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
 		case 'digital':
 			return `\n\nStrike: ${strike.toPrecision(4)}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
-				mintInfo?.title ?? reserveMint
+				mintInfo?.title ?? collateralMint
 			}\nOption premium:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nMax payout:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
 		default:
 			console.warn('Unsupported redeem logic');
@@ -49,7 +49,7 @@ export const buildCreateContractMessage = (
 	{
 		redeemLogicOption,
 		rateOption,
-		reserveMint,
+		collateralMint,
 		settleStart,
 		longDepositAmount: longDepositAmount,
 		shortDepositAmount: juniorDepositAmount
@@ -67,7 +67,7 @@ export const buildCreateContractMessage = (
 		redeemLogicOption.redeemLogicPluginType,
 		longDepositAmount,
 		juniorDepositAmount,
-		reserveMint,
+		collateralMint,
 		oracleInfo,
 		redeemLogicOption.strike,
 		redeemLogicOption.notional,
@@ -78,7 +78,7 @@ export const buildCreateContractMessage = (
 };
 
 export const buildContractFundedMessage = (
-	{ redeemLogicAccount, rateAccount, publickey, depositExpirationAt, reserveMint, buyerDepositAmount, sellerDepositAmount }: ChainOtcState,
+	{ redeemLogicAccount, rateAccount, publickey, depositExpirationAt, collateralMint, buyerDepositAmount, sellerDepositAmount }: ChainOtcState,
 	isLong: boolean,
 	isSecondSide: boolean,
 	cluster: Cluster,
@@ -100,7 +100,7 @@ export const buildContractFundedMessage = (
 		redeemLogicAccount.state.payoffId,
 		buyerDepositAmount,
 		sellerDepositAmount,
-		reserveMint.toBase58(),
+		collateralMint.toBase58(),
 		oracleInfo,
 		strike as number,
 		notional as number,
@@ -117,13 +117,13 @@ export const buildContractFundedMessage = (
 };
 
 export const buildContractSettledMessage = (
-	{ publickey, reserveMint }: ChainOtcState,
+	{ publickey, collateralMint }: ChainOtcState,
 	pnlLong: number,
 	pnlShort: number,
 	cluster: Cluster,
 	url: string
 ): string => {
-	const mintInfo = getMintByPubkey(reserveMint);
+	const mintInfo = getMintByPubkey(collateralMint);
 
 	const header = `Contract ${abbreviateAddress(publickey.toBase58())} has settled! ${cluster === 'devnet' ? '[DEVNET]' : ''}`;
 

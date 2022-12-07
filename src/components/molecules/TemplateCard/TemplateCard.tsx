@@ -43,7 +43,7 @@ function convertExpiry(expiry: ExpiryType): number {
 // TODO: accept a contract template object
 export type TemplateCardProps = {
 	description?: string;
-	reserveMint: string;
+	collateralMint: string;
 	longDepositAmount: number;
 	shortDepositAmount: number;
 	payoff: PayoffTypeIds;
@@ -66,7 +66,7 @@ function createCompletePayoffData(payoffData: any): { notional: number; isLinear
 
 export const TemplateCard = ({
 	description,
-	reserveMint,
+	collateralMint,
 	longDepositAmount,
 	shortDepositAmount,
 	payoff,
@@ -86,7 +86,7 @@ export const TemplateCard = ({
 		const price = await getPriceForStrike(rateId, [getOraclesByTitle(underlying, rateId).pubkey], connection, getCurrentCluster());
 
 		create({
-			reserveMint: reserveMint,
+			collateralMint: collateralMint,
 			longDepositAmount,
 			shortDepositAmount,
 			depositStart: moment().add(-60, 'minutes').toDate().getTime(),

@@ -20,7 +20,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
-	const reserveMintInfo = await getMint(provider.connection, new PublicKey(params.reserveMint));
+	const collateralMintInfo = await getMint(provider.connection, new PublicKey(params.collateralMint));
 
 	const otcState = Keypair.generate();
 	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
@@ -80,7 +80,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
 				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
+				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
 				params.redeemLogicOption.isLinear
 			)
 			.accounts({
@@ -98,7 +98,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
 				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
+				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
 				params.redeemLogicOption.isLinear,
 				params.redeemLogicOption.isStandard
 			)
@@ -131,7 +131,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
 				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
+				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
 				params.redeemLogicOption.isCall,
 				params.redeemLogicOption.isLinear
 			)
@@ -151,7 +151,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(
 		provider,
 		vyperCoreProgram,
-		new PublicKey(params.reserveMint),
+		new PublicKey(params.collateralMint),
 		rateProgramPublicKey,
 		ratePluginState.publicKey,
 		redeemLogicProgramPublicKey,
@@ -176,15 +176,15 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const otcInitTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
 			.initialize({
-				seniorDepositAmount: new BN(params.longDepositAmount * 10 ** reserveMintInfo.decimals),
-				juniorDepositAmount: new BN(params.shortDepositAmount * 10 ** reserveMintInfo.decimals),
+				seniorDepositAmount: new BN(params.longDepositAmount * 10 ** collateralMintInfo.decimals),
+				juniorDepositAmount: new BN(params.shortDepositAmount * 10 ** collateralMintInfo.decimals),
 				depositStart: new BN(params.depositStart / 1000),
 				depositEnd: new BN(params.depositEnd / 1000),
 				settleStart: new BN(params.settleStart / 1000),
 				description: new Array(128).fill(0)
 			})
 			.accounts({
-				reserveMint: params.reserveMint,
+				reserveMint: params.collateralMint,
 				otcAuthority,
 				otcState: otcState.publicKey,
 				seniorTrancheMint: vyperConfig.seniorTrancheMint,

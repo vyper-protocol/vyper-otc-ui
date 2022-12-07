@@ -85,9 +85,9 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	res.publickey = otcStateAddress;
 
 	res.vyperCoreTrancheConfig = accountInfo.vyperTrancheConfig;
-	res.reserveMint = trancheConfigAccountInfo.reserveMint;
-	res.reserveMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
-	res.reserveTokenInfo = await fetchTokenInfoCached(trancheConfigAccountInfo.reserveMint);
+	res.collateralMint = trancheConfigAccountInfo.reserveMint;
+	res.collateralMintInfo = await getMint(connection, trancheConfigAccountInfo.reserveMint, 'confirmed');
+	res.collateralTokenInfo = await fetchTokenInfoCached(trancheConfigAccountInfo.reserveMint);
 	res.programBuyerTA = accountInfo.otcSeniorReserveTokenAccount;
 	res.programSellerTA = accountInfo.otcJuniorReserveTokenAccount;
 
@@ -102,8 +102,8 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 		res.pricesAtSettlement = trancheConfigAccountInfo.trancheData.reserveFairValue.value.map((c) => new RustDecimalWrapper(new Uint8Array(c)).toNumber());
 	}
 
-	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
-	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber() / 10 ** res.reserveMintInfo.decimals;
+	res.buyerDepositAmount = accountInfo.seniorDepositAmount.toNumber() / 10 ** res.collateralMintInfo.decimals;
+	res.sellerDepositAmount = accountInfo.juniorDepositAmount.toNumber() / 10 ** res.collateralMintInfo.decimals;
 
 	// get accounts
 	const tokenAccountsToFetch = [
@@ -118,10 +118,11 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 	const multipleAccountInfos = await getMultipleAccountsInfo(connection, tokenAccountsToFetch, 'confirmed');
 
 	const programBuyerAccountInfo = multipleAccountInfos.find((c) => c.pubkey.equals(accountInfo.otcSeniorReserveTokenAccount));
-	res.programBuyerTAAmount = Number(unpackAccount(programBuyerAccountInfo.pubkey, programBuyerAccountInfo.data).amount) / 10 ** res.reserveMintInfo.decimals;
+	res.programBuyerTAAmount = Number(unpackAccount(programBuyerAccountInfo.pubkey, programBuyerAccountInfo.data).amount) / 10 ** res.collateralMintInfo.decimals;
 
 	const programSellerAccountInfo = multipleAccountInfos.find((c) => c.pubkey.equals(accountInfo.otcJuniorReserveTokenAccount));
-	res.programSellerTAAmount = Number(unpackAccount(programSellerAccountInfo.pubkey, programSellerAccountInfo.data).amount) / 10 ** res.reserveMintInfo.decimals;
+	res.programSellerTAAmount =
+		Number(unpackAccount(programSellerAccountInfo.pubkey, programSellerAccountInfo.data).amount) / 10 ** res.collateralMintInfo.decimals;
 
 	res.buyerTA = accountInfo.seniorSideBeneficiary;
 	if (res.buyerTA) {
@@ -214,7 +215,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 			const isLinear = redeemLogicAccountInfo.isLinear;
-			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.collateralMintInfo.decimals;
 
 			redeemLogicProgramState = new Forward(strike, isLinear, notional);
 		} catch (err) {
@@ -240,7 +241,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 
 			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
 			const isLinear = redeemLogicAccountInfo.isLinear;
-			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.collateralMintInfo.decimals;
 			const isStandard = redeemLogicAccountInfo.isStandard;
 
 			redeemLogicProgramState = new SettledForward(strike, isLinear, notional, isStandard);
@@ -291,7 +292,7 @@ async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress
 			);
 
 			const strike = new RustDecimalWrapper(new Uint8Array(redeemLogicAccountInfo.strike)).toNumber();
-			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.reserveMintInfo.decimals;
+			const notional = redeemLogicAccountInfo.notional.toNumber() / 10 ** res.collateralMintInfo.decimals;
 			const isCall = redeemLogicAccountInfo.isCall;
 			const isLinear = redeemLogicAccountInfo.isLinear;
 
@@ -319,7 +320,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	const res = new ChainOtcState();
 	res.publickey = data.publickey;
 	res.vyperCoreTrancheConfig = data.vyperCoreTrancheConfig;
-	res.reserveMint = data.reserveMint;
+	res.collateralMint = data.collateralMint;
 	res.createdAt = data.createdAt;
 	res.depositAvailableFrom = data.depositAvailableFrom;
 	res.depositExpirationAt = data.depositExpirationAt;
@@ -329,14 +330,14 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 
 	res.redeemLogicAccount = data.redeemLogicAccount.clone();
 	res.rateAccount = data.rateAccount.clone();
-	res.reserveTokenInfo = await fetchTokenInfoCached(res.reserveMint);
+	res.collateralTokenInfo = await fetchTokenInfoCached(res.collateralMint);
 
 	// first fetch
 
 	const firstFetch_pubkeys: PublicKey[] = [];
 	firstFetch_pubkeys.push(data.publickey);
 	firstFetch_pubkeys.push(data.vyperCoreTrancheConfig);
-	firstFetch_pubkeys.push(data.reserveMint);
+	firstFetch_pubkeys.push(data.collateralMint);
 	firstFetch_pubkeys.push(...data.rateAccount.state.accountsRequiredForRefresh);
 
 	const firstFetch_accountsData = await getMultipleAccountsInfo(connection, firstFetch_pubkeys);
@@ -348,7 +349,7 @@ async function fetchChainOtcStateFromDbInfo(connection: Connection, data: DbOtcS
 	res.programBuyerTA = currentOtcStateAccount.otcSeniorReserveTokenAccount;
 	res.programSellerTA = currentOtcStateAccount.otcJuniorReserveTokenAccount;
 
-	res.reserveMintInfo = unpackMint(res.reserveMint, firstFetch_accountsData.find((c) => c.pubkey.equals(res.reserveMint)).data);
+	res.collateralMintInfo = unpackMint(res.collateralMint, firstFetch_accountsData.find((c) => c.pubkey.equals(res.collateralMint)).data);
 	res.settleExecuted = currentOtcStateAccount.settleExecuted;
 
 	if (res.settleExecuted) {

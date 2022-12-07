@@ -22,9 +22,9 @@ export type ReservePickerInput = {
 	setShortDepositAmount: (value: number) => void;
 
 	// collateral mint
-	reserveMint: string;
+	collateralMint: string;
 
-	setReserveMint: (mint: string) => void;
+	setCollateralMint: (mint: string) => void;
 };
 
 type ReservePickerProps = ReservePickerInput & {
@@ -50,8 +50,8 @@ export const ReservePicker = ({
 	setLongDepositAmount,
 	shortDepositAmount,
 	setShortDepositAmount,
-	reserveMint,
-	setReserveMint,
+	collateralMint,
+	setCollateralMint,
 	reserveError,
 	setReserveError
 }: ReservePickerProps) => {
@@ -63,7 +63,7 @@ export const ReservePicker = ({
 
 		if (mint) {
 			// pubkey is in mapped list
-			setReserveMint(mint.pubkey);
+			setCollateralMint(mint.pubkey);
 			setReserveError(false);
 			setExternal({ isExternal: false });
 		} else {
@@ -84,7 +84,7 @@ export const ReservePicker = ({
 				const mintTokenInfo = await fetchTokenInfoCached(pubkey);
 				if (mintTokenInfo) {
 					// mint found on-chain
-					setReserveMint(mintTokenInfo.address);
+					setCollateralMint(mintTokenInfo.address);
 					setReserveError(false);
 					setExternal({ isExternal: true, token: mintTokenInfo });
 				} else {
@@ -114,7 +114,7 @@ export const ReservePicker = ({
 					clearOnBlur
 					handleHomeEndKeys
 					freeSolo={getCurrentCluster() === 'devnet'}
-					value={reserveMint}
+					value={collateralMint}
 					onInputChange={async (_, input: string, reason: string) => {
 						if (reason !== 'input') return;
 						if (getCurrentCluster() === 'devnet') {
@@ -133,7 +133,7 @@ export const ReservePicker = ({
 					}}
 				/>
 				<a
-					href={getExplorerLink(reserveMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					href={getExplorerLink(collateralMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
 					target="_blank"
 					rel="noopener noreferrer"
 				>

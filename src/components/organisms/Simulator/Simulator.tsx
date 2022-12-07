@@ -21,7 +21,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	const { id } = router.query;
 
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
-	const tokenSymbol = rateStateQuery?.data?.reserveTokenInfo?.symbol ?? '';
+	const tokenSymbol = rateStateQuery?.data?.collateralTokenInfo?.symbol ?? '';
 
 	const longPnl = formatWithDecimalDigits(
 		rateStateQuery?.data?.redeemLogicAccount?.state.getPnl(prices, rateStateQuery?.data?.buyerDepositAmount, rateStateQuery?.data?.sellerDepositAmount)[0],

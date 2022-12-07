@@ -41,7 +41,7 @@ export class DbOtcState extends AbsOtcState {
 		res.cluster = data.cluster as Cluster;
 		res.publickey = new PublicKey(data.pubkey);
 		res.vyperCoreTrancheConfig = new PublicKey(data.tranche_config_pubkey);
-		res.reserveMint = new PublicKey(data.reserve_mint);
+		res.collateralMint = new PublicKey(data.reserve_mint);
 		res.buyerDepositAmount = data.buyer_deposit_amount;
 		res.sellerDepositAmount = data.seller_deposit_amount;
 

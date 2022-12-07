@@ -34,7 +34,7 @@ const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isL
 	const checkTokenAmount = useCallback(async () => {
 		try {
 			const requiredAmount = isLong ? rateStateQuery.data.buyerDepositAmount : rateStateQuery.data.sellerDepositAmount;
-			const mintInfo = rateStateQuery.data.reserveMintInfo;
+			const mintInfo = rateStateQuery.data.collateralMintInfo;
 			const tokenAmount = await getTokenAmount(connection, wallet.publicKey, mintInfo.address);
 			if (tokenAmount / BigInt(10 ** mintInfo.decimals) >= requiredAmount) setIsButtonDisabled(false);
 			else setIsButtonDisabled(true);
@@ -45,7 +45,7 @@ const DepositButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isL
 		isLong,
 		rateStateQuery.data.buyerDepositAmount,
 		rateStateQuery.data.sellerDepositAmount,
-		rateStateQuery.data.reserveMintInfo,
+		rateStateQuery.data.collateralMintInfo,
 		connection,
 		wallet.publicKey
 	]);

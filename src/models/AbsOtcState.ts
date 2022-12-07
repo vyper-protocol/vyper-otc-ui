@@ -15,9 +15,9 @@ export abstract class AbsOtcState {
 	vyperCoreTrancheConfig: PublicKey;
 
 	/**
-	 * Reserve mint info
+	 * Collateral mint info
 	 */
-	reserveMint: PublicKey;
+	collateralMint: PublicKey;
 
 	/**
 	 * Creation timestamp in ms

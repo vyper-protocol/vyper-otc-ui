@@ -7,7 +7,7 @@ import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 export type OtcInitializationParams = {
-	reserveMint: string;
+	collateralMint: string;
 
 	longDepositAmount: number;
 	shortDepositAmount: number;
