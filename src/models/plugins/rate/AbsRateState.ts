@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
+import { RateTypeIds } from 'models/common';
 
 import { AbsPluginState } from '../AbsPluginState';
-import { RatePluginTypeIds } from './RatePluginTypeIds';
 
 export abstract class AbsRateState extends AbsPluginState {
 	abstract get title(): string;
@@ -10,6 +10,6 @@ export abstract class AbsRateState extends AbsPluginState {
 	abstract get accountsRequiredForRefresh(): PublicKey[];
 	abstract get livePriceAccounts(): PublicKey[];
 
-	abstract get typeId(): RatePluginTypeIds;
+	abstract get rateId(): RateTypeIds;
 	abstract clone(): AbsRateState;
 }

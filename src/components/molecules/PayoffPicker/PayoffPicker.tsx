@@ -1,17 +1,17 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { PayoffTypeIds } from 'models/common';
 import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
 
 export type PayoffPickerInput = {
 	// redeem logic plugin of the contract
-	redeemLogicPluginType: RLPluginTypeIds;
+	redeemLogicPluginType: PayoffTypeIds;
 
 	// set callback, sets the redeem logic plugin type and the main rate puybey
 	// eslint-disable-next-line no-unused-vars
-	setRedeemLogicPluginType: (redeemLogicPluginType: RLPluginTypeIds) => void;
+	setRedeemLogicPluginType: (redeemLogicPluginType: PayoffTypeIds) => void;
 };
 
-const buildDescription = (rateId: RLPluginTypeIds) => {
+const buildDescription = (rateId: PayoffTypeIds) => {
 	return (
 		<Box sx={{ marginY: 2 }}>
 			<Typography>{getRedeemLogicDescription(rateId)}</Typography>
@@ -28,7 +28,7 @@ const buildDescription = (rateId: RLPluginTypeIds) => {
 };
 
 export const PayoffPicker = ({ redeemLogicPluginType, setRedeemLogicPluginType }: PayoffPickerInput) => {
-	const uiRLTypes: RLPluginTypeIds[] = ['forward', 'vanilla_option', 'digital'];
+	const uiRLTypes: PayoffTypeIds[] = ['forward', 'vanilla_option', 'digital'];
 
 	return (
 		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>

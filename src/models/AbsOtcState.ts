@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
 import { RateAccount } from './plugins/rate/RateAccount';
-import { RLAccount } from './plugins/redeemLogic/RLAccount';
+import { PayoffAccount } from './plugins/redeemLogic/PayoffAccount';
 
 export abstract class AbsOtcState {
 	/**
@@ -52,7 +52,7 @@ export abstract class AbsOtcState {
 	/**
 	 * Redeem logic account
 	 */
-	redeemLogicAccount: RLAccount;
+	redeemLogicAccount: PayoffAccount;
 
 	/**
 	 * Rate account

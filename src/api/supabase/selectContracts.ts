@@ -1,8 +1,7 @@
 /* eslint-disable no-console */
 import { FetchContractsParams } from 'controllers/fetchContracts/FetchContractsParams';
+import { AVAILABLE_PAYOFF_TYPE_IDS, AVAILABLE_RATE_TYPE_IDS } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
-import { AVAILABLE_RATE_TYPES } from 'models/plugins/rate/RatePluginTypeIds';
-import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
 
 import { CONTRACTS_DYNAMIC_DATA_TABLE_NAME, CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
@@ -29,8 +28,8 @@ export const selectContracts = async (params: FetchContractsParams): Promise<DbO
 	});
 
 	// filter for fetching only supported plugins in the UI
-	query.in('redeem_logic_plugin_type', AVAILABLE_RL_TYPES as any);
-	query.in('rate_plugin_type', AVAILABLE_RATE_TYPES as any);
+	query.in('redeem_logic_plugin_type', AVAILABLE_PAYOFF_TYPE_IDS as any);
+	query.in('rate_plugin_type', AVAILABLE_RATE_TYPE_IDS as any);
 
 	query.range(params.range[0], params.range[1]);
 

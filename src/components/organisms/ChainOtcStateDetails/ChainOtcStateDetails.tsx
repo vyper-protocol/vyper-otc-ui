@@ -50,11 +50,11 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 			depositEnd: otcState.depositExpirationAt,
 			settleStart: otcState.settleAvailableFromAt,
 			redeemLogicOption: {
-				redeemLogicPluginType: otcState.redeemLogicAccount.state.stateType.type,
+				redeemLogicPluginType: otcState.redeemLogicAccount.state.payoffId,
 				...otcState.redeemLogicAccount.state.getPluginDataObj()
 			},
 			rateOption: {
-				ratePluginType: otcState.rateAccount.state.typeId,
+				ratePluginType: otcState.rateAccount.state.rateId,
 				// TODO extract this information in a clearer way
 				rateAccounts: otcState.rateAccount.state.accountsRequiredForRefresh.map((c) => c.toBase58())
 			},
@@ -80,7 +80,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 		isInitialized: livePriceIsInitialized,
 		removeListener
 	} = useOracleLivePrice(
-		otcState.rateAccount.state.typeId,
+		otcState.rateAccount.state.rateId,
 		otcState.rateAccount.state.livePriceAccounts.map((c) => c.toBase58())
 	);
 
@@ -101,8 +101,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					<Box role="span" sx={{ display: 'inline-flex' }}>
 						<ContractStatusBadge status={otcState.contractStatus} />
 						<Tooltip title={'Open docs'} arrow placement="bottom">
-							<a href={getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.stateType.type)} target="_blank" rel="noopener noreferrer">
-								<StatusBadge label={otcState.redeemLogicAccount.state.getTypeLabel()} mode="info" />
+							<a href={getRedeemLogicDocumentionLink(otcState.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
+								<StatusBadge label={otcState.redeemLogicAccount.state.payoffId} mode="info" />
 							</a>
 						</Tooltip>
 					</Box>

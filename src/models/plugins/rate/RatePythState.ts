@@ -2,10 +2,10 @@ import { getPythProgramKeyForCluster, parsePriceData, PriceData, Product, PythHt
 import { PythHttpClientResult } from '@pythnetwork/client/lib/PythHttpClient';
 import { AccountInfo, Cluster, Connection, PublicKey } from '@solana/web3.js';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { RateTypeIds } from 'models/common';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 
 import { AbsRateState } from './AbsRateState';
-import { RatePluginTypeIds } from './RatePluginTypeIds';
 
 export class RatePythState extends AbsRateState {
 	static pythData: PythHttpClientResult = undefined;
@@ -31,7 +31,7 @@ export class RatePythState extends AbsRateState {
 		return this.pythProducts[0]?.tenor;
 	}
 
-	get typeId(): RatePluginTypeIds {
+	get rateId(): RateTypeIds {
 		return 'pyth';
 	}
 

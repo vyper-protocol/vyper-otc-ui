@@ -5,13 +5,13 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import { Mutex } from 'async-mutex';
 import _ from 'lodash';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { RateTypeIds } from 'models/common';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { getMultipleAccountsInfo } from 'utils/multipleAccountHelper';
 
 export const useOracleLivePrice = (
-	oracleType: RatePluginTypeIds,
+	oracleType: RateTypeIds,
 	pubkeys: string[]
 ): { pricesValue: number[]; isInitialized: boolean; removeListener: () => void } => {
 	const [pricesValue, setPricesValue] = useState<number[]>([]);

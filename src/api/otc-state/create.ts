@@ -11,8 +11,7 @@ import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from '
 import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { PayoffTypeIds, RateTypeIds } from 'models/common';
 import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -31,7 +30,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  rate plugin init
 	let rateProgramPublicKey: PublicKey = undefined;
 	const ratePluginState = Keypair.generate();
-	const ratePluginType = params.rateOption.ratePluginType as RatePluginTypeIds;
+	const ratePluginType = params.rateOption.ratePluginType as RateTypeIds;
 
 	if (ratePluginType === 'switchboard') {
 		const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
@@ -73,7 +72,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RLPluginTypeIds;
+	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as PayoffTypeIds;
 
 	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);

@@ -1,16 +1,15 @@
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { AbsRLState } from '../AbsRLState';
-import { RLStateType } from '../RLStateType';
+import { PayoffTypeIds } from '../../../common';
+import { AbsPayoffState } from '../AbsPayoffState';
 
-export class RLVanillaOption extends AbsRLState {
-	// eslint-disable-next-line no-unused-vars
+export class VanillaOption extends AbsPayoffState {
 	constructor(public strike: number, public notional: number, public isCall: boolean, public isLinear: boolean) {
 		super();
 	}
 
-	get stateType(): RLStateType {
-		return new RLStateType('vanilla_option');
+	get payoffId(): PayoffTypeIds {
+		return 'vanilla_option';
 	}
 
 	get rateFeedsDescription(): string[] {
@@ -38,8 +37,8 @@ export class RLVanillaOption extends AbsRLState {
 		];
 	}
 
-	clone(): RLVanillaOption {
-		return new RLVanillaOption(this.strike, this.notional, this.isCall, this.isLinear);
+	clone(): VanillaOption {
+		return new VanillaOption(this.strike, this.notional, this.isCall, this.isLinear);
 	}
 
 	getPluginDataObj(): any {
@@ -52,7 +51,7 @@ export class RLVanillaOption extends AbsRLState {
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RLVanillaOption.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
+		return VanillaOption.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
 	}
 
 	static getPnlExtended(

@@ -6,8 +6,8 @@ import { DbOtcDynamicData } from './DbOtcDynamicData';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
 import { createRateStateFromDBData } from './plugins/rate/createRateStateFromDBData';
 import { RateAccount } from './plugins/rate/RateAccount';
-import { createRLStateFromDBData } from './plugins/redeemLogic/createRLStateFromDBData';
-import { RLAccount } from './plugins/redeemLogic/RLAccount';
+import { createPayoffStateFromDBData } from './plugins/redeemLogic/createRLStateFromDBData';
+import { PayoffAccount } from './plugins/redeemLogic/PayoffAccount';
 
 export class DbOtcState extends AbsOtcState {
 	cluster: Cluster;
@@ -45,8 +45,8 @@ export class DbOtcState extends AbsOtcState {
 		res.buyerDepositAmount = data.buyer_deposit_amount;
 		res.sellerDepositAmount = data.seller_deposit_amount;
 
-		const rlState = createRLStateFromDBData(String(data.redeem_logic_plugin_type), data.redeem_logic_plugin_data);
-		res.redeemLogicAccount = new RLAccount(data.redeem_logic_plugin_program_pubkey, data.redeem_logic_plugin_state_pubkey, rlState);
+		const rlState = createPayoffStateFromDBData(String(data.redeem_logic_plugin_type), data.redeem_logic_plugin_data);
+		res.redeemLogicAccount = new PayoffAccount(data.redeem_logic_plugin_program_pubkey, data.redeem_logic_plugin_state_pubkey, rlState);
 
 		const rateState = createRateStateFromDBData(String(data.rate_plugin_type), data.rate_plugin_data);
 		res.rateAccount = new RateAccount(data.rate_plugin_program_pubkey, data.rate_plugin_state_pubkey, rateState);

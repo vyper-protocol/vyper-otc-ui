@@ -1,16 +1,15 @@
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { AbsRLState } from '../AbsRLState';
-import { RLStateType } from '../RLStateType';
+import { PayoffTypeIds } from '../../../common';
+import { AbsPayoffState } from '../AbsPayoffState';
 
-export class RLForward extends AbsRLState {
-	// eslint-disable-next-line no-unused-vars
+export class Forward extends AbsPayoffState {
 	constructor(public strike: number, public isLinear: boolean, public notional: number) {
 		super();
 	}
 
-	get stateType(): RLStateType {
-		return new RLStateType('forward');
+	get payoffId(): PayoffTypeIds {
+		return 'forward';
 	}
 
 	getPluginDataObj(): any {
@@ -43,12 +42,12 @@ export class RLForward extends AbsRLState {
 		];
 	}
 
-	clone(): RLForward {
-		return new RLForward(this.strike, this.isLinear, this.notional);
+	clone(): Forward {
+		return new Forward(this.strike, this.isLinear, this.notional);
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RLForward.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.notional, this.strike, this.isLinear);
+		return Forward.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.notional, this.strike, this.isLinear);
 	}
 
 	static getPnlExtended(

@@ -1,10 +1,11 @@
+import { RateTypeIds } from 'models/common';
+
 import { AbsRateState } from './AbsRateState';
-import { RatePluginTypeIds } from './RatePluginTypeIds';
 import { RatePythState } from './RatePythState';
 import { RateSwitchboardState } from './RateSwitchboardState';
 
 export function createRateStateFromDBData(type: string, data: any): AbsRateState {
-	const ratePluginType = type as RatePluginTypeIds;
+	const ratePluginType = type as RateTypeIds;
 
 	switch (ratePluginType) {
 		case 'switchboard':

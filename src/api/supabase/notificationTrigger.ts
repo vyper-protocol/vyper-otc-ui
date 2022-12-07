@@ -2,8 +2,8 @@
 import { Cluster } from '@solana/web3.js';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { ChainOtcState } from 'models/ChainOtcState';
+import { PayoffTypeIds } from 'models/common';
 import { OracleDetail } from 'models/OracleDetail';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import moment from 'moment';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -13,7 +13,7 @@ import { SNS_PUBLISHER_RPC_NAME, supabase } from './client';
 
 // TODO: improve access
 const buildBody = (
-	redeemLogicPluginType: RLPluginTypeIds,
+	redeemLogicPluginType: PayoffTypeIds,
 	buyerDepositAmount: number,
 	sellerDepositAmount: number,
 	reserveMint: string,
@@ -26,7 +26,7 @@ const buildBody = (
 
 	// TODO: move this part to payoff classes
 	// TODO: improve access to redeemLogicOption
-	switch (redeemLogicPluginType as RLPluginTypeIds) {
+	switch (redeemLogicPluginType as PayoffTypeIds) {
 		case 'forward':
 			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\n\nCollateral:\t${
 				mintInfo?.title ?? reserveMint
@@ -90,7 +90,7 @@ export const buildContractFundedMessage = (
 	const isCall = redeemLogicAccount.state.pluginDetails.find(({ label }) => label.toLowerCase() === 'isCall')?.value;
 
 	const body = buildBody(
-		redeemLogicAccount.state.stateType.type,
+		redeemLogicAccount.state.payoffId,
 		buyerDepositAmount,
 		sellerDepositAmount,
 		reserveMint.toBase58(),

@@ -1,9 +1,9 @@
 import { Cluster } from '@solana/web3.js';
 
-import { RatePluginTypeIds } from './plugins/rate/RatePluginTypeIds';
+import { RateTypeIds } from './common';
 
 export type OracleDetail = {
-	type: RatePluginTypeIds;
+	type: RateTypeIds;
 	cluster: Cluster;
 	pubkey: string;
 	title: string | undefined;

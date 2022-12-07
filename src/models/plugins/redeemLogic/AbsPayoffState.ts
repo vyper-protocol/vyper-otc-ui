@@ -1,21 +1,17 @@
+import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
 import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
 
 import { AbsPluginState } from '../AbsPluginState';
-import { RLStateType } from './RLStateType';
 
-export abstract class AbsRLState extends AbsPluginState {
-	abstract get stateType(): RLStateType;
-
-	getTypeLabel(): string {
-		return this.stateType.toString();
-	}
+export abstract class AbsPayoffState extends AbsPluginState {
+	abstract get payoffId(): PayoffTypeIds;
 
 	get requiredRateFeeds(): number {
 		return this.rateFeedsDescription.length;
 	}
 
-	abstract clone(): AbsRLState;
+	abstract clone(): AbsPayoffState;
 	abstract get rateFeedsDescription(): string[];
 	abstract get settlementPricesDescription(): string[];
 
@@ -29,21 +25,21 @@ export abstract class AbsRLState extends AbsPluginState {
 	 * Returns the documentation link
 	 */
 	get documentationLink(): string {
-		return getRedeemLogicDocumentionLink(this.stateType.type);
+		return getRedeemLogicDocumentionLink(this.payoffId);
 	}
 
 	/**
 	 * Returns the source code reference link
 	 */
 	get sourceCode(): string {
-		return getRedeemLogicSourceCodeLink(this.stateType.type);
+		return getRedeemLogicSourceCodeLink(this.payoffId);
 	}
 
 	/**
 	 * Returns description
 	 */
 	get description(): string {
-		return getRedeemLogicDescription(this.stateType.type);
+		return getRedeemLogicDescription(this.payoffId);
 	}
 
 	/**

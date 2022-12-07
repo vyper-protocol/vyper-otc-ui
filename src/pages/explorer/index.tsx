@@ -13,7 +13,7 @@ import {
 	fromExplorerQueryParams,
 	ExplorerFilterOperator
 } from 'controllers/fetchContracts/FetchContractsParams';
-import { AVAILABLE_RL_TYPES } from 'models/plugins/redeemLogic/RLStateType';
+import { AVAILABLE_PAYOFF_TYPE_IDS } from 'models/common';
 import { useRouter } from 'next/router';
 
 const ExplorerPage = () => {
@@ -43,7 +43,7 @@ const ExplorerPage = () => {
 				const [value, operator] = values;
 
 				const rlTypes = value.split(',');
-				if (rlTypes.every((rlType) => AVAILABLE_RL_TYPES.includes(rlType))) {
+				if (rlTypes.every((rlType) => AVAILABLE_PAYOFF_TYPE_IDS.includes(rlType))) {
 					const filterOperator = parseExplorerFilterOperator(operator);
 					if (filterOperator !== undefined) {
 						filter.push({ key: fromExplorerQueryParams('payoff'), operator: filterOperator, value: rlTypes.length > 1 ? rlTypes : rlTypes[0] });
