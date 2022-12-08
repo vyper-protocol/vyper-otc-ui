@@ -28,7 +28,15 @@ const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgrou
 
 				<meta name="description" content={pageDescription ?? DEFAULT_PAGE_DESCRIPTION}></meta>
 
+				<meta property="og:title" content={pageTitle ?? DEFAULT_PAGE_TITLE} />
+				<meta property="og:description" content={pageDescription ?? DEFAULT_PAGE_DESCRIPTION} />
+
+				<meta property="og:image" content="/asssets/images/vyper-logo_512.png" />
+				<meta property="og:site_name" content={DEFAULT_PAGE_TITLE} />
+				<meta property="og:type" content="website" />
+
 				<link rel="icon" href="/favicon.ico" />
+
 				{/* Resets body background color for all the routes */}
 				<style>{'body { background-color: var(--color-background); }'}</style>
 			</Head>
