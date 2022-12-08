@@ -8,7 +8,6 @@ import ChainOtcStateDetails from 'components/organisms/ChainOtcStateDetails/Chai
 import Layout from 'components/templates/Layout';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
-import { buildPageTitle } from 'utils/seoHelper';
 
 import styles from './summary.module.scss';
 
@@ -23,7 +22,7 @@ const SummaryPageId = () => {
 
 	const [pageTitle, setPageTitle] = useState('');
 	useEffect(() => {
-		if (rateStateQuery.data) setPageTitle(buildPageTitle(`${rateStateQuery.data.chainData.getContractTitle()} ${rateStateQuery.data.aliasId.toUpperCase()}`));
+		if (rateStateQuery.data) setPageTitle(`${rateStateQuery.data.chainData.getContractTitle()} ${rateStateQuery.data.aliasId.toUpperCase()}`);
 	}, [rateStateQuery.data]);
 
 	const loadingSpinner = rateStateQuery?.isLoading;
