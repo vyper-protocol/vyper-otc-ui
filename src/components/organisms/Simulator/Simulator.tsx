@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
-import { TextField } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import NumericBadge from 'components/atoms/NumericBadge';
+import NumericField from 'components/atoms/NumericField';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -51,17 +51,7 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 			<p className={styles.title}>Simulate your PnL</p>
 			{rateStateQuery?.data?.chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
-					<p>{c}:</p>
-					<TextField
-						type="number"
-						size="small"
-						onFocus={(event) => {
-							event.target.select();
-						}}
-						sx={{ width: '70%' }}
-						value={prices[i]}
-						onChange={(e) => handleOnPriceChange(e.target.value, i)}
-					/>
+					<NumericField label={c} value={prices[i]} onChange={(newVal: number) => handleOnPriceChange(newVal.toString(), i)} />
 				</div>
 			))}
 
