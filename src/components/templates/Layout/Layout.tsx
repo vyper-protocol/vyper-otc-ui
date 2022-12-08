@@ -43,7 +43,7 @@ const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgrou
 					openGraph={{
 						title: pageTitle ?? DEFAULT_PAGE_TITLE,
 						description: pageDescription ?? DEFAULT_PAGE_DESCRIPTION,
-						images: [{ url: process.env.NEXT_PUBLIC_VERCEL_URL + '/assets/images/vyper-logo_512.png' }],
+						images: [{ url: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-logo_512.png` }],
 						siteName: DEFAULT_PAGE_TITLE
 					}}
 					twitter={{
