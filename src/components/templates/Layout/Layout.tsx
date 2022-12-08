@@ -30,8 +30,6 @@ const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgrou
 				{/* <title>{pageTitle ?? DEFAULT_PAGE_TITLE}</title>
 				<meta name="description" content={pageDescription ?? DEFAULT_PAGE_DESCRIPTION}></meta> */}
 
-				<meta name="twitter:image" content={logoURL}></meta>
-
 				<link rel="icon" href="/favicon.ico" />
 
 				{/* Resets body background color for all the routes */}
