@@ -3,16 +3,16 @@ import { SetStateAction, useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { CollateralPicker } from 'components/molecules/CollateralPicker';
+import CollateralPicker from 'components/molecules/CollateralPicker';
 import { ExpiryPicker } from 'components/molecules/ExpiryPicker';
 import { OraclesPicker } from 'components/molecules/OraclesPicker';
-import { PayoffPicker } from 'components/molecules/PayoffPicker';
-import { PreviewModal } from 'components/molecules/PreviewModal';
-import { RLParamsPicker } from 'components/molecules/RLParamsPicker';
+import ParamsPicker from 'components/molecules/ParamsPicker';
+import PayoffPicker from 'components/molecules/PayoffPicker';
+import PreviewModal from 'components/molecules/PreviewModal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import produce from 'immer';
-import { getPayoffTypeIdFromAlias } from 'models/common';
+import { getPayoffFromAlias } from 'models/common';
 
 type StepElement = {
 	title: string;
@@ -64,14 +64,14 @@ const CreateContractFlow = ({
 			description: 'Select the payoff of your contract from the list available',
 			content: (
 				<PayoffPicker
-					aliasIdValue={contractInitParams.aliasId}
-					setAliasIdValue={(newAliasValue) =>
+					aliasId={contractInitParams.aliasId}
+					setAliasId={(newAliasId) =>
 						onContractInitParamsChange((prevValue) =>
 							produce(prevValue, (draft) => {
-								const newPayoffId = getPayoffTypeIdFromAlias(newAliasValue);
+								const newPayoffId = getPayoffFromAlias(newAliasId);
 
-								draft.aliasId = newAliasValue;
-								draft.redeemLogicOption.redeemLogicPluginType = newPayoffId;
+								draft.aliasId = newAliasId;
+								draft.payoffOption.payoffId = newPayoffId;
 
 								if (newPayoffId === 'settled_forward' && draft.rateOption.rateAccounts.length === 1) {
 									draft.rateOption.rateAccounts.push(draft.rateOption.rateAccounts[0]);
@@ -104,7 +104,7 @@ const CreateContractFlow = ({
 						getPriceForStrike(newRateType, newRateAccounts, connection, getCurrentCluster()).then((newStrike) => {
 							onContractInitParamsChange((prevValue) =>
 								produce(prevValue, (draft) => {
-									draft.redeemLogicOption.strike = newStrike;
+									draft.payoffOption.strike = newStrike;
 								})
 							);
 						});
@@ -119,12 +119,13 @@ const CreateContractFlow = ({
 			title: 'contract parameters',
 			description: 'Select the parameters of the contract',
 			content: (
-				<RLParamsPicker
-					redeemLogicOptions={contractInitParams.redeemLogicOption}
-					setRedeemLogicOptions={(newVal) =>
+				<ParamsPicker
+					aliasId={contractInitParams.aliasId}
+					payoffOptions={contractInitParams.payoffOption}
+					setPayoffOptions={(newVal) =>
 						onContractInitParamsChange((prevValue) =>
 							produce(prevValue, (draft) => {
-								draft.redeemLogicOption = newVal;
+								draft.payoffOption = newVal;
 							})
 						)
 					}
@@ -139,6 +140,7 @@ const CreateContractFlow = ({
 			}`,
 			content: (
 				<CollateralPicker
+					aliasId={contractInitParams.aliasId}
 					longDepositAmount={contractInitParams.longDepositAmount}
 					setLongDepositAmount={(newVal) =>
 						onContractInitParamsChange((prevVal) =>
@@ -288,7 +290,8 @@ const CreateContractFlow = ({
 				</Box>
 			)}
 			<PreviewModal
-				redeemLogicOption={contractInitParams.redeemLogicOption}
+				aliasId={contractInitParams.aliasId}
+				payoffOption={contractInitParams.payoffOption}
 				rateOption={contractInitParams.rateOption}
 				depositEnd={contractInitParams.depositEnd}
 				settleStart={contractInitParams.settleStart}

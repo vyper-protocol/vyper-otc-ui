@@ -37,8 +37,8 @@ const CreateSbfJailContractPage = () => {
 
 			setIsLoading(true);
 
-			const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
-				redeemLogicPluginType: 'digital',
+			const payoffOption: OtcInitializationParams['payoffOption'] = {
+				payoffId: 'digital',
 				strike: 0.5,
 				isCall: true
 			};
@@ -59,7 +59,7 @@ const CreateSbfJailContractPage = () => {
 					ratePluginType: 'switchboard',
 					rateAccounts: ['3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW']
 				},
-				redeemLogicOption,
+				payoffOption,
 				saveOnDatabase,
 				sendNotification
 			};

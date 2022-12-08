@@ -47,7 +47,7 @@ const buildBody = (
 
 export const buildCreateContractMessage = (
 	{
-		redeemLogicOption,
+		payoffOption,
 		rateOption,
 		collateralMint,
 		settleStart,
@@ -59,19 +59,17 @@ export const buildCreateContractMessage = (
 ): string => {
 	const oracleInfo = getOracleByPubkey(rateOption.rateAccounts[0]);
 
-	const header = `New ${redeemLogicOption.redeemLogicPluginType.toUpperCase()} contract created! ${cluster === 'devnet' ? '[DEVNET]' : ''}\n\nUnderlying:\t${
-		oracleInfo.title
-	}`;
+	const header = `New ${payoffOption.payoffId.toUpperCase()} contract created! ${cluster === 'devnet' ? '[DEVNET]' : ''}\n\nUnderlying:\t${oracleInfo.title}`;
 
 	const body = buildBody(
-		redeemLogicOption.redeemLogicPluginType,
+		payoffOption.payoffId,
 		longDepositAmount,
 		juniorDepositAmount,
 		collateralMint,
 		oracleInfo,
-		redeemLogicOption.strike,
-		redeemLogicOption.notional,
-		redeemLogicOption.isCall
+		payoffOption.strike,
+		payoffOption.notional,
+		payoffOption.isCall
 	);
 
 	return header + body + `\n\nExpiry:\t${moment(settleStart).utc().format('DD MMM YYYY - hh:mm A [UTC]')}\n\nTrade now👇\n${url}`;

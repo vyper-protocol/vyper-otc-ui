@@ -40,12 +40,13 @@ const CreateContractPage = () => {
 
 		aliasId: 'forward',
 
-		redeemLogicOption: {
-			redeemLogicPluginType: 'forward',
+		payoffOption: {
+			payoffId: 'forward',
 			notional: 1,
 			strike: 0,
 			isCall: true,
-			isLinear: true
+			isLinear: true,
+			isStandard: false
 		},
 
 		rateOption: {
@@ -70,7 +71,7 @@ const CreateContractPage = () => {
 			contractStore.delete();
 		} else {
 			getPriceForStrike(initParams.rateOption.ratePluginType, initParams.rateOption.rateAccounts, connection, getCurrentCluster()).then((newStrike) => {
-				setInitParams({ ...initParams, redeemLogicOption: { ...initParams.redeemLogicOption, strike: newStrike } });
+				setInitParams({ ...initParams, payoffOption: { ...initParams.payoffOption, strike: newStrike } });
 			});
 		}
 	}, []);

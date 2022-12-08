@@ -95,8 +95,8 @@ export const TemplateCard = ({
 			depositEnd: moment().add(15, 'minutes').toDate().getTime(),
 			settleStart: convertExpiry(expiry),
 			aliasId,
-			redeemLogicOption: {
-				redeemLogicPluginType: payoff,
+			payoffOption: {
+				payoffId: payoff,
 				...createCompletePayoffData(payoffData),
 				strike: price
 			},

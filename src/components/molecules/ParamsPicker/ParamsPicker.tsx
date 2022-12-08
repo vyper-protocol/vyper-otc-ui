@@ -1,55 +1,60 @@
 import { Box, Switch, FormControlLabel, FormGroup } from '@mui/material';
 import NumericField from 'components/atoms/NumericField';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { AliasTypeIds } from 'models/common';
+import { isOptionAlias, needsNotional } from 'utils/aliasHelper';
 
-export type RLParamsPickerInput = {
-	redeemLogicOptions: OtcInitializationParams['redeemLogicOption'];
-	setRedeemLogicOptions: (newVal: OtcInitializationParams['redeemLogicOption']) => void;
+type ParamsPickerProps = {
+	// alias of the contract
+	aliasId: AliasTypeIds;
+
+	payoffOptions: OtcInitializationParams['payoffOption'];
+
+	setPayoffOptions: (newVal: OtcInitializationParams['payoffOption']) => void;
 };
 
-export const RLParamsPicker = ({ redeemLogicOptions, setRedeemLogicOptions }: RLParamsPickerInput) => {
+const ParamsPicker = ({ aliasId, payoffOptions, setPayoffOptions }: ParamsPickerProps) => {
 	// setStrikeToDefaultValue
 	return (
 		<Box sx={{ marginY: 2 }}>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<NumericField
 					label={'Strike'}
-					value={redeemLogicOptions.strike}
+					value={payoffOptions.strike}
 					onChange={(newStrike: number) =>
-						setRedeemLogicOptions({
-							...redeemLogicOptions,
+						setPayoffOptions({
+							...payoffOptions,
 							strike: newStrike
 						})
 					}
 				/>
-
-				{['forward', 'settled_forward', 'vanilla_option'].includes(redeemLogicOptions.redeemLogicPluginType) && (
+				{needsNotional(aliasId) && (
 					<NumericField
 						label={'Notional'}
-						value={redeemLogicOptions.notional}
+						value={payoffOptions.notional}
 						onChange={(newNotional: number) =>
-							setRedeemLogicOptions({
-								...redeemLogicOptions,
+							setPayoffOptions({
+								...payoffOptions,
 								notional: newNotional
 							})
 						}
 					/>
 				)}
-				{['digital', 'vanilla_option'].includes(redeemLogicOptions.redeemLogicPluginType) && (
+				{isOptionAlias(aliasId) && (
 					<FormGroup>
 						<FormControlLabel
 							control={
 								<Switch
-									checked={redeemLogicOptions.isCall}
+									checked={payoffOptions.isCall}
 									onChange={(e) =>
-										setRedeemLogicOptions({
-											...redeemLogicOptions,
+										setPayoffOptions({
+											...payoffOptions,
 											isCall: e.target.checked
 										})
 									}
 								/>
 							}
-							label={redeemLogicOptions.isCall ? 'Call' : 'Put'}
+							label={payoffOptions.isCall ? 'Call' : 'Put'}
 						/>
 					</FormGroup>
 				)}
@@ -57,3 +62,5 @@ export const RLParamsPicker = ({ redeemLogicOptions, setRedeemLogicOptions }: RL
 		</Box>
 	);
 };
+
+export default ParamsPicker;
