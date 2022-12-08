@@ -40,16 +40,15 @@ const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgrou
 					titleTemplate={'%s | ' + DEFAULT_PAGE_TITLE}
 					defaultTitle={DEFAULT_PAGE_TITLE}
 					description={pageDescription ?? DEFAULT_PAGE_DESCRIPTION}
-					canonical={process.env.VERCEL_URL}
 					openGraph={{
 						title: pageTitle ?? DEFAULT_PAGE_TITLE,
 						description: pageDescription ?? DEFAULT_PAGE_DESCRIPTION,
-						images: [{ url: process.env.VERCEL_URL + '/assets/images/vyper-logo_512.png' }],
-						siteName: 'SiteName'
+						images: [{ url: '/assets/images/vyper-logo_512.png' }],
+						siteName: DEFAULT_PAGE_TITLE
 					}}
 					twitter={{
 						handle: '@VyperProtocol',
-						site: '@site',
+						site: '@VyperProtocol',
 						cardType: 'summary_large_image'
 					}}
 					themeColor="#008891"
