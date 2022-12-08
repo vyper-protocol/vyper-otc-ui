@@ -22,11 +22,15 @@ type LayoutProps = {
 const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgroundImage }: LayoutProps) => {
 	const [searchValue, setSearchValue] = useState('');
 
+	const logoURL = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-logo_512.png`;
+
 	return (
 		<Box>
 			<Head>
 				{/* <title>{pageTitle ?? DEFAULT_PAGE_TITLE}</title>
 				<meta name="description" content={pageDescription ?? DEFAULT_PAGE_DESCRIPTION}></meta> */}
+
+				<meta name="twitter:image" content={logoURL}></meta>
 
 				<link rel="icon" href="/favicon.ico" />
 
@@ -43,7 +47,7 @@ const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgrou
 					openGraph={{
 						title: pageTitle ?? DEFAULT_PAGE_TITLE,
 						description: pageDescription ?? DEFAULT_PAGE_DESCRIPTION,
-						images: [{ url: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-logo_512.png` }],
+						images: [{ url: logoURL }],
 						siteName: DEFAULT_PAGE_TITLE
 					}}
 					twitter={{
