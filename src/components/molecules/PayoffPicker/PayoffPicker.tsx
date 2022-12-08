@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { AliasTypeIds, getPayoffFromAlias } from 'models/common';
+import { getAliasLabel } from 'utils/aliasHelper';
 import { getPayoffDocumentionLink, getPayoffSourceCodeLink, getPayoffDescription } from 'utils/payoffMetadataHelper';
 
 type PayoffPickerProps = {
@@ -31,13 +32,13 @@ const buildDescription = (aliasId: AliasTypeIds) => {
 };
 
 const PayoffPicker = ({ aliasId, setAliasId }: PayoffPickerProps) => {
-	const uiAliasIds: AliasTypeIds[] = ['forward', 'vanilla option', 'digital option'];
+	const uiAliasIds: AliasTypeIds[] = ['forward', 'vanilla_option', 'digital'];
 
 	return (
 		<Box sx={{ alignItems: 'center', marginY: 2, height: '180px' }}>
 			<Tabs value={aliasId} onChange={(_, v) => setAliasId(v)}>
-				{uiAliasIds.map((plugin) => (
-					<Tab label={plugin} key={plugin} value={plugin} />
+				{uiAliasIds.map((alias) => (
+					<Tab label={getAliasLabel(alias)} key={alias} value={alias} />
 				))}
 			</Tabs>
 			{buildDescription(aliasId)}

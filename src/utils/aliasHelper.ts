@@ -1,4 +1,18 @@
-import { AliasTypeIds } from 'models/common';
+import { AliasTypeIds, getPayoffFromAlias } from 'models/common';
+
+export const getAliasLabel = (aliasId: AliasTypeIds): string => {
+	// this should become more comprehensive if we change aliasId representation
+	switch (aliasId) {
+		case 'vanilla_option':
+			return 'vanilla option';
+		case 'digital':
+			return 'digital option';
+		case 'settled_forward':
+			return 'settled forward';
+		default:
+			return aliasId.toString();
+	}
+};
 
 export const getSidesLabel = (aliasId: AliasTypeIds): [string, string] => {
 	return isOptionAlias(aliasId) ? ['Option premium', 'Option collateral'] : ['Long collateral', 'Short collateral'];
@@ -9,14 +23,12 @@ export const getSidesLabelShort = (aliasId: AliasTypeIds): [string, string] => {
 };
 
 export const isOptionAlias = (aliasId: AliasTypeIds): boolean => {
-	switch (aliasId) {
+	switch (getPayoffFromAlias(aliasId)) {
 		case 'forward':
 		case 'settled_forward':
 			return false;
 		case 'vanilla_option':
-		case 'vanilla option':
 		case 'digital':
-		case 'digital option':
 			return true;
 		default:
 			return false;
@@ -28,10 +40,8 @@ export const needsNotional = (aliasId: AliasTypeIds): boolean => {
 		case 'forward':
 		case 'settled_forward':
 		case 'vanilla_option':
-		case 'vanilla option':
 			return true;
 		case 'digital':
-		case 'digital option':
 			return false;
 		default:
 			return false;

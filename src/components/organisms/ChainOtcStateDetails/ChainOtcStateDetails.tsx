@@ -40,10 +40,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	const wallet = useWallet();
 	const router = useRouter();
 
-	const aliasId = otcState?.aliasId ?? otcState.chainData.redeemLogicAccount.state.payoffId;
-
-	const [longLabel, shortLabel] = getSidesLabelShort(aliasId);
-	// const isOption = isOptionAlias(aliasId);
+	const [longLabel, shortLabel] = getSidesLabelShort(otcState.aliasId);
+	// const isOption = isOptionAlias(otcState.aliasId);
 
 	const { create } = useContractStore();
 
@@ -109,7 +107,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						<ContractStatusBadge status={otcState.chainData.contractStatus} />
 						<Tooltip title={'Open docs'} arrow placement="bottom">
 							<a href={getPayoffDocumentionLink(otcState.chainData.redeemLogicAccount.state.payoffId)} target="_blank" rel="noopener noreferrer">
-								<StatusBadge label={aliasId} mode="info" />
+								<StatusBadge label={otcState.aliasId} mode="info" />
 							</a>
 						</Tooltip>
 					</Box>

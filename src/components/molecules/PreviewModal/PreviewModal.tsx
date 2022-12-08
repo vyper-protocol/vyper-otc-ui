@@ -8,7 +8,7 @@ import { OtcInitializationParams } from 'controllers/createContract/OtcInitializ
 import { AliasTypeIds } from 'models/common';
 import { MintDetail } from 'models/MintDetail';
 import moment from 'moment';
-import { isOptionAlias } from 'utils/aliasHelper';
+import { getAliasLabel, isOptionAlias } from 'utils/aliasHelper';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -51,19 +51,6 @@ type PreviewModalProps = {
 	actionProps: JSX.Element;
 };
 
-export const getSidesDescription = (aliasId: AliasTypeIds): [string, string] => {
-	switch (aliasId) {
-		case 'forward':
-			return ['long side', 'short side'];
-		case 'vanilla option':
-		case 'vanilla_option':
-		case 'digital':
-			return ['option buyer', 'option seller'];
-		default:
-			return ['long side', 'short side'];
-	}
-};
-
 export const PreviewModal = ({
 	aliasId,
 	payoffOption,
@@ -79,9 +66,9 @@ export const PreviewModal = ({
 }: PreviewModalProps) => {
 	const { payoffId, strike, notional, isCall } = payoffOption;
 
-	const [longDescription, shortDescription] = getSidesDescription(aliasId);
 	const isOption = isOptionAlias(aliasId);
-	const optionPart = aliasId.split(' ')[0];
+	const [longDescription, shortDescription] = isOption ? ['option buyer', 'option seller'] : ['long side', 'short side'];
+	const optionPart = isOption ? getAliasLabel(aliasId).split(' ')[0] : '';
 
 	const [mintDetail, setMintDetail] = useState<MintDetail | undefined>(undefined);
 	useEffect(() => {
