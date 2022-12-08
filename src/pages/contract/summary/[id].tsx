@@ -1,11 +1,14 @@
 /* eslint-disable space-before-function-paren */
 
+import { useEffect, useState } from 'react';
+
 import { Box, CircularProgress } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import ChainOtcStateDetails from 'components/organisms/ChainOtcStateDetails/ChainOtcStateDetails';
 import Layout from 'components/templates/Layout';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
+import { buildPageTitle } from 'utils/seoHelper';
 
 import styles from './summary.module.scss';
 
@@ -18,12 +21,17 @@ const SummaryPageId = () => {
 	// Pass the cluster option as a unique indetifier to the query
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
 
+	const [pageTitle, setPageTitle] = useState('');
+	useEffect(() => {
+		if (rateStateQuery.data) setPageTitle(buildPageTitle(`${rateStateQuery.data.chainData.getContractTitle()} ${rateStateQuery.data.aliasId.toUpperCase()}`));
+	}, [rateStateQuery.data]);
+
 	const loadingSpinner = rateStateQuery?.isLoading;
 	const errorMessage = rateStateQuery?.isError;
 	const showContent = rateStateQuery?.isSuccess;
 
 	return (
-		<Layout withSearch>
+		<Layout withSearch pageTitle={pageTitle}>
 			<Box className={styles.container}>
 				{errorMessage && <p>Contract not found</p>}
 

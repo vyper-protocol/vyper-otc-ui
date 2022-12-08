@@ -15,6 +15,7 @@ import {
 } from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_PAYOFF_TYPE_IDS } from 'models/common';
 import { useRouter } from 'next/router';
+import { buildPageTitle } from 'utils/seoHelper';
 
 const ExplorerPage = () => {
 	const router = useRouter();
@@ -138,7 +139,11 @@ const ExplorerPage = () => {
 		}
 	}, [router.isReady, router.query, initializeContracts]);
 
-	return <Layout withSearch>{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : null}</Layout>;
+	return (
+		<Layout pageTitle={buildPageTitle('Contract Explorer')} withSearch>
+			{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : null}
+		</Layout>
+	);
 };
 
 export default ExplorerPage;

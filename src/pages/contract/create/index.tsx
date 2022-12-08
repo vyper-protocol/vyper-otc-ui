@@ -15,6 +15,7 @@ import { getPriceForStrike, OtcInitializationParams } from 'controllers/createCo
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
+import { buildPageTitle } from 'utils/seoHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 // import dynamic from 'next/dynamic';
@@ -95,7 +96,7 @@ const CreateContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={buildPageTitle('Create a new contract')}>
 			<NonAuditedDisclaimer />
 			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
 				{/* <DynamicReactJson src={initParams} /> */}

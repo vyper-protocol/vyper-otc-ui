@@ -11,6 +11,7 @@ import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { buildPageTitle } from 'utils/seoHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 const CreateSbfJailContractPage = () => {
@@ -78,7 +79,7 @@ const CreateSbfJailContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={buildPageTitle('SBF to JAIL 2022')}>
 			<Box>
 				<Stack spacing={2} direction="column" justifyContent="center" alignItems="center">
 					<Stack spacing={2} direction="column">
