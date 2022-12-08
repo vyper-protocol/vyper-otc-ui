@@ -5,19 +5,20 @@ import SearchBar from 'components/molecules/SearchBar';
 import TopBar from 'components/organisms/TopBar';
 import Head from 'next/head';
 import Image, { StaticImageData } from 'next/image';
-import { DEFAULT_PAGE_TITLE } from 'utils/seoHelper';
+import { DEFAULT_PAGE_DESCRIPTION, DEFAULT_PAGE_TITLE } from 'utils/seoHelper';
 
 import Footer from '../Footer';
 import styles from './Layout.module.scss';
 
 type LayoutProps = {
 	pageTitle?: string;
+	pageDescription?: string;
 	children: ReactNode;
 	withSearch?: boolean;
 	withBackgroundImage?: StaticImageData;
 };
 
-const Layout = ({ pageTitle, children, withSearch, withBackgroundImage }: LayoutProps) => {
+const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgroundImage }: LayoutProps) => {
 	const [searchValue, setSearchValue] = useState('');
 
 	return (
@@ -25,10 +26,7 @@ const Layout = ({ pageTitle, children, withSearch, withBackgroundImage }: Layout
 			<Head>
 				<title>{pageTitle ?? DEFAULT_PAGE_TITLE}</title>
 
-				<meta
-					name="description"
-					content="Vyper OTC is a peer-to-peer marketplace that allows anyone to trade a wide range of on-chain derivatives in a transparent and easy way. Users can choose from a wide range of assets and trade securely thanks to fully collateralized positions."
-				></meta>
+				<meta name="description" content={pageDescription ?? DEFAULT_PAGE_DESCRIPTION}></meta>
 
 				<link rel="icon" href="/favicon.ico" />
 				{/* Resets body background color for all the routes */}
