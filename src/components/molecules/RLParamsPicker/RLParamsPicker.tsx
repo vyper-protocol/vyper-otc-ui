@@ -1,4 +1,5 @@
-import { Box, Switch, FormControlLabel, FormGroup, TextField } from '@mui/material';
+import { Box, Switch, FormControlLabel, FormGroup } from '@mui/material';
+import NumericField from 'components/atoms/NumericField';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 
 export type RLParamsPickerInput = {
@@ -11,36 +12,25 @@ export const RLParamsPicker = ({ redeemLogicOptions, setRedeemLogicOptions }: RL
 	return (
 		<Box sx={{ marginY: 2 }}>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-				<TextField
-					sx={{ alignItems: 'center', marginY: 2 }}
-					label="Strike"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
+				<NumericField
+					label={'Strike'}
 					value={redeemLogicOptions.strike}
-					onChange={(e) =>
+					onChange={(newStrike: number) =>
 						setRedeemLogicOptions({
 							...redeemLogicOptions,
-							strike: +e.target.value
+							strike: newStrike
 						})
 					}
 				/>
+
 				{['forward', 'settled_forward', 'vanilla_option'].includes(redeemLogicOptions.redeemLogicPluginType) && (
-					<TextField
-						sx={{ alignItems: 'center', marginX: 2 }}
-						label="Notional"
-						variant="standard"
-						type="number"
-						InputLabelProps={{
-							shrink: true
-						}}
+					<NumericField
+						label={'Notional'}
 						value={redeemLogicOptions.notional}
-						onChange={(e) =>
+						onChange={(newNotional: number) =>
 							setRedeemLogicOptions({
 								...redeemLogicOptions,
-								notional: +e.target.value
+								notional: newNotional
 							})
 						}
 					/>

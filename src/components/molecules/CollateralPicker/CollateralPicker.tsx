@@ -5,6 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import MessageAlert from 'components/atoms/MessageAlert';
+import NumericField from 'components/atoms/NumericField';
 import TokenSymbol from 'components/atoms/TokenSymbol';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { MintDetail } from 'models/MintDetail';
@@ -154,28 +155,8 @@ export const CollateralPicker = ({
 				</div>
 			)}
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-				<TextField
-					label="Long amount"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
-					value={longDepositAmount}
-					onChange={(e) => setLongDepositAmount(+e.target.value)}
-				/>
-
-				<TextField
-					sx={{ alignItems: 'center', marginX: 2 }}
-					label="Short amount"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
-					value={shortDepositAmount}
-					onChange={(e) => setShortDepositAmount(+e.target.value)}
-				/>
+				<NumericField label={'Long amount'} value={longDepositAmount} onChange={(newAmount: number) => setLongDepositAmount(newAmount)} />
+				<NumericField label={'Short amount'} value={shortDepositAmount} onChange={(newAmount: number) => setShortDepositAmount(newAmount)} />
 			</Box>
 		</Box>
 	);
