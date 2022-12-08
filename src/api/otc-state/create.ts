@@ -72,17 +72,13 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as PayoffTypeIds;
+	const redeemLogicPluginType = params.payoffOption.payoffId as PayoffTypeIds;
 
 	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
-				params.redeemLogicOption.isLinear
-			)
+			.initialize(params.payoffOption.strike, new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals), params.payoffOption.isLinear)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				payer: provider.wallet.publicKey
@@ -97,10 +93,10 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
-				params.redeemLogicOption.isLinear,
-				params.redeemLogicOption.isStandard
+				params.payoffOption.strike,
+				new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals),
+				params.payoffOption.isLinear,
+				params.payoffOption.isStandard
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -115,7 +111,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicProgram = new Program<RedeemLogicDigital>(RedeemLogicDigitalIDL, PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(params.redeemLogicOption.strike, params.redeemLogicOption.isCall)
+			.initialize(params.payoffOption.strike, params.payoffOption.isCall)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				payer: provider.wallet.publicKey
@@ -130,10 +126,10 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
-				params.redeemLogicOption.isCall,
-				params.redeemLogicOption.isLinear
+				params.payoffOption.strike,
+				new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals),
+				params.payoffOption.isCall,
+				params.payoffOption.isLinear
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,

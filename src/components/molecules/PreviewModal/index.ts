@@ -1,2 +1,1 @@
-export { PreviewModal } from './PreviewModal';
-export type { PreviewModalInput } from './PreviewModal';
+export { default } from './PreviewModal';

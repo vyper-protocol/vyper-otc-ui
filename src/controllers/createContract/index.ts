@@ -51,7 +51,7 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 			} else {
 				console.log('saving contract on db');
 				const createdBy = provider.wallet.publicKey;
-				const aliasId = initParams.aliasId ?? initParams.redeemLogicOption.redeemLogicPluginType;
+				const aliasId = initParams.aliasId ?? initParams.payoffOption.payoffId;
 
 				await supabaseInsertContract(chainOtcState, createdBy, aliasId, cluster);
 			}
