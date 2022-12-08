@@ -78,7 +78,7 @@ const CreateSbfJailContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={'SBF to JAIL 2022'}>
 			<Box>
 				<Stack spacing={2} direction="column" justifyContent="center" alignItems="center">
 					<Stack spacing={2} direction="column">

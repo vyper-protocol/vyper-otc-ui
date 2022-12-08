@@ -96,7 +96,7 @@ const CreateContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={'Create a new contract'}>
 			<NonAuditedDisclaimer />
 			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
 				{/* <DynamicReactJson src={initParams} /> */}

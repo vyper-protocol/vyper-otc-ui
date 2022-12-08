@@ -138,7 +138,11 @@ const ExplorerPage = () => {
 		}
 	}, [router.isReady, router.query, initializeContracts]);
 
-	return <Layout withSearch>{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : null}</Layout>;
+	return (
+		<Layout pageTitle={'Contract Explorer'} withSearch>
+			{!loading && count !== null ? <ExplorerContractDataGrid query={query} count={count} /> : null}
+		</Layout>
+	);
 };
 
 export default ExplorerPage;
