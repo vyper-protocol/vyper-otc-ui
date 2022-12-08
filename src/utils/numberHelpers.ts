@@ -15,6 +15,25 @@ export const formatCurrency = (x: number, d: boolean): string | number => {
 	}
 };
 
-export const formatWithDecimalDigits = (val: number, precision: number = 4): number => {
-	return parseFloat(val.toPrecision(precision));
+export const formatWithDecimalDigits = (val: number, precision = 4): number => {
+	const str = val.toString();
+	const [integer, decimal] = str.split('.');
+
+	let parsedDecimal: string | undefined;
+	if (decimal !== undefined) {
+		let startIndex = 0;
+		while (decimal[startIndex] === '0') {
+			startIndex += 1;
+		}
+
+		const roundedDecimal = parseInt(decimal.slice(startIndex)).toPrecision(precision).toString().replace('.', '').slice(0, precision);
+		parsedDecimal = decimal.slice(0, startIndex) + roundedDecimal;
+	}
+
+	let strNum = integer;
+	if (parsedDecimal !== undefined) {
+		strNum = strNum + '.' + parsedDecimal;
+	}
+
+	return parseFloat(strNum);
 };
