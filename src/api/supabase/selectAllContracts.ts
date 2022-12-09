@@ -10,7 +10,6 @@ export const selectAllContracts = async (): Promise<DbOtcState[]> => {
 		`
 			        *,
 			        ${CONTRACTS_METADATA_TABLE_NAME}(*),
-					ignore:${CONTRACTS_DYNAMIC_DATA_TABLE_NAME}!inner(*),
 			        ${CONTRACTS_DYNAMIC_DATA_TABLE_NAME}(*)
 		`
 	);
