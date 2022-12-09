@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, CircularProgress } from '@mui/material';
 import {
-	DataGrid,
+	DataGridPro,
 	GridColumns,
 	GridRowParams,
 	GridRenderCellParams,
@@ -12,7 +12,7 @@ import {
 	GridSortModel,
 	getGridStringOperators,
 	getGridSingleSelectOperators
-} from '@mui/x-data-grid';
+} from '@mui/x-data-grid-pro';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import StatusBadge from 'components/atoms/StatusBadge';
@@ -308,6 +308,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 					icon={<OpenInNewIcon />}
 					onClick={() => window.open(window.location.origin + UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
 					label="Open"
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
 				/>,
 				<GridActionsCellItem
 					key="open_in_explorer"
@@ -315,6 +322,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: getCurrentCluster() }))}
 					label="Open in Explorer"
 					showInMenu
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
 				/>,
 				<GridActionsCellItem
 					key="open_in_solscan"
@@ -322,6 +336,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: getCurrentCluster() }))}
 					label="Open in Solscan"
 					showInMenu
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
 				/>
 			]
 		}
@@ -333,7 +354,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 				<CircularProgress />
 			) : (
 				<Box sx={{ maxWidth: 1600, width: '90%' }}>
-					<DataGrid
+					<DataGridPro
 						pagination
 						autoHeight
 						paginationMode="server"
