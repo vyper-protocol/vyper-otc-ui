@@ -1,24 +1,26 @@
 import { Address, translateAddress } from '@project-serum/anchor';
 import { Cluster, Connection } from '@solana/web3.js';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
+import { AliasTypeIds, RateTypeIds } from 'models/common';
+import { PayoffTypeIds } from 'models/common';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 export type OtcInitializationParams = {
-	reserveMint: string;
+	collateralMint: string;
 
-	seniorDepositAmount: number;
-	juniorDepositAmount: number;
+	longDepositAmount: number;
+	shortDepositAmount: number;
 
 	depositStart: number;
 	depositEnd: number;
 	settleStart: number;
 
+	aliasId: AliasTypeIds;
+
 	// TODO: extend to other redeem logic
-	redeemLogicOption: {
-		redeemLogicPluginType: RLPluginTypeIds;
+	payoffOption: {
+		payoffId: PayoffTypeIds;
 		strike?: number;
 		notional?: number;
 		isLinear?: boolean;
@@ -27,7 +29,7 @@ export type OtcInitializationParams = {
 	};
 
 	rateOption: {
-		ratePluginType: RatePluginTypeIds;
+		ratePluginType: RateTypeIds;
 		rateAccounts: string[];
 	};
 
@@ -35,7 +37,7 @@ export type OtcInitializationParams = {
 	sendNotification: boolean;
 };
 
-export const getPriceForStrike = async (ratePluginType: RatePluginTypeIds, rateAccounts: Address[], connection: Connection, cluster: Cluster) => {
+export const getPriceForStrike = async (ratePluginType: RateTypeIds, rateAccounts: Address[], connection: Connection, cluster: Cluster) => {
 	let price = 0;
 	try {
 		if (ratePluginType === 'pyth') {

@@ -9,7 +9,7 @@ import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
-const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+const WithdrawButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLong: boolean }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -31,11 +31,11 @@ const WithdrawButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; i
 		}
 	};
 
-	if (isBuyer) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawSeniorAvailable(wallet.publicKey)) {
+	if (isLong) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isWithdrawLongAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isWithdrawJuniorAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isWithdrawShortAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

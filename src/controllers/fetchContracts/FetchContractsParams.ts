@@ -93,6 +93,7 @@ export const parseExplorerFilterOperator = (operator: string): ExplorerFilterOpe
 		return ExplorerFilterOperator.OnOrBefore;
 	}
 
+	// eslint-disable-next-line no-console
 	console.log(`operator: ${operator} not supported`);
 	return undefined;
 };

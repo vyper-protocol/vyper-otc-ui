@@ -1,7 +1,14 @@
+import { useEffect, useState } from 'react';
+
+import { PublicKey } from '@solana/web3.js';
+import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import Modal from 'components/atoms/Modal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { AliasTypeIds } from 'models/common';
+import { MintDetail } from 'models/MintDetail';
 import moment from 'moment';
+import { getAliasLabel, isOptionAlias } from 'utils/aliasHelper';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -9,9 +16,12 @@ import { shortenString } from 'utils/stringHelpers';
 
 import styles from './PreviewModal.module.scss';
 
-export type PreviewModalInput = {
-	// redeem logic contract params
-	redeemLogicOption: OtcInitializationParams['redeemLogicOption'];
+type PreviewModalProps = {
+	// alias of the contract
+	aliasId: AliasTypeIds;
+
+	// payoff contract params
+	payoffOption: OtcInitializationParams['payoffOption'];
 
 	// rate contract params
 	rateOption: OtcInitializationParams['rateOption'];
@@ -22,12 +32,14 @@ export type PreviewModalInput = {
 	// contract expiry expressed in ms
 	settleStart: number;
 
-	seniorDepositAmount: number;
+	// long deposit amount
+	longDepositAmount: number;
 
-	juniorDepositAmount: number;
+	// short deposit amount
+	shortDepositAmount: number;
 
 	// collateral mint
-	reserveMint: string;
+	collateralMint: string;
 
 	// open state of the modal
 	open: boolean;
@@ -40,28 +52,63 @@ export type PreviewModalInput = {
 };
 
 export const PreviewModal = ({
-	redeemLogicOption,
+	aliasId,
+	payoffOption,
 	rateOption,
 	depositEnd,
 	settleStart,
-	seniorDepositAmount,
-	juniorDepositAmount,
-	reserveMint,
+	longDepositAmount,
+	shortDepositAmount,
+	collateralMint,
 	open,
 	handleClose,
 	actionProps
-}: PreviewModalInput) => {
-	const { redeemLogicPluginType, strike, notional, isCall } = redeemLogicOption;
+}: PreviewModalProps) => {
+	const { payoffId, strike, notional, isCall } = payoffOption;
+
+	const isOption = isOptionAlias(aliasId);
+	const [longDescription, shortDescription] = isOption ? ['option buyer', 'option seller'] : ['long side', 'short side'];
+	const optionPart = isOption ? getAliasLabel(aliasId).split(' ')[0] : '';
+
+	const [mintDetail, setMintDetail] = useState<MintDetail | undefined>(undefined);
+	useEffect(() => {
+		try {
+			const mint = getMintByPubkey(collateralMint);
+			if (mint) {
+				// pubkey is in mapped list
+				setMintDetail(mint);
+			} else {
+				// pubkey isn't mapped, look for it on chain
+				fetchTokenInfoCached(new PublicKey(collateralMint)).then((tokenInfo) => {
+					setMintDetail({
+						cluster: getCurrentCluster(),
+						pubkey: collateralMint,
+						title: tokenInfo.symbol
+					});
+				});
+			}
+		} catch {
+			setMintDetail(undefined);
+		}
+	}, [collateralMint]);
 
 	const PreviewDescription = (
 		<div className={styles.content}>
 			<p className={styles.description}>
-				You are creating a <span className={styles.highlight}>{redeemLogicPluginType}</span>{' '}
-				{redeemLogicPluginType === 'vanilla_option' ||
-					(redeemLogicPluginType === 'digital' && <span className={styles.highlight}>{isCall ? 'CALL' : 'PUT'}</span>)}{' '}
+				You are creating a{' '}
+				{isOption ? (
+					<>
+						<span className={styles.highlight}>
+							{optionPart} {isCall ? 'CALL' : 'PUT'}
+							{' option'}
+						</span>
+					</>
+				) : (
+					<span className={styles.highlight}>{aliasId}</span>
+				)}{' '}
 				contract on <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[0])?.title}</span> with strike{' '}
 				<span className={styles.highlight}>{formatWithDecimalDigits(strike, 6)}</span>
-				{redeemLogicPluginType !== 'digital' && (
+				{payoffId !== 'digital' && (
 					<span>
 						{' '}
 						{'and notional'}{' '}
@@ -71,7 +118,7 @@ export const PreviewModal = ({
 					</span>
 				)}
 				{'.'}{' '}
-				{redeemLogicPluginType === 'settled_forward' && rateOption.rateAccounts.length > 1 && (
+				{payoffId === 'settled_forward' && rateOption.rateAccounts.length > 1 && (
 					<span>
 						{' '}
 						The contract will be settled using <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[1])?.title}.</span>
@@ -82,27 +129,28 @@ export const PreviewModal = ({
 			// TODO: load onchain data for unknwon mints , checks are not useful for now*/}
 			<p className={styles.description}>
 				The contract will be settled in{' '}
-				{reserveMint && (
+				{collateralMint && (
 					<span>
-						<span className={styles.highlightNoCap}>{getMintByPubkey(reserveMint).title}</span>.
+						<span className={styles.highlightNoCap}>{mintDetail?.title}</span>.
 					</span>
 				)}
-				{!reserveMint && (
+				{!collateralMint && (
 					<span>
-						an unknown token, with token mint <span className={styles.highlight}>{shortenString(reserveMint)}</span>.
+						an unknown token, with token mint <span className={styles.highlight}>{shortenString(collateralMint)}</span>.
 					</span>
 				)}{' '}
-				The <span className={styles.highlight}>long</span> side will need to deposit{' '}
+				The <span className={styles.highlight}>{longDescription}</span> will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
-					{seniorDepositAmount}
-					{reserveMint && <span> {getMintByPubkey(reserveMint).title}</span>}
+					{longDepositAmount}
+					{collateralMint && <span> {mintDetail?.title}</span>}
 				</span>{' '}
-				while the <span className={styles.highlight}>short</span> side will need to deposit{' '}
+				{isOption ? 'as premium ' : ''}
+				while the <span className={styles.highlight}>{shortDescription}</span> will need to deposit{' '}
 				<span className={styles.highlightNoCap}>
-					{juniorDepositAmount}
-					{reserveMint && <span> {getMintByPubkey(reserveMint).title}</span>}
+					{shortDepositAmount}
+					{collateralMint && <span> {mintDetail?.title}</span>}
 				</span>
-				.
+				{isOption ? ' as collateral' : ''}.
 			</p>
 			<p className={styles.description}>
 				The deposit period will end in <span className={styles.highlight}>{moment(depositEnd).fromNow(true)}</span> and the contract will expire in{' '}
@@ -127,3 +175,5 @@ export const PreviewModal = ({
 		</div>
 	);
 };
+
+export default PreviewModal;

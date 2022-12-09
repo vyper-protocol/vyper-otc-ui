@@ -11,14 +11,14 @@ export type ContractStatusIds = typeof AVAILABLE_CONTRACT_STATUS_IDS[number];
 
 export class ChainOtcState extends AbsOtcState {
 	/**
-	 * Reserve mint info
+	 * Collateral mint info
 	 */
-	reserveMintInfo: Mint;
+	collateralMintInfo: Mint;
 
 	/**
-	 * Reserve token info
+	 * Collateral token info
 	 */
-	reserveTokenInfo?: TokenInfo;
+	collateralTokenInfo?: TokenInfo;
 
 	/**
 	 * Flag for the settlement execution
@@ -82,21 +82,21 @@ export class ChainOtcState extends AbsOtcState {
 		return this.buyerWallet != undefined && this.sellerWallet != undefined;
 	}
 
-	isDepositBuyerAvailable(currentUserWallet: PublicKey): boolean {
+	isDepositLongAvailable(currentUserWallet: PublicKey): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return !this.isDepositExpired() && this.buyerTA === null && currentUserWallet.toBase58() !== this.sellerWallet?.toBase58();
 	}
 
-	isBuyerFunded(): boolean {
+	isLongFunded(): boolean {
 		return this.buyerTA != null;
 	}
 
-	isDepositSellerAvailable(currentUserWallet: PublicKey): boolean {
+	isDepositShortAvailable(currentUserWallet: PublicKey): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return !this.isDepositExpired() && this.sellerTA === null && currentUserWallet.toBase58() !== this.buyerWallet?.toBase58();
 	}
 
-	isSellerFunded(): boolean {
+	isShortFunded(): boolean {
 		return this.sellerTA != null;
 	}
 
@@ -104,24 +104,24 @@ export class ChainOtcState extends AbsOtcState {
 		return Date.now() > this.settleAvailableFromAt && !this.settleExecuted && this.buyerWallet !== undefined && this.sellerWallet !== undefined;
 	}
 
-	isClaimSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+	isClaimLongAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return this.settleExecuted && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0;
 	}
 
-	isClaimJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+	isClaimShortAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return this.settleExecuted && this.sellerWallet.equals(currentUserWallet) && this.programSellerTAAmount > 0;
 	}
 
-	isWithdrawSeniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+	isWithdrawLongAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
 			this.isDepositExpired() && this.buyerTA !== null && this.sellerTA === null && this.buyerWallet.equals(currentUserWallet) && this.programBuyerTAAmount > 0
 		);
 	}
 
-	isWithdrawJuniorAvailable(currentUserWallet: PublicKey | undefined): boolean {
+	isWithdrawShortAvailable(currentUserWallet: PublicKey | undefined): boolean {
 		if (currentUserWallet === undefined || currentUserWallet === null) return false;
 		return (
 			this.isDepositExpired() &&
@@ -152,12 +152,12 @@ export class ChainOtcState extends AbsOtcState {
 		return this.areBothSidesFunded();
 	}
 
-	getPnlBuyer(prices: number[]): number {
+	getLongPnl(prices: number[]): number {
 		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
 		return this.redeemLogicAccount.state.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[0];
 	}
 
-	getPnlSeller(prices: number[]): number {
+	getShortPnl(prices: number[]): number {
 		const priceToUse = this.settleExecuted ? this.pricesAtSettlement : prices;
 		return this.redeemLogicAccount.state.getPnl(priceToUse, this.buyerDepositAmount, this.sellerDepositAmount)[1];
 	}

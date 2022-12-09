@@ -14,10 +14,10 @@ import PROGRAMS from '../../configs/programs.json';
  * Deposit assets in the otc state containter
  * @param provider anchor provider with connection and user wallet
  * @param otcState public key of the current otc state
- * @param isSeniorSide flag: if true the user will deposit as senior, otherwise as junior
+ * @param isLongSide flag: if true the user will deposit as long, otherwise as short
  * @returns transaction package ready to submit
  */
-export const deposit = async (provider: AnchorProvider, otcState: PublicKey, isSeniorSide: boolean): Promise<TxPackage> => {
+export const deposit = async (provider: AnchorProvider, otcState: PublicKey, isLongSide: boolean): Promise<TxPackage> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
@@ -84,7 +84,7 @@ export const deposit = async (provider: AnchorProvider, otcState: PublicKey, isS
 	const otcDepositTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
 			.deposit({
-				isSeniorSide
+				isSeniorSide: isLongSide
 			})
 			.accounts({
 				userReserveTokenAccount: atokenAccount,

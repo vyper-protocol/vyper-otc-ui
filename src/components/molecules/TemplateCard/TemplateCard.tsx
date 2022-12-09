@@ -4,8 +4,7 @@ import cn from 'classnames';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { getPriceForStrike } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { RateTypeIds, PayoffTypeIds, AliasTypeIds } from 'models/common';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
@@ -44,13 +43,14 @@ function convertExpiry(expiry: ExpiryType): number {
 // TODO: accept a contract template object
 export type TemplateCardProps = {
 	description?: string;
-	reserveMint: string;
-	buyerDepositAmount: number;
-	sellerDepositAmount: number;
-	payoff: RLPluginTypeIds;
+	collateralMint: string;
+	longDepositAmount: number;
+	shortDepositAmount: number;
+	aliasId: AliasTypeIds;
+	payoff: PayoffTypeIds;
 	payoffData: any;
 	expiry: ExpiryType;
-	rateId: RatePluginTypeIds;
+	rateId: RateTypeIds;
 	underlying: string;
 	imgPath: string;
 };
@@ -67,9 +67,10 @@ function createCompletePayoffData(payoffData: any): { notional: number; isLinear
 
 export const TemplateCard = ({
 	description,
-	reserveMint,
-	buyerDepositAmount,
-	sellerDepositAmount,
+	collateralMint,
+	longDepositAmount,
+	shortDepositAmount,
+	aliasId,
 	payoff,
 	payoffData,
 	expiry,
@@ -87,14 +88,15 @@ export const TemplateCard = ({
 		const price = await getPriceForStrike(rateId, [getOraclesByTitle(underlying, rateId).pubkey], connection, getCurrentCluster());
 
 		create({
-			reserveMint: reserveMint,
-			seniorDepositAmount: buyerDepositAmount,
-			juniorDepositAmount: sellerDepositAmount,
+			collateralMint: collateralMint,
+			longDepositAmount,
+			shortDepositAmount,
 			depositStart: moment().add(-60, 'minutes').toDate().getTime(),
 			depositEnd: moment().add(15, 'minutes').toDate().getTime(),
 			settleStart: convertExpiry(expiry),
-			redeemLogicOption: {
-				redeemLogicPluginType: payoff,
+			aliasId,
+			payoffOption: {
+				payoffId: payoff,
 				...createCompletePayoffData(payoffData),
 				strike: price
 			},

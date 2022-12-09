@@ -1,16 +1,15 @@
+import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { AbsRLState } from '../AbsRLState';
-import { RLStateType } from '../RLStateType';
+import { AbsPayoffState } from './AbsPayoffState';
 
-export class RLSettledForward extends AbsRLState {
-	// eslint-disable-next-line no-unused-vars
+export class SettledForward extends AbsPayoffState {
 	constructor(public strike: number, public isLinear: boolean, public notional: number, public isStandard: boolean) {
 		super();
 	}
 
-	get stateType(): RLStateType {
-		return new RLStateType('settled_forward');
+	get payoffId(): PayoffTypeIds {
+		return 'settled_forward';
 	}
 
 	getPluginDataObj(): any {
@@ -44,18 +43,18 @@ export class RLSettledForward extends AbsRLState {
 		];
 	}
 
-	clone(): RLSettledForward {
-		return new RLSettledForward(this.strike, this.isLinear, this.notional, this.isStandard);
+	clone(): SettledForward {
+		return new SettledForward(this.strike, this.isLinear, this.notional, this.isStandard);
 	}
 
-	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RLSettledForward.getPnlExtended(prices, buyerDepositAmount, sellerDepositAmount, this.notional, this.strike, this.isLinear, this.isStandard);
+	getPnl(prices: number[], longDepositAmount: number, shortDepositAmount: number): [number, number] {
+		return SettledForward.getPnlExtended(prices, longDepositAmount, shortDepositAmount, this.notional, this.strike, this.isLinear, this.isStandard);
 	}
 
 	static getPnlExtended(
 		prices: number[],
-		buyerDepositAmount: number,
-		sellerDepositAmount: number,
+		longDepositAmount: number,
+		shortDepositAmount: number,
 		notional: number,
 		strike: number,
 		isLinear: boolean,
@@ -64,9 +63,9 @@ export class RLSettledForward extends AbsRLState {
 		const buyerPnl = Math.max(
 			Math.min(
 				((notional * (prices[0] - strike)) / (isLinear ? 1 : prices[0])) * (isStandard || prices[1] === 0 ? prices[1] : 1 / prices[1]),
-				sellerDepositAmount
+				shortDepositAmount
 			),
-			-buyerDepositAmount
+			-longDepositAmount
 		);
 		const sellerPnl = -1 * buyerPnl;
 		return [buyerPnl, sellerPnl];

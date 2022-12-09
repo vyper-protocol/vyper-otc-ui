@@ -1,16 +1,15 @@
+import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { AbsRLState } from '../AbsRLState';
-import { RLStateType } from '../RLStateType';
+import { AbsPayoffState } from './AbsPayoffState';
 
-export class RLDigital extends AbsRLState {
-	// eslint-disable-next-line no-unused-vars
+export class Digital extends AbsPayoffState {
 	constructor(public strike: number, public isCall: boolean) {
 		super();
 	}
 
-	get stateType(): RLStateType {
-		return new RLStateType('digital');
+	get payoffId(): PayoffTypeIds {
+		return 'digital';
 	}
 
 	getPluginDataObj(): any {
@@ -37,17 +36,17 @@ export class RLDigital extends AbsRLState {
 			{
 				label: 'Type',
 				value: this.isCall ? 'Call' : 'Put',
-				tooltip: this.isCall ? 'Long makes money if final price is >= strike' : 'Long makes money if final price is < strike'
+				tooltip: this.isCall ? 'Buyer makes money if final price is \u2265 strike' : 'Buyer makes money if final price is < strike'
 			}
 		];
 	}
 
-	clone(): RLDigital {
-		return new RLDigital(this.strike, this.isCall);
+	clone(): Digital {
+		return new Digital(this.strike, this.isCall);
 	}
 
 	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RLDigital.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.isCall);
+		return Digital.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.isCall);
 	}
 
 	static getPnlExtended(price: number, buyerDepositAmount: number, sellerDepositAmount: number, strike: number, isCall: boolean): [number, number] {

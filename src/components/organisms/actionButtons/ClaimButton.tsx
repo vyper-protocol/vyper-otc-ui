@@ -10,7 +10,7 @@ import ButtonPill from 'components/atoms/ButtonPill';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 
-const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBuyer: boolean }) => {
+const ClaimButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLong: boolean }) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
@@ -21,7 +21,7 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 	const [isDeposited, setIsDeposited] = useState(false);
 
 	useEffect(() => {
-		const programTokenAccount = isBuyer ? rateStateQuery.data.programBuyerTA : rateStateQuery.data.programSellerTA;
+		const programTokenAccount = isLong ? rateStateQuery.data.chainData.programBuyerTA : rateStateQuery.data.chainData.programSellerTA;
 		const subscriptionId = connection.onAccountChange(
 			programTokenAccount,
 			async (updatedAccountInfo) => {
@@ -33,7 +33,7 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 		return () => {
 			connection.removeAccountChangeListener(subscriptionId);
 		};
-	}, [connection, isBuyer, rateStateQuery.data.programBuyerTA, rateStateQuery.data.programSellerTA]);
+	}, [connection, isLong, rateStateQuery.data.chainData.programBuyerTA, rateStateQuery.data.chainData.programSellerTA]);
 
 	const onClaimClick = async () => {
 		try {
@@ -49,11 +49,11 @@ const ClaimButton = ({ otcStatePubkey, isBuyer }: { otcStatePubkey: string; isBu
 	};
 	if (isDeposited) {
 		return <></>;
-	} else if (isBuyer) {
-		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimSeniorAvailable(wallet.publicKey)) {
+	} else if (isLong) {
+		if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isClaimLongAvailable(wallet.publicKey)) {
 			return <></>;
 		}
-	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isClaimJuniorAvailable(wallet.publicKey)) {
+	} else if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isClaimShortAvailable(wallet.publicKey)) {
 		return <></>;
 	}
 

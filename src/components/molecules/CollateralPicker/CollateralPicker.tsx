@@ -5,32 +5,32 @@ import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import MessageAlert from 'components/atoms/MessageAlert';
+import NumericField from 'components/atoms/NumericField';
 import TokenSymbol from 'components/atoms/TokenSymbol';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { AliasTypeIds } from 'models/common';
 import { MintDetail } from 'models/MintDetail';
 import { TokenInfo } from 'models/TokenInfo';
+import { getSidesLabel } from 'utils/aliasHelper';
 import { getMintByPubkey, getMintByTitle, getMints } from 'utils/mintDatasetHelper';
 
-// TODO: fix typing
-export type ReservePickerInput = {
-	seniorDepositAmount: number;
+type CollateralPickerProps = {
+	// alias of the contract
+	aliasId: AliasTypeIds;
 
-	// eslint-disable-next-line no-unused-vars
-	setSeniorDepositAmount: (value: number) => void;
+	longDepositAmount: number;
 
-	juniorDepositAmount: number;
+	setLongDepositAmount: (value: number) => void;
 
-	// eslint-disable-next-line no-unused-vars
-	setJuniorDepositAmount: (value: number) => void;
+	shortDepositAmount: number;
+
+	setShortDepositAmount: (value: number) => void;
 
 	// collateral mint
-	reserveMint: string;
+	collateralMint: string;
 
-	// eslint-disable-next-line no-unused-vars
-	setReserveMint: (mint: string) => void;
-};
+	setCollateralMint: (mint: string) => void;
 
-type ReservePickerProps = ReservePickerInput & {
 	// error in mint input
 	reserveError: boolean;
 
@@ -46,27 +46,28 @@ type ExternalType = {
 	token?: TokenInfo;
 };
 
-// FIXME
-
-export const ReservePicker = ({
-	seniorDepositAmount,
-	setSeniorDepositAmount,
-	juniorDepositAmount,
-	setJuniorDepositAmount,
-	reserveMint,
-	setReserveMint,
+const CollateralPicker = ({
+	aliasId,
+	longDepositAmount,
+	setLongDepositAmount,
+	shortDepositAmount,
+	setShortDepositAmount,
+	collateralMint,
+	setCollateralMint,
 	reserveError,
 	setReserveError
-}: ReservePickerProps) => {
+}: CollateralPickerProps) => {
 	const [external, setExternal] = useState<ExternalType>({ isExternal: false });
 	const [isLoading, setIsLoading] = useState(false);
+
+	const [longLabel, shortLabel] = getSidesLabel(aliasId);
 
 	const handleInputChange = async (input: string) => {
 		const mint = getMintByPubkey(input) || getMintByTitle(input);
 
 		if (mint) {
 			// pubkey is in mapped list
-			setReserveMint(mint.pubkey);
+			setCollateralMint(mint.pubkey);
 			setReserveError(false);
 			setExternal({ isExternal: false });
 		} else {
@@ -87,7 +88,7 @@ export const ReservePicker = ({
 				const mintTokenInfo = await fetchTokenInfoCached(pubkey);
 				if (mintTokenInfo) {
 					// mint found on-chain
-					setReserveMint(mintTokenInfo.address);
+					setCollateralMint(mintTokenInfo.address);
 					setReserveError(false);
 					setExternal({ isExternal: true, token: mintTokenInfo });
 				} else {
@@ -107,6 +108,10 @@ export const ReservePicker = ({
 
 	return (
 		<Box sx={{ marginY: 2 }}>
+			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 2 }}>
+				<NumericField label={longLabel} value={longDepositAmount} onChange={(newAmount: number) => setLongDepositAmount(newAmount)} />
+				<NumericField label={shortLabel} value={shortDepositAmount} onChange={(newAmount: number) => setShortDepositAmount(newAmount)} />
+			</Box>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<Autocomplete
 					disabled={isLoading}
@@ -117,7 +122,7 @@ export const ReservePicker = ({
 					clearOnBlur
 					handleHomeEndKeys
 					freeSolo={getCurrentCluster() === 'devnet'}
-					value={reserveMint}
+					value={collateralMint}
 					onInputChange={async (_, input: string, reason: string) => {
 						if (reason !== 'input') return;
 						if (getCurrentCluster() === 'devnet') {
@@ -136,7 +141,7 @@ export const ReservePicker = ({
 					}}
 				/>
 				<a
-					href={getExplorerLink(reserveMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
+					href={getExplorerLink(collateralMint, { explorer: 'solscan', type: 'account', cluster: getCurrentCluster() })}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -156,30 +161,8 @@ export const ReservePicker = ({
 					<MessageAlert message={'Please use extra care when using external mints.'} severity={'info'} />
 				</div>
 			)}
-			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-				<TextField
-					label="Long amount"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
-					value={seniorDepositAmount}
-					onChange={(e) => setSeniorDepositAmount(+e.target.value)}
-				/>
-
-				<TextField
-					sx={{ alignItems: 'center', marginX: 2 }}
-					label="Short amount"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
-					value={juniorDepositAmount}
-					onChange={(e) => setJuniorDepositAmount(+e.target.value)}
-				/>
-			</Box>
 		</Box>
 	);
 };
+
+export default CollateralPicker;

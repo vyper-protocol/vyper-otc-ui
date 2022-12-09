@@ -35,15 +35,18 @@ const CreateContractPage = () => {
 		depositEnd: moment().add(5, 'minutes').toDate().getTime(),
 		settleStart: moment().add(15, 'minutes').toDate().getTime(),
 
-		juniorDepositAmount: 100,
-		seniorDepositAmount: 100,
+		shortDepositAmount: 100,
+		longDepositAmount: 100,
 
-		redeemLogicOption: {
-			redeemLogicPluginType: 'forward',
+		aliasId: 'forward',
+
+		payoffOption: {
+			payoffId: 'forward',
 			notional: 1,
 			strike: 0,
 			isCall: true,
-			isLinear: true
+			isLinear: true,
+			isStandard: false
 		},
 
 		rateOption: {
@@ -55,11 +58,12 @@ const CreateContractPage = () => {
 		},
 
 		// USDC in mainnet, devUSD in devnet
-		reserveMint: currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+		collateralMint: currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
 		saveOnDatabase: process.env.NODE_ENV !== 'development',
 		sendNotification: process.env.NODE_ENV !== 'development'
 	});
 
+	// eslint-disable-next-line eqeqeq
 	const isPresentTempData = contractStore?.contractData != null;
 	useEffect(() => {
 		if (contractStore?.contractData) {
@@ -67,7 +71,7 @@ const CreateContractPage = () => {
 			contractStore.delete();
 		} else {
 			getPriceForStrike(initParams.rateOption.ratePluginType, initParams.rateOption.rateAccounts, connection, getCurrentCluster()).then((newStrike) => {
-				setInitParams({ ...initParams, redeemLogicOption: { ...initParams.redeemLogicOption, strike: newStrike } });
+				setInitParams({ ...initParams, payoffOption: { ...initParams.payoffOption, strike: newStrike } });
 			});
 		}
 	}, []);
@@ -92,7 +96,7 @@ const CreateContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={'Create a new contract'}>
 			<NonAuditedDisclaimer />
 			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
 				{/* <DynamicReactJson src={initParams} /> */}

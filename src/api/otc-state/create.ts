@@ -11,8 +11,7 @@ import { RedeemLogicSettledForward, IDL as RedeemLogicSettledForwardIDL } from '
 import { RedeemLogicVanillaOption, IDL as RedeemLogicVanillaOptionIDL } from 'idls/redeem_logic_vanilla_option';
 import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
-import { RLPluginTypeIds } from 'models/plugins/redeemLogic/RLStateType';
+import { PayoffTypeIds, RateTypeIds } from 'models/common';
 import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
@@ -21,7 +20,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
-	const reserveMintInfo = await getMint(provider.connection, new PublicKey(params.reserveMint));
+	const collateralMintInfo = await getMint(provider.connection, new PublicKey(params.collateralMint));
 
 	const otcState = Keypair.generate();
 	const [otcAuthority] = await PublicKey.findProgramAddress([otcState.publicKey.toBuffer(), utils.bytes.utf8.encode('authority')], vyperOtcProgram.programId);
@@ -31,7 +30,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  rate plugin init
 	let rateProgramPublicKey: PublicKey = undefined;
 	const ratePluginState = Keypair.generate();
-	const ratePluginType = params.rateOption.ratePluginType as RatePluginTypeIds;
+	const ratePluginType = params.rateOption.ratePluginType as RateTypeIds;
 
 	if (ratePluginType === 'switchboard') {
 		const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
@@ -73,17 +72,13 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as RLPluginTypeIds;
+	const redeemLogicPluginType = params.payoffOption.payoffId as PayoffTypeIds;
 
 	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
-				params.redeemLogicOption.isLinear
-			)
+			.initialize(params.payoffOption.strike, new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals), params.payoffOption.isLinear)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				payer: provider.wallet.publicKey
@@ -98,10 +93,10 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
-				params.redeemLogicOption.isLinear,
-				params.redeemLogicOption.isStandard
+				params.payoffOption.strike,
+				new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals),
+				params.payoffOption.isLinear,
+				params.payoffOption.isStandard
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -116,7 +111,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicProgram = new Program<RedeemLogicDigital>(RedeemLogicDigitalIDL, PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(params.redeemLogicOption.strike, params.redeemLogicOption.isCall)
+			.initialize(params.payoffOption.strike, params.payoffOption.isCall)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				payer: provider.wallet.publicKey
@@ -131,10 +126,10 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** reserveMintInfo.decimals),
-				params.redeemLogicOption.isCall,
-				params.redeemLogicOption.isLinear
+				params.payoffOption.strike,
+				new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals),
+				params.payoffOption.isCall,
+				params.payoffOption.isLinear
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -152,7 +147,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const [vyperCoreTx, vyperCoreSigners, vyperConfig] = await createVyperCoreTrancheConfig(
 		provider,
 		vyperCoreProgram,
-		new PublicKey(params.reserveMint),
+		new PublicKey(params.collateralMint),
 		rateProgramPublicKey,
 		ratePluginState.publicKey,
 		redeemLogicProgramPublicKey,
@@ -177,15 +172,15 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	const otcInitTx: TxPackage = {
 		tx: await vyperOtcProgram.methods
 			.initialize({
-				seniorDepositAmount: new BN(params.seniorDepositAmount * 10 ** reserveMintInfo.decimals),
-				juniorDepositAmount: new BN(params.juniorDepositAmount * 10 ** reserveMintInfo.decimals),
+				seniorDepositAmount: new BN(params.longDepositAmount * 10 ** collateralMintInfo.decimals),
+				juniorDepositAmount: new BN(params.shortDepositAmount * 10 ** collateralMintInfo.decimals),
 				depositStart: new BN(params.depositStart / 1000),
 				depositEnd: new BN(params.depositEnd / 1000),
 				settleStart: new BN(params.settleStart / 1000),
 				description: new Array(128).fill(0)
 			})
 			.accounts({
-				reserveMint: params.reserveMint,
+				reserveMint: params.collateralMint,
 				otcAuthority,
 				otcState: otcState.publicKey,
 				seniorTrancheMint: vyperConfig.seniorTrancheMint,

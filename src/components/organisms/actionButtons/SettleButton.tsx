@@ -14,6 +14,10 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const wallet = useWallet();
 	const txHandler = useContext(TxHandlerContext);
 
+	// settle notifs should be handled carefully
+	// const sendNotification = process.env.NEXT_PUBLIC_LIVE_ENVIRONMENT === 'production';
+	const sendNotification = false;
+
 	const provider = new AnchorProvider(connection, wallet, {});
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, otcStatePubkey);
 	const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +25,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 	const onSettleClick = async () => {
 		try {
 			setIsLoading(true);
-			await settleContract(provider, txHandler, new PublicKey(otcStatePubkey));
+			await settleContract(provider, txHandler, new PublicKey(otcStatePubkey), rateStateQuery?.data.chainData, sendNotification);
 		} catch (err) {
 			console.log(err);
 		} finally {
@@ -30,7 +34,7 @@ const SettleButton = ({ otcStatePubkey }: { otcStatePubkey: string }) => {
 		}
 	};
 
-	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.isSettlementAvailable()) {
+	if (rateStateQuery?.data === undefined || !rateStateQuery?.data?.chainData.isSettlementAvailable()) {
 		return <></>;
 	}
 

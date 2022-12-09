@@ -2,10 +2,10 @@ import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AggregatorAccount } from '@switchboard-xyz/switchboard-v2';
 import { loadSwitchboardProgramOffline } from 'api/switchboard/switchboardHelper';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { RateTypeIds } from 'models/common';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 
 import { AbsRateState } from './AbsRateState';
-import { RatePluginTypeIds } from './RatePluginTypeIds';
 
 export class RateSwitchboardState extends AbsRateState {
 	aggregatorsData: any;
@@ -33,7 +33,7 @@ export class RateSwitchboardState extends AbsRateState {
 		return this.title;
 	}
 
-	get typeId(): RatePluginTypeIds {
+	get rateId(): RateTypeIds {
 		return 'switchboard';
 	}
 

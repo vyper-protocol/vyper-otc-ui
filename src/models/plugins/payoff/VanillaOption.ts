@@ -1,16 +1,15 @@
+import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
 
-import { AbsRLState } from '../AbsRLState';
-import { RLStateType } from '../RLStateType';
+import { AbsPayoffState } from './AbsPayoffState';
 
-export class RLVanillaOption extends AbsRLState {
-	// eslint-disable-next-line no-unused-vars
+export class VanillaOption extends AbsPayoffState {
 	constructor(public strike: number, public notional: number, public isCall: boolean, public isLinear: boolean) {
 		super();
 	}
 
-	get stateType(): RLStateType {
-		return new RLStateType('vanilla_option');
+	get payoffId(): PayoffTypeIds {
+		return 'vanilla_option';
 	}
 
 	get rateFeedsDescription(): string[] {
@@ -38,8 +37,8 @@ export class RLVanillaOption extends AbsRLState {
 		];
 	}
 
-	clone(): RLVanillaOption {
-		return new RLVanillaOption(this.strike, this.notional, this.isCall, this.isLinear);
+	clone(): VanillaOption {
+		return new VanillaOption(this.strike, this.notional, this.isCall, this.isLinear);
 	}
 
 	getPluginDataObj(): any {
@@ -51,21 +50,21 @@ export class RLVanillaOption extends AbsRLState {
 		};
 	}
 
-	getPnl(prices: number[], buyerDepositAmount: number, sellerDepositAmount: number): [number, number] {
-		return RLVanillaOption.getPnlExtended(prices[0], buyerDepositAmount, sellerDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
+	getPnl(prices: number[], longDepositAmount: number, shortDepositAmount: number): [number, number] {
+		return VanillaOption.getPnlExtended(prices[0], longDepositAmount, shortDepositAmount, this.strike, this.notional, this.isCall, this.isLinear);
 	}
 
 	static getPnlExtended(
 		price: number,
-		buyerDepositAmount: number,
-		sellerDepositAmount: number,
+		longDepositAmount: number,
+		shortDepositAmount: number,
 		strike: number,
 		notional: number,
 		isCall: boolean,
 		isLinear: boolean
 	): [number, number] {
 		const payoff = price === 0 && !isLinear ? (!isCall || strike > 0 ? 0 : 1) : Math.max(0, isCall ? price - strike : strike - price) / (isLinear ? 1 : price);
-		const buyerPnl = -buyerDepositAmount + Math.min(sellerDepositAmount, notional * payoff);
+		const buyerPnl = -longDepositAmount + Math.min(shortDepositAmount, notional * payoff);
 		const sellerPnl = -buyerPnl;
 		return [buyerPnl, sellerPnl];
 	}

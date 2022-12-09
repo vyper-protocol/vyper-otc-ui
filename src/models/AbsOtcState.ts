@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
+import { PayoffAccount } from './plugins/payoff/PayoffAccount';
 import { RateAccount } from './plugins/rate/RateAccount';
-import { RLAccount } from './plugins/redeemLogic/RLAccount';
 
 export abstract class AbsOtcState {
 	/**
@@ -15,9 +15,9 @@ export abstract class AbsOtcState {
 	vyperCoreTrancheConfig: PublicKey;
 
 	/**
-	 * Reserve mint info
+	 * Collateral mint info
 	 */
-	reserveMint: PublicKey;
+	collateralMint: PublicKey;
 
 	/**
 	 * Creation timestamp in ms
@@ -52,7 +52,7 @@ export abstract class AbsOtcState {
 	/**
 	 * Redeem logic account
 	 */
-	redeemLogicAccount: RLAccount;
+	redeemLogicAccount: PayoffAccount;
 
 	/**
 	 * Rate account

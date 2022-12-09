@@ -6,8 +6,8 @@ import { PublicKey } from '@solana/web3.js';
 import MessageAlert from 'components/atoms/MessageAlert';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import _ from 'lodash';
+import { RateTypeIds } from 'models/common';
 import { OracleDetail } from 'models/OracleDetail';
-import { RatePluginTypeIds } from 'models/plugins/rate/RatePluginTypeIds';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { getOracleByPubkey, getOracles, getOraclesByTitle } from 'utils/oracleDatasetHelper';
@@ -24,7 +24,7 @@ type OraclePickerInput = {
 	rateAccount: string;
 
 	// set callback, sets the rate
-	setRateAccount: (newPubkey: string, newType: RatePluginTypeIds) => void;
+	setRateAccount: (newPubkey: string, newType: RateTypeIds) => void;
 
 	rateError: boolean;
 
@@ -133,7 +133,14 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 							await handleInputChange(input);
 						}
 					}}
-					options={options}
+					options={_.sortBy(options, ['category'], ['asc']) as OracleDetail[]}
+					groupBy={(oracleOrPubkey: OracleDetail | string) => {
+						if (typeof oracleOrPubkey === 'object') {
+							return oracleOrPubkey.category ?? 'Other';
+						} else {
+							return 'Other';
+						}
+					}}
 					getOptionLabel={(oracleOrPubkey: OracleDetail | string) => {
 						if (typeof oracleOrPubkey === 'object') {
 							return oracleOrPubkey.title;
@@ -196,9 +203,9 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 
 export type OraclesPickerInput = {
 	// oracleRequired: 'single' | 'double';
-	// ratePluginType: RatePluginTypeIds;
+	// ratePluginType: RateTypeIds;
 	rateAccounts: string[];
-	setRateAccounts: (newType: RatePluginTypeIds, newVal: string[]) => void;
+	setRateAccounts: (newType: RateTypeIds, newVal: string[]) => void;
 	oracleError: boolean;
 	setOracleError: (error: boolean) => void;
 };

@@ -1,3 +1,5 @@
+import { Cluster } from '@solana/web3.js';
+
 export const buildHomeUrl = (): string => {
 	return '/';
 };
@@ -17,3 +19,7 @@ export const buildExplorerUrl = (): string => {
 export function buildDepositQRCodeUrl(contract: string, isBuyer: boolean): string {
 	return `/qr?op=deposit&contract=${contract}&isBuyer=${isBuyer}`;
 }
+
+export const buildFullUrl = (cluster: Cluster, path: string): string => {
+	return cluster === 'devnet' ? `https://demo.otc.vyperprotocol.io${path}` : `https://otc.vyperprotocol.io${path}`;
+};
