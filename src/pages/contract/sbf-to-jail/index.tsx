@@ -37,8 +37,8 @@ const CreateSbfJailContractPage = () => {
 
 			setIsLoading(true);
 
-			const redeemLogicOption: OtcInitializationParams['redeemLogicOption'] = {
-				redeemLogicPluginType: 'digital',
+			const payoffOption: OtcInitializationParams['payoffOption'] = {
+				payoffId: 'digital',
 				strike: 0.5,
 				isCall: true
 			};
@@ -54,11 +54,12 @@ const CreateSbfJailContractPage = () => {
 				settleStart,
 				longDepositAmount: longAmount,
 				shortDepositAmount: 100,
+				aliasId: 'digital',
 				rateOption: {
 					ratePluginType: 'switchboard',
 					rateAccounts: ['3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW']
 				},
-				redeemLogicOption,
+				payoffOption,
 				saveOnDatabase,
 				sendNotification
 			};
@@ -77,7 +78,7 @@ const CreateSbfJailContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={'SBF to JAIL 2022'}>
 			<Box>
 				<Stack spacing={2} direction="column" justifyContent="center" alignItems="center">
 					<Stack spacing={2} direction="column">

@@ -1,6 +1,6 @@
 import { Address, translateAddress } from '@project-serum/anchor';
 import { Cluster, Connection } from '@solana/web3.js';
-import { RateTypeIds } from 'models/common';
+import { AliasTypeIds, RateTypeIds } from 'models/common';
 import { PayoffTypeIds } from 'models/common';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
@@ -16,9 +16,11 @@ export type OtcInitializationParams = {
 	depositEnd: number;
 	settleStart: number;
 
+	aliasId: AliasTypeIds;
+
 	// TODO: extend to other redeem logic
-	redeemLogicOption: {
-		redeemLogicPluginType: PayoffTypeIds;
+	payoffOption: {
+		payoffId: PayoffTypeIds;
 		strike?: number;
 		notional?: number;
 		isLinear?: boolean;

@@ -5,7 +5,7 @@ import { getMint, getMultipleAccounts, unpackAccount, unpackMint } from '@solana
 import { Connection, PublicKey } from '@solana/web3.js';
 import { RustDecimalWrapper } from '@vyper-protocol/rust-decimal-wrapper';
 import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
-import { CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
+import { CONTRACTS_DYNAMIC_DATA_TABLE_NAME, CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from 'api/supabase/client';
 import { syncContractFromChain as syncContractDynamicData } from 'api/supabase/syncContractData';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
 import { RateSwitchboard, IDL as RateSwitchboardIDL } from 'idls/rate_switchboard';
@@ -17,6 +17,7 @@ import { VyperCore, IDL as VyperCoreIDL } from 'idls/vyper_core';
 import { VyperOtc, IDL as VyperOtcIDL } from 'idls/vyper_otc';
 import _ from 'lodash';
 import { DbOtcState } from 'models/DbOtcState';
+import { OtcContract } from 'models/OtcContract';
 import { AbsPayoffState } from 'models/plugins/payoff/AbsPayoffState';
 import { Digital } from 'models/plugins/payoff/Digital';
 import { Forward } from 'models/plugins/payoff/Forward';
@@ -37,17 +38,27 @@ export const fetchContract = async (
 	otcStateAddress: PublicKey,
 	skipDbCheck: boolean = false,
 	syncDynamicDataOnFetch: boolean = true
-): Promise<ChainOtcState> => {
+): Promise<OtcContract> => {
 	console.group('CONTROLLER: fetchContract');
 	const controllerStartMark = performance.mark('controller_start');
 
 	let chainOtcResult: ChainOtcState = undefined;
+	let dbOtcStateResult: DbOtcState = undefined;
 	try {
-		let dbOtcStateResult: DbOtcState = undefined;
 		if (!skipDbCheck) {
 			try {
 				// fetching data from supabase
-				const res = await supabase.from(CONTRACTS_TABLE_NAME).select().eq('pubkey', otcStateAddress.toBase58()).range(0, 1);
+				const res = await supabase
+					.from(CONTRACTS_TABLE_NAME)
+					.select(
+						`
+							*,
+							${CONTRACTS_METADATA_TABLE_NAME}(*),
+							${CONTRACTS_DYNAMIC_DATA_TABLE_NAME}(*)
+						`
+					)
+					.eq('pubkey', otcStateAddress.toBase58())
+					.range(0, 1);
 				if (res.error) throw Error(res.error.message);
 				if (res.data.length !== 1) throw Error('entry not found');
 
@@ -71,7 +82,7 @@ export const fetchContract = async (
 		console.log('controller total time elapsed: ', performance.measure('controller_end', controllerStartMark.name));
 	}
 
-	return chainOtcResult;
+	return new OtcContract(chainOtcResult, dbOtcStateResult);
 };
 
 async function fetchContractWithNoDbInfo(connection: Connection, otcStateAddress: PublicKey): Promise<ChainOtcState> {

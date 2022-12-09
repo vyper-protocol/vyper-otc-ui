@@ -38,12 +38,15 @@ const CreateContractPage = () => {
 		shortDepositAmount: 100,
 		longDepositAmount: 100,
 
-		redeemLogicOption: {
-			redeemLogicPluginType: 'forward',
+		aliasId: 'forward',
+
+		payoffOption: {
+			payoffId: 'forward',
 			notional: 1,
 			strike: 0,
 			isCall: true,
-			isLinear: true
+			isLinear: true,
+			isStandard: false
 		},
 
 		rateOption: {
@@ -68,7 +71,7 @@ const CreateContractPage = () => {
 			contractStore.delete();
 		} else {
 			getPriceForStrike(initParams.rateOption.ratePluginType, initParams.rateOption.rateAccounts, connection, getCurrentCluster()).then((newStrike) => {
-				setInitParams({ ...initParams, redeemLogicOption: { ...initParams.redeemLogicOption, strike: newStrike } });
+				setInitParams({ ...initParams, payoffOption: { ...initParams.payoffOption, strike: newStrike } });
 			});
 		}
 	}, []);
@@ -93,7 +96,7 @@ const CreateContractPage = () => {
 	};
 
 	return (
-		<Layout>
+		<Layout pageTitle={'Create a new contract'}>
 			<NonAuditedDisclaimer />
 			<Box sx={{ width: '75vh', alignItems: 'center', my: 2 }}>
 				{/* <DynamicReactJson src={initParams} /> */}

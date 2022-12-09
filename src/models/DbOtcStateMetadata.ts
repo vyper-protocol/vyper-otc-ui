@@ -1,6 +1,17 @@
 import { PublicKey } from '@solana/web3.js';
 
+import { AliasTypeIds } from './common';
+
 export class DbOtcStateMetadata {
-	// eslint-disable-next-line no-empty-function, no-unused-vars
-	constructor(public createdBy: PublicKey, public data: any) {}
+	constructor(public createdBy: PublicKey, public aliasId: AliasTypeIds, public data: any) {
+		//
+	}
+
+	static createFromDBData(v: any): DbOtcStateMetadata {
+		const createdBy = new PublicKey(v.created_by);
+		const alias = v.alias;
+		const data = v.metadata;
+
+		return new DbOtcStateMetadata(createdBy, alias, data);
+	}
 }

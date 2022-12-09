@@ -5,14 +5,19 @@ import { PublicKey } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import { fetchTokenInfoCached } from 'api/next-api/fetchTokenInfo';
 import MessageAlert from 'components/atoms/MessageAlert';
+import NumericField from 'components/atoms/NumericField';
 import TokenSymbol from 'components/atoms/TokenSymbol';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { AliasTypeIds } from 'models/common';
 import { MintDetail } from 'models/MintDetail';
 import { TokenInfo } from 'models/TokenInfo';
+import { getSidesLabel } from 'utils/aliasHelper';
 import { getMintByPubkey, getMintByTitle, getMints } from 'utils/mintDatasetHelper';
 
-// TODO: fix typing
-export type CollateralPickerInput = {
+type CollateralPickerProps = {
+	// alias of the contract
+	aliasId: AliasTypeIds;
+
 	longDepositAmount: number;
 
 	setLongDepositAmount: (value: number) => void;
@@ -25,9 +30,7 @@ export type CollateralPickerInput = {
 	collateralMint: string;
 
 	setCollateralMint: (mint: string) => void;
-};
 
-type CollateralPickerProps = CollateralPickerInput & {
 	// error in mint input
 	reserveError: boolean;
 
@@ -43,9 +46,8 @@ type ExternalType = {
 	token?: TokenInfo;
 };
 
-// FIXME
-
-export const CollateralPicker = ({
+const CollateralPicker = ({
+	aliasId,
 	longDepositAmount,
 	setLongDepositAmount,
 	shortDepositAmount,
@@ -57,6 +59,8 @@ export const CollateralPicker = ({
 }: CollateralPickerProps) => {
 	const [external, setExternal] = useState<ExternalType>({ isExternal: false });
 	const [isLoading, setIsLoading] = useState(false);
+
+	const [longLabel, shortLabel] = getSidesLabel(aliasId);
 
 	const handleInputChange = async (input: string) => {
 		const mint = getMintByPubkey(input) || getMintByTitle(input);
@@ -104,6 +108,10 @@ export const CollateralPicker = ({
 
 	return (
 		<Box sx={{ marginY: 2 }}>
+			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 2 }}>
+				<NumericField label={longLabel} value={longDepositAmount} onChange={(newAmount: number) => setLongDepositAmount(newAmount)} />
+				<NumericField label={shortLabel} value={shortDepositAmount} onChange={(newAmount: number) => setShortDepositAmount(newAmount)} />
+			</Box>
 			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
 				<Autocomplete
 					disabled={isLoading}
@@ -153,30 +161,8 @@ export const CollateralPicker = ({
 					<MessageAlert message={'Please use extra care when using external mints.'} severity={'info'} />
 				</div>
 			)}
-			<Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-				<TextField
-					label="Long amount"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
-					value={longDepositAmount}
-					onChange={(e) => setLongDepositAmount(+e.target.value)}
-				/>
-
-				<TextField
-					sx={{ alignItems: 'center', marginX: 2 }}
-					label="Short amount"
-					variant="standard"
-					type="number"
-					InputLabelProps={{
-						shrink: true
-					}}
-					value={shortDepositAmount}
-					onChange={(e) => setShortDepositAmount(+e.target.value)}
-				/>
-			</Box>
 		</Box>
 	);
 };
+
+export default CollateralPicker;
