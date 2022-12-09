@@ -32,10 +32,14 @@ import useExplorerParamsStore from 'store/useExplorerParamsStore';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
+import OtcContractContainer from '../OtcContractContainer';
 
 // import dynamic from 'next/dynamic';
 // const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
+const EMPTY_FILTER_MODEL: GridFilterModel = {
+	items: []
+};
 const ACTIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
 	items: [
 		{
@@ -79,49 +83,74 @@ const ExplorerContractDataGrid = () => {
 	}, [sortModel]);
 
 	useEffect(() => {
+		// HARD CONTRACT SYNC, USE WITH CARE
+		// const syncAllContracts = async (input: DbOtcState[]) => {
+		// 	for (let i = 0; i < input.length; i++) {
+		// 		const cc = input[i];
+		// 		const chainOtcState = await fetchChainOtcStateFromDbInfo(connection, cc);
+		// 		syncContractFromChain(chainOtcState);
+		// 		await sleep(50);
+		// 		console.log(`SYNC ALL CONTRACTS PROGRESS: ${i} / ${input.length} => ${formatWithDecimalDigits((100 * i) / input.length, 2)}%`);
+		// 	}
+		// };
+
 		setIsLoading(true);
 		fetchContracts()
-			.then((c) => setContracts(c))
+			.then((c) => {
+				setContracts(c);
+				// syncAllContracts(c);
+			})
 			.finally(() => setIsLoading(false));
 	}, []);
 
 	const GridHeader = () => {
 		return (
-			<Stack direction="row">
-				<GridToolbar />
-				<Button
-					onClick={() => {
-						setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
-						setSortModel(CREATED_AT_SORT_MODEL);
-					}}
-				>
-					Active Contracts
-				</Button>
-				<Button
-					disabled={!wallet.connected}
-					onClick={() => {
-						setFilterModel({
-							items: [
-								{
-									id: 0,
-									columnField: 'dynamicData.buyerWallet',
-									operatorValue: 'equals',
-									value: wallet.publicKey.toBase58()
-								},
-								{
-									id: 1,
-									columnField: 'dynamicData.sellerWallet',
-									operatorValue: 'equals',
-									value: wallet.publicKey.toBase58()
-								}
-							],
-							linkOperator: GridLinkOperator.Or
-						});
-						setSortModel(CREATED_AT_SORT_MODEL);
-					}}
-				>
-					my contracts
-				</Button>
+			<Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
+				<GridToolbar showQuickFilter />
+
+				<div>
+					<Button
+						onClick={() => {
+							setFilterModel(EMPTY_FILTER_MODEL);
+							setSortModel(CREATED_AT_SORT_MODEL);
+						}}
+					>
+						All Contracts
+					</Button>
+					<Button
+						onClick={() => {
+							setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
+							setSortModel(CREATED_AT_SORT_MODEL);
+						}}
+					>
+						Active Contracts
+					</Button>
+					<Button
+						disabled={!wallet.connected}
+						onClick={() => {
+							setFilterModel({
+								items: [
+									{
+										id: 0,
+										columnField: 'dynamicData.buyerWallet',
+										operatorValue: 'equals',
+										value: wallet.publicKey.toBase58()
+									},
+									{
+										id: 1,
+										columnField: 'dynamicData.sellerWallet',
+										operatorValue: 'equals',
+										value: wallet.publicKey.toBase58()
+									}
+								],
+								linkOperator: GridLinkOperator.Or
+							});
+							setSortModel(CREATED_AT_SORT_MODEL);
+						}}
+					>
+						my contracts
+					</Button>
+				</div>
 			</Stack>
 		);
 	};
@@ -399,6 +428,7 @@ const ExplorerContractDataGrid = () => {
 					getRowId={(row) => row.publickey.toBase58()}
 					rows={contracts}
 					rowsPerPageOptions={[5, 25, 50, 100]}
+					pageSize={25}
 					columns={columns}
 					filterModel={filterModel}
 					sortModel={sortModel}
@@ -412,12 +442,13 @@ const ExplorerContractDataGrid = () => {
 						columns: {
 							columnVisibilityModel: {
 								publickey: false,
-								// createdAt: false,
 								depositAvailableFrom: false,
 								depositExpirationAt: false
 							}
 						}
 					}}
+					getDetailPanelContent={({ row }) => <OtcContractContainer pubkey={row.publickey.toBase58()} />}
+					getDetailPanelHeight={() => 600}
 				/>
 			</Box>
 		</>

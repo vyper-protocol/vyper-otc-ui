@@ -1,7 +1,5 @@
 import { GridFilterModel, GridSortModel } from '@mui/x-data-grid-pro';
 import produce from 'immer';
-import omit from 'lodash-es/omit';
-import { TokenInfo } from 'models/TokenInfo';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
