@@ -10,8 +10,11 @@ import {
 	GridActionsCellItem,
 	GridFilterModel,
 	GridSortModel,
-	GridToolbar,
-	GridLinkOperator
+	GridLinkOperator,
+	GridToolbarColumnsButton,
+	GridToolbarFilterButton,
+	GridToolbarExport,
+	GridToolbarQuickFilter
 } from '@mui/x-data-grid-pro';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
@@ -105,52 +108,73 @@ const ExplorerContractDataGrid = () => {
 
 	const GridHeader = () => {
 		return (
-			<Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-				<GridToolbar showQuickFilter />
+			<Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={2}>
+				{/* <GridToolbarContainer> */}
+				<Button
+					onClick={() => {
+						setFilterModel(EMPTY_FILTER_MODEL);
+						setSortModel(CREATED_AT_SORT_MODEL);
+					}}
+				>
+					All Contracts
+				</Button>
+				<Button
+					onClick={() => {
+						setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
+						setSortModel(CREATED_AT_SORT_MODEL);
+					}}
+				>
+					Active Contracts
+				</Button>
+				<Button
+					disabled={!wallet.connected}
+					onClick={() => {
+						setFilterModel({
+							items: [
+								{
+									id: 0,
+									columnField: 'dynamicData.buyerWallet',
+									operatorValue: 'equals',
+									value: wallet.publicKey.toBase58()
+								},
+								{
+									id: 1,
+									columnField: 'dynamicData.sellerWallet',
+									operatorValue: 'equals',
+									value: wallet.publicKey.toBase58()
+								}
+							],
+							linkOperator: GridLinkOperator.Or
+						});
+						setSortModel(CREATED_AT_SORT_MODEL);
+					}}
+				>
+					my contracts
+				</Button>
 
-				<div>
-					<Button
-						onClick={() => {
-							setFilterModel(EMPTY_FILTER_MODEL);
-							setSortModel(CREATED_AT_SORT_MODEL);
-						}}
-					>
-						All Contracts
-					</Button>
-					<Button
-						onClick={() => {
-							setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
-							setSortModel(CREATED_AT_SORT_MODEL);
-						}}
-					>
-						Active Contracts
-					</Button>
-					<Button
-						disabled={!wallet.connected}
-						onClick={() => {
-							setFilterModel({
-								items: [
-									{
-										id: 0,
-										columnField: 'dynamicData.buyerWallet',
-										operatorValue: 'equals',
-										value: wallet.publicKey.toBase58()
-									},
-									{
-										id: 1,
-										columnField: 'dynamicData.sellerWallet',
-										operatorValue: 'equals',
-										value: wallet.publicKey.toBase58()
-									}
-								],
-								linkOperator: GridLinkOperator.Or
-							});
-							setSortModel(CREATED_AT_SORT_MODEL);
-						}}
-					>
-						my contracts
-					</Button>
-				</div>
+				<GridToolbarColumnsButton
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
+				/>
+				<GridToolbarFilterButton
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
+				/>
+				<GridToolbarExport />
+				<GridToolbarQuickFilter />
+				{/* </GridToolbarContainer> */}
+
+				{/* <GridToolbar showQuickFilter /> */}
 			</Stack>
 		);
 	};
