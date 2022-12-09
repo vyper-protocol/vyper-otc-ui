@@ -28,6 +28,7 @@ import { Digital } from 'models/plugins/payoff/Digital';
 import { Forward } from 'models/plugins/payoff/Forward';
 import { SettledForward } from 'models/plugins/payoff/SettledForward';
 import { VanillaOption } from 'models/plugins/payoff/VanillaOption';
+import useExplorerParamsStore from 'store/useExplorerParamsStore';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -35,7 +36,7 @@ import OracleLivePrice from '../OracleLivePrice';
 // import dynamic from 'next/dynamic';
 // const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
-const DEFAULT_FILTER_MODEL: GridFilterModel = {
+const ACTIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
 	items: [
 		{
 			id: 0,
@@ -45,16 +46,37 @@ const DEFAULT_FILTER_MODEL: GridFilterModel = {
 		}
 	]
 };
-const DEFAULT_SORT_MODEL: GridSortModel = [{ field: 'createdAt', sort: 'desc' }];
+const CREATED_AT_SORT_MODEL: GridSortModel = [{ field: 'createdAt', sort: 'desc' }];
 
 const ExplorerContractDataGrid = () => {
-	const [isLoading, setIsLoading] = useState(false);
-	const [contracts, setContracts] = useState<DbOtcState[]>([]);
-
+	const {
+		filterModel: storageFilterModel,
+		sortModel: storageSortModel,
+		setFilterModel: setStorageFilterModel,
+		setSortModel: setStorageSortModel
+	} = useExplorerParamsStore();
 	const wallet = useWallet();
 
-	const [filterModel, setFilterModel] = useState<GridFilterModel>(DEFAULT_FILTER_MODEL);
-	const [sortModel, setSortModel] = useState<GridSortModel>(DEFAULT_SORT_MODEL);
+	const [isLoading, setIsLoading] = useState(false);
+	const [contracts, setContracts] = useState<DbOtcState[]>([]);
+	const [filterModel, setFilterModel] = useState<GridFilterModel>(ACTIVE_CONTRACTS_FILTER_MODEL);
+	const [sortModel, setSortModel] = useState<GridSortModel>(CREATED_AT_SORT_MODEL);
+
+	useEffect(() => {
+		if (storageFilterModel) setFilterModel(storageFilterModel);
+		if (storageSortModel) setSortModel(storageSortModel);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	useEffect(() => {
+		setStorageFilterModel(filterModel);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [filterModel]);
+
+	useEffect(() => {
+		setStorageSortModel(sortModel);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sortModel]);
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -69,8 +91,8 @@ const ExplorerContractDataGrid = () => {
 				<GridToolbar />
 				<Button
 					onClick={() => {
-						setFilterModel(DEFAULT_FILTER_MODEL);
-						setSortModel(DEFAULT_SORT_MODEL);
+						setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
+						setSortModel(CREATED_AT_SORT_MODEL);
 					}}
 				>
 					Active Contracts
@@ -95,7 +117,7 @@ const ExplorerContractDataGrid = () => {
 							],
 							linkOperator: GridLinkOperator.Or
 						});
-						setSortModel(DEFAULT_SORT_MODEL);
+						setSortModel(CREATED_AT_SORT_MODEL);
 					}}
 				>
 					my contracts
@@ -380,8 +402,8 @@ const ExplorerContractDataGrid = () => {
 					columns={columns}
 					filterModel={filterModel}
 					sortModel={sortModel}
-					onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
-					onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
+					onFilterModelChange={(v) => setFilterModel(v)}
+					onSortModelChange={(v) => setSortModel(v)}
 					components={{
 						Toolbar: GridHeader
 					}}
