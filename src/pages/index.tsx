@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { Skeleton, Stack } from '@mui/material';
 import cn from 'classnames';
-import FrequentlyAskedQuestions from 'components/organisms/FrequentlyAskedQuestions';
-import TemplateGrid from 'components/organisms/TemplateGrid';
+import FrequentlyAskedQuestions from 'components/FrequentlyAskedQuestions';
+import TemplateGrid from 'components/TemplateGrid';
 import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
 import { useGetPlatformStatsQuery } from 'hooks/useGetPlatformStatsQuery';

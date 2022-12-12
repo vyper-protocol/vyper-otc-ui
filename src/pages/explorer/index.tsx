@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { countContracts } from 'api/supabase/countContracts';
-import ExplorerContractDataGrid from 'components/organisms/ExplorerContractDataGrid';
+import ExplorerContractDataGrid from 'components/ExplorerContractDataGrid';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import Layout from 'components/templates/Layout';
 import {

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Box, CircularProgress } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
-import ChainOtcStateDetails from 'components/organisms/ChainOtcStateDetails/ChainOtcStateDetails';
+import ChainOtcStateDetails from 'components/ChainOtcStateDetails/ChainOtcStateDetails';
 import Layout from 'components/templates/Layout';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
