@@ -116,14 +116,14 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
 				<PublicKeyPicker
 					title={renderInputTitle}
-					publicKeyLabels={options.map((o) => ({
+					availableOptions={options.map((o) => ({
 						label: o.title,
 						pubkey: o.pubkey,
 						category: o.category,
 						type: o.type
 					}))}
 					onChange={handleInputChange}
-					free={currentCluster === 'devnet'}
+					freeSolo={currentCluster === 'devnet'}
 					value={value}
 				/>
 				{/* TODO: abstract Link component and disable it on rateError */}

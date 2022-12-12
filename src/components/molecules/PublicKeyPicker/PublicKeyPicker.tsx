@@ -12,13 +12,13 @@ type PublicKeyLabel = {
 
 export type PublicKeyPickerInput = {
 	title: string;
-	publicKeyLabels: PublicKeyLabel[];
+	availableOptions: PublicKeyLabel[];
 	onChange: (input: string) => Promise<void>;
-	free: boolean;
+	freeSolo: boolean;
 	value: string;
 };
 
-export const PublicKeyPicker = ({ title, publicKeyLabels, onChange, free, value }: PublicKeyPickerInput) => {
+export const PublicKeyPicker = ({ title, availableOptions, onChange, freeSolo, value }: PublicKeyPickerInput) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	return (
@@ -30,15 +30,15 @@ export const PublicKeyPicker = ({ title, publicKeyLabels, onChange, free, value 
 			selectOnFocus
 			clearOnBlur
 			handleHomeEndKeys
-			freeSolo={free}
+			freeSolo={freeSolo}
 			value={value}
 			onInputChange={async (e, input: string, reason: string) => {
 				if (reason !== 'input') return;
-				if (free) {
+				if (freeSolo) {
 					await onChange(input);
 				}
 			}}
-			options={_.sortBy(publicKeyLabels, ['category'], ['asc']) as PublicKeyLabel[]}
+			options={_.sortBy(availableOptions, ['category'], ['asc']) as PublicKeyLabel[]}
 			groupBy={(pubkeyOrOther: PublicKeyLabel | string) => {
 				if (typeof pubkeyOrOther === 'object') {
 					return pubkeyOrOther.category ?? 'Other';
