@@ -316,7 +316,7 @@ const CreateContractFlow = ({
 					<LoadingButton
 						variant="contained"
 						loading={isLoading}
-						disabled={!wallet.connected && initParamsErrors.length !== 0}
+						disabled={!wallet.connected || initParamsErrors.length !== 0}
 						onClick={onCreateContractButtonClick}
 					>
 						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
