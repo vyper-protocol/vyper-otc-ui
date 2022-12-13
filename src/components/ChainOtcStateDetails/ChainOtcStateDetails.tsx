@@ -16,6 +16,7 @@ import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { OtcContract } from 'models/OtcContract';
+import moment from 'moment';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import { getSidesLabelShort } from 'utils/aliasHelper';
@@ -46,13 +47,20 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	const { create } = useContractStore();
 
 	const cloneContract = () => {
+		const depositEndMoment = moment().add(15, 'minutes');
+
+		// https://momentjs.com/docs/#/parsing/unix-timestamp-milliseconds/
+		const chainDataSettleAvailableFromAtMoment = moment(otcState.chainData.settleAvailableFromAt);
+		const chainDataDepositExpirationAtMoment = moment(otcState.chainData.depositExpirationAt);
+		const settleStartMoment = depositEndMoment.clone().add(chainDataSettleAvailableFromAtMoment.diff(chainDataDepositExpirationAtMoment));
+
 		create({
 			collateralMint: otcState.chainData.collateralMint.toBase58(),
 			longDepositAmount: otcState.chainData.buyerDepositAmount,
 			shortDepositAmount: otcState.chainData.sellerDepositAmount,
-			depositStart: otcState.chainData.depositAvailableFrom,
-			depositEnd: otcState.chainData.depositExpirationAt,
-			settleStart: otcState.chainData.settleAvailableFromAt,
+			depositStart: moment().add(-60, 'minutes').toDate().getTime(),
+			depositEnd: depositEndMoment.toDate().getTime(),
+			settleStart: settleStartMoment.toDate().getTime(),
 			aliasId: otcState.aliasId,
 			payoffOption: {
 				payoffId: otcState.chainData.redeemLogicAccount.state.payoffId,
