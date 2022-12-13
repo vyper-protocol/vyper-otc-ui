@@ -1,7 +1,7 @@
 import { SetStateAction, useState } from 'react';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack } from '@mui/material';
+import { Box, Stepper, Step, StepLabel, StepContent, Button, Switch, FormGroup, FormControlLabel, Typography, Stack, Alert } from '@mui/material';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import CollateralPicker from 'components/CollateralPicker';
 import { ExpiryPicker } from 'components/ExpiryPicker';
@@ -10,8 +10,9 @@ import ParamsPicker from 'components/ParamsPicker';
 import PayoffPicker from 'components/PayoffPicker';
 import PreviewModal from 'components/PreviewModal';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
-import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
+import { validateInitParams, getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import produce from 'immer';
+import _ from 'lodash';
 import { getPayoffFromAlias } from 'models/common';
 
 type StepElement = {
@@ -55,6 +56,8 @@ const CreateContractFlow = ({
 	const [expiryError, setExpiryError] = useState(false);
 	const [oracleError, setOracleError] = useState(false);
 	const [reserveError, setReserveError] = useState(false);
+
+	const initParamsErrors = validateInitParams(contractInitParams);
 
 	// TODO fill other errors
 
@@ -231,14 +234,22 @@ const CreateContractFlow = ({
 											Back
 										</Button>
 										{i === steps.length - 1 ? (
-											<Button
-												sx={{ mt: 1, mr: 1 }}
-												variant="contained"
-												disabled={!wallet.connected || openPreview || steps.some(({ error }) => error)}
-												onClick={handleOpenPreview}
-											>
-												{wallet.connected ? 'Preview' : 'Connect Wallet'}
-											</Button>
+											initParamsErrors.length === 0 ? (
+												<Button
+													sx={{ mt: 1, mr: 1 }}
+													variant="contained"
+													disabled={!wallet.connected || openPreview || steps.some(({ error }) => error)}
+													onClick={handleOpenPreview}
+												>
+													{wallet.connected ? 'Preview' : 'Connect Wallet'}
+												</Button>
+											) : (
+												initParamsErrors.map((err, errIdx) => (
+													<Alert key={errIdx} severity="error">
+														{_.capitalize(err)}
+													</Alert>
+												))
+											)
 										) : (
 											<Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }} disabled={step.error}>
 												Next
@@ -254,6 +265,7 @@ const CreateContractFlow = ({
 					</Step>
 				))}
 			</Stepper>
+
 			{process.env.NODE_ENV === 'development' && (
 				<Box>
 					<Button onClick={handleReset}>Reset</Button>
@@ -301,7 +313,12 @@ const CreateContractFlow = ({
 				open={openPreview}
 				handleClose={handleClosePreview}
 				actionProps={
-					<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={onCreateContractButtonClick}>
+					<LoadingButton
+						variant="contained"
+						loading={isLoading}
+						disabled={!wallet.connected && initParamsErrors.length !== 0}
+						onClick={onCreateContractButtonClick}
+					>
 						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
 					</LoadingButton>
 				}
