@@ -1,4 +1,4 @@
-import ExplorerContractDataGrid from 'components/organisms/ExplorerContractDataGrid';
+import ExplorerContractDataGrid from 'components/ExplorerContractDataGrid';
 import Layout from 'components/templates/Layout';
 
 const ExplorerPage = () => {

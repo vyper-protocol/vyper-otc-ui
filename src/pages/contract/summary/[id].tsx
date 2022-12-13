@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { useConnection } from '@solana/wallet-adapter-react';
-import OtcContractContainer from 'components/organisms/OtcContractContainer';
+import OtcContractContainer from 'components/OtcContractContainer';
 import Layout from 'components/templates/Layout';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';

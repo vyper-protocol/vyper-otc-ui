@@ -1,8 +1,8 @@
 import { ReactNode, useState } from 'react';
 
 import { Box } from '@mui/material';
-import SearchBar from 'components/molecules/SearchBar';
-import TopBar from 'components/organisms/TopBar';
+import SearchBar from 'components/SearchBar';
+import TopBar from 'components/TopBar';
 import { NextSeo } from 'next-seo';
 import Head from 'next/head';
 import Image, { StaticImageData } from 'next/image';
