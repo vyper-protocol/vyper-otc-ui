@@ -6,37 +6,26 @@ import NumericBadge from 'components/NumericBadge';
 import NumericField from 'components/NumericField';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';
-import { useRouter } from 'next/router';
+import { ChainOtcState } from 'models/ChainOtcState';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 import styles from './Simulator.module.scss';
 
-type SimulatorProps = {} & React.HTMLProps<HTMLDivElement>;
+type SimulatorProps = {
+	chainData: ChainOtcState;
+} & React.HTMLProps<HTMLDivElement>;
 
-const Simulator = ({ className, ref }: SimulatorProps) => {
-	const router = useRouter();
-	const { connection } = useConnection();
+const Simulator = ({ chainData, className, ref }: SimulatorProps) => {
 	const [prices, setPrices] = useState<number[]>(Array(10).fill(0));
 
-	const { id } = router.query;
-
-	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
-	const tokenSymbol = rateStateQuery?.data?.chainData.collateralTokenInfo?.symbol ?? '';
+	const tokenSymbol = chainData.collateralTokenInfo?.symbol ?? '';
 
 	const longPnl = formatWithDecimalDigits(
-		rateStateQuery?.data?.chainData.redeemLogicAccount?.state.getPnl(
-			prices,
-			rateStateQuery?.data?.chainData.buyerDepositAmount,
-			rateStateQuery?.data?.chainData.sellerDepositAmount
-		)[0],
+		chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[0],
 		4
 	);
 	const shortPnl = formatWithDecimalDigits(
-		rateStateQuery?.data?.chainData.redeemLogicAccount?.state.getPnl(
-			prices,
-			rateStateQuery?.data?.chainData.buyerDepositAmount,
-			rateStateQuery?.data?.chainData.sellerDepositAmount
-		)[1],
+		chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[1],
 		4
 	);
 
@@ -49,14 +38,14 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 	return (
 		<div className={cn(styles.wrapper, className)} ref={ref}>
 			<p className={styles.title}>Simulate your PnL</p>
-			{rateStateQuery?.data?.chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
+			{chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
 					<NumericField label={c} value={prices[i]} onChange={(newVal: number) => handleOnPriceChange(newVal.toString(), i)} />
 				</div>
 			))}
 
 			<div className={styles.margin}>
-				{rateStateQuery?.data?.chainData.redeemLogicAccount.state.pluginDetails.map((detail, index) => (
+				{chainData.redeemLogicAccount.state.pluginDetails.map((detail, index) => (
 					<div key={detail.label} className={cn(styles.flex, index % 2 && styles.row)}>
 						<p className={styles.bold}>{detail.label}</p>
 						<p className={styles.bold}>{typeof detail.value === 'number' ? formatWithDecimalDigits(detail.value) : detail.value}</p>
@@ -79,10 +68,10 @@ const Simulator = ({ className, ref }: SimulatorProps) => {
 
 			<p className={styles.note}>
 				This is the simulated PnL if{' '}
-				{rateStateQuery?.data.chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
+				{chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 					<span key={i}>
 						{c.toLowerCase()} gets to {prices[i]}
-						{i === rateStateQuery?.data.chainData.redeemLogicAccount.state.settlementPricesDescription.length - 1 ? '' : ', '}
+						{i === chainData.redeemLogicAccount.state.settlementPricesDescription.length - 1 ? '' : ', '}
 					</span>
 				))}
 			</p>

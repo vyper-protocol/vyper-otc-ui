@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Box, Stack, Autocomplete, TextField, Typography, CircularProgress } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import MessageAlert from 'components/MessageAlert';
@@ -12,6 +12,8 @@ import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
 import { getOracleByPubkey, getOracles, getOraclesByTitle } from 'utils/oracleDatasetHelper';
 import { getRateExplorer } from 'utils/oraclesExplorerHelper';
+
+import { PublicKeyPicker } from '../PublicKeyPicker';
 
 type OraclePickerInput = {
 	// label of the oracle
@@ -37,8 +39,6 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 
 	const [oracleDetail, setOracleDetail] = useState(getOracleByPubkey(rateAccount));
 	const [value, setValue] = useState('');
-
-	const [isLoading, setIsLoading] = useState(false);
 	const [isExternal, setIsExternal] = useState(false);
 
 	const handleOracleDetail = (oracle: OracleDetail) => {
@@ -56,8 +56,6 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 	}, [rateAccount]);
 
 	const handleInputChange = async (input: string) => {
-		setIsLoading(true);
-
 		const rate = getOracleByPubkey(input) || getOraclesByTitle(input, 'pyth') || getOraclesByTitle(input, 'switchboard');
 
 		if (rate) {
@@ -111,73 +109,22 @@ const OraclePicker = ({ rateLabel: renderInputTitle, options, rateAccount, setRa
 				setIsExternal(false);
 			}
 		}
-		setIsLoading(false);
 	};
 
 	return (
 		<Box>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
-				<Autocomplete
-					disabled={isLoading}
-					sx={{ width: 300, marginY: 2 }}
-					disableClearable
-					autoHighlight
-					selectOnFocus
-					clearOnBlur
-					handleHomeEndKeys
+				<PublicKeyPicker
+					title={renderInputTitle}
+					availableOptions={options.map((o) => ({
+						label: o.title,
+						pubkey: o.pubkey,
+						category: o.category,
+						type: o.type
+					}))}
+					onChange={handleInputChange}
 					freeSolo={currentCluster === 'devnet'}
 					value={value}
-					onInputChange={async (e, input: string, reason: string) => {
-						if (reason !== 'input') return;
-						if (currentCluster === 'devnet') {
-							await handleInputChange(input);
-						}
-					}}
-					options={_.sortBy(options, ['category'], ['asc']) as OracleDetail[]}
-					groupBy={(oracleOrPubkey: OracleDetail | string) => {
-						if (typeof oracleOrPubkey === 'object') {
-							return oracleOrPubkey.category ?? 'Other';
-						} else {
-							return 'Other';
-						}
-					}}
-					getOptionLabel={(oracleOrPubkey: OracleDetail | string) => {
-						if (typeof oracleOrPubkey === 'object') {
-							return oracleOrPubkey.title;
-						} else {
-							return oracleOrPubkey;
-						}
-					}}
-					onChange={async (e, oracleOrPubkey: OracleDetail | string) => {
-						if (typeof oracleOrPubkey === 'object') {
-							handleInputChange(oracleOrPubkey.title);
-						} else {
-							await handleInputChange(oracleOrPubkey);
-						}
-					}}
-					renderOption={(props, option: OracleDetail) => (
-						<Box component="li" {...props}>
-							<Typography align="left">{option.title}</Typography>
-							<Typography sx={{ color: 'grey', ml: 0.8, fontSize: '0.7em' }} align="right">
-								{option.type.toUpperCase()}
-							</Typography>
-						</Box>
-					)}
-					renderInput={(params) => (
-						<TextField
-							{...params}
-							label={renderInputTitle}
-							InputProps={{
-								...params.InputProps,
-								endAdornment: (
-									<div>
-										{isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-										{params.InputProps.endAdornment}
-									</div>
-								)
-							}}
-						/>
-					)}
 				/>
 				{/* TODO: abstract Link component and disable it on rateError */}
 				<a href={oracleDetail.explorerUrl} target="_blank" rel="noopener noreferrer">

@@ -1,5 +1,5 @@
-import { Address } from '@project-serum/anchor';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Address, translateAddress } from '@project-serum/anchor';
+import { Connection } from '@solana/web3.js';
 import { fetchContract } from 'controllers/fetchContract';
 import { OtcContract } from 'models/OtcContract';
 import { useQuery, UseQueryResult } from 'react-query';
@@ -14,7 +14,7 @@ export const useGetFetchOTCStateQuery = (connection: Connection, otcState: Addre
 	return useQuery<OtcContract>(
 		['otc-state', otcState, connection.rpcEndpoint],
 		() => {
-			if (otcState !== undefined) return fetchContract(connection, new PublicKey(otcState));
+			if (otcState !== undefined) return fetchContract(connection, translateAddress(otcState));
 		},
 		{
 			// 5min

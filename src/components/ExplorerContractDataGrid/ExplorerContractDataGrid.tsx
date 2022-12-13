@@ -1,19 +1,22 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import {
-	DataGrid,
+	DataGridPro,
 	GridColumns,
 	GridRowParams,
 	GridRenderCellParams,
 	GridActionsCellItem,
 	GridFilterModel,
 	GridSortModel,
-	getGridStringOperators,
-	getGridSingleSelectOperators
-} from '@mui/x-data-grid';
-import { useConnection } from '@solana/wallet-adapter-react';
+	GridLinkOperator,
+	GridToolbarColumnsButton,
+	GridToolbarFilterButton,
+	GridToolbarExport,
+	GridToolbarQuickFilter
+} from '@mui/x-data-grid-pro';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
@@ -21,16 +24,6 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import PublicKeyLink from 'components/PublicKeyLink';
 import StatusBadge from 'components/StatusBadge';
 import fetchContracts from 'controllers/fetchContracts';
-import {
-	cleanParams,
-	FetchContractsParams,
-	fromFilterModel,
-	fromSortModel,
-	QueryParams,
-	toFilterModel,
-	toSortModel,
-	transformParams
-} from 'controllers/fetchContracts/FetchContractsParams';
 import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/ChainOtcState';
 import { AVAILABLE_PAYOFF_TYPE_IDS, PayoffTypeIds } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
@@ -38,94 +31,169 @@ import { Digital } from 'models/plugins/payoff/Digital';
 import { Forward } from 'models/plugins/payoff/Forward';
 import { SettledForward } from 'models/plugins/payoff/SettledForward';
 import { VanillaOption } from 'models/plugins/payoff/VanillaOption';
-import { useRouter } from 'next/router';
+import useExplorerParamsStore from 'store/useExplorerParamsStore';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
+import OtcContractContainer from '../OtcContractContainer';
 
-// @ts-ignore
-BigInt.prototype.toJSON = function () {
-	return this.toString();
+// import dynamic from 'next/dynamic';
+// const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
+
+const EMPTY_FILTER_MODEL: GridFilterModel = {
+	items: []
 };
-
-type Props = {
-	query: QueryParams;
-	count: number;
+const ACTIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
+	items: [
+		{
+			id: 0,
+			columnField: 'contractStatus',
+			operatorValue: 'is',
+			value: 'active'
+		}
+	]
 };
+const CREATED_AT_SORT_MODEL: GridSortModel = [{ field: 'createdAt', sort: 'desc' }];
 
-const ExplorerContractDataGrid = ({ query, count }: Props) => {
-	const { page, limit, sort, filter } = query;
+const ExplorerContractDataGrid = () => {
+	const {
+		filterModel: storageFilterModel,
+		sortModel: storageSortModel,
+		setFilterModel: setStorageFilterModel,
+		setSortModel: setStorageSortModel
+	} = useExplorerParamsStore();
+	const wallet = useWallet();
 
-	const { connection } = useConnection();
-	const router = useRouter();
-
-	const [contractsLoading, setContractsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const [contracts, setContracts] = useState<DbOtcState[]>([]);
-
-	const [explorerPage, setExplorerPage] = useState(page || 1);
-	const [explorerLimit, setExplorerLimit] = useState(limit || 25);
-	const [filterModel, setFilterModel] = useState<GridFilterModel | null>(filter ? toFilterModel(filter) : null);
-	const [sortModel, setSortModel] = useState<GridSortModel | null>(sort ? toSortModel(sort) : null);
-
-	const explorerPageRef = useRef(true);
-	const explorerStateRef = useRef(true);
-
-	const updateQueryParams = useCallback(() => {
-		const updatedQueryParams = transformParams({
-			filter: fromFilterModel(filterModel),
-			sort: fromSortModel(sortModel),
-			page: explorerPage,
-			limit: explorerLimit
-		});
-		const updatedQuery = cleanParams(updatedQueryParams);
-
-		router.push({
-			pathname: '/explorer',
-			query: updatedQuery
-		});
-	}, [router, explorerPage, explorerLimit, filterModel, sortModel]);
+	const [filterModel, setFilterModel] = useState<GridFilterModel>(ACTIVE_CONTRACTS_FILTER_MODEL);
+	const [sortModel, setSortModel] = useState<GridSortModel>(CREATED_AT_SORT_MODEL);
 
 	useEffect(() => {
-		setContractsLoading(true);
-		setContracts([]);
-
-		const fetchContractsParams = FetchContractsParams.build(getCurrentCluster(), query);
-		fetchContracts(fetchContractsParams)
-			.then((c) => setContracts(c))
-			.finally(() => setContractsLoading(false));
-	}, [connection, query]);
+		if (storageFilterModel) setFilterModel(storageFilterModel);
+		if (storageSortModel) setSortModel(storageSortModel);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	useEffect(() => {
-		if (explorerPageRef.current) {
-			explorerPageRef.current = false;
-			return;
-		}
-
-		// When explorer page is updated, update the query params
-		updateQueryParams();
-		// eslint-disable-next-line
-	}, [explorerPage]);
+		setStorageFilterModel(filterModel);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [filterModel]);
 
 	useEffect(() => {
-		if (explorerStateRef.current) {
-			explorerStateRef.current = false;
-			return;
-		}
+		setStorageSortModel(sortModel);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sortModel]);
 
-		setExplorerPage((prevPage) => {
-			if (prevPage === 1) {
-				updateQueryParams();
-			}
+	useEffect(() => {
+		// HARD CONTRACT SYNC, USE WITH CARE
+		// const syncAllContracts = async (input: DbOtcState[]) => {
+		// 	for (let i = 0; i < input.length; i++) {
+		// 		const cc = input[i];
+		// 		const chainOtcState = await fetchChainOtcStateFromDbInfo(connection, cc);
+		// 		syncContractFromChain(chainOtcState);
+		// 		await sleep(50);
+		// 		console.log(`SYNC ALL CONTRACTS PROGRESS: ${i} / ${input.length} => ${formatWithDecimalDigits((100 * i) / input.length, 2)}%`);
+		// 	}
+		// };
 
-			return 1;
-		});
-		// eslint-disable-next-line
-	}, [explorerLimit, sortModel]);
+		setIsLoading(true);
+		fetchContracts()
+			.then((c) => {
+				setContracts(c);
+				// syncAllContracts(c);
+			})
+			.finally(() => setIsLoading(false));
+	}, []);
+
+	const GridHeader = () => {
+		return (
+			<Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={2}>
+				{/* <GridToolbarContainer> */}
+				<Button
+					onClick={() => {
+						setFilterModel(EMPTY_FILTER_MODEL);
+						setSortModel(CREATED_AT_SORT_MODEL);
+					}}
+				>
+					All Contracts
+				</Button>
+				<Button
+					onClick={() => {
+						setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
+						setSortModel(CREATED_AT_SORT_MODEL);
+					}}
+				>
+					Active Contracts
+				</Button>
+				<Button
+					disabled={!wallet.connected}
+					onClick={() => {
+						setFilterModel({
+							items: [
+								{
+									id: 0,
+									columnField: 'dynamicData.buyerWallet',
+									operatorValue: 'equals',
+									value: wallet.publicKey.toBase58()
+								},
+								{
+									id: 1,
+									columnField: 'dynamicData.sellerWallet',
+									operatorValue: 'equals',
+									value: wallet.publicKey.toBase58()
+								}
+							],
+							linkOperator: GridLinkOperator.Or
+						});
+						setSortModel(CREATED_AT_SORT_MODEL);
+					}}
+				>
+					my contracts
+				</Button>
+
+				<GridToolbarColumnsButton
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
+				/>
+				<GridToolbarFilterButton
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
+				/>
+				<GridToolbarExport />
+				<GridToolbarQuickFilter />
+				{/* </GridToolbarContainer> */}
+
+				{/* <GridToolbar showQuickFilter /> */}
+			</Stack>
+		);
+	};
 
 	const columns: GridColumns<DbOtcState> = [
 		{
+			field: 'publickey',
+			headerName: 'Public Key',
+			sortable: true,
+			filterable: true,
+			flex: 1,
+			minWidth: 50,
+			renderCell: (params) => {
+				return <PublicKeyLink address={params.row.publickey.toBase58()} />;
+			}
+		},
+		{
 			type: 'singleSelect',
-			field: 'redeemLogicState.typeId',
+			field: 'redeemLogicAccount.state.payoffId',
 			headerName: 'Instrument',
 			flex: 1,
 			minWidth: 150,
@@ -134,13 +202,12 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: true,
 			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
 			valueGetter: (params) => {
-				return (params.row as DbOtcState).redeemLogicAccount.state.payoffId;
-			},
-			filterOperators: getGridSingleSelectOperators().filter((op) => op.value === 'isAnyOf')
+				return params.row.redeemLogicAccount.state.payoffId;
+			}
 		},
 		{
 			type: 'string',
-			field: 'underlying',
+			field: 'dynamicData.title',
 			headerName: 'Underlying',
 			flex: 1,
 			minWidth: 150,
@@ -148,12 +215,11 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			filterable: true,
 			valueGetter: (params) => {
 				return params.row.dynamicData?.title ?? 'NA';
-			},
-			filterOperators: getGridStringOperators().filter((op) => op.value === 'equals')
+			}
 		},
 		{
 			type: 'number',
-			field: 'redeemLogicState.notional',
+			field: 'redeemLogicAccount.state.notional',
 			headerName: 'Size',
 			flex: 1,
 			minWidth: 100,
@@ -177,7 +243,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		},
 		{
 			type: 'number',
-			field: 'redeemLogicState.strike',
+			field: 'redeemLogicAccount.state.strike',
 			headerName: 'Strike',
 			flex: 1,
 			minWidth: 100,
@@ -201,7 +267,7 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 		},
 		{
 			type: 'number',
-			field: 'rateState.aggregatorLastValue',
+			field: 'rateAccount.state.aggregatorLastValue',
 			headerName: 'Current Price',
 			sortable: false,
 			filterable: false,
@@ -215,9 +281,9 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			minWidth: 125
 		},
 		{
-			field: 'settleAvailableFromAt',
+			field: 'createdAt',
 			type: 'dateTime',
-			headerName: 'Expiry',
+			headerName: 'Created at',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			sortable: true,
 			filterable: true,
@@ -225,9 +291,29 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			minWidth: 100
 		},
 		{
-			field: 'createdAt',
+			field: 'depositAvailableFrom',
 			type: 'dateTime',
-			headerName: 'Created at',
+			headerName: 'Deposit start',
+			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			sortable: true,
+			filterable: true,
+			flex: 1,
+			minWidth: 100
+		},
+		{
+			field: 'depositExpirationAt',
+			type: 'dateTime',
+			headerName: 'Deposit close',
+			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			sortable: true,
+			filterable: true,
+			flex: 1,
+			minWidth: 100
+		},
+		{
+			field: 'settleAvailableFromAt',
+			type: 'dateTime',
+			headerName: 'Expiry',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			sortable: true,
 			filterable: true,
@@ -259,30 +345,34 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			}
 		},
 		{
-			field: 'buyerWallet',
+			field: 'dynamicData.buyerWallet',
 			headerName: 'Buyer wallet',
 			sortable: true,
 			filterable: true,
 			flex: 1,
 			minWidth: 50,
-			renderCell: (params) => {
-				if (!params.row.dynamicData?.buyerWallet) return <></>;
-				return <PublicKeyLink address={params.row.dynamicData?.buyerWallet} />;
+			valueGetter: (params) => {
+				return params.row.dynamicData?.buyerWallet;
 			},
-			filterOperators: getGridStringOperators().filter((op) => op.value === 'equals' || op.value === 'isAnyOf')
+			renderCell: (params) => {
+				if (!params.value) return <></>;
+				return <PublicKeyLink address={params.value} />;
+			}
 		},
 		{
-			field: 'sellerWallet',
+			field: 'dynamicData.sellerWallet',
 			headerName: 'Seller wallet',
 			sortable: true,
 			filterable: true,
 			flex: 1,
 			minWidth: 50,
-			renderCell: (params) => {
-				if (!params.row.dynamicData?.sellerWallet) return <></>;
-				return <PublicKeyLink address={params.row.dynamicData?.sellerWallet} />;
+			valueGetter: (params) => {
+				return params.row.dynamicData?.sellerWallet;
 			},
-			filterOperators: getGridStringOperators().filter((op) => op.value === 'equals' || op.value === 'isAnyOf')
+			renderCell: (params) => {
+				if (!params.value) return <></>;
+				return <PublicKeyLink address={params.value} />;
+			}
 		},
 		{
 			type: 'singleSelect',
@@ -291,8 +381,8 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 			headerName: 'Status',
 			flex: 1,
 			minWidth: 100,
-			sortable: false,
-			filterable: false,
+			sortable: true,
+			filterable: true,
 			renderCell: (params) => {
 				return <ContractStatusBadge status={params.row.contractStatus} />;
 			}
@@ -308,6 +398,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 					icon={<OpenInNewIcon />}
 					onClick={() => window.open(window.location.origin + UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
 					label="Open"
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
 				/>,
 				<GridActionsCellItem
 					key="open_in_explorer"
@@ -315,6 +412,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: getCurrentCluster() }))}
 					label="Open in Explorer"
 					showInMenu
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
 				/>,
 				<GridActionsCellItem
 					key="open_in_solscan"
@@ -322,6 +426,13 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: getCurrentCluster() }))}
 					label="Open in Solscan"
 					showInMenu
+					nonce=""
+					onResize={() => {
+						//
+					}}
+					onResizeCapture={() => {
+						//
+					}}
 				/>
 			]
 		}
@@ -329,39 +440,41 @@ const ExplorerContractDataGrid = ({ query, count }: Props) => {
 
 	return (
 		<>
-			{contractsLoading ? (
-				<CircularProgress />
-			) : (
-				<Box sx={{ maxWidth: 1600, width: '90%' }}>
-					<DataGrid
-						pagination
-						autoHeight
-						paginationMode="server"
-						filterMode="server"
-						sortingMode="server"
-						page={explorerPage - 1}
-						pageSize={explorerLimit}
-						getRowId={(row) => row.publickey.toBase58()}
-						rows={contracts}
-						rowCount={count}
-						columns={columns}
-						filterModel={filterModel}
-						sortModel={sortModel}
-						// Material UI page starts from 0
-						onPreferencePanelClose={() => {
-							if (explorerPage === 1) {
-								updateQueryParams();
-							} else {
-								setExplorerPage(1);
+			{/* <Stack direction="row" padding={5}>
+				<DynamicReactJson src={filterModel} name="filterModel" />
+				<DynamicReactJson src={sortModel} name="sortModel" />
+			</Stack> */}
+			<Box sx={{ maxWidth: 1600, width: '90%' }}>
+				<DataGridPro
+					pagination
+					autoHeight
+					loading={isLoading}
+					getRowId={(row) => row.publickey.toBase58()}
+					rows={contracts}
+					rowsPerPageOptions={[5, 25, 50, 100]}
+					pageSize={25}
+					columns={columns}
+					filterModel={filterModel}
+					sortModel={sortModel}
+					onFilterModelChange={(v) => setFilterModel(v)}
+					onSortModelChange={(v) => setSortModel(v)}
+					components={{
+						Toolbar: GridHeader
+					}}
+					density="compact"
+					initialState={{
+						columns: {
+							columnVisibilityModel: {
+								publickey: false,
+								depositAvailableFrom: false,
+								depositExpirationAt: false
 							}
-						}}
-						onPageChange={(newPage) => setExplorerPage(newPage + 1)}
-						onPageSizeChange={(newLimit) => setExplorerLimit(newLimit)}
-						onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
-						onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
-					/>
-				</Box>
-			)}
+						}
+					}}
+					getDetailPanelContent={({ row }) => <OtcContractContainer pubkey={row.publickey.toBase58()} />}
+					getDetailPanelHeight={() => 600}
+				/>
+			</Box>
 		</>
 	);
 };

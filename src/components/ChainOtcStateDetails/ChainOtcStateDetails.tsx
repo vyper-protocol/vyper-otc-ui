@@ -309,7 +309,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 				</div>
 			</div>
 			<Collapse in={showSimulator} orientation={'horizontal'}>
-				<Simulator className={styles.simulator} />
+				<Simulator className={styles.simulator} chainData={otcState.chainData} />
 			</Collapse>
 		</div>
 	);
