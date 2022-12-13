@@ -55,3 +55,6 @@ out
 
 # Storybook
 storybook-static
+
+robots.txt
+sitemap*.xml
