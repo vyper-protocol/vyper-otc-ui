@@ -24,7 +24,7 @@
 		"@mui/icons-material": "^5.10.6",
 		"@mui/lab": "^5.0.0-alpha.108",
 		"@mui/material": "^5.10.11",
-		"@mui/x-data-grid": "^5.17.6",
+		"@mui/x-data-grid-pro": "^5.17.14",
 		"@mui/x-date-pickers": "^5.0.4",
 		"@next/bundle-analyzer": "^12.3.1",
 		"@project-serum/anchor": "0.24.2",

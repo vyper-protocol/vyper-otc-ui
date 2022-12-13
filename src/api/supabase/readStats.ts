@@ -1,4 +1,5 @@
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { AVAILABLE_PAYOFF_TYPE_IDS, AVAILABLE_RATE_TYPE_IDS } from 'models/common';
 
 import { CONTRACTS_DYNAMIC_DATA_TABLE_NAME, CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
@@ -11,7 +12,12 @@ export type ContractsStats = {
 };
 
 export const readStats = async (): Promise<ContractsStats> => {
-	const { count: numberOfContracts } = await supabase.from(CONTRACTS_TABLE_NAME).select('*', { count: 'exact', head: true }).eq('cluster', getCurrentCluster());
+	const { count: numberOfContracts } = await supabase
+		.from(CONTRACTS_TABLE_NAME)
+		.select('*', { count: 'exact', head: true })
+		.eq('cluster', getCurrentCluster())
+		.in('redeem_logic_plugin_type', AVAILABLE_PAYOFF_TYPE_IDS as any)
+		.in('rate_plugin_type', AVAILABLE_RATE_TYPE_IDS as any);
 
 	const now = new Date().toISOString();
 	const { count: depositOpenContracts } = await supabase
