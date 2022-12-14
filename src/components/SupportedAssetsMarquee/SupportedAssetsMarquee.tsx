@@ -4,6 +4,7 @@ import { Box } from '@mui/system';
 import { getTokenMetadata as getCoingeckoTokenMetadata } from 'api/coingecko/getTokenMetadata';
 import { fetchTokenInfoBySymbolCached } from 'api/next-api/fetchTokenInfo';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+import _ from 'lodash';
 import { OracleDetail } from 'models/OracleDetail';
 import Marquee from 'react-fast-marquee';
 import { useQuery } from 'react-query';
@@ -19,7 +20,7 @@ type OracleMarqueeCardProps = {
 const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 	const {
 		pricesValue: [priceValue],
-		isInitialized
+		isInitialized: isPriceInitialized
 	} = useOracleLivePrice(oracle.type, [oracle.pubkey]);
 
 	const logoURIQuery = useQuery<string>(
@@ -46,6 +47,9 @@ const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 	return (
 		<Box className={styles.oracle_marquee_card}>
 			<Stack justifyContent="center" direction="row" spacing={2}>
+				{(logoURIQuery.isFetching || logoURIQuery.isLoading) && (
+					<Box className={styles.coin} component="img" src="/assets/images/vyper-logo_512.png" alt={oracle.title} />
+				)}
 				{logoURIQuery?.data && <Box className={styles.coin} component="img" src={logoURIQuery?.data} alt={oracle.title} />}
 				<div>
 					<a href={oracle.explorerUrl} target="_blank" rel="noreferrer">
@@ -53,19 +57,19 @@ const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 					</a>
 				</div>
 
-				<div>{isInitialized && formatWithDecimalDigits(priceValue)}</div>
+				{isPriceInitialized && <div>{formatWithDecimalDigits(priceValue)}</div>}
 			</Stack>
 		</Box>
 	);
 };
 
 const SupportedAssetsMarquee = () => {
-	const oracles = getOracles();
+	const oracles = _.shuffle(getOracles());
 
 	return (
 		<Marquee pauseOnHover>
-			{oracles.map((oracle, idx) => (
-				<OracleMarqueeCard key={idx} oracle={oracle} />
+			{oracles.map((oracle) => (
+				<OracleMarqueeCard key={oracle.pubkey} oracle={oracle} />
 			))}
 		</Marquee>
 	);
