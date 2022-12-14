@@ -1,17 +1,10 @@
 /* eslint-disable no-console */
-import LinkIcon from '@mui/icons-material/Link';
-import { IconButton, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { getTokenMetadata as getCoingeckoTokenMetadata } from 'api/coingecko/getTokenMetadata';
 import { fetchTokenInfoBySymbolCached } from 'api/next-api/fetchTokenInfo';
-import axios from 'axios';
-import CoinBadge from 'components/CoinBadge';
-import TokenSymbol from 'components/TokenSymbol';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
-import _ from 'lodash';
 import { OracleDetail } from 'models/OracleDetail';
-import { TokenInfo } from 'models/TokenInfo';
-import { useEffect, useState } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useQuery } from 'react-query';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
@@ -32,21 +25,15 @@ const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 	const logoURIQuery = useQuery<string>(
 		['logo-uri', oracle.baseCurrency],
 		async () => {
+			console.log('triggered coin asset fetching for ', oracle.baseCurrency);
 			const localRes = await fetchTokenInfoBySymbolCached(oracle.baseCurrency);
-			console.log('local result: ', localRes);
-
-			if (localRes) {
-				return localRes.logoURI;
-			}
+			if (localRes) return localRes.logoURI;
 			const coingeckoRes = await getCoingeckoTokenMetadata(oracle.baseCurrency);
-			console.log('coingecko result: ', coingeckoRes);
-			if (coingeckoRes?.image?.small) {
-				return coingeckoRes.image.small;
-			}
+			if (coingeckoRes?.image?.small) return coingeckoRes.image.small;
 		},
 		{
-			// 20min
-			cacheTime: 20 * 60 * 1000,
+			// 7d
+			cacheTime: 7 * 24 * 60 * 60 * 1000,
 			refetchOnWindowFocus: false,
 			refetchOnMount: false,
 			refetchOnReconnect: false,
@@ -60,13 +47,13 @@ const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 		<Box className={styles.oracle_marquee_card}>
 			<Stack justifyContent="center" direction="row" spacing={2}>
 				{logoURIQuery?.data && <Box className={styles.coin} component="img" src={logoURIQuery?.data} alt={oracle.title} />}
-				<div className={styles.title}>
+				<div>
 					<a href={oracle.explorerUrl} target="_blank" rel="noreferrer">
 						{oracle.title}
 					</a>
 				</div>
 
-				<div className={styles.price}>{isInitialized && formatWithDecimalDigits(priceValue)}</div>
+				<div>{isInitialized && formatWithDecimalDigits(priceValue)}</div>
 			</Stack>
 		</Box>
 	);
