@@ -1,0 +1,31 @@
+.oracle_marquee_card {
+	margin: 5px;
+	max-width: 250px;
+
+	padding: 5px;
+	border: 2px solid var(--color-primary);
+	border-radius: 5px;
+	font-family: monospace;
+
+	.type {
+		font-size: 0.7rem;
+		font-weight: 600;
+		// font-family: monospace;
+	}
+
+	.title {
+		// font-size: 1.3rem;
+		// font-weight: 600;
+		// font-family: monospace;
+	}
+
+	.price {
+	}
+
+	.coin {
+		margin-left: var(--space-4);
+		border-radius: var(--border-radius-extend);
+		width: 18px;
+		height: 18px;
+	}
+}
