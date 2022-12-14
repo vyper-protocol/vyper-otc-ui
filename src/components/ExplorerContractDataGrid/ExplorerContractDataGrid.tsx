@@ -471,6 +471,7 @@ const ExplorerContractDataGrid = () => {
 							}
 						}
 					}}
+					isRowSelectable={(node: GridRowParams<DbOtcState>) => false}
 					getDetailPanelContent={({ row }) => <OtcContractContainer pubkey={row.publickey.toBase58()} />}
 					getDetailPanelHeight={() => 600}
 				/>
