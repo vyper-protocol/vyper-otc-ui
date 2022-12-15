@@ -49,7 +49,7 @@ export function getNextFriday(utcHour: number) {
 }
 
 export function getLastFridayOfMonth(utcHour: number) {
-	const thisMonthEnd = getUtcNextMonth(utcHour, true);
+	const thisMonthEnd = getUtcNextMonth(utcHour);
 	const thisMonthFridayEnd = moveToDayOfWeek(thisMonthEnd, 5, -1);
 
 	const nextMonthEnd = getUtcNextMonth(utcHour, true);
