@@ -67,8 +67,8 @@ const createContract = async (
 		}
 
 		if (fundSide) {
-			const buySideTxs = await deposit(provider, otcPublicKey, fundSide === 'long');
-			await txHandler.handleTxs([buySideTxs], 2, 3);
+			const fundSideTxs = await deposit(provider, otcPublicKey, fundSide === 'long');
+			await txHandler.handleTxs([fundSideTxs], 2, 3);
 		}
 
 		if (initParams.sendNotification) {
