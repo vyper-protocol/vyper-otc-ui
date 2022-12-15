@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 import { Box, Typography, Popover } from '@mui/material';
 import cn from 'classnames';
 import AirdropButton from 'components/AirdropButton';
@@ -27,12 +28,18 @@ const TopBar = () => {
 	const pathname = router.pathname;
 	const cluster = getCurrentCluster();
 	const [socialsMenuAnchor, setSocialsMenuAnchor] = useState();
+	const [featuredMenuAnchor, setFeaturedMenuAnchor] = useState();
 	const [mobileMenuAnchor, setMobileMenuAnchor] = useState();
 	const showSocialsMenu = !!socialsMenuAnchor;
+	const showFeaturedMenu = !!featuredMenuAnchor;
 	const showMobileMenu = !!mobileMenuAnchor;
 
 	const openSocialsMenu = (event) => setSocialsMenuAnchor(event.currentTarget);
 	const closeSocialsMenu = () => setSocialsMenuAnchor(undefined);
+
+	const openFeaturedMenu = (event) => setFeaturedMenuAnchor(event.currentTarget);
+	const closeFeaturedMenu = () => setFeaturedMenuAnchor(undefined);
+
 	const openMobileMenu = (event) => setMobileMenuAnchor(event.currentTarget);
 	const closeMobileMenu = () => setMobileMenuAnchor(undefined);
 
@@ -41,6 +48,19 @@ const TopBar = () => {
 		{ href: ['/contract/create'], current: false },
 		{ href: ['/explorer'], current: false }
 	]);
+
+	const featured = [
+		{
+			id: 'sbf-to-jail',
+			name: 'SBF TO JAIL',
+			icon: 'GiImprisoned'
+		},
+		{
+			id: 'sol-10x',
+			name: 'SOL 10x',
+			icon: 'IoIosRocket'
+		}
+	];
 
 	const menuItems = (
 		<>
@@ -52,6 +72,34 @@ const TopBar = () => {
 					</a>
 				</Link>
 			</div>
+
+			{/* FEATURED */}
+			<div className={showFeaturedMenu ? cn(styles.item, styles.active) : cn(styles.item)} onClick={openFeaturedMenu}>
+				<EmojiObjectsIcon /> Featured <BiChevronDown size="20px" />
+			</div>
+			<Popover
+				open={showFeaturedMenu}
+				anchorEl={featuredMenuAnchor}
+				anchorOrigin={{
+					horizontal: 'left',
+					vertical: 'bottom'
+				}}
+				PaperProps={{
+					className: styles.popover
+				}}
+				onClose={closeFeaturedMenu}
+			>
+				<Box className={styles.container}>
+					{featured.map((item, i) => {
+						return (
+							<a key={i} className={styles.item} href={UrlBuilder.buildFeaturedUrl(item.id)}>
+								<Icon name={item.icon as AvailableIconNames} />
+								<Typography className={styles.typography}>{item.name}</Typography>
+							</a>
+						);
+					})}
+				</Box>
+			</Popover>
 
 			{/* CREATE CONTRACT LINK */}
 			<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>
@@ -73,9 +121,7 @@ const TopBar = () => {
 
 			{/* SOCIALS */}
 			<div className={styles.item} onClick={openSocialsMenu}>
-				<Typography className={styles.typography}>
-					<RiLayoutGridFill size="20px" /> More <BiChevronDown size="20px" />
-				</Typography>
+				<RiLayoutGridFill size="20px" /> More <BiChevronDown size="20px" />
 			</div>
 			<Popover
 				open={showSocialsMenu}

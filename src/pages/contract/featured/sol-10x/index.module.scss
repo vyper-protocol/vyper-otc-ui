@@ -1,0 +1,25 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	.description {
+		color: var(--color-black);
+		font-size: 16px;
+	}
+
+	.profit {
+		font-weight: 700;
+		color: green;
+	}
+
+	.loss {
+		font-weight: 700;
+		color: red;
+	}
+
+	.highlight {
+		font-weight: 700;
+		color: black;
+	}
+}
