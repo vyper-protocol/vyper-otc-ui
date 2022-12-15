@@ -78,12 +78,12 @@ const CreateContractPage = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onCreateContractButtonClick = async (buySide?: 'long' | 'short') => {
+	const onCreateContractButtonClick = async (fundSide?: 'long' | 'short') => {
 		try {
 			setIsLoading(true);
 
 			// create contract
-			const otcPublicKey = await createContract(provider, txHandler, initParams, buySide);
+			const otcPublicKey = await createContract(provider, txHandler, initParams, fundSide);
 
 			// Create contract URL
 			router.push(UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));

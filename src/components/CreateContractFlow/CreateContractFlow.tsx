@@ -33,7 +33,7 @@ type CreateContractFlowInput = {
 	isLoading: boolean;
 
 	// on-chain contract create callback
-	onCreateContractButtonClick: (buySide?: 'long' | 'short') => Promise<void>;
+	onCreateContractButtonClick: (fundSide?: 'long' | 'short') => Promise<void>;
 
 	initialStep?: number;
 };

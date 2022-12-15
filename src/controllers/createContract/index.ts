@@ -22,7 +22,7 @@ const createContract = async (
 	provider: AnchorProvider,
 	txHandler: TxHandler,
 	initParams: OtcInitializationParams,
-	buySide?: 'long' | 'short'
+	fundSide?: 'long' | 'short'
 ): Promise<PublicKey> => {
 	console.group('CONTROLLER: create contract');
 	console.log('create txs');
@@ -30,7 +30,7 @@ const createContract = async (
 	console.log('otcPublicKey: ' + otcPublicKey);
 
 	console.log('submit txs');
-	if (buySide) await txHandler.handleTxs(txs, 0, 3);
+	if (fundSide) await txHandler.handleTxs(txs, 0, 3);
 	else await txHandler.handleTxs(txs);
 
 	try {
@@ -66,8 +66,8 @@ const createContract = async (
 			}
 		}
 
-		if (buySide) {
-			const buySideTxs = await deposit(provider, otcPublicKey, buySide === 'long');
+		if (fundSide) {
+			const buySideTxs = await deposit(provider, otcPublicKey, fundSide === 'long');
 			await txHandler.handleTxs([buySideTxs], 2, 3);
 		}
 
