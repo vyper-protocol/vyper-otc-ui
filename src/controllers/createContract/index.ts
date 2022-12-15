@@ -2,12 +2,15 @@
 import { AnchorProvider } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
+import { deposit } from 'api/otc-state/deposit';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
 import { buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
 import { fetchContract } from 'controllers/fetchContract';
+import { fundContract } from 'controllers/fundContract';
 import { ChainOtcState } from 'models/ChainOtcState';
+import { sleep } from 'utils/sleep';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import { OtcInitializationParams } from './OtcInitializationParams';
@@ -15,14 +18,20 @@ import { OtcInitializationParams } from './OtcInitializationParams';
 const MAX_RETRIES = 30;
 const RETRY_TIMEOUT = 1000;
 
-const createContract = async (provider: AnchorProvider, txHandler: TxHandler, initParams: OtcInitializationParams): Promise<PublicKey> => {
+const createContract = async (
+	provider: AnchorProvider,
+	txHandler: TxHandler,
+	initParams: OtcInitializationParams,
+	buySide?: 'long' | 'short'
+): Promise<PublicKey> => {
 	console.group('CONTROLLER: create contract');
 	console.log('create txs');
 	const [txs, otcPublicKey] = await create(provider, initParams);
 	console.log('otcPublicKey: ' + otcPublicKey);
 
 	console.log('submit txs');
-	await txHandler.handleTxs(...txs);
+	if (buySide) await txHandler.handleTxs(txs, 0, 3);
+	else await txHandler.handleTxs(txs);
 
 	try {
 		const cluster = getCurrentCluster();
@@ -57,6 +66,11 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 			}
 		}
 
+		if (buySide) {
+			const buySideTxs = await deposit(provider, otcPublicKey, buySide === 'long');
+			await txHandler.handleTxs([buySideTxs], 2, 3);
+		}
+
 		if (initParams.sendNotification) {
 			const contractURL = UrlBuilder.buildFullUrl(cluster, UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
 			const notification = buildCreateContractMessage(initParams, cluster, contractURL);
@@ -72,7 +86,3 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 };
 
 export default createContract;
-
-const sleep = (milliseconds) => {
-	return new Promise((resolve) => setTimeout(resolve, milliseconds));
-};
