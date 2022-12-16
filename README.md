@@ -41,6 +41,12 @@ Create an optmized build
 yarn build
 ```
 
+Run tests
+
+```bash
+yarn test
+```
+
 ### NPM Scripts
 
 | Script          | Use                                                                                             |
@@ -55,18 +61,15 @@ yarn build
 | prepare         | Husky install                                                                                   |
 | storybook       | Starts the storybook development server                                                         |
 | build-storybook | Creates the storybook production build                                                          |
+| test            | Run testing suite                                                                               |
 
 ### Next.js
 
 This projects uses **Next.js**. You can check further info regarding the [Next.js Docs here](https://nextjs.org/docs/getting-started)
 
-### Design principle
+### Writing tests
 
-This project is using the `Atomic Design Methodology`. Atomic design thinks of basic fundamental components as **atoms** (like a Button). Those atomic units bond together to form **molecules** (like an InputForm), which in turn combine into more complex **organisms** to ultimately create bigger structures (like a Card).
-
-Then we also have **templates**, which are, like the names implies, generic layouts for our components. And last but not least **pages**, which are templates with real content inside.
-
-In our case the section **pages**, has being moved outside of the `components` folder, because in Next.js, a page lives inside the `pages` directory and is associated with a `route` based on its file name.
+This project uses `jest` for testing. Add a test file `.test.ts` in the same directory. For example `foo.test.ts` for tests of `foo.ts`
 
 ### Styles & CSS
 

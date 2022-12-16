@@ -147,9 +147,11 @@ const TopBar = () => {
 				</Box>
 			</Popover>
 
-			<div className={cn(styles.item, cluster !== 'devnet' && styles.hidden)}>
-				<AirdropButton />
-			</div>
+			{cluster === 'devnet' && (
+				<div className={styles.item}>
+					<AirdropButton />
+				</div>
+			)}
 		</>
 	);
 
