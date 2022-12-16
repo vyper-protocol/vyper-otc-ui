@@ -14,7 +14,7 @@ import { getCurrentCluster } from './OtcConnectionProvider';
 
 export type TxHandler = {
 	// eslint-disable-next-line no-unused-vars
-	handleTxs: (...txs: TxPackage[]) => Promise<void>;
+	handleTxs: (txs: TxPackage[], txCountOffset?: number, txCount?: number) => Promise<void>;
 };
 
 export const TxHandlerContext = createContext<TxHandler>(undefined);
@@ -37,13 +37,16 @@ export const TxHandlerProvider = ({ children }) => {
 		preflightCommitment: confirmOptions.preflightCommitment || confirmOptions.commitment
 	};
 
-	const handleTxs = async (...txs: TxPackage[]) => {
+	const handleTxs = async (txs: TxPackage[], txCountOffset?: number, txCount?: number) => {
 		console.log('getting latest blockhash');
 		const recentBlockhash = (await connection.getLatestBlockhash(confirmOptions.preflightCommitment)).blockhash;
 		console.log('recentBlockhash: ', recentBlockhash);
 
 		for (let i = 0; i < txs.length; i++) {
-			console.group(`sending tx# ${i + 1} / ${txs.length} `);
+			const currentTdIdx = i + 1 + (txCountOffset ?? 0);
+			const txBatchSize = txCount ?? txs.length;
+
+			console.group(`sending tx# ${currentTdIdx} / ${txBatchSize} `);
 
 			let toastID: Id;
 
@@ -56,7 +59,7 @@ export const TxHandlerProvider = ({ children }) => {
 				tx.feePayer = wallet.publicKey;
 				tx.recentBlockhash = recentBlockhash;
 
-				toastID = toast.warn(`Signing tx ${i + 1} / ${txs.length} ${description}`, {
+				toastID = toast.warn(`Signing tx ${currentTdIdx} / ${txBatchSize} ${description}`, {
 					autoClose: false,
 					// icon: '📝',
 					isLoading: true,
@@ -75,7 +78,7 @@ export const TxHandlerProvider = ({ children }) => {
 				console.log('confirming...');
 
 				toast.update(toastID, {
-					render: `Confirming tx ${i + 1} / ${txs.length} ${description}`
+					render: `Confirming tx ${currentTdIdx} / ${txBatchSize} ${description}`
 				});
 
 				const signatureResult = await connection.confirmTransaction(signature, confirmOptions.commitment);
@@ -86,9 +89,9 @@ export const TxHandlerProvider = ({ children }) => {
 				console.log('processed in slot: ', signatureResult.context.slot);
 
 				toast.update(toastID, {
-					render: `Transaction sent ${i + 1} / ${txs.length} ${description}. Processed in slot: ${signatureResult.context.slot}. Signature: ${abbreviateAddress(
-						signature
-					)}`,
+					render: `Transaction sent ${currentTdIdx} / ${txBatchSize} ${description}. Processed in slot: ${
+						signatureResult.context.slot
+					}. Signature: ${abbreviateAddress(signature)}`,
 					onClick: () => {
 						window.open(getExplorerLink(signature, { explorer: 'solscan', cluster: getCurrentCluster() }));
 					},
