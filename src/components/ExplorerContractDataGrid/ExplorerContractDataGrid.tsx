@@ -24,7 +24,7 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import PublicKeyLink from 'components/PublicKeyLink';
 import StatusBadge from 'components/StatusBadge';
 import fetchContracts from 'controllers/fetchContracts';
-import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/ChainOtcState';
+import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/common';
 import { AVAILABLE_PAYOFF_TYPE_IDS, PayoffTypeIds } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
 import { Digital } from 'models/plugins/payoff/Digital';
