@@ -24,11 +24,11 @@ const getLabelFromStatus = (s: ContractStatusIds) => {
 
 const getTooltipTitle = (s: ContractStatusIds): string => {
 	if (s === 'unfunded') return 'Neither long or short has deposited';
-	if (s === 'wtb') return 'Only buyer has deposited';
-	if (s === 'wts') return 'Only seller has deposited';
-	if (s === 'live') return 'Both sides have deposited and the contract has not yet settled';
+	if (s === 'wtb') return 'Only long side has deposited';
+	if (s === 'wts') return 'Only short side has deposited';
+	if (s === 'live') return 'The contract is live and waiting to settle';
 	if (s === 'settled') return 'Both sides have deposited and the contract has settled';
-	if (s === 'expired') return 'Deposit period is over and the contract has not been funded by both sides';
+	if (s === 'expired') return 'Deposit window is over and the contract has not been funded by both sides';
 
 	return '';
 };
