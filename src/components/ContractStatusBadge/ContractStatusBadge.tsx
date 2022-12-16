@@ -11,7 +11,7 @@ const getColorFromStatus = (s: ContractStatusIds): 'success' | 'error' | 'dark' 
 	if (s === 'unfunded') return 'dark';
 	if (s === 'wtb') return 'warning';
 	if (s === 'wts') return 'warning';
-	if (s === 'active') return 'success';
+	if (s === 'live') return 'success';
 	if (s === 'settled') return 'success';
 	if (s === 'expired') return 'info';
 
@@ -26,7 +26,7 @@ const getTooltipTitle = (s: ContractStatusIds): string => {
 	if (s === 'unfunded') return 'Neither long or short has deposited';
 	if (s === 'wtb') return 'Only buyer has deposited';
 	if (s === 'wts') return 'Only seller has deposited';
-	if (s === 'active') return 'Both sides have deposited and the contract has not yet settled';
+	if (s === 'live') return 'Both sides have deposited and the contract has not yet settled';
 	if (s === 'settled') return 'Both sides have deposited and the contract has settled';
 	if (s === 'expired') return 'Deposit period is over and the contract has not been funded by both sides';
 

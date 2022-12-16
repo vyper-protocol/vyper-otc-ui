@@ -73,12 +73,12 @@ export abstract class AbsOtcState {
 			if (!this.isLongFunded() && this.isShortFunded()) return 'wts';
 
 			// both sides funded
-			return 'active';
+			return 'live';
 		} else {
 			// on side unfunded
 			if (!this.isLongFunded() || !this.isShortFunded()) return 'expired';
 
-			if (!this.settleExecuted) return 'active';
+			if (!this.settleExecuted) return 'live';
 			else return 'settled';
 		}
 	}

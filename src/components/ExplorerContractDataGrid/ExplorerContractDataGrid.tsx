@@ -43,13 +43,13 @@ import OtcContractContainer from '../OtcContractContainer';
 const EMPTY_FILTER_MODEL: GridFilterModel = {
 	items: []
 };
-const ACTIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
+const LIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
 	items: [
 		{
 			id: 0,
 			columnField: 'contractStatus',
 			operatorValue: 'is',
-			value: 'active'
+			value: 'live'
 		}
 	]
 };
@@ -66,7 +66,7 @@ const ExplorerContractDataGrid = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [contracts, setContracts] = useState<DbOtcState[]>([]);
-	const [filterModel, setFilterModel] = useState<GridFilterModel>(ACTIVE_CONTRACTS_FILTER_MODEL);
+	const [filterModel, setFilterModel] = useState<GridFilterModel>(LIVE_CONTRACTS_FILTER_MODEL);
 	const [sortModel, setSortModel] = useState<GridSortModel>(CREATED_AT_SORT_MODEL);
 
 	useEffect(() => {
@@ -120,11 +120,11 @@ const ExplorerContractDataGrid = () => {
 				</Button>
 				<Button
 					onClick={() => {
-						setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
+						setFilterModel(LIVE_CONTRACTS_FILTER_MODEL);
 						setSortModel(CREATED_AT_SORT_MODEL);
 					}}
 				>
-					Active Contracts
+					Live Contracts
 				</Button>
 				<Button
 					disabled={!wallet.connected}
