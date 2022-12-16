@@ -13,21 +13,14 @@ import { abbreviateAddress } from 'utils/stringHelpers';
 import { getCurrentCluster } from './OtcConnectionProvider';
 
 export type TxHandler = {
-	// eslint-disable-next-line no-unused-vars
-	handleTxs: (txs: TxPackage[], txCountOffset?: number, txCount?: number) => Promise<void>;
+	handleTxs: (txs: TxPackage[]) => Promise<void>;
 };
 
 export const TxHandlerContext = createContext<TxHandler>(undefined);
 
 export const TxHandlerProvider = ({ children }) => {
-	// Establish a connection with the chain
 	const { connection } = useConnection();
-
-	// Init Solana wallet
 	const wallet = useWallet();
-
-	// Init Anchor
-	// const provider = new AnchorProvider(connection, wallet, {});
 	const confirmOptions: ConfirmOptions = {
 		preflightCommitment: 'processed',
 		commitment: 'processed'
@@ -37,51 +30,65 @@ export const TxHandlerProvider = ({ children }) => {
 		preflightCommitment: confirmOptions.preflightCommitment || confirmOptions.commitment
 	};
 
-	const handleTxs = async (txs: TxPackage[], txCountOffset?: number, txCount?: number) => {
+	const handleTxs = async (txs: TxPackage[]) => {
 		console.log('getting latest blockhash');
-		const recentBlockhash = (await connection.getLatestBlockhash(confirmOptions.preflightCommitment)).blockhash;
-		console.log('recentBlockhash: ', recentBlockhash);
+		const latestBlockhash = await connection.getLatestBlockhash(confirmOptions.preflightCommitment);
+
+		// * * * * * * * * * *
+		// 1. CONFIG
+
+		// setting fee payer and recentBlockhash
+		txs.forEach((txPackage) => {
+			txPackage.tx.feePayer = wallet.publicKey;
+			txPackage.tx.recentBlockhash = latestBlockhash.blockhash;
+		});
+
+		// * * * * * * * * * *
+		// 2. SIGNING
+
+		const signedTransactions = await wallet.signAllTransactions(txs.map((t) => t.tx));
+
+		// partial signing for other signers
+		txs.forEach(({ signers }, i) => {
+			(signers ?? []).forEach((kp) => {
+				signedTransactions[i].partialSign(kp);
+			});
+		});
+
+		// * * * * * * * * * *
+		// 3. SENDING AND CONFIRMING
 
 		for (let i = 0; i < txs.length; i++) {
-			const currentTdIdx = i + 1 + (txCountOffset ?? 0);
-			const txBatchSize = txCount ?? txs.length;
+			const { description } = txs[i];
+			const toastID = toast.warn(`Sending tx ${i + 1} / ${txs.length} ${description}`, {
+				autoClose: false,
+				isLoading: true,
+				closeButton: false
+			});
 
-			console.group(`sending tx# ${currentTdIdx} / ${txBatchSize} `);
-
-			let toastID: Id;
-
-			const { signers } = txs[i];
-			let { tx, description } = txs[i];
 			try {
-				if (description) console.log('description: ' + description);
-				description = description ? ' | ' + description : '';
+				console.log(`sending tx ${i + 1}/${txs.length} ${description}`);
 
-				tx.feePayer = wallet.publicKey;
-				tx.recentBlockhash = recentBlockhash;
-
-				toastID = toast.warn(`Signing tx ${currentTdIdx} / ${txBatchSize} ${description}`, {
-					autoClose: false,
-					// icon: '📝',
-					isLoading: true,
-					closeButton: false
-				});
-				console.log('signing txs...');
-				tx = await wallet.signTransaction(tx);
-				(signers ?? []).forEach((kp) => {
-					tx.partialSign(kp);
-				});
+				console.log('serializing...');
+				const serializedTx = signedTransactions[i].serialize();
 
 				console.log('sending...');
-				const signature = await connection.sendRawTransaction(tx.serialize(), sendOptions);
+				const signature = await connection.sendRawTransaction(serializedTx, sendOptions);
 				console.log('signature: ', signature);
 
 				console.log('confirming...');
 
 				toast.update(toastID, {
-					render: `Confirming tx ${currentTdIdx} / ${txBatchSize} ${description}`
+					render: `Confirming tx ${i + 1} / ${txs.length} ${description}`
 				});
 
-				const signatureResult = await connection.confirmTransaction(signature, confirmOptions.commitment);
+				const signatureResult = await connection.confirmTransaction(
+					{
+						signature: signature,
+						...latestBlockhash
+					},
+					confirmOptions.commitment
+				);
 				if (signatureResult.value.err) {
 					throw Error('error: ' + signatureResult.value.err);
 				}
@@ -89,9 +96,9 @@ export const TxHandlerProvider = ({ children }) => {
 				console.log('processed in slot: ', signatureResult.context.slot);
 
 				toast.update(toastID, {
-					render: `Transaction sent ${currentTdIdx} / ${txBatchSize} ${description}. Processed in slot: ${
-						signatureResult.context.slot
-					}. Signature: ${abbreviateAddress(signature)}`,
+					render: `Transaction sent ${i + 1} / ${txs.length} ${description}. Processed in slot: ${signatureResult.context.slot}. Signature: ${abbreviateAddress(
+						signature
+					)}`,
 					onClick: () => {
 						window.open(getExplorerLink(signature, { explorer: 'solscan', cluster: getCurrentCluster() }));
 					},
@@ -141,6 +148,7 @@ export const TxHandlerProvider = ({ children }) => {
 
 				throw Error('error: ', err);
 			}
+
 			console.groupEnd();
 		}
 	};
