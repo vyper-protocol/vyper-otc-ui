@@ -26,12 +26,11 @@ const createContract = async (
 ): Promise<PublicKey> => {
 	console.group('CONTROLLER: create contract');
 	console.log('create txs');
-	const [txs, otcPublicKey] = await create(provider, initParams);
+	const [txs, otcPublicKey] = await create(provider, initParams, fundSide);
 	console.log('otcPublicKey: ' + otcPublicKey);
 
 	console.log('submit txs');
-	if (fundSide) await txHandler.handleTxs(txs, 0, 3);
-	else await txHandler.handleTxs(txs);
+	await txHandler.handleTxs(txs);
 
 	try {
 		const cluster = getCurrentCluster();
@@ -64,11 +63,6 @@ const createContract = async (
 
 				await supabaseInsertContract(chainOtcState, createdBy, aliasId, cluster);
 			}
-		}
-
-		if (fundSide) {
-			const fundSideTxs = await deposit(provider, otcPublicKey, fundSide === 'long');
-			await txHandler.handleTxs([fundSideTxs], 2, 3);
 		}
 
 		if (initParams.sendNotification) {
