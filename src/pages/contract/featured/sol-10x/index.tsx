@@ -112,7 +112,7 @@ const ActionPanel = () => {
 			};
 
 			// create contract
-			const otcPublicKey = await createContract(provider, txHandler, initParams);
+			const otcPublicKey = await createContract(provider, txHandler, initParams, 'long');
 
 			// Create contract URL
 			router.push(UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
@@ -171,18 +171,28 @@ const ActionPanel = () => {
 						<div>
 							<b>Expiry</b>: <MomentTooltipSpan datetime={settleStart} />
 						</div>
-						<div>
-							<Box sx={{ display: 'inline-flex' }}>
-								<b>Max gain</b>:
-								<Box role="span" sx={{ px: 0.5 }} className={styles.profit}>
-									${longDepositAmount * 10}
-								</Box>{' '}
-								if SOL {'>'}{' '}
-								<LoadingValue isLoading={rfqLoading}>
-									<Box role="span">{rfqStrike.toFixed(4)}</Box>
-								</LoadingValue>
-							</Box>
-						</div>
+
+						<Box sx={{ display: 'inline-flex' }}>
+							<b>Max gain</b>:
+							<Box role="span" sx={{ px: 0.5 }} className={styles.profit}>
+								${longDepositAmount * 10}
+							</Box>{' '}
+							if SOL/USD {'>'}{' '}
+							<LoadingValue isLoading={rfqLoading}>
+								<Box role="span">{rfqStrike.toFixed(4)}</Box>
+							</LoadingValue>
+						</Box>
+
+						<Box sx={{ display: 'inline-flex' }}>
+							<b>Max loss</b>:
+							<Box role="span" sx={{ px: 0.5 }} className={styles.loss}>
+								${longDepositAmount}
+							</Box>{' '}
+							if SOL/USD {'<'}{' '}
+							<LoadingValue isLoading={rfqLoading}>
+								<Box role="span">{rfqStrike.toFixed(4)}</Box>
+							</LoadingValue>
+						</Box>
 					</Box>
 
 					<LoadingButton
