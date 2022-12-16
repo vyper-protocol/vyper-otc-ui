@@ -456,7 +456,6 @@ const ExplorerContractDataGrid = () => {
 					getRowId={(row) => row.publickey.toBase58()}
 					rows={contracts}
 					rowsPerPageOptions={[5, 25, 50, 100]}
-					pageSize={25}
 					columns={columns}
 					filterModel={filterModel}
 					sortModel={sortModel}
@@ -473,6 +472,9 @@ const ExplorerContractDataGrid = () => {
 								depositAvailableFrom: false,
 								depositExpirationAt: false
 							}
+						},
+						pagination: {
+							pageSize: 25
 						}
 					}}
 					isRowSelectable={(node: GridRowParams<DbOtcState>) => false}
