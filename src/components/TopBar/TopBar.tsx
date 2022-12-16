@@ -61,7 +61,7 @@ const TopBar = () => {
 			</div>
 
 			{/* FEATURED */}
-			{cluster !== 'devnet' && (
+			{cluster === 'devnet' && (
 				<>
 					<div className={showFeaturedMenu ? cn(styles.item, styles.active) : cn(styles.item)} onClick={openFeaturedMenu}>
 						<EmojiObjectsIcon /> Featured <BiChevronDown size="20px" />
