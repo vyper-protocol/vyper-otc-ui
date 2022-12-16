@@ -49,19 +49,6 @@ const TopBar = () => {
 		{ href: ['/explorer'], current: false }
 	]);
 
-	const featured = [
-		{
-			id: 'sbf-to-jail',
-			name: 'SBF TO JAIL',
-			icon: 'GiImprisoned'
-		},
-		{
-			id: 'sol-10x',
-			name: 'SOL 10x',
-			icon: 'IoIosRocket'
-		}
-	];
-
 	const menuItems = (
 		<>
 			{/* HOME LINK */}
@@ -74,32 +61,36 @@ const TopBar = () => {
 			</div>
 
 			{/* FEATURED */}
-			<div className={showFeaturedMenu ? cn(styles.item, styles.active) : cn(styles.item)} onClick={openFeaturedMenu}>
-				<EmojiObjectsIcon /> Featured <BiChevronDown size="20px" />
-			</div>
-			<Popover
-				open={showFeaturedMenu}
-				anchorEl={featuredMenuAnchor}
-				anchorOrigin={{
-					horizontal: 'left',
-					vertical: 'bottom'
-				}}
-				PaperProps={{
-					className: styles.popover
-				}}
-				onClose={closeFeaturedMenu}
-			>
-				<Box className={styles.container}>
-					{featured.map((item, i) => {
-						return (
-							<a key={i} className={styles.item} href={UrlBuilder.buildFeaturedUrl(item.id)}>
-								<Icon name={item.icon as AvailableIconNames} />
-								<Typography className={styles.typography}>{item.name}</Typography>
-							</a>
-						);
-					})}
-				</Box>
-			</Popover>
+			{cluster !== 'devnet' && (
+				<>
+					<div className={showFeaturedMenu ? cn(styles.item, styles.active) : cn(styles.item)} onClick={openFeaturedMenu}>
+						<EmojiObjectsIcon /> Featured <BiChevronDown size="20px" />
+					</div>
+					<Popover
+						open={showFeaturedMenu}
+						anchorEl={featuredMenuAnchor}
+						anchorOrigin={{
+							horizontal: 'left',
+							vertical: 'bottom'
+						}}
+						PaperProps={{
+							className: styles.popover
+						}}
+						onClose={closeFeaturedMenu}
+					>
+						<Box className={styles.container}>
+							{resources.featured.map((item, i) => {
+								return (
+									<a key={i} className={styles.item} href={UrlBuilder.buildFeaturedUrl(item.id)}>
+										<Icon name={item.icon as AvailableIconNames} />
+										<Typography className={styles.typography}>{item.name}</Typography>
+									</a>
+								);
+							})}
+						</Box>
+					</Popover>
+				</>
+			)}
 
 			{/* CREATE CONTRACT LINK */}
 			<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>

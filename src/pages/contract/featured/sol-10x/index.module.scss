@@ -1,22 +1,7 @@
 .container {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-
-	.actionGroup {
-		margin: 12px;
-		padding: 24px;
-		height: fit-content;
-		background-color: rgba(128, 128, 128, 0.478);
-		border-color: black;
-		border-width: 2px;
-		border-radius: 12px;
-	}
-
-	.description {
-		color: var(--color-black);
-		font-size: 16px;
-	}
+	align-items: flex-start;
 
 	.profit {
 		font-weight: 700;
@@ -31,5 +16,32 @@
 	.highlight {
 		font-weight: 700;
 		color: black;
+	}
+}
+
+.actionGroup {
+	margin: 12px;
+	padding: 24px;
+	height: fit-content;
+	background-color: rgba(47, 52, 74, 0.078);
+	border: solid #000;
+	border-width: 2px;
+	border-radius: 12px;
+	align-items: left;
+
+	.descriptionGroup {
+		margin: 12px 0px;
+		display: flex;
+		flex-direction: column;
+		text-align: left;
+	}
+
+	.progress {
+		margin-top: 16px;
+		width: 95%;
+	}
+
+	.rush {
+		color: red;
 	}
 }
