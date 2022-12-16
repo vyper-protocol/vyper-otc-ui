@@ -22,7 +22,7 @@ const WithdrawButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; is
 		try {
 			setIsLoading(true);
 			const tx = await withdraw(provider, new PublicKey(otcStatePubkey));
-			await txHandler.handleTxs(tx);
+			await txHandler.handleTxs([tx]);
 		} catch (err) {
 			console.log(err);
 		} finally {

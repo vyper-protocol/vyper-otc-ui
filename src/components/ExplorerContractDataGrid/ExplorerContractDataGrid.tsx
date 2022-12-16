@@ -285,6 +285,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Created at',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -295,6 +296,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Deposit start',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -305,6 +307,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Deposit close',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -315,6 +318,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Expiry',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -452,7 +456,6 @@ const ExplorerContractDataGrid = () => {
 					getRowId={(row) => row.publickey.toBase58()}
 					rows={contracts}
 					rowsPerPageOptions={[5, 25, 50, 100]}
-					pageSize={25}
 					columns={columns}
 					filterModel={filterModel}
 					sortModel={sortModel}
@@ -469,8 +472,12 @@ const ExplorerContractDataGrid = () => {
 								depositAvailableFrom: false,
 								depositExpirationAt: false
 							}
+						},
+						pagination: {
+							pageSize: 25
 						}
 					}}
+					isRowSelectable={(node: GridRowParams<DbOtcState>) => false}
 					getDetailPanelContent={({ row }) => <OtcContractContainer pubkey={row.publickey.toBase58()} />}
 					getDetailPanelHeight={() => 600}
 				/>

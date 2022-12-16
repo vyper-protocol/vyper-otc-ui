@@ -22,7 +22,7 @@ export const fundContract = async (
 		const txs = await deposit(provider, contractPublicKey, isLong);
 
 		console.log('submit txs');
-		await txHandler.handleTxs(txs);
+		await txHandler.handleTxs([txs]);
 
 		if (sendNotification) {
 			const cluster = getCurrentCluster();

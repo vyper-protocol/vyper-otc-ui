@@ -33,7 +33,7 @@ type CreateContractFlowInput = {
 	isLoading: boolean;
 
 	// on-chain contract create callback
-	onCreateContractButtonClick: () => Promise<void>;
+	onCreateContractButtonClick: (fundSide?: 'long' | 'short') => Promise<void>;
 
 	initialStep?: number;
 };
@@ -313,14 +313,24 @@ const CreateContractFlow = ({
 				open={openPreview}
 				handleClose={handleClosePreview}
 				actionProps={
-					<LoadingButton
-						variant="contained"
-						loading={isLoading}
-						disabled={!wallet.connected || initParamsErrors.length !== 0}
-						onClick={onCreateContractButtonClick}
-					>
-						{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
-					</LoadingButton>
+					<>
+						<LoadingButton
+							variant="contained"
+							loading={isLoading}
+							disabled={!wallet.connected || initParamsErrors.length !== 0}
+							onClick={() => onCreateContractButtonClick()}
+						>
+							{wallet.connected ? 'Create 🚀' : 'Connect Wallet'}
+						</LoadingButton>
+
+						{/* <LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={() => onCreateContractButtonClick('long')}>
+							{wallet.connected ? 'Create and long 🚀' : 'Connect Wallet'}
+						</LoadingButton>
+
+						<LoadingButton variant="contained" loading={isLoading} disabled={!wallet.connected} onClick={() => onCreateContractButtonClick('short')}>
+							{wallet.connected ? 'Create and short 🚀' : 'Connect Wallet'}
+						</LoadingButton> */}
+					</>
 				}
 			/>
 		</Box>

@@ -39,7 +39,7 @@ const ClaimButton = ({ otcStatePubkey, isLong }: { otcStatePubkey: string; isLon
 		try {
 			setIsLoading(true);
 			const tx = await claim(provider, new PublicKey(otcStatePubkey));
-			await txHandler.handleTxs(tx);
+			await txHandler.handleTxs([tx]);
 		} catch (err) {
 			console.log(err);
 		} finally {
