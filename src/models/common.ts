@@ -4,6 +4,17 @@ export const AVAILABLE_RATE_TYPE_IDS = ['switchboard', 'pyth'];
 export type PayoffTypeIds = 'forward' | 'settled_forward' | 'digital' | 'vanilla_option';
 export const AVAILABLE_PAYOFF_TYPE_IDS = ['forward', 'settled_forward', 'digital', 'vanilla_option'];
 
+/**
+ * unfunded: neither long or short has deposited
+ * wtb: only buyer has deposited
+ * wts: only seller has deposited
+ * live: both have deposited, and not yet settled
+ * settled: both have deposited and contract has settled
+ * expired: either/neither buyer/seller have deposited, and deposit period is over
+ */
+export const AVAILABLE_CONTRACT_STATUS_IDS = ['unfunded', 'wtb', 'wts', 'live', 'settled', 'expired'] as const;
+export type ContractStatusIds = typeof AVAILABLE_CONTRACT_STATUS_IDS[number];
+
 /** * * * * * * * * * * * * *
  * ALIAS
  * * * * * * * * * * * * * * */
