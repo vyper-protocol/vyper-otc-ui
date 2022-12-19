@@ -54,7 +54,7 @@ const Application = ({ Component, pageProps }) => {
 			<LocalizationProvider dateAdapter={AdapterMoment}>
 				<QueryClientProvider client={queryClient}>
 					<OtcConnectionProvider>
-						<WalletProvider wallets={wallets}>
+						<WalletProvider wallets={wallets} autoConnect={process.env.NODE_ENV === 'development'}>
 							<WalletModalProvider>
 								<TxHandlerProvider>
 									<ErrorBoundary FallbackComponent={ApplicationError}>
