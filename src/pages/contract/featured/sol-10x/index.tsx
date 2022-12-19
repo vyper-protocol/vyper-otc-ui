@@ -19,6 +19,7 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { BSDigitalStrike } from 'utils/blackScholes';
+import { sleep } from 'utils/sleep';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './index.module.scss';
@@ -47,35 +48,29 @@ const ActionPanel = () => {
 
 	const { pricesValue, isInitialized } = useOracleLivePrice('pyth', DEFAULT_INIT_PARAMS.rateOption.rateAccounts);
 
-	const onRfqButtonClick = () => {
-		// reset color
-		setRfqProgress(100);
+	const onRfqButtonClick = async () => {
 		setRfqLoading(true);
-	};
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			if (rfqLoading) {
-				setSettleStart(refSettle());
-				setRfqStrike(BSDigitalStrike(pricesValue[0], 0, 3.5, 1 / 24 / 365, true, 0.1));
-				if (!showRfq) {
-					setShowRfq(true);
-				}
-				setRfqProgress(100);
-				setRfqLoading(false);
+		// needed to update color on loading
+		setRfqProgress(100);
+
+		try {
+			await sleep(1500);
+
+			setSettleStart(refSettle());
+			setRfqStrike(BSDigitalStrike(pricesValue[0], 0, 3.5, 1 / 24 / 365, true, 0.1));
+			if (!showRfq) {
+				setShowRfq(true);
 			}
-		}, 1500);
-
-		return () => clearTimeout(timer);
-	}, [showRfq, rfqLoading, pricesValue]);
+		} finally {
+			setRfqProgress(100);
+			setRfqLoading(false);
+		}
+	};
 
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setRfqProgress((oldProgress) => {
-				if (oldProgress === 0) {
-					return 0;
-				}
-
 				// 60s timer updated every 0.5s
 				return Math.max(0, oldProgress - 100 / 120);
 			});
@@ -84,7 +79,7 @@ const ActionPanel = () => {
 		return () => {
 			clearInterval(timer);
 		};
-	}, [rfqProgress]);
+	}, []);
 
 	const onCreateContractButtonClick = async () => {
 		try {
