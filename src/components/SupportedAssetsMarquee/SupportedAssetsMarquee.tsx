@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Stack } from '@mui/material';
+import { CircularProgress, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { getTokenMetadata as getCoingeckoTokenMetadata } from 'api/coingecko/getTokenMetadata';
 import { fetchTokenInfoBySymbolCached } from 'api/next-api/fetchTokenInfo';
@@ -44,11 +44,19 @@ const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 		}
 	);
 
+	// on no logo fetched we hide the entire component
+	if (!logoURIQuery?.data && !(logoURIQuery.isFetching || logoURIQuery.isLoading)) return <></>;
+
 	return (
 		<Box className={styles.oracle_marquee_card}>
 			<Stack justifyContent="center" direction="row" spacing={2}>
 				{(logoURIQuery.isFetching || logoURIQuery.isLoading) && (
-					<Box className={styles.coin} component="img" src="/assets/images/vyper-logo_512.png" alt={oracle.title} />
+					<CircularProgress
+						sx={{
+							color: 'grey'
+						}}
+						size={20}
+					/>
 				)}
 				{logoURIQuery?.data && <Box className={styles.coin} component="img" src={logoURIQuery?.data} alt={oracle.title} />}
 				<div>
