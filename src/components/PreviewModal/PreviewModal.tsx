@@ -12,7 +12,7 @@ import { getAliasLabel, isOptionAlias } from 'utils/aliasHelper';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
-import { shortenString } from 'utils/stringHelpers';
+import { abbreviateAddress, shortenString } from 'utils/stringHelpers';
 
 import styles from './PreviewModal.module.scss';
 
@@ -71,6 +71,9 @@ export const PreviewModal = ({
 	const optionPart = isOption ? getAliasLabel(aliasId).split(' ')[0] : '';
 
 	const [mintDetail, setMintDetail] = useState<MintDetail | undefined>(undefined);
+
+	const address = rateOption.rateAccounts[0];
+
 	useEffect(() => {
 		try {
 			const mint = getMintByPubkey(collateralMint);
@@ -106,7 +109,7 @@ export const PreviewModal = ({
 				) : (
 					<span className={styles.highlight}>{aliasId}</span>
 				)}{' '}
-				contract on <span className={styles.highlightNoCap}>{getOracleByPubkey(rateOption.rateAccounts[0])?.title}</span> with strike{' '}
+				contract on <span className={styles.highlightNoCap}>{getOracleByPubkey(address)?.title ?? abbreviateAddress(address)}</span> with strike{' '}
 				<span className={styles.highlight}>{formatWithDecimalDigits(strike, 6)}</span>
 				{payoffId !== 'digital' && (
 					<span>
@@ -125,7 +128,7 @@ export const PreviewModal = ({
 					</span>
 				)}{' '}
 			</p>
-			{/* // TODO: LONG/SHORT contextualized by payoff
+			{/*
 			// TODO: load onchain data for unknwon mints , checks are not useful for now*/}
 			<p className={styles.description}>
 				The contract will be settled in{' '}
