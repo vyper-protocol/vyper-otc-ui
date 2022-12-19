@@ -2,13 +2,11 @@
 import { AnchorProvider } from '@project-serum/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { create } from 'api/otc-state/create';
-import { deposit } from 'api/otc-state/deposit';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
 import { buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
 import { fetchContract } from 'controllers/fetchContract';
-import { fundContract } from 'controllers/fundContract';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { sleep } from 'utils/sleep';
 import * as UrlBuilder from 'utils/urlBuilder';

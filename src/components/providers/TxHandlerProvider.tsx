@@ -7,7 +7,7 @@ import { ConfirmOptions, SendOptions } from '@solana/web3.js';
 import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import _ from 'lodash';
 import { TxPackage } from 'models/TxPackage';
-import { Id, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { abbreviateAddress } from 'utils/stringHelpers';
 
 import { getCurrentCluster } from './OtcConnectionProvider';
