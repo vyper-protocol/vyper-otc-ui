@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
-import { ContractStatusIds } from './common';
 
+import { ContractStatusIds } from './common';
 import { PayoffAccount } from './plugins/payoff/PayoffAccount';
 import { RateAccount } from './plugins/rate/RateAccount';
 
