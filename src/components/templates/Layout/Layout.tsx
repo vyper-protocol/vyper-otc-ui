@@ -22,7 +22,7 @@ type LayoutProps = {
 const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgroundImage }: LayoutProps) => {
 	const [searchValue, setSearchValue] = useState('');
 
-	const logoURL = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-logo_512.png`;
+	const logoURL = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-banner.png`;
 
 	return (
 		<Box>
