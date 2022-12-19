@@ -74,6 +74,7 @@ const CreateContractPage = () => {
 				setInitParams({ ...initParams, payoffOption: { ...initParams.payoffOption, strike: newStrike } });
 			});
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const [isLoading, setIsLoading] = useState(false);

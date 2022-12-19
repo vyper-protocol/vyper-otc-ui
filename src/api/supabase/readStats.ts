@@ -1,7 +1,7 @@
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { AVAILABLE_PAYOFF_TYPE_IDS, AVAILABLE_RATE_TYPE_IDS } from 'models/common';
 
-import { CONTRACTS_DYNAMIC_DATA_TABLE_NAME, CONTRACTS_METADATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
+import { CONTRACTS_DYNAMIC_DATA_TABLE_NAME, CONTRACTS_TABLE_NAME, supabase } from './client';
 
 export type ContractsStats = {
 	// number of contracts saved in the database

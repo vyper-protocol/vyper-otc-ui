@@ -1,10 +1,8 @@
 import { useState } from 'react';
 
-import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import NumericBadge from 'components/NumericBadge';
 import NumericField from 'components/NumericField';
-import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import _ from 'lodash';
 import { ChainOtcState } from 'models/ChainOtcState';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
