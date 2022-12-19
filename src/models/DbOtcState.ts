@@ -1,7 +1,6 @@
 import { Cluster, PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
-import { ContractStatusIds } from './common';
 import { DbOtcDynamicData } from './DbOtcDynamicData';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
 import { createPayoffStateFromDBData } from './plugins/payoff/createPayoffStateFromDBData';

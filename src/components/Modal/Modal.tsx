@@ -1,4 +1,4 @@
-import { Button, Dialog } from '@mui/material';
+import { Dialog } from '@mui/material';
 
 import styles from './Modal.module.scss';
 
