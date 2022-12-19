@@ -26,7 +26,7 @@ const OracleMarqueeCard = ({ oracle }: OracleMarqueeCardProps) => {
 	const logoURIQuery = useQuery<string>(
 		['logo-uri', oracle.baseCurrency],
 		async () => {
-			console.log('triggered coin asset fetching for ', oracle.baseCurrency);
+			// console.log('triggered coin asset fetching for ', oracle.baseCurrency);
 			const localRes = await fetchTokenInfoBySymbolCached(oracle.baseCurrency);
 			if (localRes) return localRes.logoURI;
 			const coingeckoRes = await getCoingeckoTokenMetadata(oracle.baseCurrency);
