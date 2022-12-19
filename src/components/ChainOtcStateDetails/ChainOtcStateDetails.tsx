@@ -315,6 +315,10 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					<ClaimButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={true} />
 					<ClaimButton otcStatePubkey={otcState.chainData.publickey.toBase58()} isLong={false} />
 				</div>
+				{/* <div className={styles.buttons}>
+					<ButtonPill mode="success" onClick={() => autoFundContractSide(otcState.chainData.publickey, 'long')} text="auto long" />
+					<ButtonPill mode="error" onClick={() => autoFundContractSide(otcState.chainData.publickey, 'short')} text="auto short" />
+				</div> */}
 			</div>
 			<Collapse in={showSimulator} orientation={'horizontal'}>
 				<Simulator className={styles.simulator} chainData={otcState.chainData} />
