@@ -33,7 +33,7 @@ const Modal = ({ title, open, handleClose, contentProps, actionProps }: ModalPro
 			<div className={styles.content}>{contentProps}</div>
 
 			<div className={styles.actions}>
-				<Button onClick={handleClose}>Cancel</Button>
+				{/* <Button onClick={handleClose}>Cancel</Button> */}
 				{actionProps}
 			</div>
 		</Dialog>
