@@ -1,7 +1,7 @@
 import { Cluster, PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
-import { ContractStatusIds } from './ChainOtcState';
+import { ContractStatusIds } from './common';
 import { DbOtcDynamicData } from './DbOtcDynamicData';
 import { DbOtcStateMetadata } from './DbOtcStateMetadata';
 import { createPayoffStateFromDBData } from './plugins/payoff/createPayoffStateFromDBData';
@@ -24,12 +24,8 @@ export class DbOtcState extends AbsOtcState {
 		return false;
 	}
 
-	get contractStatus(): ContractStatusIds {
-		const currentTime = Date.now();
-		if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
-			return 'expired';
-		}
-		return 'active';
+	get settleExecuted(): boolean {
+		return !!this.dynamicData?.settleExecuted;
 	}
 
 	areBothSidesFunded(): boolean {

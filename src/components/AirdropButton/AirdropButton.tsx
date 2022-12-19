@@ -19,7 +19,7 @@ const AirdropButton = () => {
 
 		try {
 			const tx = await airdrop(connection, wallet.publicKey);
-			await txHandler.handleTxs(tx);
+			await txHandler.handleTxs([tx]);
 
 			toast.success('Airdrop completed');
 		} catch (err) {

@@ -24,7 +24,7 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import PublicKeyLink from 'components/PublicKeyLink';
 import StatusBadge from 'components/StatusBadge';
 import fetchContracts from 'controllers/fetchContracts';
-import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/ChainOtcState';
+import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/common';
 import { AVAILABLE_PAYOFF_TYPE_IDS, PayoffTypeIds } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
 import { Digital } from 'models/plugins/payoff/Digital';
@@ -43,13 +43,13 @@ import OtcContractContainer from '../OtcContractContainer';
 const EMPTY_FILTER_MODEL: GridFilterModel = {
 	items: []
 };
-const ACTIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
+const LIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
 	items: [
 		{
 			id: 0,
 			columnField: 'contractStatus',
 			operatorValue: 'is',
-			value: 'active'
+			value: 'live'
 		}
 	]
 };
@@ -66,7 +66,7 @@ const ExplorerContractDataGrid = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [contracts, setContracts] = useState<DbOtcState[]>([]);
-	const [filterModel, setFilterModel] = useState<GridFilterModel>(ACTIVE_CONTRACTS_FILTER_MODEL);
+	const [filterModel, setFilterModel] = useState<GridFilterModel>(LIVE_CONTRACTS_FILTER_MODEL);
 	const [sortModel, setSortModel] = useState<GridSortModel>(CREATED_AT_SORT_MODEL);
 
 	useEffect(() => {
@@ -120,11 +120,11 @@ const ExplorerContractDataGrid = () => {
 				</Button>
 				<Button
 					onClick={() => {
-						setFilterModel(ACTIVE_CONTRACTS_FILTER_MODEL);
+						setFilterModel(LIVE_CONTRACTS_FILTER_MODEL);
 						setSortModel(CREATED_AT_SORT_MODEL);
 					}}
 				>
-					Active Contracts
+					Live Contracts
 				</Button>
 				<Button
 					disabled={!wallet.connected}
@@ -285,6 +285,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Created at',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -295,6 +296,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Deposit start',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -305,6 +307,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Deposit close',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -315,6 +318,7 @@ const ExplorerContractDataGrid = () => {
 			type: 'dateTime',
 			headerName: 'Expiry',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
+			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
 			filterable: true,
 			flex: 1,
@@ -452,7 +456,6 @@ const ExplorerContractDataGrid = () => {
 					getRowId={(row) => row.publickey.toBase58()}
 					rows={contracts}
 					rowsPerPageOptions={[5, 25, 50, 100]}
-					pageSize={25}
 					columns={columns}
 					filterModel={filterModel}
 					sortModel={sortModel}
@@ -469,8 +472,12 @@ const ExplorerContractDataGrid = () => {
 								depositAvailableFrom: false,
 								depositExpirationAt: false
 							}
+						},
+						pagination: {
+							pageSize: 25
 						}
 					}}
+					isRowSelectable={(node: GridRowParams<DbOtcState>) => false}
 					getDetailPanelContent={({ row }) => <OtcContractContainer pubkey={row.publickey.toBase58()} />}
 					getDetailPanelHeight={() => 600}
 				/>
