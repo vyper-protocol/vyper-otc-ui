@@ -35,5 +35,18 @@
 			"icon": "FaTelegramPlane",
 			"link": "https://t.me/+aiK0sR0msfk1NWNk"
 		}
+	],
+
+	"featured": [
+		{
+			"id": "sbf-to-jail",
+			"name": "SBF TO JAIL",
+			"icon": "GiImprisoned"
+		},
+		{
+			"id": "sol-10x",
+			"name": "SOL 10x",
+			"icon": "IoIosRocket"
+		}
 	]
 }

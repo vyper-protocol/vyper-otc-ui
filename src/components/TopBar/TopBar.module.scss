@@ -35,14 +35,32 @@
 		.item {
 			margin-left: 25px;
 			margin-right: 25px;
+			color: var(--color-text-disabled);
+			font-family: var(--font-primary) !important;
+			font-size: 15px;
+			color: var(--color-text-disabled);
+			font-weight: 500;
+			height: 100%;
+			display: block;
+
+			&:hover {
+				cursor: pointer;
+				color: var(--color-black);
+			}
 
 			a {
+				color: var(--color-text-disabled);
 				font-family: var(--font-primary) !important;
 				font-size: 15px;
 				color: var(--color-text-disabled);
 				font-weight: 500;
 				height: 100%;
 				display: block;
+
+				&:hover {
+					cursor: pointer;
+					color: var(--color-black);
+				}
 			}
 
 			svg {
@@ -54,13 +72,6 @@
 
 		.item.mobileonly {
 			display: none;
-		}
-
-		.item:hover {
-			cursor: pointer;
-			span {
-				color: var(--color-black);
-			}
 		}
 
 		.active {
@@ -83,6 +94,7 @@
 
 .popover {
 	min-width: 100px;
+	margin-top: 6px;
 
 	.container {
 		padding: var(--space-20) var(--space-32) var(--space-8) var(--space-24);

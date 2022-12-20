@@ -10,9 +10,9 @@ import NonAuditedDisclaimer from 'components/NonAuditedDisclaimer';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
+import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
 import createContract from 'controllers/createContract';
-import { getPriceForStrike, OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
-import moment from 'moment';
+import { getPriceForStrike } from 'controllers/createContract/OtcInitializationParams';
 import { useRouter } from 'next/router';
 import useContractStore from 'store/useContractStore';
 import * as UrlBuilder from 'utils/urlBuilder';
@@ -22,7 +22,6 @@ import * as UrlBuilder from 'utils/urlBuilder';
 
 const CreateContractPage = () => {
 	const contractStore = useContractStore();
-	const currentCluster = getCurrentCluster();
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -30,38 +29,7 @@ const CreateContractPage = () => {
 	const provider = new AnchorProvider(connection, wallet, {});
 	const txHandler = useContext(TxHandlerContext);
 
-	const [initParams, setInitParams] = useState<OtcInitializationParams>({
-		depositStart: moment().add(-60, 'minutes').toDate().getTime(),
-		depositEnd: moment().add(5, 'minutes').toDate().getTime(),
-		settleStart: moment().add(15, 'minutes').toDate().getTime(),
-
-		shortDepositAmount: 100,
-		longDepositAmount: 100,
-
-		aliasId: 'forward',
-
-		payoffOption: {
-			payoffId: 'forward',
-			notional: 1,
-			strike: 0,
-			isCall: true,
-			isLinear: true,
-			isStandard: false
-		},
-
-		rateOption: {
-			ratePluginType: 'pyth',
-			rateAccounts: [
-				currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG'
-				// currentCluster === 'devnet' ? 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix' : 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG'
-			]
-		},
-
-		// USDC in mainnet, devUSD in devnet
-		collateralMint: currentCluster === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-		saveOnDatabase: process.env.NODE_ENV !== 'development',
-		sendNotification: process.env.NODE_ENV !== 'development'
-	});
+	const [initParams, setInitParams] = useState(DEFAULT_INIT_PARAMS);
 
 	// eslint-disable-next-line eqeqeq
 	const isPresentTempData = contractStore?.contractData != null;

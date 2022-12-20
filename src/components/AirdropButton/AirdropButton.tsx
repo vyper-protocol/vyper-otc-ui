@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import { CircularProgress, Tooltip } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { airdrop } from 'api/dummy-tokens/airdrop';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
+import { BsFillCloudArrowDownFill } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 
 const AirdropButton = () => {
@@ -31,16 +31,7 @@ const AirdropButton = () => {
 
 	if (!wallet.connected) return <></>;
 
-	if (isLoading) return <CircularProgress size={24} />;
-
-	return (
-		<Tooltip title="Airdrop tokens">
-			<div onClick={onAirdropClick} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-				<CloudDownloadIcon />
-				<p>Airdrop</p>
-			</div>
-		</Tooltip>
-	);
+	return <div onClick={onAirdropClick}>{isLoading ? <CircularProgress size={20} /> : <BsFillCloudArrowDownFill size="20px" />} Airdrop</div>;
 };
 
 export default AirdropButton;
