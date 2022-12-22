@@ -53,6 +53,7 @@ export type TemplateCardProps = {
 	rateId: RateTypeIds;
 	underlying: string;
 	imgPath: string;
+	strike?: number;
 };
 
 function createCompletePayoffData(payoffData: any): { notional: number; isLinear: boolean; isStandard: boolean; isCall: boolean } {
@@ -76,7 +77,8 @@ export const TemplateCard = ({
 	expiry,
 	rateId,
 	underlying,
-	imgPath
+	imgPath,
+	strike
 }: TemplateCardProps) => {
 	const { pricesValue, isInitialized } = useOracleLivePrice(rateId, [getOraclesByTitle(underlying, rateId).pubkey]);
 	const { connection } = useConnection();
@@ -98,7 +100,7 @@ export const TemplateCard = ({
 			payoffOption: {
 				payoffId: payoff,
 				...createCompletePayoffData(payoffData),
-				strike: price
+				strike: strike ?? price
 			},
 			rateOption: {
 				ratePluginType: rateId,

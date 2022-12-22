@@ -179,6 +179,16 @@
 		},
 		{
 			"type": "pyth",
+			"title": "DOGE/USD",
+			"cluster": "mainnet-beta",
+			"baseCurrency": "DOGE",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-doge-usd?cluster=mainnet-beta",
+			"pubkey": "FsSM3s38PX9K7Dn6eGzuE29S2Dsk1Sss1baytTQdCaQj",
+			"category": "Crypto"
+		},
+		{
+			"type": "pyth",
 			"title": "EUR/USD",
 			"cluster": "devnet",
 			"baseCurrency": "EUR",
@@ -455,6 +465,26 @@
 			"baseCurrency": "",
 			"quoteCurrency": "",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW"
+		},
+		{
+			"type": "pyth",
+			"title": "AAPL/USD",
+			"cluster": "mainnet-beta",
+			"baseCurrency": "AAPL",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/equity-us-aapl-usd?cluster=mainnet-beta",
+			"pubkey": "5yixRcKtcs5BZ1K2FsLFwmES1MyA92d6efvijjVevQCw",
+			"category": "Equity"
+		},
+		{
+			"type": "pyth",
+			"title": "AAPL/USD",
+			"cluster": "devnet",
+			"baseCurrency": "AAPL",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/equity-us-aapl-usd?cluster=devnet",
+			"pubkey": "CqFJLrT4rSpA46RQkVYWn8tdBDuQ7p7RXcp6Um76oaph",
+			"category": "Equity"
 		}
 	]
 }
