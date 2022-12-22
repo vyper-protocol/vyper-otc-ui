@@ -13,8 +13,9 @@ const TradingViewChart = ({ symbol }: TradingViewChartProps) => {
 		<DynamicAdvancedChart
 			widgetProps={{
 				symbol: symbol,
-				interval: '1',
+				interval: '1m',
 				theme: 'dark',
+				autosize: true,
 				hide_top_toolbar: true,
 				hide_side_toolbar: true,
 				withdateranges: false,
