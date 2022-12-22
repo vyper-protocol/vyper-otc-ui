@@ -1,21 +1,20 @@
-import Carousel from "react-material-ui-carousel";
-import { UserStory } from "components/UserStory";
+import Carousel from 'react-material-ui-carousel';
+import { UserStory } from 'components/UserStory';
 import storyData from 'configs/stories';
-import styles from "./UserStories.module.scss";
+import styles from './UserStories.module.scss';
 
 const UserStories = () => {
   return (
     <Carousel
         className={styles.carousel}
         navButtonsAlwaysVisible={true}
-        animation="slide"
         duration={600}
         navButtonsProps={{
             style: {
                 backgroundColor: 'transparent',
-                color: "#494949"
+                color: '#494949'
             }
-        }} 
+        }}
     >
         {
           storyData.map((story, i) => (
@@ -24,5 +23,6 @@ const UserStories = () => {
         }
     </Carousel>
   )
-}
+};
+
 export default UserStories;

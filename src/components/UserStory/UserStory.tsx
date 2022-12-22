@@ -13,9 +13,10 @@ export const UserStory = ({
     return (
         <div className={styles.container}>
             <div className={styles.story}>
-                { story }
+                <div className={styles.storyPrefix}>I want to...</div>
+                <div className={styles.storyBody}>{ story }</div>
             </div>
             <TemplateCard {...template} />
         </div>
-    )
+    );
 };
