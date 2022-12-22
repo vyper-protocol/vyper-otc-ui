@@ -122,10 +122,13 @@ const ActionPanel = () => {
 	};
 
 	return (
-		<Box sx={{ alignItems: 'center', maxWidth: '50vw' }} className={cn(styles.container, styles.actionGroup)}>
+		<Box sx={{ alignItems: 'center', maxWidth: '45vw' }} className={cn(styles.container, styles.actionGroup)}>
 			<Typography variant="h6">
-				Make 10x if the price of <b>SOL/USD</b> is above <LoadingValue isLoading={rfqLoading || !isInitialized}>${rfqStrike.toFixed(4)}</LoadingValue> on{' '}
-				{settleLabel}
+				Make 10x if the price of <span className={styles.highlight}>SOL/USD</span> is above{' '}
+				<LoadingValue isLoading={rfqLoading || !isInitialized}>
+					<span className={styles.highlight}>${rfqStrike.toFixed(4)}</span>
+				</LoadingValue>{' '}
+				on <span className={styles.highlight}>{settleLabel}</span>
 			</Typography>
 			<br />
 			<Typography variant="body1">
@@ -145,14 +148,13 @@ const ActionPanel = () => {
 						<ToggleButton
 							key={i}
 							value={pillarValue}
+							color="primary"
 							sx={{
-								textTransform: 'none',
-								fontSize: 12,
-								py: 0.5,
-								px: 1.5,
-								mx: 0.5
+								fontSize: 18,
+								p: 2,
+								mx: 1
 							}}
-							size="small"
+							size="large"
 							fullWidth={true}
 							selected={pillarValue === longDepositAmount}
 							onChange={(_e, v) => setLongDepositAmount(v)}
@@ -221,8 +223,16 @@ const ActionPanel = () => {
 
 const CreateSol10xPage = () => {
 	return (
-		<FeaturedProduct pageTitle={'SOL 10x'} title={'SOL 10x weekly call'} symbol={'SOLUSD'}>
-			<ActionPanel />
+		<FeaturedProduct pageTitle={'SOL 10x'} symbol={'SOLUSD'}>
+			<Box>
+				<div className={styles.title}>
+					<h1>
+						SOL 10x <br /> weekly call
+					</h1>
+				</div>
+
+				<ActionPanel />
+			</Box>
 		</FeaturedProduct>
 	);
 };
