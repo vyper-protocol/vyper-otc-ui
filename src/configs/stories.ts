@@ -18,7 +18,7 @@ const Stories: UserStoryProps[] = [
 			imgPath: '/doge-logo.png',
 			rateId: 'pyth'
 		}
-	}, 
+	},
 	{
 		story: 'short this altcoin but it is impossible to borrow it',
 		template: {
