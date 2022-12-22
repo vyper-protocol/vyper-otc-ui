@@ -5,6 +5,7 @@ import cn from 'classnames';
 import FrequentlyAskedQuestions from 'components/FrequentlyAskedQuestions';
 import SupportedAssetsMarquee from 'components/SupportedAssetsMarquee';
 import TemplateGrid from 'components/TemplateGrid';
+import UserStories from 'components/UserStories';
 import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
 import { useGetPlatformStatsQuery } from 'hooks/useGetPlatformStatsQuery';
@@ -114,6 +115,9 @@ const Home = () => {
 							</a>
 						</div>
 					</div>
+
+					<UserStories />
+
 					<div className={styles.templates}>
 						<div className={styles.title}>Start from a template contract</div>
 						<TemplateGrid />

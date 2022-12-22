@@ -1,0 +1,20 @@
+.container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 0 60px;
+
+    .story {
+        text-align: center;
+        padding: 24px;
+        flex-grow: 1;
+        font-size: var(--font-p-large);
+    }
+}
+
+@media (max-width: 725px) {
+    .container {
+        flex-direction: column;
+    }
+}
