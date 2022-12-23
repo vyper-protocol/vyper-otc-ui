@@ -4,7 +4,6 @@ import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from 
 import { AnchorWallet } from '@switchboard-xyz/switchboard-v2';
 import { airdrop, MINT_ADDRESS_DEVNET } from 'api/dummy-tokens/airdrop';
 import { create } from 'api/otc-state/create';
-import { deposit } from 'api/otc-state/deposit';
 import { cloneContractFromChain as supabaseInsertContract } from 'api/supabase/insertContract';
 import { buildCreateContractMessage, sendSnsPublisherNotification } from 'api/supabase/notificationTrigger';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';

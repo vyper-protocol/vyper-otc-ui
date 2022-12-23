@@ -8,7 +8,13 @@ type LoadingValueProps = {
 };
 
 const LoadingValue = ({ isLoading, children }: LoadingValueProps) => {
-	return isLoading ? <Skeleton>{children}</Skeleton> : <span>{children}</span>;
+	return isLoading ? (
+		<Skeleton sx={{ display: 'inline-block' }}>
+			<span>{children}</span>
+		</Skeleton>
+	) : (
+		<span>{children}</span>
+	);
 };
 
 export default LoadingValue;

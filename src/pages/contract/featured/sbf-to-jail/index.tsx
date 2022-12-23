@@ -7,6 +7,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
+import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import moment from 'moment';
@@ -37,21 +38,13 @@ const CreateSbfJailContractPage = () => {
 
 			setIsLoading(true);
 
-			const payoffOption: OtcInitializationParams['payoffOption'] = {
-				payoffId: 'digital',
-				strike: 0.5,
-				isCall: true
-			};
-
-			const depositStart = moment().toDate().getTime();
-			const depositEnd = moment().add(2, 'days').toDate().getTime();
-			const settleStart = moment('2022-12-31 09:00:00Z').toDate().getTime();
-
 			const initParams: OtcInitializationParams = {
-				collateralMint: '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W',
-				depositStart,
-				depositEnd,
-				settleStart,
+				collateralMint: DEFAULT_INIT_PARAMS.collateralMint,
+
+				depositStart: moment().toDate().getTime(),
+				depositEnd: moment().add(2, 'days').toDate().getTime(),
+				settleStart: moment('2022-12-31 09:00:00Z').toDate().getTime(),
+
 				longDepositAmount: longAmount,
 				shortDepositAmount: 100,
 				aliasId: 'digital',
@@ -59,7 +52,11 @@ const CreateSbfJailContractPage = () => {
 					ratePluginType: 'switchboard',
 					rateAccounts: ['3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW']
 				},
-				payoffOption,
+				payoffOption: {
+					payoffId: 'digital',
+					strike: 0.5,
+					isCall: true
+				},
 				saveOnDatabase,
 				sendNotification
 			};

@@ -1,0 +1,16 @@
+.oracle_marquee_card {
+	margin: 5px;
+	max-width: 250px;
+
+	padding: 5px;
+	border: 2px solid #e7e7e7;
+	border-radius: 2px;
+	font-family: monospace;
+
+	.coin {
+		margin-left: var(--space-4);
+		border-radius: var(--border-radius-extend);
+		width: 20px;
+		height: 20px;
+	}
+}

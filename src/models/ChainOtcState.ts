@@ -4,7 +4,6 @@ import { Mint } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import { AbsOtcState } from './AbsOtcState';
-import { ContractStatusIds } from './common';
 import { TokenInfo } from './TokenInfo';
 
 export class ChainOtcState extends AbsOtcState {

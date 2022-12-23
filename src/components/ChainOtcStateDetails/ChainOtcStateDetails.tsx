@@ -4,6 +4,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LoopIcon from '@mui/icons-material/Loop';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import ShareIcon from '@mui/icons-material/Share';
 import { Tooltip, Box, Grid, Collapse } from '@mui/material';
 import { useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -12,6 +13,7 @@ import ClickableIcon from 'components/ClickableIcon';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import LoadingValue from 'components/LoadingValue';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
+import ShareModal from 'components/ShareModal';
 import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
@@ -43,6 +45,10 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 
 	const [longLabel, shortLabel] = getSidesLabelShort(otcState.aliasId);
 	// const isOption = isOptionAlias(otcState.aliasId);
+
+	const [openShare, setOpenShare] = useState(false);
+	const handleOpenShare = () => setOpenShare(true);
+	const handleCloseShare = () => setOpenShare(false);
 
 	const { create } = useContractStore();
 
@@ -120,6 +126,9 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</Tooltip>
 					</Box>
 					<span>
+						<ClickableIcon onClick={handleOpenShare} label={'Share contract'} clickedLabel={''}>
+							<ShareIcon fontSize="small" sx={{ mx: 0.5 }} />
+						</ClickableIcon>
 						<ClickableIcon onClick={onRefetchClick} label={'Refresh'} clickedLabel={'Refreshing...'}>
 							<LoopIcon className={cn(isFetching && styles.rotating)} fontSize="small" sx={{ mx: 0.5 }} />
 						</ClickableIcon>
@@ -323,6 +332,15 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 			<Collapse in={showSimulator} orientation={'horizontal'}>
 				<Simulator className={styles.simulator} chainData={otcState.chainData} />
 			</Collapse>
+
+			<ShareModal
+				aliasId={otcState.aliasId}
+				statusId={otcState.chainData.contractStatus}
+				contractAddress={otcState.chainData.publickey.toBase58()}
+				rateAddress={otcState.chainData.rateAccount.state.livePriceAccounts[0].toBase58()}
+				open={openShare}
+				handleClose={handleCloseShare}
+			/>
 		</div>
 	);
 };

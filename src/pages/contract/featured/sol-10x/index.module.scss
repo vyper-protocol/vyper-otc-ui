@@ -1,0 +1,85 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	.highlight {
+		font-weight: 700;
+		background: linear-gradient(180deg, #262629 0%, #2f3bdd 52.92%, #bda6f3 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.profit {
+		font-weight: 700;
+		color: rgb(40, 199, 40);
+		font-size: 2em;
+	}
+
+	.loss {
+		font-weight: 700;
+		color: rgb(223, 76, 76);
+		font-size: 2em;
+	}
+}
+
+.button {
+	border-radius: 16px;
+}
+.refresh {
+	background-color: rgba(18, 20, 177, 0.797);
+
+	&:hover {
+		background-color: rgba(68, 71, 255, 0.959);
+	}
+}
+
+.buy {
+	background-color: rgba(1, 134, 16, 0.838);
+
+	&:hover {
+		background-color: rgba(0, 201, 23, 0.79);
+	}
+}
+
+.actionGroup {
+	margin: 12px;
+	padding: 24px;
+	height: fit-content;
+	align-items: left;
+
+	.progress {
+		color: black;
+	}
+
+	.rush {
+		color: red;
+	}
+
+	.hidden {
+		visibility: hidden;
+	}
+
+	.background {
+		color: rgba(52, 133, 155, 0.167);
+	}
+
+	.background_rush {
+		color: rgba(255, 0, 0, 0.235);
+	}
+}
+
+.caption {
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.title {
+	padding-left: 24px;
+
+	h1 {
+		margin: 0;
+		line-height: 60px;
+	}
+}
