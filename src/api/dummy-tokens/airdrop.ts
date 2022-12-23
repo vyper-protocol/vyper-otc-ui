@@ -9,6 +9,7 @@ const MINT_AUTHORITY_KP = [
 ];
 
 export const MINT_ADDRESS_DEVNET = new PublicKey('7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W');
+export const DEV_USD_MINT_DECIMALS = 6;
 const AIRDROP_AMOUNT = 1_000_000_000;
 
 export const airdrop = async (connection: Connection, wallet: PublicKey, amount: number = AIRDROP_AMOUNT): Promise<TxPackage> => {
