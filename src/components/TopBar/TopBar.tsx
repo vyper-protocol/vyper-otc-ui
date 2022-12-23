@@ -162,9 +162,7 @@ const TopBar = () => {
 				<div className={styles.navLeftItems}>
 					<Link href={UrlBuilder.buildHomeUrl()}>
 						<a>
-							<Typography component="h2" variant="h6" sx={{ fontWeight: 600, fontSize: '1.15rem', fontFamily: 'monospace' }} className={styles.hover}>
-								Vyper OTC
-							</Typography>
+							<div className={cn(styles.home, styles.hover)}>Vyper OTC</div>
 						</a>
 					</Link>
 				</div>
