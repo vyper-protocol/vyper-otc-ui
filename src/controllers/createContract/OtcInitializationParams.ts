@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Address, translateAddress } from '@project-serum/anchor';
 import { Cluster, Connection } from '@solana/web3.js';
 import { AliasTypeIds, RateTypeIds } from 'models/common';
@@ -52,4 +53,23 @@ export const getPriceForStrike = async (ratePluginType: RateTypeIds, rateAccount
 	} catch {}
 
 	return formatWithDecimalDigits(price);
+};
+
+/**
+ *
+ * @param val init parameters to validate
+ * @returns return an array with all the validation errors, an empty array means the object is valid
+ */
+export const validateInitParams = (val: OtcInitializationParams): string[] => {
+	try {
+		const errors: string[] = [];
+		if (val.depositStart > val.depositEnd) errors.push('Contract deposit start must be before deposit end');
+		if (val.depositEnd > val.settleStart) errors.push('Contract expiry must be after the deposit end');
+		if (val.rateOption.rateAccounts.length === 0) errors.push('No oracle provided');
+		return errors;
+	} catch (err) {
+		console.error(err);
+		if (process.env.NODE_ENV === 'development') return [err.message];
+		else ['unknown error, plese retry later'];
+	}
 };

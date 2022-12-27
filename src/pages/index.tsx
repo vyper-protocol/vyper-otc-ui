@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 
 import { Skeleton, Stack } from '@mui/material';
 import cn from 'classnames';
-import FrequentlyAskedQuestions from 'components/organisms/FrequentlyAskedQuestions';
-import TemplateGrid from 'components/organisms/TemplateGrid';
+import FrequentlyAskedQuestions from 'components/FrequentlyAskedQuestions';
+import SupportedAssetsMarquee from 'components/SupportedAssetsMarquee';
+import TemplateGrid from 'components/TemplateGrid';
 import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
 import { useGetPlatformStatsQuery } from 'hooks/useGetPlatformStatsQuery';
@@ -41,6 +42,7 @@ const Home = () => {
 			</Head>
 			<Layout>
 				<Stack spacing={24} className={styles.container}>
+					<SupportedAssetsMarquee />
 					<div className={styles.hero}>
 						<div className={styles.title}>
 							Create and trade
@@ -58,7 +60,6 @@ const Home = () => {
 							</a>
 						</div>
 					</div>
-
 					<div className={styles.stats_container}>
 						<div className={styles.stats_group}>
 							<div className={cn(styles.stat, styles.first)}>
@@ -80,7 +81,6 @@ const Home = () => {
 							</div>
 						</div>
 					</div>
-
 					<div className={styles.features_group}>
 						<div className={cn(styles.feature, styles.first)}>
 							<div className={styles.title}>Create</div>
@@ -114,7 +114,6 @@ const Home = () => {
 							</a>
 						</div>
 					</div>
-
 					<div className={styles.templates}>
 						<div className={styles.title}>Start from a template contract</div>
 						<TemplateGrid />

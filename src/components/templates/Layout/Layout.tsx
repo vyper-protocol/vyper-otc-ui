@@ -1,8 +1,8 @@
 import { ReactNode, useState } from 'react';
 
 import { Box } from '@mui/material';
-import SearchBar from 'components/molecules/SearchBar';
-import TopBar from 'components/organisms/TopBar';
+import SearchBar from 'components/SearchBar';
+import TopBar from 'components/TopBar';
 import { NextSeo } from 'next-seo';
 import Head from 'next/head';
 import Image, { StaticImageData } from 'next/image';
@@ -22,7 +22,7 @@ type LayoutProps = {
 const Layout = ({ pageTitle, pageDescription, children, withSearch, withBackgroundImage }: LayoutProps) => {
 	const [searchValue, setSearchValue] = useState('');
 
-	const logoURL = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-logo_512.png`;
+	const logoURL = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/assets/images/vyper-banner_1200.png`;
 
 	return (
 		<Box>

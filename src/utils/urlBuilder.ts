@@ -16,6 +16,10 @@ export const buildExplorerUrl = (): string => {
 	return '/explorer';
 };
 
+export const buildFeaturedUrl = (featuredId: string): string => {
+	return `/contract/featured/${featuredId}`;
+};
+
 export function buildDepositQRCodeUrl(contract: string, isBuyer: boolean): string {
 	return `/qr?op=deposit&contract=${contract}&isBuyer=${isBuyer}`;
 }

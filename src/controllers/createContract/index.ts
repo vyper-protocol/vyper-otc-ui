@@ -8,6 +8,7 @@ import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandler } from 'components/providers/TxHandlerProvider';
 import { fetchContract } from 'controllers/fetchContract';
 import { ChainOtcState } from 'models/ChainOtcState';
+import { sleep } from 'utils/sleep';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import { OtcInitializationParams } from './OtcInitializationParams';
@@ -15,14 +16,19 @@ import { OtcInitializationParams } from './OtcInitializationParams';
 const MAX_RETRIES = 30;
 const RETRY_TIMEOUT = 1000;
 
-const createContract = async (provider: AnchorProvider, txHandler: TxHandler, initParams: OtcInitializationParams): Promise<PublicKey> => {
+const createContract = async (
+	provider: AnchorProvider,
+	txHandler: TxHandler,
+	initParams: OtcInitializationParams,
+	fundSide?: 'long' | 'short'
+): Promise<PublicKey> => {
 	console.group('CONTROLLER: create contract');
 	console.log('create txs');
-	const [txs, otcPublicKey] = await create(provider, initParams);
+	const [txs, otcPublicKey] = await create(provider, initParams, fundSide);
 	console.log('otcPublicKey: ' + otcPublicKey);
 
 	console.log('submit txs');
-	await txHandler.handleTxs(...txs);
+	await txHandler.handleTxs(txs);
 
 	try {
 		const cluster = getCurrentCluster();
@@ -72,7 +78,3 @@ const createContract = async (provider: AnchorProvider, txHandler: TxHandler, in
 };
 
 export default createContract;
-
-const sleep = (milliseconds) => {
-	return new Promise((resolve) => setTimeout(resolve, milliseconds));
-};

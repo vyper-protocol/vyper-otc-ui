@@ -6,9 +6,6 @@ import { PublicKey } from '@solana/web3.js';
 import { AbsOtcState } from './AbsOtcState';
 import { TokenInfo } from './TokenInfo';
 
-export const AVAILABLE_CONTRACT_STATUS_IDS = ['active', 'expired'] as const;
-export type ContractStatusIds = typeof AVAILABLE_CONTRACT_STATUS_IDS[number];
-
 export class ChainOtcState extends AbsOtcState {
 	/**
 	 * Collateral mint info
@@ -74,10 +71,6 @@ export class ChainOtcState extends AbsOtcState {
 		return this.rateAccount.state.title;
 	}
 
-	isDepositExpired(): boolean {
-		return Date.now() > this.depositExpirationAt;
-	}
-
 	areBothSidesFunded(): boolean {
 		return this.buyerWallet != undefined && this.sellerWallet != undefined;
 	}
@@ -130,22 +123,6 @@ export class ChainOtcState extends AbsOtcState {
 			this.sellerWallet.equals(currentUserWallet) &&
 			this.programSellerTAAmount > 0
 		);
-	}
-
-	// getContractStatus(): ContractStatusIds {
-	// 	const currentTime = Date.now();
-	// 	if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
-	// 		return 'expired';
-	// 	}
-	// 	return 'active';
-	// }
-
-	get contractStatus(): ContractStatusIds {
-		const currentTime = Date.now();
-		if (currentTime > this.settleAvailableFromAt || (currentTime > this.depositExpirationAt && !this.areBothSidesFunded())) {
-			return 'expired';
-		}
-		return 'active';
 	}
 
 	isPnlAvailable(): boolean {

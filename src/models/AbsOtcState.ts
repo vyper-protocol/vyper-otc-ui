@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
+import { ContractStatusIds } from './common';
 import { PayoffAccount } from './plugins/payoff/PayoffAccount';
 import { RateAccount } from './plugins/rate/RateAccount';
 
@@ -58,4 +59,39 @@ export abstract class AbsOtcState {
 	 * Rate account
 	 */
 	rateAccount: RateAccount;
+
+	/**
+	 * Get the contract current status
+	 */
+	get contractStatus(): ContractStatusIds {
+		if (!this.isDepositExpired()) {
+			// both sides unfunded
+			if (!this.isLongFunded() && !this.isShortFunded()) return 'unfunded';
+
+			// only one side is funded
+			if (this.isLongFunded() && !this.isShortFunded()) return 'wtb';
+			if (!this.isLongFunded() && this.isShortFunded()) return 'wts';
+
+			// both sides funded
+			return 'live';
+		} else {
+			// on side unfunded
+			if (!this.isLongFunded() || !this.isShortFunded()) return 'expired';
+
+			if (!this.settleExecuted) return 'live';
+			else return 'settled';
+		}
+	}
+
+	/**
+	 * Get true if settlement is already executed
+	 */
+	abstract get settleExecuted(): boolean;
+
+	abstract isLongFunded(): boolean;
+	abstract isShortFunded(): boolean;
+
+	isDepositExpired(): boolean {
+		return Date.now() > this.depositExpirationAt;
+	}
 }

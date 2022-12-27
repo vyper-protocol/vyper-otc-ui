@@ -1,7 +1,7 @@
 import { Box, Button, styled, Typography } from '@mui/material';
 import { FallbackProps } from 'react-error-boundary';
 
-import Icon from '../../atoms/Icon';
+import Icon from '../../Icon';
 import Layout from '../Layout';
 import styles from './ApplicationError.module.scss';
 

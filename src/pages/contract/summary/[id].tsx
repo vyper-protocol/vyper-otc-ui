@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-import { Box, CircularProgress } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
-import ChainOtcStateDetails from 'components/organisms/ChainOtcStateDetails/ChainOtcStateDetails';
+import OtcContractContainer from 'components/OtcContractContainer';
 import Layout from 'components/templates/Layout';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
-
-import styles from './summary.module.scss';
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -25,27 +22,9 @@ const SummaryPageId = () => {
 		if (rateStateQuery.data) setPageTitle(`${rateStateQuery.data.chainData.getContractTitle()} ${rateStateQuery.data.aliasId.toUpperCase()}`);
 	}, [rateStateQuery.data]);
 
-	const loadingSpinner = rateStateQuery?.isLoading;
-	const errorMessage = rateStateQuery?.isError;
-	const showContent = rateStateQuery?.isSuccess;
-
 	return (
 		<Layout withSearch pageTitle={pageTitle}>
-			<Box className={styles.container}>
-				{errorMessage && <p>Contract not found</p>}
-
-				{loadingSpinner && <CircularProgress />}
-
-				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
-					<ChainOtcStateDetails
-						otcState={rateStateQuery?.data}
-						isFetching={rateStateQuery.isFetching}
-						onRefetchClick={() => {
-							rateStateQuery.refetch();
-						}}
-					/>
-				)}
-			</Box>
+			<OtcContractContainer pubkey={id as string} />
 		</Layout>
 	);
 };
