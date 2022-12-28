@@ -1,6 +1,8 @@
 import FeaturedFixedPayout from 'components/FeaturedFixedPayout';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import resources from 'configs/resources.json';
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Custom404Page from 'pages/404';
 
 export const getStaticPaths: GetStaticPaths = async () => {
 	return {
@@ -30,7 +32,7 @@ interface FixedPayoutPageProps {
 }
 
 const FixedPayoutPage = ({ pubkey }: FixedPayoutPageProps) => {
-	return <FeaturedFixedPayout oraclePubkey={pubkey} />;
+	return getCurrentCluster() === 'devnet' ? <FeaturedFixedPayout oraclePubkey={pubkey} /> : <Custom404Page />;
 };
 
 export default FixedPayoutPage;
