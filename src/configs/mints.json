@@ -7,6 +7,12 @@
 			"isStable": true
 		},
 		{
+			"cluster": "mainnet-beta",
+			"pubkey": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+			"title": "BONK",
+			"isStable": false
+		},
+		{
 			"cluster": "devnet",
 			"pubkey": "7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W",
 			"title": "devUSD",
