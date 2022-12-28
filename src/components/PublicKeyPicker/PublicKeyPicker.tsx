@@ -28,6 +28,7 @@ export const PublicKeyPicker = ({ title, availableOptions, onChange, freeSolo, v
 			disableClearable
 			autoHighlight
 			selectOnFocus
+			multiple={false}
 			clearOnBlur
 			handleHomeEndKeys
 			freeSolo={freeSolo}

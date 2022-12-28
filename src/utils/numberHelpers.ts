@@ -21,17 +21,17 @@ export const formatWithDecimalDigits = (val: number, precision = 4): string => {
 
 	const parsedIntegerString = new Intl.NumberFormat('en-US').format(parseInt(integerString));
 
-	if ( precision === -1 ) {
-		if ( decimalString ) return `${parsedIntegerString}.${decimalString}`;
+	if (precision === -1) {
+		if (decimalString) return `${parsedIntegerString}.${decimalString}`;
 		return parsedIntegerString;
 	}
 
-	if ( val < 1 && val > -1 ) {
+	if (val < 1 && val > -1) {
 		return val.toPrecision(precision);
 	}
-	
+
 	const decimal = val - parseInt(integerString);
 	const parsedDecimalString = decimal.toFixed(precision).slice(2);
-	
+
 	return `${parsedIntegerString}.${parsedDecimalString}`;
 };
