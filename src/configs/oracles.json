@@ -389,6 +389,16 @@
 		},
 		{
 			"type": "pyth",
+			"title": "MATIC/USD",
+			"cluster": "devnet",
+			"baseCurrency": "MATIC",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://pyth.network/price-feeds/crypto-matic-usd?cluster=devnet",
+			"pubkey": "FBirwuDFuRAu4iSGc7RGxN5koHB7EJM1wbCmyPuQoGur",
+			"category": "Crypto"
+		},
+		{
+			"type": "pyth",
 			"title": "XAU/USD",
 			"cluster": "mainnet-beta",
 			"baseCurrency": "XAU",
@@ -455,6 +465,16 @@
 			"baseCurrency": "",
 			"quoteCurrency": "",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "CqoifEoCm6CLKfae8pryn65bwpv3MkX65sBtCAwi5xGr",
+			"title": "Coffee Mar23",
+			"baseCurrency": "Coffee",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://switchboard.xyz/explorer/2/CqoifEoCm6CLKfae8pryn65bwpv3MkX65sBtCAwi5xGr",
+			"tradingViewSymbol": "COFFEEMAR23"
 		}
 	]
 }
