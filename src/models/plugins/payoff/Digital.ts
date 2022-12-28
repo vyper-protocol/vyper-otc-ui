@@ -36,7 +36,7 @@ export class Digital extends AbsPayoffState {
 			{
 				label: 'Type',
 				value: this.isCall ? 'Call' : 'Put',
-				tooltip: this.isCall ? 'Long makes money if final price is >= strike' : 'Long makes money if final price is < strike'
+				tooltip: this.isCall ? 'Buyer makes money if final price is \u2265 strike' : 'Buyer makes money if final price is < strike'
 			}
 		];
 	}

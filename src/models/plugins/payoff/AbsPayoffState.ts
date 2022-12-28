@@ -1,6 +1,6 @@
 import { PayoffTypeIds } from 'models/common';
 import { ListItemDetail } from 'models/ListItemDetail';
-import { getRedeemLogicDocumentionLink, getRedeemLogicSourceCodeLink, getRedeemLogicDescription } from 'utils/redeemLogicMetadataHelper';
+import { getPayoffDocumentionLink, getPayoffSourceCodeLink, getPayoffDescription } from 'utils/payoffMetadataHelper';
 
 import { AbsPluginState } from '../AbsPluginState';
 
@@ -25,21 +25,21 @@ export abstract class AbsPayoffState extends AbsPluginState {
 	 * Returns the documentation link
 	 */
 	get documentationLink(): string {
-		return getRedeemLogicDocumentionLink(this.payoffId);
+		return getPayoffDocumentionLink(this.payoffId);
 	}
 
 	/**
 	 * Returns the source code reference link
 	 */
 	get sourceCode(): string {
-		return getRedeemLogicSourceCodeLink(this.payoffId);
+		return getPayoffSourceCodeLink(this.payoffId);
 	}
 
 	/**
 	 * Returns description
 	 */
 	get description(): string {
-		return getRedeemLogicDescription(this.payoffId);
+		return getPayoffDescription(this.payoffId);
 	}
 
 	/**

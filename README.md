@@ -41,6 +41,12 @@ Create an optmized build
 yarn build
 ```
 
+Run tests
+
+```bash
+yarn test
+```
+
 ### NPM Scripts
 
 | Script          | Use                                                                                             |
@@ -55,18 +61,15 @@ yarn build
 | prepare         | Husky install                                                                                   |
 | storybook       | Starts the storybook development server                                                         |
 | build-storybook | Creates the storybook production build                                                          |
+| test            | Run testing suite                                                                               |
 
 ### Next.js
 
 This projects uses **Next.js**. You can check further info regarding the [Next.js Docs here](https://nextjs.org/docs/getting-started)
 
-### Design principle
+### Writing tests
 
-This project is using the `Atomic Design Methodology`. Atomic design thinks of basic fundamental components as **atoms** (like a Button). Those atomic units bond together to form **molecules** (like an InputForm), which in turn combine into more complex **organisms** to ultimately create bigger structures (like a Card).
-
-Then we also have **templates**, which are, like the names implies, generic layouts for our components. And last but not least **pages**, which are templates with real content inside.
-
-In our case the section **pages**, has being moved outside of the `components` folder, because in Next.js, a page lives inside the `pages` directory and is associated with a `route` based on its file name.
+This project uses `jest` for testing. Add a test file `.test.ts` in the same directory. For example `foo.test.ts` for tests of `foo.ts`
 
 ### Styles & CSS
 
@@ -89,7 +92,7 @@ Storybook is a visual documentation of the components that are available in the 
 The guideline for creating a component's story is:
 
 1. The component's story filename should follow this pattern: `*.stories.tsx`, otherwise it won't be detected by Storybook
-2. The title of the component metadata should follow the path under `src`, for example `<ButtonPill />` is located at `src/components/atoms/ButtonPill`, then it should be `components/atoms/ButonPill`
+2. The title of the component metadata should follow the path under `src`, for example `<ButtonPill />` is located at `src/components/ButtonPill`, then it should be `components/ButonPill`
 3. It's encouraged that developers to give a comment above each props of the actual component, the comments will act as the description of the props in Storybook
 4. The best practice for props that have multiple options such as enum is to create multiple stories of the component in order to show different possibilities of how the component will look like with different options.
 

@@ -21,7 +21,7 @@ export const settleContract = async (
 		const txs = await settle(provider, contractPublicKey);
 
 		console.log('submit txs');
-		await txHandler.handleTxs(txs);
+		await txHandler.handleTxs([txs]);
 
 		if (sendNotification && otcState.settleExecuted && otcState.pricesAtSettlement) {
 			const cluster = getCurrentCluster();

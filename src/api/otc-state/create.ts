@@ -1,6 +1,6 @@
 /* eslint-disable space-before-function-paren */
 import { AnchorProvider, BN, Program, utils } from '@project-serum/anchor';
-import { getMint } from '@solana/spl-token';
+import { getAssociatedTokenAddress, getMint } from '@solana/spl-token';
 import { Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { RatePyth, IDL as RatePythIDL } from 'idls/rate_pyth';
@@ -16,7 +16,7 @@ import { TxPackage } from 'models/TxPackage';
 
 import PROGRAMS from '../../configs/programs.json';
 
-export const create = async (provider: AnchorProvider, params: OtcInitializationParams): Promise<[TxPackage[], PublicKey]> => {
+export const create = async (provider: AnchorProvider, params: OtcInitializationParams, fundSide?: 'long' | 'short'): Promise<[TxPackage[], PublicKey]> => {
 	const vyperOtcProgram = new Program<VyperOtc>(VyperOtcIDL, new PublicKey(PROGRAMS.VYPER_OTC_PROGRAM_ID), provider);
 	const vyperCoreProgram = new Program<VyperCore>(VyperCoreIDL, new PublicKey(PROGRAMS.VYPER_CORE_PROGRAM_ID), provider);
 
@@ -72,17 +72,13 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 	//  redeem logic plugin init
 	let redeemLogicProgramPublicKey: PublicKey = undefined;
 	const redeemLogicPluginState = Keypair.generate();
-	const redeemLogicPluginType = params.redeemLogicOption.redeemLogicPluginType as PayoffTypeIds;
+	const redeemLogicPluginType = params.payoffOption.payoffId as PayoffTypeIds;
 
 	if (redeemLogicPluginType === 'forward') {
 		const redeemLogicProgram = new Program<RedeemLogicForward>(RedeemLogicForwardIDL, PROGRAMS.REDEEM_LOGIC_FORWARD_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
-				params.redeemLogicOption.isLinear
-			)
+			.initialize(params.payoffOption.strike, new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals), params.payoffOption.isLinear)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				payer: provider.wallet.publicKey
@@ -97,10 +93,10 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
-				params.redeemLogicOption.isLinear,
-				params.redeemLogicOption.isStandard
+				params.payoffOption.strike,
+				new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals),
+				params.payoffOption.isLinear,
+				params.payoffOption.isStandard
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -115,7 +111,7 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		const redeemLogicProgram = new Program<RedeemLogicDigital>(RedeemLogicDigitalIDL, PROGRAMS.REDEEM_LOGIC_DIGITAL_PROGRAM_ID, provider);
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
-			.initialize(params.redeemLogicOption.strike, params.redeemLogicOption.isCall)
+			.initialize(params.payoffOption.strike, params.payoffOption.isCall)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
 				payer: provider.wallet.publicKey
@@ -130,10 +126,10 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 
 		const redeemLogicInixIX = await redeemLogicProgram.methods
 			.initialize(
-				params.redeemLogicOption.strike,
-				new BN(params.redeemLogicOption.notional * 10 ** collateralMintInfo.decimals),
-				params.redeemLogicOption.isCall,
-				params.redeemLogicOption.isLinear
+				params.payoffOption.strike,
+				new BN(params.payoffOption.notional * 10 ** collateralMintInfo.decimals),
+				params.payoffOption.isCall,
+				params.payoffOption.isLinear
 			)
 			.accounts({
 				redeemLogicConfig: redeemLogicPluginState.publicKey,
@@ -203,7 +199,92 @@ export const create = async (provider: AnchorProvider, params: OtcInitialization
 		signers: [otcState, otcSeniorReserveTokenAccount, otcJuniorReserveTokenAccount, otcSeniorTrancheTokenAccount, otcJuniorTrancheTokenAccount]
 	};
 
-	return [[vyperCoreInitTxPackage, otcInitTx], otcState.publicKey];
+	const txPackages = [vyperCoreInitTxPackage, otcInitTx];
+
+	if (fundSide) {
+		const fundTx = new Transaction();
+
+		if (ratePluginType === 'switchboard') {
+			const rateSwitchboardProgram = new Program<RateSwitchboard>(RateSwitchboardIDL, new PublicKey(PROGRAMS.RATE_SWITCHBOARD_PROGRAM_ID), provider);
+			fundTx.add(
+				await rateSwitchboardProgram.methods
+					.refresh()
+					.accounts({
+						rateData: ratePluginState.publicKey
+					})
+					.remainingAccounts(
+						params.rateOption.rateAccounts.map((c) => {
+							return { pubkey: new PublicKey(c), isSigner: false, isWritable: false };
+						})
+					)
+					.instruction()
+			);
+		} else if (ratePluginType === 'pyth') {
+			const ratePythProgram = new Program<RatePyth>(RatePythIDL, new PublicKey(PROGRAMS.RATE_PYTH_PROGRAM_ID), provider);
+			fundTx.add(
+				await ratePythProgram.methods
+					.refresh()
+					.accounts({
+						rateData: ratePluginState.publicKey
+					})
+					.remainingAccounts(
+						params.rateOption.rateAccounts.map((c) => {
+							return { pubkey: new PublicKey(c), isSigner: false, isWritable: false };
+						})
+					)
+					.instruction()
+			);
+		} else {
+			throw Error('rate plugin not supported: ' + ratePluginType);
+		}
+
+		fundTx.add(
+			await vyperCoreProgram.methods
+				.refreshTrancheFairValue()
+				.accounts({
+					trancheConfig: vyperConfig.trancheConfig,
+					seniorTrancheMint: vyperConfig.seniorTrancheMint,
+					juniorTrancheMint: vyperConfig.juniorTrancheMint,
+					rateProgramState: ratePluginState.publicKey,
+					redeemLogicProgram: redeemLogicProgramPublicKey,
+					redeemLogicProgramState: redeemLogicPluginState.publicKey
+				})
+				.instruction()
+		);
+
+		const atokenAccount = await getAssociatedTokenAddress(new PublicKey(params.collateralMint), provider.wallet.publicKey);
+
+		fundTx.add(
+			await vyperOtcProgram.methods
+				.deposit({
+					isSeniorSide: fundSide === 'long'
+				})
+				.accounts({
+					userReserveTokenAccount: atokenAccount,
+					beneficiaryTokenAccount: atokenAccount,
+					otcState: otcState.publicKey,
+					otcAuthority,
+					otcSeniorReserveTokenAccount: otcSeniorReserveTokenAccount.publicKey,
+					otcJuniorReserveTokenAccount: otcJuniorReserveTokenAccount.publicKey,
+					otcSeniorTrancheTokenAccount: otcSeniorTrancheTokenAccount.publicKey,
+					otcJuniorTrancheTokenAccount: otcJuniorTrancheTokenAccount.publicKey,
+
+					reserveMint: params.collateralMint,
+					seniorTrancheMint: vyperConfig.seniorTrancheMint,
+					juniorTrancheMint: vyperConfig.juniorTrancheMint,
+
+					vyperTrancheConfig: vyperConfig.trancheConfig,
+					vyperTrancheAuthority: vyperConfig.trancheAuthority,
+					vyperReserve: vyperConfig.vyperReserve,
+					vyperCore: vyperCoreProgram.programId
+				})
+				.instruction()
+		);
+
+		txPackages.push({ tx: fundTx, description: fundSide === 'long' ? 'Buy contract' : 'Sell contract' });
+	}
+
+	return [txPackages, otcState.publicKey];
 };
 
 type VyperCoreTrancheConfig = {

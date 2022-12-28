@@ -1,13 +1,12 @@
 /* eslint-disable space-before-function-paren */
 
-import { Box, CircularProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
+
 import { useConnection } from '@solana/wallet-adapter-react';
-import ChainOtcStateDetails from 'components/organisms/ChainOtcStateDetails/ChainOtcStateDetails';
+import OtcContractContainer from 'components/OtcContractContainer';
 import Layout from 'components/templates/Layout';
 import { useGetFetchOTCStateQuery } from 'hooks/useGetFetchOTCStateQuery';
 import { useRouter } from 'next/router';
-
-import styles from './summary.module.scss';
 
 const SummaryPageId = () => {
 	const router = useRouter();
@@ -18,27 +17,14 @@ const SummaryPageId = () => {
 	// Pass the cluster option as a unique indetifier to the query
 	const rateStateQuery = useGetFetchOTCStateQuery(connection, id as string);
 
-	const loadingSpinner = rateStateQuery?.isLoading;
-	const errorMessage = rateStateQuery?.isError;
-	const showContent = rateStateQuery?.isSuccess;
+	const [pageTitle, setPageTitle] = useState('');
+	useEffect(() => {
+		if (rateStateQuery.data) setPageTitle(`${rateStateQuery.data.chainData.getContractTitle()} ${rateStateQuery.data.aliasId.toUpperCase()}`);
+	}, [rateStateQuery.data]);
 
 	return (
-		<Layout withSearch>
-			<Box className={styles.container}>
-				{errorMessage && <p>Contract not found</p>}
-
-				{loadingSpinner && <CircularProgress />}
-
-				{showContent && !errorMessage && !loadingSpinner && rateStateQuery?.data && (
-					<ChainOtcStateDetails
-						otcState={rateStateQuery?.data}
-						isFetching={rateStateQuery.isFetching}
-						onRefetchClick={() => {
-							rateStateQuery.refetch();
-						}}
-					/>
-				)}
-			</Box>
+		<Layout withSearch pageTitle={pageTitle}>
+			<OtcContractContainer pubkey={id as string} />
 		</Layout>
 	);
 };
