@@ -19,16 +19,10 @@ const Simulator = ({ chainData, className, ref }: SimulatorProps) => {
 	const tokenSymbol = chainData.collateralTokenInfo?.symbol ?? '';
 
 	const longPnl = parseFloat(
-		formatWithDecimalDigits(
-			chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[0],
-			4
-		)
+		formatWithDecimalDigits(chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[0], 4)
 	);
 	const shortPnl = parseFloat(
-		formatWithDecimalDigits(
-			chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[1],
-			4
-		)
+		formatWithDecimalDigits(chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[1], 4)
 	);
 
 	const handleOnPriceChange = (newValue: string, i: number) => {
