@@ -15,25 +15,23 @@ export const formatCurrency = (x: number, d: boolean): string | number => {
 	}
 };
 
-export const formatWithDecimalDigits = (val: number, precision = 4): number => {
+export const formatWithDecimalDigits = (val: number, precision = 4): string => {
 	const str = val.toString();
-	const [integer, decimal] = str.split('.');
+	const [integerString, decimalString] = str.split('.');
 
-	let parsedDecimal: string | undefined;
-	if (decimal !== undefined) {
-		let startIndex = 0;
-		while (decimal[startIndex] === '0') {
-			startIndex += 1;
-		}
+	const parsedIntegerString = new Intl.NumberFormat('en-US').format(parseInt(integerString));
 
-		const roundedDecimal = parseInt(decimal.slice(startIndex)).toPrecision(precision).toString().replace('.', '').slice(0, precision);
-		parsedDecimal = decimal.slice(0, startIndex) + roundedDecimal;
+	if ( precision === -1 ) {
+		if ( decimalString ) return `${parsedIntegerString}.${decimalString}`;
+		return parsedIntegerString;
 	}
 
-	let strNum = integer;
-	if (parsedDecimal !== undefined) {
-		strNum = strNum + '.' + parsedDecimal;
+	if ( val < 1 && val > -1 ) {
+		return val.toPrecision(precision);
 	}
-
-	return parseFloat(strNum);
+	
+	const decimal = val - parseInt(integerString);
+	const parsedDecimalString = decimal.toFixed(precision).slice(2);
+	
+	return `${parsedIntegerString}.${parsedDecimalString}`;
 };
