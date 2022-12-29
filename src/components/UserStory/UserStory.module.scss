@@ -1,0 +1,36 @@
+.container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 0 60px;
+
+    .story {
+        text-align: center;
+        padding: 24px;
+        flex-grow: 1;
+        font-size: var(--font-heading);
+
+        .storyPrefix {
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .storyBody {
+            background-color: #caffc8;
+            display: inline-block;
+            padding: 16px 24px;
+            border-radius: 16px;
+        }
+    }
+}
+
+@media (max-width: 725px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .story {
+        min-height: 200px;
+    }
+}
