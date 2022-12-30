@@ -455,6 +455,15 @@
 			"baseCurrency": "",
 			"quoteCurrency": "",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/3DVLHvQSfTiU5EjswsQHr4MTNxtyaUFaWSshakQnKJoW"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "RxUSGMjEXXZbz5sycYm7BPm1GpYSDkx884RUdE4orG6",
+			"title": "BONK/USD",
+			"baseCurrency": "BONK",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://switchboard.xyz/explorer/2/RxUSGMjEXXZbz5sycYm7BPm1GpYSDkx884RUdE4orG6"
 		}
 	]
 }
