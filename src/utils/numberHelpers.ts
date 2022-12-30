@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+
 /**
  * Converts a number value into a string with commas for thousands
  * and dots for decimals
@@ -16,7 +18,8 @@ export const formatCurrency = (x: number, d: boolean): string | number => {
 };
 
 export const formatWithDecimalDigits = (val: number, precision = 4): string => {
-	const str = val.toString();
+	const bigVal = new BigNumber(val);
+	const str = bigVal.toString();
 	const [integerString, decimalString] = str.split('.');
 
 	const parsedIntegerString = new Intl.NumberFormat('en-US').format(parseInt(integerString));
@@ -26,12 +29,16 @@ export const formatWithDecimalDigits = (val: number, precision = 4): string => {
 		return parsedIntegerString;
 	}
 
-	if (val < 1 && val > -1) {
-		return val.toPrecision(precision);
+	if (bigVal.isEqualTo(0)) {
+		return bigVal.toPrecision(precision + 1);
 	}
 
-	const decimal = val - parseInt(integerString);
-	const parsedDecimalString = decimal.toFixed(precision).slice(2);
+	if (bigVal.isLessThan(1) && bigVal.isGreaterThan(-1)) {
+		return bigVal.toPrecision(precision);
+	}
+
+	const decimal = bigVal.minus(new BigNumber(integerString));
+	const parsedDecimalString = decimal.toFixed(precision).split('.')[1];
 
 	return `${parsedIntegerString}.${parsedDecimalString}`;
 };
