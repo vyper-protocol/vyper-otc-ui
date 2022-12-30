@@ -475,6 +475,15 @@
 			"quoteCurrency": "USD",
 			"explorerUrl": "https://switchboard.xyz/explorer/2/CqoifEoCm6CLKfae8pryn65bwpv3MkX65sBtCAwi5xGr",
 			"tradingViewSymbol": "COFFEEMAR23"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "devnet",
+			"pubkey": "RxUSGMjEXXZbz5sycYm7BPm1GpYSDkx884RUdE4orG6",
+			"title": "BONK/USD",
+			"baseCurrency": "BONK",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://switchboard.xyz/explorer/2/RxUSGMjEXXZbz5sycYm7BPm1GpYSDkx884RUdE4orG6"
 		}
 	]
 }
