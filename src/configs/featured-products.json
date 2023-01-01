@@ -1,60 +1,60 @@
 {
-    "sponsored" : [
-        {
-            "ticker": "SBF-JAIL",
-            "title": "Will Sam-Bankman Fried go to jail?",
-            "description": "A contract to bet whether SBF will go to jail by year-end 2022.",
-            "chipOne": "DIGITAL",
-            "chipTwo": "ALTERNATIVE",
-            "imgSrc": "/sbf-logo.jpg",
-            "linkUrl": "/contract/featured/sbf-to-jail",
-            "isActive": true
-        },
-        {
-            "ticker": "C-SOL-10X",
-            "title": "Will Solana go up 10% in the next 30 days?",
-            "description": "A binary option to bet on SOL short term price movements.",
-            "chipOne": "DIGITAL",
-            "chipTwo": "CRYPTO",
-            "imgSrc": "/sol-logo.png",
-            "linkUrl": "/contract/featured/sol-10x",
-            "isActive": true
-    },
-        {
-            "ticker": "P-BNB-1wk",
-            "title": "Will Binance Coin go down?",
-            "description": "Hedge against unexpected events in BNB price with a BNB put option.",
-            "chipOne": "VANILLA OPTION",
-            "chipTwo": "CRYPTO",
-            "imgSrc": "/bnb-logo.png",
-            "isActive": false
-        },
-        {
-            "ticker": "ALMD-DEFAULT",
-            "title": "Alameda Research Credit Default Put",
-            "description": "Hedge against a potential default of Alameda Research.",
-            "chipOne": "DIGITAL",
-            "chipTwo": "CREDIT",
-            "imgSrc": "/almond-research.png",
-            "isActive": false
-        },
-        {
-            "ticker": "AAPL/USD",
-            "title": "Apple Inc. Non Deliverable Forward",
-            "description": "It's dividend season! Bet on whether Apple will pay a dividend in 2022.",
-            "chipOne": "FORWARD",
-            "chipTwo": "STOCKS",
-            "imgSrc": "/apple-logo.png",
-            "isActive": false
-        },
-        {
-            "ticker": "USDT Depeg",
-            "title": "Tether depegging from 1 USD",
-            "description": "Defend against a potential depegging of USDT with a crash put.",
-            "chipOne": "DIGITAL",
-            "chipTwo": "STABLECOIN",
-            "imgSrc" :"/usdt-logo.png",
-            "isActive": false
-        }
-    ]
+	"sponsored": [
+		{
+			"ticker": "SBF-JAIL",
+			"title": "Will Sam-Bankman Fried go to jail?",
+			"description": "A contract to bet whether SBF will go to jail by year-end 2022.",
+			"chipOne": "DIGITAL",
+			"chipTwo": "ALTERNATIVE",
+			"imgSrc": "/sbf-logo.jpg",
+			"linkUrl": "/contract/featured/sbf-to-jail",
+			"isActive": true
+		},
+		{
+			"ticker": "C-SOL-10X",
+			"title": "Will Solana go up 10% in the next 30 days?",
+			"description": "A binary option to bet on SOL short term price movements.",
+			"chipOne": "DIGITAL",
+			"chipTwo": "CRYPTO",
+			"imgSrc": "/sol-logo.png",
+			"linkUrl": "/contract/featured/sol-10x",
+			"isActive": true
+		},
+		{
+			"ticker": "USDT Depeg",
+			"title": "Tether depegging from 1 USD",
+			"description": "Defend against a potential depegging of USDT with a crash put.",
+			"chipOne": "DIGITAL",
+			"chipTwo": "STABLECOIN",
+			"imgSrc": "/usdt-logo.png",
+			"isActive": false
+		},
+		{
+			"ticker": "P-BNB-1wk",
+			"title": "Will Binance Coin go down?",
+			"description": "Hedge against unexpected events in BNB price with a BNB put option.",
+			"chipOne": "VANILLA OPTION",
+			"chipTwo": "CRYPTO",
+			"imgSrc": "/bnb-logo.png",
+			"isActive": false
+		},
+		{
+			"ticker": "ALMD-DEFAULT",
+			"title": "Alameda Research Credit Default Put",
+			"description": "Hedge against a potential default of Alameda Research.",
+			"chipOne": "DIGITAL",
+			"chipTwo": "CREDIT",
+			"imgSrc": "/almond-research.png",
+			"isActive": false
+		},
+		{
+			"ticker": "AAPL/USD",
+			"title": "Apple Inc. Non Deliverable Forward",
+			"description": "It's dividend season! Bet on whether Apple will pay a dividend in 2022.",
+			"chipOne": "FORWARD",
+			"chipTwo": "STOCKS",
+			"imgSrc": "/apple-logo.png",
+			"isActive": false
+		}
+	]
 }

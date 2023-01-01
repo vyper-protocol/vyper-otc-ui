@@ -1,89 +1,90 @@
 .sponsored_div {
-    /* Auto layout */
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 0px;
-    display: flex;
-    // align-self: auto;
-    width: 400px;
-    height: auto;
-    padding: 15px;
-    margin: 5px;
-    transition: transform 0.25s, box-shadow 0.25s;
+	/* Auto layout */
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	padding: 0px;
+	display: flex;
+	// align-self: auto;
+	width: 350px;
+	height: auto;
+	padding: 10px;
+	margin: 2px;
+	transition: transform 0.25s, box-shadow 0.25s;
 }
 
 .sponsored_card:hover {
-    transform: scale(1.05) perspective(10px);
-    box-shadow: 10px 10px 10px rgb(45, 76, 137);
-    // rotate: 100deg;
-    // transform: rotate3d(180, 0, 0, 100deg);
-    }
+	// transform: scale(1.05) perspective(10px);
+	box-shadow: 5px 5px 5px rgb(45, 76, 137);
+	// rotate: 100deg;
+	// transform: rotate3d(180, 0, 0, 100deg);
+}
 
 .sponsored_card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 16px;
-    height: auto;
-    background: #FFFFFF;
-    box-shadow: 1px 1px 1px 1px #E0E0E0;
-    border-radius: 4px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 16px;
+	height: auto;
+	background: #ffffff;
+	box-shadow: 1px 1px 1px 1px #e0e0e0;
+	border-radius: 4px;
 }
 
 .sponsored_card_inactive {
-    filter: blur(3px);
-  }
+	filter: blur(1px);
+	opacity: 0.3;
+}
 
 .card_box {
-    flex: none;
-    align-self: stretch;
-    padding: 16px;
+	flex: none;
+	align-self: stretch;
+	padding: 16px;
 
-    width: fit-content;
-    height: 250px;
+	width: fit-content;
+	height: 250px;
 }
 
 .card_header {
-   /* Typography/Subtitle 2 */
+	/* Typography/Subtitle 2 */
 
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 157%;
-    /* identical to box height, or 22px */
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 157%;
+	/* identical to box height, or 22px */
 
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.1px;
+	display: flex;
+	align-items: center;
+	letter-spacing: 0.1px;
 
-    /* Light/Primary/Main */
-    color: #1976D2;
+	/* Light/Primary/Main */
+	color: #1976d2;
 }
 
 .card_title {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 160%;
-    /* identical to box height, or 32px */
-    
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.15px;
-    
-    /* Light/Text/Primary */
-    
-    color: rgba(0, 0, 0, 0.87);
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 160%;
+	/* identical to box height, or 32px */
+
+	display: flex;
+	align-items: center;
+	letter-spacing: 0.15px;
+
+	/* Light/Text/Primary */
+
+	color: rgba(0, 0, 0, 0.87);
 }
 
 .card_image {
-// width: auto; 
-// height: 100%;
-// padding: 0;
-// margin: 0;
-width: auto;
-height: 120px;
+	// width: auto;
+	// height: 100%;
+	// padding: 0;
+	// margin: 0;
+	width: auto;
+	height: 120px;
 }

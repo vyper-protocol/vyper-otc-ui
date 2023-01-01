@@ -10,10 +10,10 @@ const SponsoredPage = () => {
 		<Layout>
 			<Box className={styles.container}>
 				<h2>Featured Products</h2>
-				<h4>
+				{/* <h4>
 					A selection of our most requested trading products, all built using our <Link href="/contract/create">Vyper derivatives engine</Link>{' '}
-				</h4>
-				<div>
+				</h4> */}
+				<div className={styles.container}>
 					<SponsoredGrid></SponsoredGrid>
 				</div>
 			</Box>
