@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { Box, Link } from '@mui/material';
+import { Box } from '@mui/material';
 import SponsoredGrid from 'components/SponsoredGrid/SponsoredGrid';
 import Layout from 'components/templates/Layout';
 
@@ -10,11 +9,9 @@ const SponsoredPage = () => {
 		<Layout>
 			<Box className={styles.container}>
 				<h2>Featured Products</h2>
-				{/* <h4>
-					A selection of our most requested trading products, all built using our <Link href="/contract/create">Vyper derivatives engine</Link>{' '}
-				</h4> */}
+
 				<div className={styles.container}>
-					<SponsoredGrid></SponsoredGrid>
+					<SponsoredGrid />
 				</div>
 			</Box>
 		</Layout>

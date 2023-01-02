@@ -483,7 +483,18 @@
 			"title": "BONK/USD",
 			"baseCurrency": "BONK",
 			"quoteCurrency": "USD",
-			"explorerUrl": "https://switchboard.xyz/explorer/2/RxUSGMjEXXZbz5sycYm7BPm1GpYSDkx884RUdE4orG6"
+			"explorerUrl": "https://switchboard.xyz/explorer/2/RxUSGMjEXXZbz5sycYm7BPm1GpYSDkx884RUdE4orG6",
+			"category": "Crypto"
+		},
+		{
+			"type": "switchboard",
+			"cluster": "mainnet-beta",
+			"pubkey": "GnL9fGrXVSMyEeoGtrmPzjEaw9JdbNpioQkJj6wfcscY",
+			"title": "BONK/USD",
+			"baseCurrency": "BONK",
+			"quoteCurrency": "USD",
+			"explorerUrl": "https://switchboard.xyz/explorer/3/GnL9fGrXVSMyEeoGtrmPzjEaw9JdbNpioQkJj6wfcscY",
+			"category": "Crypto"
 		}
 	]
 }

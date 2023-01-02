@@ -35,49 +35,5 @@
 			"icon": "FaTelegramPlane",
 			"link": "https://t.me/+aiK0sR0msfk1NWNk"
 		}
-	],
-
-	"featured": [
-		{
-			"id": "sbf-to-jail",
-			"name": "SBF TO JAIL",
-			"icon": "GiImprisoned"
-		},
-		{
-			"id": "fixed-payout/btc",
-			"pubkey": "HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J",
-			"name": "BTC 10x",
-			"icon": "IoIosRocket"
-		},
-		{
-			"id": "fixed-payout/eth",
-			"pubkey": "EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw",
-			"name": "ETH 10x",
-			"icon": "IoIosRocket"
-		},
-		{
-			"id": "fixed-payout/sol",
-			"pubkey": "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix",
-			"name": "SOL 10x",
-			"icon": "IoIosRocket"
-		},
-		{
-			"id": "fixed-payout/bnb",
-			"pubkey": "GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b",
-			"name": "BNB 10x",
-			"icon": "IoIosRocket"
-		},
-		{
-			"id": "fixed-payout/matic",
-			"pubkey": "FBirwuDFuRAu4iSGc7RGxN5koHB7EJM1wbCmyPuQoGur",
-			"name": "MATIC 10x",
-			"icon": "IoIosRocket"
-		},
-		{
-			"id": "fixed-payout/coffee",
-			"pubkey": "CqoifEoCm6CLKfae8pryn65bwpv3MkX65sBtCAwi5xGr",
-			"name": "COFFEE 10x",
-			"icon": "IoIosRocket"
-		}
 	]
 }

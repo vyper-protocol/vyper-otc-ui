@@ -10,6 +10,7 @@ import Icon, { AvailableIconNames } from 'components/Icon';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import SelectWallet from 'components/SelectWallet';
 import StatusBadge from 'components/StatusBadge';
+import featured from 'configs/featured.json';
 import resources from 'configs/resources.json';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -61,36 +62,39 @@ const TopBar = () => {
 			</div>
 
 			{/* FEATURED */}
-			{cluster === 'devnet' && (
-				<>
-					<div className={showFeaturedMenu ? cn(styles.item, styles.active) : cn(styles.item)} onClick={openFeaturedMenu}>
-						<EmojiObjectsIcon /> Featured <BiChevronDown size="20px" />
-					</div>
-					<Popover
-						open={showFeaturedMenu}
-						anchorEl={featuredMenuAnchor}
-						anchorOrigin={{
-							horizontal: 'left',
-							vertical: 'bottom'
-						}}
-						PaperProps={{
-							className: styles.popover
-						}}
-						onClose={closeFeaturedMenu}
-					>
-						<Box className={styles.container}>
-							{resources.featured.map((item, i) => {
-								return (
-									<a key={i} className={styles.item} href={UrlBuilder.buildFeaturedUrl(item.id)}>
-										<Icon name={item.icon as AvailableIconNames} />
-										<Typography className={styles.typography}>{item.name}</Typography>
-									</a>
-								);
-							})}
-						</Box>
-					</Popover>
-				</>
-			)}
+
+			<div className={showFeaturedMenu ? cn(styles.item, styles.active) : cn(styles.item)} onClick={openFeaturedMenu}>
+				<EmojiObjectsIcon /> Featured <BiChevronDown size="20px" />
+			</div>
+			<Popover
+				open={showFeaturedMenu}
+				anchorEl={featuredMenuAnchor}
+				anchorOrigin={{
+					horizontal: 'left',
+					vertical: 'bottom'
+				}}
+				PaperProps={{
+					className: styles.popover
+				}}
+				onClose={closeFeaturedMenu}
+			>
+				<Box className={styles.container}>
+					<a className={styles.item} href={UrlBuilder.buildFeaturedUrl()}>
+						<Icon name={'AiFillWarning'} />
+						<Typography className={styles.typography}>{'SEE ALL'}</Typography>
+					</a>
+					{featured.featured
+						.filter(({ icon, clusters }) => icon && clusters?.includes(cluster))
+						.map((item, i) => {
+							return (
+								<a key={i} className={styles.item} href={UrlBuilder.buildFeaturedContractUrl(item.id)}>
+									<Icon name={item.icon as AvailableIconNames} />
+									<Typography className={styles.typography}>{item.ticker}</Typography>
+								</a>
+							);
+						})}
+				</Box>
+			</Popover>
 
 			{/* CREATE CONTRACT LINK */}
 			<div className={navigation[1].current ? cn(styles.item, styles.active) : cn(styles.item)}>

@@ -17,7 +17,7 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { OracleDetail } from 'models/OracleDetail';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
+import { getOraclesByTitle } from 'utils/oracleDatasetHelper';
 import { sleep } from 'utils/sleep';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -25,9 +25,10 @@ import styles from './FeaturedFixedPayout.module.scss';
 
 interface ActionPanelProps {
 	oracleDetail: OracleDetail;
+	multiplier: number;
 }
 
-const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
+const ActionPanel = ({ oracleDetail, multiplier }: ActionPanelProps) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -91,11 +92,6 @@ const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
 
 	const onCreateContractButtonClick = async () => {
 		try {
-			if (getCurrentCluster() !== 'devnet') {
-				alert('this page is only available on devnet');
-				return;
-			}
-
 			setIsLoading(true);
 
 			const initParams: OtcInitializationParams = {
@@ -105,7 +101,7 @@ const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
 				settleStart: settleStart.toDate().getTime(),
 
 				longDepositAmount,
-				shortDepositAmount: longDepositAmount * 10,
+				shortDepositAmount: longDepositAmount * multiplier,
 				aliasId: 'digital',
 				payoffOption: {
 					payoffId: 'digital',
@@ -135,7 +131,7 @@ const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
 	return (
 		<Box sx={{ alignItems: 'center', maxWidth: '45vw' }} className={cn(styles.container, styles.actionGroup)}>
 			<Typography variant="h6">
-				Make 10x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
+				Make {multiplier}x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
 				<LoadingValue isLoading={rfqLoading || !isInitialized}>
 					<span className={styles.highlight}>${rfqStrike.toFixed(4)}</span>
 				</LoadingValue>{' '}
@@ -143,13 +139,13 @@ const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
 			</Typography>
 			<br />
 			<Typography variant="body1">
-				With this instrument you can get a <b>fixed payout</b> (10x the invested amount) when the <b>market price</b> (
+				With this instrument you can get a <b>fixed payout</b> ({multiplier}x the invested amount) when the <b>market price</b> (
 				<LoadingValue isLoading={!isInitialized}>${pricesValue[0]?.toFixed(4)}</LoadingValue>) of the underlying asset ({oracleDetail.title}){' '}
 				<b>is greater than</b> the <b>strike price</b> (<LoadingValue isLoading={rfqLoading}>${rfqStrike.toFixed(4)}</LoadingValue>) within a given time (
 				{settleLabel}).
 				<br />
 				<br />
-				The maximum <b>gain</b> is <b>10x</b> the invested amount
+				The maximum <b>gain</b> is <b>{multiplier}x</b> the invested amount
 				<br />
 				The maximum <b>loss</b> is the invested amount
 			</Typography>
@@ -221,7 +217,7 @@ const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
 
 			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '100%' }}>
 				<Box>
-					<div className={styles.profit}>${longDepositAmount * 10}</div>
+					<div className={styles.profit}>${longDepositAmount * multiplier}</div>
 					<span className={styles.caption}>max gain</span>
 				</Box>
 				<Box>
@@ -234,21 +230,21 @@ const ActionPanel = ({ oracleDetail }: ActionPanelProps) => {
 };
 
 interface FeaturedFixedPayoutProps {
-	oraclePubkey: string;
+	ticker: string;
+	oracleTitle: string;
+	title: string;
 }
 
-const FeaturedFixedPayout = ({ oraclePubkey }: FeaturedFixedPayoutProps) => {
-	const oracleDetail = getOracleByPubkey(oraclePubkey);
+const FeaturedFixedPayout = ({ ticker, title, oracleTitle }: FeaturedFixedPayoutProps) => {
+	const oracleDetail = getOraclesByTitle(oracleTitle, 'pyth') ?? getOraclesByTitle(oracleTitle, 'switchboard');
 	return (
-		<FeaturedProduct pageTitle={`${oracleDetail.title} 10x`} symbol={oracleDetail?.tradingViewSymbol ?? oracleDetail.baseCurrency + oracleDetail.quoteCurrency}>
+		<FeaturedProduct pageTitle={ticker} symbol={oracleDetail?.tradingViewSymbol ?? oracleDetail?.baseCurrency + oracleDetail?.quoteCurrency}>
 			<Box>
 				<div className={styles.title}>
-					<h1>
-						{`${oracleDetail.title} 10x`} <br /> weekly call
-					</h1>
+					<h1>{title}</h1>
 				</div>
 
-				<ActionPanel oracleDetail={oracleDetail} />
+				<ActionPanel oracleDetail={oracleDetail} multiplier={10} />
 			</Box>
 		</FeaturedProduct>
 	);

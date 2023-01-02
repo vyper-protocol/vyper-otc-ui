@@ -1,15 +1,6 @@
 .sponsored_div {
-	/* Auto layout */
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	padding: 0px;
-	display: flex;
-	// align-self: auto;
 	width: 350px;
-	height: auto;
 	padding: 10px;
-	margin: 2px;
 	transition: transform 0.25s, box-shadow 0.25s;
 }
 
