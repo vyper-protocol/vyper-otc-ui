@@ -22,24 +22,25 @@
 		color: rgb(223, 76, 76);
 		font-size: 2em;
 	}
-}
 
-.button {
-	border-radius: 16px;
-}
-.refresh {
-	background-color: rgba(18, 20, 177, 0.797);
-
-	&:hover {
-		background-color: rgba(68, 71, 255, 0.959);
+	.button {
+		border-radius: 16px;
 	}
-}
 
-.buy {
-	background-color: rgba(1, 134, 16, 0.838);
+	.refresh {
+		background-color: rgba(18, 20, 177, 0.797);
 
-	&:hover {
-		background-color: rgba(0, 201, 23, 0.79);
+		&:hover {
+			background-color: rgba(68, 71, 255, 0.959);
+		}
+	}
+
+	.buy {
+		background-color: rgba(1, 134, 16, 0.838);
+
+		&:hover {
+			background-color: rgba(0, 201, 23, 0.79);
+		}
 	}
 }
 

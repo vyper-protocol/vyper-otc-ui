@@ -104,8 +104,8 @@ export const TemplateCard = ({
 				ratePluginType: rateId,
 				rateAccounts: [getOraclesByTitle(underlying, rateId).pubkey]
 			},
-			saveOnDatabase: true,
-			sendNotification: true
+			saveOnDatabase: process.env.NODE_ENV !== 'development',
+			sendNotification: process.env.NODE_ENV !== 'development'
 		});
 		router.push('/contract/create');
 	};
