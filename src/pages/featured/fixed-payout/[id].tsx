@@ -1,11 +1,12 @@
 import FeaturedFixedPayout from 'components/FeaturedFixedPayout';
+import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import featured from 'configs/featured.json';
 import { GetStaticProps, GetStaticPaths } from 'next';
 
 export const getStaticPaths: GetStaticPaths = async () => {
 	return {
 		paths: featured.featured
-			.filter(({ id }) => id && id.includes('fixed-payout'))
+			.filter(({ id, clusters }) => id && id.includes('fixed-payout') && clusters?.includes(getCurrentCluster()))
 			.map(({ id }) => {
 				return {
 					params: {
