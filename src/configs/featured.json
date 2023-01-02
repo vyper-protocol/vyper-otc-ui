@@ -76,7 +76,7 @@
 			"imgSrc": "/coffee-logo.png",
 			"isActive": true,
 			"id": "fixed-payout/coffee",
-			"oracle": "COFFEE/USD"
+			"oracle": "Coffee Mar23"
 		},
 		{
 			"ticker": "USDT Depeg",

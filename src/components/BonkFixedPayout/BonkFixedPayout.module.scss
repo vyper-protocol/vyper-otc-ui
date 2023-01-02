@@ -27,14 +27,6 @@
 		border-radius: 16px;
 	}
 
-	.refresh {
-		background-color: rgba(18, 20, 177, 0.797);
-
-		&:hover {
-			background-color: rgba(68, 71, 255, 0.959);
-		}
-	}
-
 	.buy {
 		background-color: rgba(1, 134, 16, 0.838);
 
@@ -49,26 +41,6 @@
 	padding: 24px;
 	height: fit-content;
 	align-items: left;
-
-	.progress {
-		color: black;
-	}
-
-	.rush {
-		color: red;
-	}
-
-	.hidden {
-		visibility: hidden;
-	}
-
-	.background {
-		color: rgba(52, 133, 155, 0.167);
-	}
-
-	.background_rush {
-		color: rgba(255, 0, 0, 0.235);
-	}
 }
 
 .caption {

@@ -8,7 +8,6 @@ import cn from 'classnames';
 import FeaturedProduct from 'components/FeaturedProduct';
 import LoadingValue from 'components/LoadingValue';
 import NumericField from 'components/NumericField';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
 import createContract from 'controllers/createContract';

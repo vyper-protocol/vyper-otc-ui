@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Box, Card, Chip, Grid } from '@mui/material';
+import { Box, Card } from '@mui/material';
 import { Cluster } from '@solana/web3.js';
 import cn from 'classnames';
 import StatusBadge from 'components/StatusBadge';
