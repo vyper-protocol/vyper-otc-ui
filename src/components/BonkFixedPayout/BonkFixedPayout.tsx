@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Box, Typography, ToggleButton } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -15,13 +15,16 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './BonkFixedPayout.module.scss';
 
 // TODO reuse make FeaturedFixedPayout more reusable
+
+const formatSmallNumber = (n: number): string => {
+	return n.toPrecision(4);
+};
 
 const ActionPanel = () => {
 	const { connection } = useConnection();
@@ -89,70 +92,37 @@ const ActionPanel = () => {
 
 	return (
 		<Box sx={{ alignItems: 'center', maxWidth: '45vw' }} className={cn(styles.container, styles.actionGroup)}>
-			<Typography variant="h6">
+			<Typography variant="h5">
 				Make 2x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
 				<LoadingValue isLoading={!isInitialized}>
-					<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(pricesValue[0], 4)}</span>
+					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0])}</span>
 				</LoadingValue>{' '}
-				on <span className={styles.highlight}>{settleLabel}</span>
+				in <span className={styles.highlight}>{60} minutes</span>
 			</Typography>
 			<br />
-			<Typography variant="body1">
-				With this instrument you can get a <b>fixed payout</b> (2x the invested amount) when the <b>market price</b> of {oracleDetail.title}{' '}
-				<b>is greater than</b> the <b>spot price</b> within the next 60 minutes.
+			<Typography sx={{ fontSize: '1.5em' }} variant="body1">
+				Bet <b>1,000,000 BONK</b> that BONK/USD will be <b>above</b>{' '}
+				<LoadingValue isLoading={!isInitialized}>
+					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0])}</span>
+				</LoadingValue>{' '}
+				in 60 minutes.
 				<br />
 				<br />
-				The maximum <b>gain</b> is <b>{maxGain} BONK</b>
+				If BONK/USD is <b>above</b> you <span className={styles.profit}>win 2,000,000 BONK</span> 🤑
 				<br />
-				The maximum <b>loss</b> is <b>{maxLoss} BONK</b>
+				If BONK/USD is <b>below</b> you <span className={styles.loss}>lose 1,000,000 BONK</span>
 			</Typography>
-			<hr />
-			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%', alignItems: 'center' }}>
-				<Box sx={{ display: 'inline-flex', height: 24 }}>
-					{pillars.map((pillarValue, i) => (
-						<ToggleButton
-							key={i}
-							value={pillarValue}
-							color="primary"
-							sx={{
-								fontSize: 18,
-								p: 2,
-								mx: 1
-							}}
-							size="large"
-							fullWidth={true}
-							selected={pillarValue === longDepositAmount}
-							onChange={(_e, v) => setLongDepositAmount(v)}
-						>
-							{`${pillarValue} BONK`}
-						</ToggleButton>
-					))}
-				</Box>
-
-				<Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
-					<LoadingButton
-						className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
-						loading={isLoading}
-						variant="contained"
-						disabled={!wallet.connected}
-						onClick={onCreateContractButtonClick}
-					>
-						{wallet.connected ? 'BUY' : 'Connect wallet'}
-					</LoadingButton>
-				</Box>
-			</Box>
-
-			<hr />
-
-			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '100%' }}>
-				<Box>
-					<div className={styles.profit}>{maxGain} BONK</div>
-					<span className={styles.caption}>max gain</span>
-				</Box>
-				<Box>
-					<div className={styles.loss}>{maxLoss} BONK</div>
-					<span className={styles.caption}>max loss</span>
-				</Box>
+			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%', alignItems: 'center', mt: 3 }}>
+				<LoadingButton
+					className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
+					loading={isLoading}
+					variant="contained"
+					disabled={!wallet.connected}
+					onClick={onCreateContractButtonClick}
+					size="large"
+				>
+					{wallet.connected ? 'BUY NOW' : 'Connect wallet'}
+				</LoadingButton>
 			</Box>
 		</Box>
 	);
@@ -163,7 +133,7 @@ const BonkFixedPayout = () => {
 		<FeaturedProduct pageTitle={'BONK'} image={'/bonk-logo.png'}>
 			<Box>
 				<div className={styles.title}>
-					<h1>{'BONK 2x'}</h1>
+					<h1>{'BONK 2x in 1 hour'}</h1>
 				</div>
 
 				<ActionPanel />
