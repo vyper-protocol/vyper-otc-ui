@@ -15,6 +15,7 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
@@ -34,7 +35,7 @@ const ActionPanel = () => {
 	const mintDetail = getMintByPubkey('DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263');
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [longDepositAmount, setLongDepositAmount] = useState(1_000_000);
+	const [longDepositAmount, setLongDepositAmount] = useState(1000000);
 
 	const settleStart = moment().add(1, 'hour');
 	const settleLabel = settleStart.format('DD MMM YYYY - hh:mm A');
@@ -70,6 +71,7 @@ const ActionPanel = () => {
 					rateAccounts: [oracleDetail.pubkey]
 				},
 				collateralMint: mintDetail.pubkey
+				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
 			};
 
 			// create contract
@@ -90,7 +92,7 @@ const ActionPanel = () => {
 			<Typography variant="h6">
 				Make 2x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
 				<LoadingValue isLoading={!isInitialized}>
-					<span className={styles.highlight}>${pricesValue[0]}</span>
+					<span className={styles.highlight}>${formatWithDecimalDigits(pricesValue[0], 4)}</span>
 				</LoadingValue>{' '}
 				on <span className={styles.highlight}>{settleLabel}</span>
 			</Typography>
@@ -158,7 +160,7 @@ const ActionPanel = () => {
 
 const BonkFixedPayout = () => {
 	return (
-		<FeaturedProduct pageTitle={'BONK'} symbol={'BONKUSD'}>
+		<FeaturedProduct pageTitle={'BONK'} image={'/bonk-logo.png'}>
 			<Box>
 				<div className={styles.title}>
 					<h1>{'BONK 2x'}</h1>

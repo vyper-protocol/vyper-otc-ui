@@ -7,12 +7,9 @@ import styles from './index.module.scss';
 const SponsoredPage = () => {
 	return (
 		<Layout>
-			<Box className={styles.container}>
+			<Box sx={{ display: 'flex' }} className={styles.container}>
 				<h2>Featured Products</h2>
-
-				<div className={styles.container}>
-					<SponsoredGrid />
-				</div>
+				<SponsoredGrid />
 			</Box>
 		</Layout>
 	);

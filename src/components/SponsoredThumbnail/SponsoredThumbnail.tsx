@@ -23,7 +23,7 @@ export type SponsoredThumbnailProps = {
 
 const SponsoredThumbnail = ({ ticker, title, description, tags, imgSrc, isActive, id }: SponsoredThumbnailProps) => {
 	return (
-		<a href={buildFeaturedContractUrl(id)} target="_blank" rel="noreferrer">
+		<a href={id} target="_blank" rel="noreferrer">
 			<div className={styles.sponsored_div}>
 				<Card className={isActive ? styles.sponsored_card : cn(styles.sponsored_card, styles.sponsored_card_inactive)}>
 					<Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
