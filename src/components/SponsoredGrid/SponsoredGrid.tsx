@@ -16,6 +16,11 @@ const createYourOwn = {
 	isActive: true
 };
 
+const isFullUrl = (s: string) => {
+	const regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+	return regexp.test(s);
+};
+
 const SponsoredGrid = () => {
 	const sponsoredList = featured.featured as TemplateCardProps[];
 	const currentCluster = getCurrentCluster();
@@ -29,7 +34,7 @@ const SponsoredGrid = () => {
 				.map(({ ticker, title, description, tags, imgSrc, isActive, id }, i) => (
 					<SponsoredThumbnail
 						key={i}
-						id={buildFeaturedContractUrl(id)}
+						id={isFullUrl(id) ? id : buildFeaturedContractUrl(id)}
 						ticker={ticker}
 						title={title}
 						description={description}

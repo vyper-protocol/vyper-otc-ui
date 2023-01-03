@@ -92,7 +92,7 @@ const ActionPanel = () => {
 			<Typography variant="h6">
 				Make 2x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
 				<LoadingValue isLoading={!isInitialized}>
-					<span className={styles.highlight}>${formatWithDecimalDigits(pricesValue[0], 4)}</span>
+					<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(pricesValue[0], 4)}</span>
 				</LoadingValue>{' '}
 				on <span className={styles.highlight}>{settleLabel}</span>
 			</Typography>
