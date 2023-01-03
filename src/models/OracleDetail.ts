@@ -6,9 +6,10 @@ export type OracleDetail = {
 	type: RateTypeIds;
 	cluster: Cluster;
 	pubkey: string;
-	title: string | undefined;
-	baseCurrency?: string | undefined;
-	quoteCurrency?: string | undefined;
-	explorerUrl: string | undefined;
-	category?: string | undefined;
+	title: string;
+	baseCurrency?: string;
+	quoteCurrency?: string;
+	explorerUrl: string;
+	category?: string;
+	tradingViewSymbol?: string;
 };

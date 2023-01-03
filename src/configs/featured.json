@@ -1,0 +1,116 @@
+{
+	"featured": [
+		{
+			"ticker": "BONK",
+			"title": "Make 1m BONK betting on BONK",
+			"description": "Make 2x on your BONK if the price goes up in 60 minutes",
+			"tags": ["digital", "crypto"],
+			"clusters": ["mainnet-beta"],
+			"imgSrc": "/bonk-logo.png",
+			"isActive": true,
+			"id": "bonk",
+			"icon": "IoIosRocket"
+		},
+		{
+			"ticker": "SOL 10x",
+			"title": "Will Solana go up in the next week?",
+			"description": "A binary option to bet on SOL short term price movements.",
+			"tags": ["digital", "crypto"],
+			"clusters": ["devnet", "mainnet-beta"],
+			"imgSrc": "/sol-logo.png",
+			"isActive": true,
+			"id": "fixed-payout/sol",
+			"oracle": "SOL/USD",
+			"icon": "IoIosRocket"
+		},
+		{
+			"ticker": "BTC 10x",
+			"title": "Will Bitcoin go up in the next week?",
+			"description": "A binary option to bet on BTC short term price movements.",
+			"tags": ["digital", "crypto"],
+			"clusters": ["devnet"],
+			"imgSrc": "/btc-logo.png",
+			"isActive": true,
+			"id": "fixed-payout/btc",
+			"oracle": "BTC/USD"
+		},
+		{
+			"ticker": "ETH 10x",
+			"title": "Will Ethereum go up in the next week?",
+			"description": "A binary option to bet on ETH short term price movements.",
+			"tags": ["digital", "crypto"],
+			"clusters": ["devnet"],
+			"imgSrc": "/eth-logo.png",
+			"isActive": true,
+			"id": "fixed-payout/eth",
+			"oracle": "ETH/USD"
+		},
+		{
+			"ticker": "BNB 10x",
+			"title": "Will Binance Coin go up in the next week?",
+			"description": "A binary option to bet on BNB short term price movements.",
+			"tags": ["digital", "crypto"],
+			"clusters": ["devnet"],
+			"imgSrc": "/bnb-logo.png",
+			"isActive": true,
+			"id": "fixed-payout/bnb",
+			"oracle": "BNB/USD"
+		},
+		{
+			"ticker": "MATIC 10x",
+			"title": "Will Matic go up in the next week?",
+			"description": "A binary option to bet on MATIC short term price movements.",
+			"tags": ["digital", "crypto"],
+			"clusters": ["devnet"],
+			"imgSrc": "/matic-logo.png",
+			"isActive": true,
+			"id": "fixed-payout/matic",
+			"oracle": "MATIC/USD"
+		},
+		{
+			"ticker": "COFFEE 10x",
+			"title": "Will Coffee go up in the next week?",
+			"description": "A binary option to bet on COFFEE short term price movements.",
+			"tags": ["digital", "commodities"],
+			"clusters": ["devnet"],
+			"imgSrc": "/coffee-logo.png",
+			"isActive": true,
+			"id": "fixed-payout/coffee",
+			"oracle": "Coffee Mar23"
+		},
+		{
+			"ticker": "USDT Depeg",
+			"title": "Tether depegging from 1 USD?",
+			"description": "Defend against a potential depegging of USDT with a crash put.",
+			"tags": ["digital", "stablecoin"],
+			"imgSrc": "/usdt-logo.png",
+			"isActive": false
+		},
+		{
+			"ticker": "P-BNB-1wk",
+			"title": "Will Binance Coin go down?",
+			"description": "Hedge against unexpected events in BNB price with a BNB put option.",
+			"tags": ["vanilla option", "crypto"],
+			"imgSrc": "/bnb-logo.png",
+			"isActive": false
+		},
+		{
+			"ticker": "ALMD-DEFAULT",
+			"title": "Alameda Research Credit Default Put",
+			"description": "Hedge against a potential default of Alameda Research.",
+			"tags": ["digital", "credit"],
+			"clusters": ["devnet", "mainnet-beta"],
+			"imgSrc": "/almond-research.png",
+			"isActive": true,
+			"id": "https://www.notion.so/vyperprotocol/Credora-Credit-Derivatives-b4bb2b642fdb43be83fafb1c31ef8902"
+		},
+		{
+			"ticker": "AAPL/USD",
+			"title": "Apple Inc. Non Deliverable Forward",
+			"description": "It's dividend season! Bet on whether Apple will pay a dividend in 2022.",
+			"tags": ["forward", "stocks"],
+			"imgSrc": "/apple-logo.png",
+			"isActive": false
+		}
+	]
+}

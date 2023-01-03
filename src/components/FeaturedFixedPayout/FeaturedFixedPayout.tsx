@@ -1,28 +1,33 @@
-/* eslint-disable no-console */
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Box, CircularProgress, ToggleButton, Typography } from '@mui/material';
+import { Box, Typography, ToggleButton, CircularProgress } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import FeaturedProduct from 'components/FeaturedProduct';
 import LoadingValue from 'components/LoadingValue';
 import NumericField from 'components/NumericField';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+import { OracleDetail } from 'models/OracleDetail';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { getOraclesByTitle } from 'utils/oracleDatasetHelper';
 import { sleep } from 'utils/sleep';
 import * as UrlBuilder from 'utils/urlBuilder';
 
-import styles from './index.module.scss';
+import styles from './FeaturedFixedPayout.module.scss';
 
-const ActionPanel = () => {
+interface ActionPanelProps {
+	oracleDetail: OracleDetail;
+	multiplier: number;
+}
+
+const ActionPanel = ({ oracleDetail, multiplier }: ActionPanelProps) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -39,7 +44,8 @@ const ActionPanel = () => {
 	const settleLabel = settleStart.format('DD MMM YYYY - hh:mm A');
 
 	const [rfqLoading, setRfqLoading] = useState(false);
-	const { pricesValue, isInitialized } = useOracleLivePrice('pyth', DEFAULT_INIT_PARAMS.rateOption.rateAccounts);
+
+	const { pricesValue, isInitialized } = useOracleLivePrice(oracleDetail.type, [oracleDetail.pubkey]);
 
 	// const refStrike = () => BSDigitalStrike(pricesValue[0], 0, 0.85, 7 / 365, true, 0.1);
 	// FIXME
@@ -85,11 +91,6 @@ const ActionPanel = () => {
 
 	const onCreateContractButtonClick = async () => {
 		try {
-			if (getCurrentCluster() !== 'devnet') {
-				alert('this page is only available on devnet');
-				return;
-			}
-
 			setIsLoading(true);
 
 			const initParams: OtcInitializationParams = {
@@ -99,12 +100,17 @@ const ActionPanel = () => {
 				settleStart: settleStart.toDate().getTime(),
 
 				longDepositAmount,
-				shortDepositAmount: longDepositAmount * 10,
+				shortDepositAmount: longDepositAmount * multiplier,
 				aliasId: 'digital',
 				payoffOption: {
 					payoffId: 'digital',
 					strike: rfqStrike,
 					isCall: true
+				},
+
+				rateOption: {
+					ratePluginType: oracleDetail.type,
+					rateAccounts: [oracleDetail.pubkey]
 				}
 			};
 
@@ -124,7 +130,7 @@ const ActionPanel = () => {
 	return (
 		<Box sx={{ alignItems: 'center', maxWidth: '45vw' }} className={cn(styles.container, styles.actionGroup)}>
 			<Typography variant="h6">
-				Make 10x if the price of <span className={styles.highlight}>SOL/USD</span> is above{' '}
+				Make {multiplier}x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
 				<LoadingValue isLoading={rfqLoading || !isInitialized}>
 					<span className={styles.highlight}>${rfqStrike.toFixed(4)}</span>
 				</LoadingValue>{' '}
@@ -132,12 +138,13 @@ const ActionPanel = () => {
 			</Typography>
 			<br />
 			<Typography variant="body1">
-				With this instrument you can get a <b>fixed payout</b> (10x the invested amount) when the <b>market price</b> (
-				<LoadingValue isLoading={!isInitialized}>${pricesValue[0]?.toFixed(4)}</LoadingValue>) of the underlying asset (SOL/USD) <b>is greater than</b> the{' '}
-				<b>strike price</b> (<LoadingValue isLoading={rfqLoading}>${rfqStrike.toFixed(4)}</LoadingValue>) within a given time ({settleLabel}).
+				With this instrument you can get a <b>fixed payout</b> ({multiplier}x the invested amount) when the <b>market price</b> (
+				<LoadingValue isLoading={!isInitialized}>${pricesValue[0]?.toFixed(4)}</LoadingValue>) of the underlying asset ({oracleDetail.title}){' '}
+				<b>is greater than</b> the <b>strike price</b> (<LoadingValue isLoading={rfqLoading}>${rfqStrike.toFixed(4)}</LoadingValue>) within a given time (
+				{settleLabel}).
 				<br />
 				<br />
-				The maximum <b>gain</b> is <b>10x</b> the invested amount
+				The maximum <b>gain</b> is <b>{multiplier}x</b> the invested amount
 				<br />
 				The maximum <b>loss</b> is the invested amount
 			</Typography>
@@ -170,7 +177,7 @@ const ActionPanel = () => {
 				</Box>
 				<Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
 					<LoadingButton
-						className={cn(styles.button, rfqProgress === 100 ? styles.refresh : styles.buy)}
+						className={cn(styles.button, !wallet.connected ? '' : rfqProgress === 100 ? styles.refresh : styles.buy)}
 						loading={isLoading}
 						variant="contained"
 						disabled={!wallet.connected || rfqLoading}
@@ -209,7 +216,7 @@ const ActionPanel = () => {
 
 			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '100%' }}>
 				<Box>
-					<div className={styles.profit}>${longDepositAmount * 10}</div>
+					<div className={styles.profit}>${longDepositAmount * multiplier}</div>
 					<span className={styles.caption}>max gain</span>
 				</Box>
 				<Box>
@@ -221,20 +228,25 @@ const ActionPanel = () => {
 	);
 };
 
-const CreateSol10xPage = () => {
+interface FeaturedFixedPayoutProps {
+	ticker: string;
+	oracleTitle: string;
+	title: string;
+}
+
+const FeaturedFixedPayout = ({ ticker, title, oracleTitle }: FeaturedFixedPayoutProps) => {
+	const oracleDetail = getOraclesByTitle(oracleTitle, 'pyth') ?? getOraclesByTitle(oracleTitle, 'switchboard');
 	return (
-		<FeaturedProduct pageTitle={'SOL 10x'} symbol={'SOLUSD'}>
+		<FeaturedProduct pageTitle={ticker} symbol={oracleDetail?.tradingViewSymbol ?? oracleDetail?.baseCurrency + oracleDetail?.quoteCurrency}>
 			<Box>
 				<div className={styles.title}>
-					<h1>
-						SOL 10x <br /> weekly call
-					</h1>
+					<h1>{title}</h1>
 				</div>
 
-				<ActionPanel />
+				<ActionPanel oracleDetail={oracleDetail} multiplier={10} />
 			</Box>
 		</FeaturedProduct>
 	);
 };
 
-export default CreateSol10xPage;
+export default FeaturedFixedPayout;

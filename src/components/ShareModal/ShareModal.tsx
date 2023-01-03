@@ -60,7 +60,7 @@ const ShareModal = ({ aliasId, statusId, contractAddress, rateAddress, open, han
 	const ShareMessage = (
 		<Box sx={{ p: 1 }}>
 			<Typography align="center" variant="h6">
-				{shareText} [LINK]
+				{shareText}
 			</Typography>
 		</Box>
 	);
