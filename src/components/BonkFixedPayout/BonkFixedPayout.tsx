@@ -38,15 +38,7 @@ const ActionPanel = () => {
 	const mintDetail = getMintByPubkey('DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263');
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [longDepositAmount, setLongDepositAmount] = useState(1000000);
-
-	const settleStart = moment().add(1, 'hour');
-	const settleLabel = settleStart.format('DD MMM YYYY - hh:mm A');
-
-	const pillars = [1000000];
-
-	const maxGain = new Intl.NumberFormat('en-US').format(longDepositAmount * 2);
-	const maxLoss = new Intl.NumberFormat('en-US').format(longDepositAmount);
+	const longDepositAmount = 1_000_000;
 
 	const { pricesValue, isInitialized } = useOracleLivePrice(oracleDetail.type, [oracleDetail.pubkey]);
 
@@ -57,8 +49,8 @@ const ActionPanel = () => {
 			const initParams: OtcInitializationParams = {
 				...DEFAULT_INIT_PARAMS,
 
-				depositEnd: moment().add(5, 'minutes').toDate().getTime(),
-				settleStart: moment().add(1, 'hour').toDate().getTime(),
+				depositEnd: moment().add(15, 'minutes').toDate().getTime(),
+				settleStart: moment().add(30, 'minutes').toDate().getTime(),
 
 				longDepositAmount,
 				shortDepositAmount: longDepositAmount * 2,
@@ -97,7 +89,7 @@ const ActionPanel = () => {
 				<LoadingValue isLoading={!isInitialized}>
 					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0])}</span>
 				</LoadingValue>{' '}
-				in <span className={styles.highlight}>{60} minutes</span>
+				in <span className={styles.highlight}>{30} minutes</span>
 			</Typography>
 			<br />
 			<Typography sx={{ fontSize: '1.5em' }} variant="body1">
@@ -105,7 +97,7 @@ const ActionPanel = () => {
 				<LoadingValue isLoading={!isInitialized}>
 					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0])}</span>
 				</LoadingValue>{' '}
-				in 60 minutes.
+				in 30 minutes.
 				<br />
 				<br />
 				If BONK/USD is <b>above</b> you <span className={styles.profit}>win 2,000,000 BONK</span> 🤑
@@ -133,7 +125,7 @@ const BonkFixedPayout = () => {
 		<FeaturedProduct pageTitle={'BONK'} image={'/bonk-logo.png'}>
 			<Box>
 				<div className={styles.title}>
-					<h1>{'BONK 2x in 1 hour'}</h1>
+					<h1>{'BONK 2x in 30 minutes'}</h1>
 				</div>
 
 				<ActionPanel />
