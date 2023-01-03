@@ -6,11 +6,12 @@ import TradingViewSymbol from 'components/TradingViewSymbol';
 
 interface FeaturedProductProps {
 	pageTitle: string;
-	symbol: string;
+	symbol?: string;
+	image?: string;
 	children: ReactNode;
 }
 
-const FeaturedProduct = ({ pageTitle, symbol, children }: FeaturedProductProps) => {
+const FeaturedProduct = ({ pageTitle, symbol, image, children }: FeaturedProductProps) => {
 	return (
 		<Layout pageTitle={pageTitle}>
 			<Box sx={{ display: 'flex', flexDirection: 'column', mt: 4 }}>
@@ -18,7 +19,8 @@ const FeaturedProduct = ({ pageTitle, symbol, children }: FeaturedProductProps) 
 					{children}
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 						<Box sx={{ width: '40vw', height: '500px' }}>
-							<TradingViewSymbol symbol={symbol} />
+							{symbol && <TradingViewSymbol symbol={symbol} />}
+							{image && <Box component="img" src={image} />}
 						</Box>
 					</Box>
 				</Box>
