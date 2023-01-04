@@ -1,25 +1,14 @@
 {
 	"featured": [
 		{
-			"ticker": "BONK-UP",
-			"title": "Make 1m BONK betting on BONK going up",
-			"description": "Make 2x on your BONK if the price goes up in 30 minutes",
+			"ticker": "BONK  2x",
+			"title": "Make 1m BONK betting on BONK",
+			"description": "Make 2x on your BONK if the price goes up or down in 30 minutes",
 			"tags": ["digital", "crypto"],
 			"clusters": ["mainnet-beta"],
 			"imgSrc": "/bonk-logo.png",
 			"isActive": true,
-			"id": "bonk-up",
-			"icon": "IoIosRocket"
-		},
-		{
-			"ticker": "BONK-DOWN",
-			"title": "Make 1m BONK betting on BONK going down",
-			"description": "Make 2x on your BONK if the price goes down in 30 minutes",
-			"tags": ["digital", "crypto"],
-			"clusters": ["mainnet-beta"],
-			"imgSrc": "/bonk-logo.png",
-			"isActive": true,
-			"id": "bonk-down",
+			"id": "bonk",
 			"icon": "IoIosRocket"
 		},
 		{
