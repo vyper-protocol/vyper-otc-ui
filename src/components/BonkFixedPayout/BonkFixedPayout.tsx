@@ -127,7 +127,7 @@ const BonkFixedPayout = () => {
 						{wallet.connected ? 'Double or nothing' : 'Connect wallet'}
 					</LoadingButton>
 					<Box className={styles.alert}>
-						<MessageAlert message="You will send 1,000,000 BONK from your wallet to enter the bet" severity="warning" />
+						<MessageAlert message="You will send 1,000,000 BONK from your wallet to enter the trade" severity="warning" />
 					</Box>
 				</Box>
 			</Box>
