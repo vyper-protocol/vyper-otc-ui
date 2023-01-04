@@ -12,7 +12,7 @@ type OracleLivePriceInput = {
 
 const OracleLivePrice = ({ oracleType, pubkey }: OracleLivePriceInput) => {
 	const { pricesValue, isInitialized } = useOracleLivePrice(oracleType, [pubkey]);
-	return !isInitialized ? <Skeleton variant="rectangular" width={80} height={20} animation="wave" /> : <p>{formatWithDecimalDigits(pricesValue[0], 5)}</p>;
+	return !isInitialized ? <Skeleton variant="rectangular" width={80} height={20} animation="wave" /> : <p>{formatWithDecimalDigits(pricesValue[0], 4)}</p>;
 };
 
 export default OracleLivePrice;

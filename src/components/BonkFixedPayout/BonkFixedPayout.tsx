@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Box, Link, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -15,16 +15,11 @@ import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './BonkFixedPayout.module.scss';
-
-// TODO reuse make FeaturedFixedPayout more reusable
-
-const formatSmallNumber = (n: number): string => {
-	return n.toPrecision(4);
-};
 
 const BonkFixedPayout = () => {
 	const oracleDetail = getOracleByPubkey('GnL9fGrXVSMyEeoGtrmPzjEaw9JdbNpioQkJj6wfcscY');
@@ -42,7 +37,11 @@ const BonkFixedPayout = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const longDepositAmount = 1_000_000;
 
-	const strike = isInitialized ? pricesValue[0] * (isCall ? 1.02 : 0.98) : 0;
+	const [strike, setStrike] = useState(0);
+
+	useEffect(() => {
+		setStrike(isInitialized ? pricesValue[0] * (isCall ? 1.03 : 0.97) : 0);
+	}, [isInitialized, pricesValue, JSON.stringify(pricesValue), isCall]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
@@ -114,7 +113,7 @@ const BonkFixedPayout = () => {
 							pay 1,000,000 BONK and <br />
 							win if BONK is {isCall ? 'above' : 'below'}{' '}
 							<LoadingValue isLoading={!isInitialized}>
-								<span className={styles.highlight}>${isInitialized && formatSmallNumber(strike)}</span>
+								<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(strike, 6)}</span>
 							</LoadingValue>{' '}
 							in 30 minutes
 							<br />
