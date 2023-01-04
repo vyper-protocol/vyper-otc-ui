@@ -164,7 +164,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								<p>{priceAtSet}</p>
 								<LoadingValue isLoading={isFetching}>
 									<p>
-										{isUsdQuote ? '$ ' : ''}
+										{isUsdQuote ? '$' : ''}
 										{formatWithDecimalDigits(otcState.chainData.pricesAtSettlement[i])}
 									</p>
 								</LoadingValue>
@@ -286,13 +286,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								{/* TODO: fix decimal digits ref #380 */}
-								<p>{otcState.chainData.buyerDepositAmount.toFixed(2).toString()}</p>
+								<p>{formatWithDecimalDigits(otcState.chainData.buyerDepositAmount, -1)}</p>
 							</LoadingValue>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<p>{otcState.chainData.sellerDepositAmount.toFixed(2).toString()}</p>
+								<p>{formatWithDecimalDigits(otcState.chainData.sellerDepositAmount, -1)}</p>
 							</LoadingValue>
 						</Grid>
 						{livePriceIsInitialized && otcState.chainData.isPnlAvailable() && (
@@ -302,12 +301,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.chainData.getLongPnl(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.chainData.getLongPnl(livePricesValue), -1)}</p>
 									</LoadingValue>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.chainData.getShortPnl(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.chainData.getShortPnl(livePricesValue), -1)}</p>
 									</LoadingValue>
 								</Grid>
 							</>

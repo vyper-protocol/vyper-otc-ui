@@ -17,10 +17,8 @@ import {
 	GridToolbarQuickFilter
 } from '@mui/x-data-grid-pro';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { getExplorerLink } from '@vyper-protocol/explorer-link-helper';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
-import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import PublicKeyLink from 'components/PublicKeyLink';
 import StatusBadge from 'components/StatusBadge';
 import fetchContracts from 'controllers/fetchContracts';
@@ -32,6 +30,8 @@ import { Forward } from 'models/plugins/payoff/Forward';
 import { SettledForward } from 'models/plugins/payoff/SettledForward';
 import { VanillaOption } from 'models/plugins/payoff/VanillaOption';
 import useExplorerParamsStore from 'store/useExplorerParamsStore';
+import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import OracleLivePrice from '../OracleLivePrice';
@@ -53,6 +53,7 @@ const LIVE_CONTRACTS_FILTER_MODEL: GridFilterModel = {
 		}
 	]
 };
+
 const CREATED_AT_SORT_MODEL: GridSortModel = [{ field: 'createdAt', sort: 'desc' }];
 
 const ExplorerContractDataGrid = () => {
@@ -62,6 +63,7 @@ const ExplorerContractDataGrid = () => {
 		setFilterModel: setStorageFilterModel,
 		setSortModel: setStorageSortModel
 	} = useExplorerParamsStore();
+
 	const wallet = useWallet();
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -111,6 +113,9 @@ const ExplorerContractDataGrid = () => {
 			<Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={2}>
 				{/* <GridToolbarContainer> */}
 				<Button
+					sx={{ px: 2, m: 1, height: 36 }}
+					variant="outlined"
+					disableRipple
 					onClick={() => {
 						setFilterModel(EMPTY_FILTER_MODEL);
 						setSortModel(CREATED_AT_SORT_MODEL);
@@ -119,6 +124,9 @@ const ExplorerContractDataGrid = () => {
 					All Contracts
 				</Button>
 				<Button
+					sx={{ px: 2, m: 1, height: 36 }}
+					variant="outlined"
+					disableRipple
 					onClick={() => {
 						setFilterModel(LIVE_CONTRACTS_FILTER_MODEL);
 						setSortModel(CREATED_AT_SORT_MODEL);
@@ -127,6 +135,9 @@ const ExplorerContractDataGrid = () => {
 					Live Contracts
 				</Button>
 				<Button
+					sx={{ px: 2, m: 1, height: 36 }}
+					variant="outlined"
+					disableRipple
 					disabled={!wallet.connected}
 					onClick={() => {
 						setFilterModel({
@@ -153,6 +164,9 @@ const ExplorerContractDataGrid = () => {
 				</Button>
 
 				<GridToolbarColumnsButton
+					sx={{ px: 2, m: 1, height: 36 }}
+					variant="outlined"
+					disableRipple
 					nonce=""
 					onResize={() => {
 						//
@@ -161,7 +175,9 @@ const ExplorerContractDataGrid = () => {
 						//
 					}}
 				/>
+				<GridToolbarExport sx={{ px: 2, m: 1, height: 36 }} variant="outlined" disableRipple />
 				<GridToolbarFilterButton
+					sx={{ px: 2, m: 1, height: 36 }}
 					nonce=""
 					onResize={() => {
 						//
@@ -170,7 +186,7 @@ const ExplorerContractDataGrid = () => {
 						//
 					}}
 				/>
-				<GridToolbarExport />
+
 				<GridToolbarQuickFilter />
 				{/* </GridToolbarContainer> */}
 
@@ -184,6 +200,8 @@ const ExplorerContractDataGrid = () => {
 			field: 'publickey',
 			headerName: 'Public Key',
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 50,
@@ -192,53 +210,41 @@ const ExplorerContractDataGrid = () => {
 			}
 		},
 		{
-			type: 'singleSelect',
 			field: 'redeemLogicAccount.state.payoffId',
+			type: 'singleSelect',
 			headerName: 'Instrument',
 			flex: 1,
-			minWidth: 150,
+			minWidth: 120,
 			valueOptions: AVAILABLE_PAYOFF_TYPE_IDS as any,
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
-			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
+			renderCell: (params: GridRenderCellParams<[string, boolean | null]>) => {
+				return (
+					<Box sx={{ display: 'inline-flex' }}>
+						<StatusBadge label={params.value[0]} mode="info" />
+						{typeof params.value[1] === 'boolean' && <StatusBadge label={params.value[1] ? 'call' : 'put'} mode={params.value[1] ? 'success' : 'error'} />}
+					</Box>
+				);
+			},
 			valueGetter: (params) => {
-				return params.row.redeemLogicAccount.state.payoffId;
+				const dataObj = params.row.redeemLogicAccount.state.getPluginDataObj();
+				return [params.row.metadata?.aliasId ?? params.row.redeemLogicAccount.state.payoffId, dataObj.hasOwnProperty('isCall') ? dataObj.isCall : null];
 			}
 		},
 		{
-			type: 'string',
 			field: 'dynamicData.title',
+			type: 'string',
 			headerName: 'Underlying',
 			flex: 1,
-			minWidth: 150,
+			minWidth: 120,
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			valueGetter: (params) => {
 				return params.row.dynamicData?.title ?? 'NA';
-			}
-		},
-		{
-			type: 'number',
-			field: 'redeemLogicAccount.state.notional',
-			headerName: 'Size',
-			flex: 1,
-			minWidth: 100,
-			sortable: true,
-			filterable: true,
-			valueGetter: (params) => {
-				const rlState = params.row.redeemLogicAccount.state;
-				switch (rlState.payoffId as PayoffTypeIds) {
-					case 'forward':
-						return (rlState as Forward).notional;
-					case 'settled_forward':
-						return (rlState as SettledForward).notional;
-					case 'vanilla_option':
-						return (rlState as VanillaOption).notional;
-					// TODO: find common columns
-					case 'digital':
-					default:
-						return '-';
-				}
 			}
 		},
 		{
@@ -248,18 +254,20 @@ const ExplorerContractDataGrid = () => {
 			flex: 1,
 			minWidth: 100,
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			valueGetter: (params) => {
 				const rlState = params.row.redeemLogicAccount.state;
 				switch (rlState.payoffId as PayoffTypeIds) {
 					case 'forward':
-						return (rlState as Forward).strike;
+						return formatWithDecimalDigits((rlState as Forward).strike);
 					case 'settled_forward':
-						return (rlState as SettledForward).strike;
+						return formatWithDecimalDigits((rlState as SettledForward).strike);
 					case 'vanilla_option':
-						return (rlState as VanillaOption).strike;
+						return formatWithDecimalDigits((rlState as VanillaOption).strike);
 					case 'digital':
-						return (rlState as Digital).strike;
+						return formatWithDecimalDigits((rlState as Digital).strike);
 					default:
 						return '-';
 				}
@@ -270,6 +278,8 @@ const ExplorerContractDataGrid = () => {
 			field: 'rateAccount.state.aggregatorLastValue',
 			headerName: 'Current Price',
 			sortable: false,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: false,
 			renderCell: (params: GridRenderCellParams<any>) => (
 				<OracleLivePrice
@@ -283,10 +293,12 @@ const ExplorerContractDataGrid = () => {
 		{
 			field: 'createdAt',
 			type: 'dateTime',
-			headerName: 'Created at',
+			headerName: 'Created',
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 100
@@ -298,6 +310,8 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 100
@@ -309,6 +323,8 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 100
@@ -320,38 +336,48 @@ const ExplorerContractDataGrid = () => {
 			renderCell: (params: GridRenderCellParams<number>) => <MomentTooltipSpan datetime={params.value} />,
 			valueGetter: ({ value }) => value && new Date(value),
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 100
 		},
 		{
-			type: 'boolean',
-			field: 'buyerFunded',
-			headerName: 'Long funded',
-			sortable: true,
-			filterable: true,
+			field: 'longCollateral',
+			type: 'number',
+			headerName: 'Long Collateral',
 			flex: 1,
-			minWidth: 100,
+			minWidth: 150,
+			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
+			filterable: true,
 			valueGetter: (params) => {
-				return params.row.isLongFunded();
+				const mint = getMintByPubkey(params.row.collateralMint);
+				return `${formatWithDecimalDigits(params.row.buyerDepositAmount, -1)} ${mint?.title ?? ''}`;
 			}
 		},
 		{
-			type: 'boolean',
-			field: 'sellerFunded',
-			headerName: 'Short funded',
-			sortable: true,
-			filterable: true,
+			field: 'shotCollateral',
+			type: 'number',
+			headerName: 'Short Collateral',
 			flex: 1,
-			minWidth: 100,
+			minWidth: 150,
+			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
+			filterable: true,
 			valueGetter: (params) => {
-				return params.row.isShortFunded();
+				const mint = getMintByPubkey(params.row.collateralMint);
+				return `${formatWithDecimalDigits(params.row.sellerDepositAmount, -1)} ${mint?.title ?? ''}`;
 			}
 		},
 		{
 			field: 'dynamicData.buyerWallet',
 			headerName: 'Buyer wallet',
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 50,
@@ -367,6 +393,8 @@ const ExplorerContractDataGrid = () => {
 			field: 'dynamicData.sellerWallet',
 			headerName: 'Seller wallet',
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			flex: 1,
 			minWidth: 50,
@@ -386,13 +414,15 @@ const ExplorerContractDataGrid = () => {
 			flex: 1,
 			minWidth: 100,
 			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
 			filterable: true,
 			renderCell: (params) => {
 				return <ContractStatusBadge status={params.row.contractStatus} />;
 			}
 		},
 		{
-			field: 'actions',
+			field: 'actionsShow',
 			type: 'actions',
 			headerName: 'Show details',
 			flex: 1,
@@ -402,34 +432,6 @@ const ExplorerContractDataGrid = () => {
 					icon={<OpenInNewIcon />}
 					onClick={() => window.open(window.location.origin + UrlBuilder.buildContractSummaryUrl(params.id.toString()))}
 					label="Open"
-					nonce=""
-					onResize={() => {
-						//
-					}}
-					onResizeCapture={() => {
-						//
-					}}
-				/>,
-				<GridActionsCellItem
-					key="open_in_explorer"
-					icon={<OpenInNewIcon />}
-					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solana-explorer', cluster: getCurrentCluster() }))}
-					label="Open in Explorer"
-					showInMenu
-					nonce=""
-					onResize={() => {
-						//
-					}}
-					onResizeCapture={() => {
-						//
-					}}
-				/>,
-				<GridActionsCellItem
-					key="open_in_solscan"
-					icon={<OpenInNewIcon />}
-					onClick={() => window.open(getExplorerLink(params.id.toString(), { explorer: 'solscan', cluster: getCurrentCluster() }))}
-					label="Open in Solscan"
-					showInMenu
 					nonce=""
 					onResize={() => {
 						//
@@ -470,7 +472,10 @@ const ExplorerContractDataGrid = () => {
 							columnVisibilityModel: {
 								publickey: false,
 								depositAvailableFrom: false,
-								depositExpirationAt: false
+								depositExpirationAt: false,
+								'dynamicData.buyerWallet': false,
+								'dynamicData.sellerWallet': false,
+								createdAt: false
 							}
 						},
 						pagination: {
