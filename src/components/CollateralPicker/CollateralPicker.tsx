@@ -117,6 +117,7 @@ const CollateralPicker = ({
 					disabled={isLoading}
 					sx={{ width: 300, alignItems: 'center', marginY: 2 }}
 					disableClearable
+					multiple={false}
 					autoHighlight
 					selectOnFocus
 					clearOnBlur

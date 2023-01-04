@@ -302,12 +302,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.chainData.getLongPnl(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.chainData.getLongPnl(livePricesValue), 2)}</p>
 									</LoadingValue>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.chainData.getShortPnl(livePricesValue)).toFixed(2).toString()}</p>
+										<p>{formatWithDecimalDigits(otcState.chainData.getShortPnl(livePricesValue), 2)}</p>
 									</LoadingValue>
 								</Grid>
 							</>

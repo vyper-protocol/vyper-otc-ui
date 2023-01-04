@@ -52,7 +52,7 @@ export const getPriceForStrike = async (ratePluginType: RateTypeIds, rateAccount
 		}
 	} catch {}
 
-	return formatWithDecimalDigits(price);
+	return parseFloat(formatWithDecimalDigits(price));
 };
 
 /**
