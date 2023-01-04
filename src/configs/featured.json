@@ -1,14 +1,25 @@
 {
 	"featured": [
 		{
-			"ticker": "BONK",
-			"title": "Make 1m BONK betting on BONK",
-			"description": "Make 2x on your BONK if the price goes up in 60 minutes",
+			"ticker": "BONK-UP",
+			"title": "Make 1m BONK betting on BONK going up",
+			"description": "Make 2x on your BONK if the price goes up in 30 minutes",
 			"tags": ["digital", "crypto"],
 			"clusters": ["mainnet-beta"],
 			"imgSrc": "/bonk-logo.png",
 			"isActive": true,
-			"id": "bonk",
+			"id": "bonk-up",
+			"icon": "IoIosRocket"
+		},
+		{
+			"ticker": "BONK-DOWN",
+			"title": "Make 1m BONK betting on BONK going down",
+			"description": "Make 2x on your BONK if the price goes down in 30 minutes",
+			"tags": ["digital", "crypto"],
+			"clusters": ["mainnet-beta"],
+			"imgSrc": "/bonk-logo.png",
+			"isActive": true,
+			"id": "bonk-down",
 			"icon": "IoIosRocket"
 		},
 		{
@@ -79,6 +90,16 @@
 			"oracle": "Coffee Mar23"
 		},
 		{
+			"ticker": "ALMD-DEFAULT",
+			"title": "Alameda Research Credit Default Put",
+			"description": "Hedge against a potential default of Alameda Research.",
+			"tags": ["digital", "credit"],
+			"clusters": ["devnet", "mainnet-beta"],
+			"imgSrc": "/almond-research.png",
+			"isActive": true,
+			"id": "https://www.notion.so/vyperprotocol/Credora-Credit-Derivatives-b4bb2b642fdb43be83fafb1c31ef8902"
+		},
+		{
 			"ticker": "USDT Depeg",
 			"title": "Tether depegging from 1 USD?",
 			"description": "Defend against a potential depegging of USDT with a crash put.",
@@ -93,16 +114,6 @@
 			"tags": ["vanilla option", "crypto"],
 			"imgSrc": "/bnb-logo.png",
 			"isActive": false
-		},
-		{
-			"ticker": "ALMD-DEFAULT",
-			"title": "Alameda Research Credit Default Put",
-			"description": "Hedge against a potential default of Alameda Research.",
-			"tags": ["digital", "credit"],
-			"clusters": ["devnet", "mainnet-beta"],
-			"imgSrc": "/almond-research.png",
-			"isActive": true,
-			"id": "https://www.notion.so/vyperprotocol/Credora-Credit-Derivatives-b4bb2b642fdb43be83fafb1c31ef8902"
 		},
 		{
 			"ticker": "AAPL/USD",

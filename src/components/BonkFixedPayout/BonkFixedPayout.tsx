@@ -26,7 +26,12 @@ const formatSmallNumber = (n: number): string => {
 	return n.toPrecision(4);
 };
 
-const ActionPanel = () => {
+interface ActionPanelProps {
+	isCall: boolean;
+	strike: number;
+}
+
+const ActionPanel = ({ isCall, strike }: ActionPanelProps) => {
 	const { connection } = useConnection();
 	const wallet = useWallet();
 	const router = useRouter();
@@ -57,8 +62,8 @@ const ActionPanel = () => {
 				aliasId: 'digital',
 				payoffOption: {
 					payoffId: 'digital',
-					strike: pricesValue[0],
-					isCall: true
+					strike: pricesValue[0] * strike,
+					isCall: isCall
 				},
 
 				rateOption: {
@@ -85,24 +90,24 @@ const ActionPanel = () => {
 	return (
 		<Box sx={{ alignItems: 'center', maxWidth: '45vw' }} className={cn(styles.container, styles.actionGroup)}>
 			<Typography variant="h5">
-				Make 2x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is above{' '}
+				Make 2x if the price of <span className={styles.highlight}>{oracleDetail.title}</span> is {isCall ? 'above' : 'below'}{' '}
 				<LoadingValue isLoading={!isInitialized}>
-					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0])}</span>
+					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0] * strike)}</span>
 				</LoadingValue>{' '}
 				in <span className={styles.highlight}>{30} minutes</span>
 			</Typography>
 			<br />
 			<Typography sx={{ fontSize: '1.5em' }} variant="body1">
-				Bet <b>1,000,000 BONK</b> that BONK/USD will be <b>above</b>{' '}
+				Bet <b>1,000,000 BONK</b> that BONK/USD will be <b>{isCall ? 'above' : 'below'}</b>{' '}
 				<LoadingValue isLoading={!isInitialized}>
-					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0])}</span>
+					<span className={styles.highlight}>${isInitialized && formatSmallNumber(pricesValue[0] * strike)}</span>
 				</LoadingValue>{' '}
 				in 30 minutes.
 				<br />
 				<br />
-				If BONK/USD is <b>above</b> you <span className={styles.profit}>win 2,000,000 BONK</span> 🤑
+				If BONK/USD is <b>{isCall ? 'above' : 'below'}</b> you <span className={styles.profit}>win 2,000,000 BONK</span> 🤑
 				<br />
-				If BONK/USD is <b>below</b> you <span className={styles.loss}>lose 1,000,000 BONK</span>
+				If BONK/USD is <b>{isCall ? 'below' : 'above'}</b> you <span className={styles.loss}>lose 1,000,000 BONK</span>
 			</Typography>
 			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%', alignItems: 'center', mt: 3 }}>
 				<LoadingButton
@@ -120,15 +125,21 @@ const ActionPanel = () => {
 	);
 };
 
-const BonkFixedPayout = () => {
+interface BonkFixedPayout {
+	pageTitle: string;
+	isCall: boolean;
+	strike: number;
+}
+
+const BonkFixedPayout = ({ pageTitle, isCall, strike }: BonkFixedPayout) => {
 	return (
-		<FeaturedProduct pageTitle={'BONK'} image={'/bonk-logo.png'}>
+		<FeaturedProduct pageTitle={pageTitle} image={'/bonk-logo.png'}>
 			<Box>
 				<div className={styles.title}>
 					<h1>{'BONK 2x in 30 minutes'}</h1>
 				</div>
 
-				<ActionPanel />
+				<ActionPanel isCall={isCall} strike={strike} />
 			</Box>
 		</FeaturedProduct>
 	);
