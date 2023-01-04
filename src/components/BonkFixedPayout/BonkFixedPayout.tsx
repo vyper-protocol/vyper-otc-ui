@@ -41,7 +41,7 @@ const BonkFixedPayout = () => {
 
 	useEffect(() => {
 		setStrike(isInitialized ? pricesValue[0] * (isCall ? 1.03 : 0.97) : 0);
-	}, [isInitialized, pricesValue, JSON.stringify(pricesValue), isCall]);
+	}, [isInitialized, pricesValue, isCall]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
@@ -113,7 +113,7 @@ const BonkFixedPayout = () => {
 							pay 1,000,000 BONK and <br />
 							win if BONK is {isCall ? 'above' : 'below'}{' '}
 							<LoadingValue isLoading={!isInitialized}>
-								<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(strike, 6)}</span>
+								<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(strike, 4)}</span>
 							</LoadingValue>{' '}
 							in 30 minutes
 							<br />

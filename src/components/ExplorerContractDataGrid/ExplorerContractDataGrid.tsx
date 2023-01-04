@@ -220,9 +220,17 @@ const ExplorerContractDataGrid = () => {
 			align: 'center',
 			headerAlign: 'center',
 			filterable: true,
-			renderCell: (params: GridRenderCellParams<string>) => <StatusBadge label={params.value} mode="dark" />,
+			renderCell: (params: GridRenderCellParams<[string, boolean | null]>) => {
+				return (
+					<Box sx={{ display: 'inline-flex' }}>
+						<StatusBadge label={params.value[0]} mode="info" />
+						{typeof params.value[1] === 'boolean' && <StatusBadge label={params.value[1] ? 'call' : 'put'} mode={params.value[1] ? 'success' : 'error'} />}
+					</Box>
+				);
+			},
 			valueGetter: (params) => {
-				return params.row.redeemLogicAccount.state.payoffId;
+				const dataObj = params.row.redeemLogicAccount.state.getPluginDataObj();
+				return [params.row.metadata?.aliasId ?? params.row.redeemLogicAccount.state.payoffId, dataObj.hasOwnProperty('isCall') ? dataObj.isCall : null];
 			}
 		},
 		{
