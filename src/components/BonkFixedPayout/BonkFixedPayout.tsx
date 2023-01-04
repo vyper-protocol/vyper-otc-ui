@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -85,48 +85,63 @@ const BonkFixedPayout = () => {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }} className={styles.container}>
-			<Box component={'img'} src={'/bonk-logo.png'} sx={{ maxWidth: '250px' }} />
+		<Box sx={{ display: 'flex', width: '100%', px: 16, mt: 4, justifyContent: 'center' }}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }} className={styles.container}>
+				<Box component={'img'} src={'/bonk-logo.jpg'} sx={{ maxWidth: '250px', borderRadius: 10000 }} />
 
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }}>
-				<Typography sx={{ fontWeight: 600 }} variant="h5">
-					I think BONK will go
-				</Typography>
-				<ToggleButtonGroup sx={{ mt: 2 }} value={isCall} exclusive onChange={(_e, v) => setIsCall(v)}>
-					{['UP', 'DOWN'].map((v, i) => (
-						<ToggleButton sx={{ width: '96px' }} key={i} disableRipple value={v === 'UP'} size="medium">
-							{v}
-						</ToggleButton>
-					))}
-				</ToggleButtonGroup>
-				<Box>
-					<Typography sx={{ mt: 4, fontWeight: 600, textTransform: 'uppercase' }} variant="h6" align="center">
-						bet 1,000,000 BONK and <br />
-						win if BONK is {isCall ? 'above' : 'below'}{' '}
-						<LoadingValue isLoading={!isInitialized}>
-							<span className={styles.highlight}>${isInitialized && formatSmallNumber(strike)}</span>
-						</LoadingValue>{' '}
-						in 30 minutes
-						<br />
-						<br />
-						If BONK/USD is <b>{isCall ? 'above' : 'below'}</b> you <span className={styles.profit}>win 2,000,000 BONK</span> 🤑
-						<br />
-						If BONK/USD is <b>{isCall ? 'below' : 'above'}</b> you <span className={styles.loss}>lose 1,000,000 BONK</span>
+				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }}>
+					<Typography sx={{ fontWeight: 600 }} variant="h5">
+						I think BONK will go
 					</Typography>
+					<ToggleButtonGroup sx={{ mt: 2 }} value={isCall} exclusive onChange={(_e, v) => setIsCall(v)}>
+						{['UP ⬆️', 'DOWN ⬇️'].map((v, i) => (
+							<ToggleButton sx={{ width: '96px' }} key={i} disableRipple value={v === 'UP'} size="medium">
+								{v}
+							</ToggleButton>
+						))}
+					</ToggleButtonGroup>
+					<Box>
+						<Typography sx={{ mt: 4, fontWeight: 600, textTransform: 'uppercase' }} variant="h6" align="center">
+							pay 1,000,000 BONK and <br />
+							win if BONK is {isCall ? 'above' : 'below'}{' '}
+							<LoadingValue isLoading={!isInitialized}>
+								<span className={styles.highlight}>${isInitialized && formatSmallNumber(strike)}</span>
+							</LoadingValue>{' '}
+							in 30 minutes
+							<br />
+							<br />
+							If BONK/USD is <b>{isCall ? 'above' : 'below'}</b> you <span className={styles.profit}>win 2,000,000 BONK</span> 🤑
+							<br />
+							If BONK/USD is <b>{isCall ? 'below' : 'above'}</b> you <span className={styles.loss}>lose 1,000,000 BONK</span>
+						</Typography>
+					</Box>
+					<LoadingButton
+						sx={{ mt: 2 }}
+						className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
+						loading={isLoading}
+						variant="contained"
+						disabled={!wallet.connected}
+						onClick={onCreateContractButtonClick}
+						size="large"
+					>
+						{wallet.connected ? 'Double or nothing' : 'Connect wallet'}
+					</LoadingButton>
+					<Box className={styles.alert}>
+						<MessageAlert message="You will send 1,000,000 BONK from your wallet to enter the trade" severity="warning" />
+					</Box>
 				</Box>
-				<LoadingButton
-					sx={{ mt: 2 }}
-					className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
-					loading={isLoading}
-					variant="contained"
-					disabled={!wallet.connected}
-					onClick={onCreateContractButtonClick}
-					size="large"
-				>
-					{wallet.connected ? 'Double or nothing' : 'Connect wallet'}
-				</LoadingButton>
-				<Box className={styles.alert}>
-					<MessageAlert message="You will send 1,000,000 BONK from your wallet to enter the bet" severity="warning" />
+			</Box>
+
+			<Box sx={{ width: '50%', ml: 8 }} className={styles.desktop_only}>
+				<iframe src="https://birdeye.so/tv-widget/DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263" width={'100%'} height={'100%'} />
+				<Box sx={{ display: 'flex', flexDirection: 'row', justifyItems: 'center', height: '32px', justifyContent: 'flex-end' }}>
+					<Typography sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>Powered by</Typography>
+					<Box
+						sx={{ backgroundColor: 'grey', borderRadius: 8, p: 0.5 }}
+						component="img"
+						src="https://birdeye.so/static/media/logo-birdeye.f6511fe2e85b2503f8f4.png"
+						width={'10%'}
+					/>
 				</Box>
 			</Box>
 		</Box>

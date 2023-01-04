@@ -6,7 +6,7 @@
 			"description": "Make 2x on your BONK if the price goes up or down in 30 minutes",
 			"tags": ["digital", "crypto"],
 			"clusters": ["mainnet-beta"],
-			"imgSrc": "/bonk-logo.png",
+			"imgSrc": "/bonk-logo.jpg",
 			"isActive": true,
 			"id": "bonk",
 			"icon": "IoIosRocket"

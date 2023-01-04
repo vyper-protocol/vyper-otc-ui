@@ -56,3 +56,9 @@
 		line-height: 60px;
 	}
 }
+
+@media screen and (max-width: 600px) {
+	.desktop_only {
+		display: none;
+	}
+}
