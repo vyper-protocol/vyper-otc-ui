@@ -1,8 +1,4 @@
 .container {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-
 	.highlight {
 		font-weight: 700;
 		background: linear-gradient(180deg, #262629 0%, #2f3bdd 52.92%, #bda6f3 100%);
@@ -32,6 +28,12 @@
 			background-color: rgba(0, 201, 23, 0.79);
 		}
 	}
+}
+
+.alert {
+	background-color: rgba(235, 223, 60, 0.288);
+	margin-top: 12px;
+	padding: 0px 12px;
 }
 
 .actionGroup {
