@@ -57,6 +57,14 @@
 	}
 }
 
+.glow {
+	margin: 20px;
+	padding: 20px;
+	-webkit-box-shadow: 0 0 20px rgb(0, 64, 255);
+	-moz-box-shadow: 0 0 20px rgb(55, 0, 255);
+	box-shadow: 0 0 30px rgb(0, 72, 255);
+}
+
 @media screen and (max-width: 600px) {
 	.desktop_only {
 		display: none;
