@@ -24,6 +24,10 @@ export const formatWithDecimalDigits = (val: number, precision = 4): string => {
 
 	const parsedIntegerString = new Intl.NumberFormat('en-US').format(parseInt(integerString));
 
+	if (precision === 0) {
+		return parsedIntegerString;
+	}
+
 	if (precision === -1) {
 		if (decimalString) return `${parsedIntegerString}.${decimalString}`;
 		return parsedIntegerString;

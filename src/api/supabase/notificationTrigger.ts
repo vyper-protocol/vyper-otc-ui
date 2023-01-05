@@ -89,7 +89,6 @@ export const buildContractFundedMessage = (
 	}! ${cluster === 'devnet' ? '[DEVNET]' : ''}\n\nUnderlying:\t${oracleInfo.title}`;
 
 	// TODO: improve access with param types
-	console.log(redeemLogicAccount.state.pluginDetails);
 	const strike = redeemLogicAccount.state.pluginDetails.find(({ label }) => label.toLowerCase() === 'strike')?.value;
 	const notional = redeemLogicAccount.state.pluginDetails.find(({ label }) => label.toLowerCase() === 'size')?.value;
 	const isCall = redeemLogicAccount.state.pluginDetails.find(({ label }) => label.toLowerCase() === 'isCall')?.value;
