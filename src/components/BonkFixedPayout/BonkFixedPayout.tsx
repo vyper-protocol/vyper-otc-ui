@@ -6,7 +6,6 @@ import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import LoadingValue from 'components/LoadingValue';
-import MessageAlert from 'components/MessageAlert';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
 import createContract from 'controllers/createContract';
@@ -20,7 +19,6 @@ import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './BonkFixedPayout.module.scss';
-import { Opacity } from '@mui/icons-material';
 
 const BonkFixedPayout = () => {
 	const oracleDetail = getOracleByPubkey('GnL9fGrXVSMyEeoGtrmPzjEaw9JdbNpioQkJj6wfcscY');
@@ -79,8 +77,6 @@ const BonkFixedPayout = () => {
 				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
 			};
 
-			console.log(initParams);
-
 			// create contract
 			const otcPublicKey = await createContract(provider, txHandler, initParams, 'long');
 
@@ -105,12 +101,12 @@ const BonkFixedPayout = () => {
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
 						🐍 by VYPER OTC 🐍
 					</Typography>
-					<div className={styles.glow}>
-						<Typography sx={{ fontWeight: 500, justifyContent: 'center' }} variant="h6">
+					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
+						<Typography sx={{ fontWeight: 500 }} variant="h6">
 							I think BONK is going
 						</Typography>
 						<ToggleButtonGroup
-							sx={{ mt: 2 }}
+							sx={{ mt: 1 }}
 							value={isCall}
 							exclusive
 							onChange={(_e, v) => {
@@ -126,11 +122,11 @@ const BonkFixedPayout = () => {
 							))}
 						</ToggleButtonGroup>
 
-						<Typography sx={{ fontWeight: 500, justifyContent: 'center' }} variant="h6">
+						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
 							Trade Amount
 						</Typography>
 						<ToggleButtonGroup
-							sx={{ mt: 2 }}
+							sx={{ mt: 1 }}
 							value={longDepositAmount}
 							exclusive
 							onChange={(_e, v) => {
@@ -146,17 +142,17 @@ const BonkFixedPayout = () => {
 							))}
 						</ToggleButtonGroup>
 
-						<Typography sx={{ fontWeight: 500 }} variant="h6">
+						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
 							Multiplier 💰
 						</Typography>
-						<ToggleButtonGroup sx={{ mt: 2 }} value={multiplier} exclusive onChange={(_e, v) => setMultiplier(v)}>
+						<ToggleButtonGroup sx={{ mt: 1 }} value={multiplier} exclusive onChange={(_e, v) => setMultiplier(v)}>
 							{[2, 5, 10].map((v, i) => (
 								<ToggleButton sx={{ width: '96px', '&.Mui-selected': { backgroundColor: '#9D9FA0' } }} key={i} disableRipple value={v} size="small">
 									{v}X
 								</ToggleButton>
 							))}
 						</ToggleButtonGroup>
-					</div>
+					</Box>
 
 					<Box>
 						<Typography sx={{ mt: 4, fontWeight: 400, textTransform: 'uppercase' }} variant="h6" align="center">
