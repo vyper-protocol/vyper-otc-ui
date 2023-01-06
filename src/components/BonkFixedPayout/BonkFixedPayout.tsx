@@ -95,7 +95,7 @@ const BonkFixedPayout = () => {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', width: '100%', mt: 1, justifyContent: 'center' }}>
+		<Box sx={{ display: 'flex', width: '100%', mt: 1, justifyContent: 'center', height: '93vh' }}>
 			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4, px: 16 }} className={styles.container}>
 				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
@@ -119,7 +119,14 @@ const BonkFixedPayout = () => {
 							}}
 						>
 							{['UP', 'DOWN'].map((v, i) => (
-								<ToggleButton className={cn(styles.button, v === 'UP' ? styles.profit : styles.loss)} key={i} disableRipple value={v === 'UP'} size="small">
+								<ToggleButton
+									className={cn(styles.button, v === 'UP' ? styles.profit : styles.loss)}
+									key={i}
+									disableRipple
+									value={v === 'UP'}
+									size="small"
+									sx={{ mx: 1.5 }}
+								>
 									{v}
 								</ToggleButton>
 							))}
@@ -139,7 +146,7 @@ const BonkFixedPayout = () => {
 							}}
 						>
 							{[100_000, 500_000, 1_000_000].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small">
+								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
 									{v.toLocaleString()}
 								</ToggleButton>
 							))}
@@ -159,7 +166,7 @@ const BonkFixedPayout = () => {
 							}}
 						>
 							{[2, 5, 10].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small">
+								<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
 									{v}x
 								</ToggleButton>
 							))}
@@ -179,7 +186,7 @@ const BonkFixedPayout = () => {
 							}}
 						>
 							{[10, 30, 60].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small">
+								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
 									{v} min
 								</ToggleButton>
 							))}
