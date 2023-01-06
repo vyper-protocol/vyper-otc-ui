@@ -1,3 +1,18 @@
+@mixin glow-button($color) {
+	// border-color: $color;
+	transition: 0.25s;
+
+	&:hover,
+	&:global(.Mui-selected) {
+		background: $color;
+		color: #fff;
+		box-shadow: 0 0 5px $color, 0 0 10px $color, 0 0 10px $color, 0 0 30px $color;
+		opacity: 0.7;
+		// font-size: 13.5px;
+		border-color: transparent;
+	}
+}
+
 .container {
 	.highlight {
 		font-weight: 700;
@@ -5,6 +20,41 @@
 		-webkit-background-clip: text;
 		background-clip: text;
 		-webkit-text-fill-color: transparent;
+	}
+
+	.button_group {
+		margin-top: 4px;
+
+		.button {
+			border-color: #0000002d;
+			margin: 0px 4px;
+			border-radius: 8px;
+			width: 96px;
+			text-transform: none;
+			color: black;
+			font-size: 14.5px;
+			padding: 8px;
+
+			&.profit {
+				@include glow-button(rgb(35, 211, 0));
+			}
+
+			&.loss {
+				@include glow-button(rgb(204, 8, 8));
+			}
+
+			&.second {
+				@include glow-button(rgb(0, 238, 255));
+			}
+
+			&.third {
+				@include glow-button(rgb(4, 0, 211));
+			}
+
+			&.fourth {
+				@include glow-button(rgb(255, 187, 0));
+			}
+		}
 	}
 
 	.profit {
@@ -15,10 +65,6 @@
 	.loss {
 		font-weight: 700;
 		color: rgb(223, 76, 76);
-	}
-
-	.button {
-		border-radius: 16px;
 	}
 
 	.buy {
@@ -34,27 +80,6 @@
 	background-color: rgba(235, 223, 60, 0.288);
 	margin-top: 12px;
 	padding: 0px 12px;
-}
-
-.actionGroup {
-	margin: 12px;
-	padding: 24px;
-	height: fit-content;
-	align-items: left;
-}
-
-.caption {
-	font-size: 12px;
-	font-weight: bold;
-}
-
-.title {
-	padding-left: 24px;
-
-	h1 {
-		margin: 0;
-		line-height: 60px;
-	}
 }
 
 .glow {

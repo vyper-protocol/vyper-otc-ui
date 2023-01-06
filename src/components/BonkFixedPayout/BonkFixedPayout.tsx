@@ -13,6 +13,7 @@ import { OtcInitializationParams } from 'controllers/createContract/OtcInitializ
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { BSDigitalStrike } from 'utils/blackScholes';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -37,18 +38,18 @@ const BonkFixedPayout = () => {
 
 	const [longDepositAmount, setLongDepositAmount] = useState(1_000_000);
 	const [multiplier, setMultiplier] = useState(2);
+	const [expiry, setExpiry] = useState(30);
+
 	const shortDepositAmount = longDepositAmount * multiplier;
-
 	const [strike, setStrike] = useState(0);
-
-	const multiplierOptions = { 2: 0.01, 5: 0.06, 10: 0.12 };
-	const strikeAdjustment = multiplierOptions[multiplier];
 
 	const [open, setOpen] = useState(true);
 
 	useEffect(() => {
-		setStrike(isInitialized ? pricesValue[0] * (isCall ? 1 + strikeAdjustment : 1 - strikeAdjustment) : 0);
-	}, [isInitialized, pricesValue, isCall, strikeAdjustment]);
+		if (isInitialized) {
+			setStrike(BSDigitalStrike(pricesValue[0], 0, 7, expiry / 60 / 24 / 365, isCall, 1 / multiplier) * (isCall ? 1.015 : 0.985));
+		}
+	}, [isInitialized, pricesValue, isCall, expiry, multiplier]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
@@ -57,8 +58,11 @@ const BonkFixedPayout = () => {
 			const initParams: OtcInitializationParams = {
 				...DEFAULT_INIT_PARAMS,
 
-				depositEnd: moment().add(15, 'minutes').toDate().getTime(),
-				settleStart: moment().add(30, 'minutes').toDate().getTime(),
+				depositEnd: moment()
+					.add(expiry - 1, 'minutes')
+					.toDate()
+					.getTime(),
+				settleStart: moment().add(expiry, 'minutes').toDate().getTime(),
 
 				longDepositAmount,
 				shortDepositAmount: longDepositAmount * multiplier,
@@ -91,11 +95,10 @@ const BonkFixedPayout = () => {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', width: '100%', px: 16, mt: 4, justifyContent: 'center' }}>
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4 }} className={styles.container}>
+		<Box sx={{ display: 'flex', width: '100%', mt: 1, justifyContent: 'center' }}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4, px: 16 }} className={styles.container}>
 				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
-						{' '}
 						🐕 BONK OPTIONS 🐕
 					</Typography>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
@@ -103,10 +106,10 @@ const BonkFixedPayout = () => {
 					</Typography>
 					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
 						<Typography sx={{ fontWeight: 500 }} variant="h6">
-							I think BONK is going
+							I think BONK is going {isCall ? '⬆️' : '⬇️'}
 						</Typography>
 						<ToggleButtonGroup
-							sx={{ mt: 1 }}
+							className={styles.button_group}
 							value={isCall}
 							exclusive
 							onChange={(_e, v) => {
@@ -115,18 +118,18 @@ const BonkFixedPayout = () => {
 								}
 							}}
 						>
-							{['UP ⬆️', 'DOWN ⬇️'].map((v, i) => (
-								<ToggleButton sx={{ width: '96px', '&.Mui-selected': { backgroundColor: '#9D9FA0' } }} key={i} disableRipple value={v === 'UP ⬆️'} size="small">
+							{['UP', 'DOWN'].map((v, i) => (
+								<ToggleButton className={cn(styles.button, v === 'UP' ? styles.profit : styles.loss)} key={i} disableRipple value={v === 'UP'} size="small">
 									{v}
 								</ToggleButton>
 							))}
 						</ToggleButtonGroup>
 
 						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Trade Amount
+							Trade Amount 💰
 						</Typography>
 						<ToggleButtonGroup
-							sx={{ mt: 1 }}
+							className={styles.button_group}
 							value={longDepositAmount}
 							exclusive
 							onChange={(_e, v) => {
@@ -136,32 +139,60 @@ const BonkFixedPayout = () => {
 							}}
 						>
 							{[100_000, 500_000, 1_000_000].map((v, i) => (
-								<ToggleButton sx={{ width: '96px', '&.Mui-selected': { backgroundColor: '#9D9FA0' } }} key={i} disableRipple value={v} size="small">
+								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small">
 									{v.toLocaleString()}
 								</ToggleButton>
 							))}
 						</ToggleButtonGroup>
 
 						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Multiplier 💰
+							Multiplier 🔢
 						</Typography>
-						<ToggleButtonGroup sx={{ mt: 1 }} value={multiplier} exclusive onChange={(_e, v) => setMultiplier(v)}>
+						<ToggleButtonGroup
+							className={styles.button_group}
+							value={multiplier}
+							exclusive
+							onChange={(_e, v) => {
+								if (v !== null) {
+									setMultiplier(v);
+								}
+							}}
+						>
 							{[2, 5, 10].map((v, i) => (
-								<ToggleButton sx={{ width: '96px', '&.Mui-selected': { backgroundColor: '#9D9FA0' } }} key={i} disableRipple value={v} size="small">
-									{v}X
+								<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small">
+									{v}x
+								</ToggleButton>
+							))}
+						</ToggleButtonGroup>
+
+						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
+							Expiry ⏰
+						</Typography>
+						<ToggleButtonGroup
+							className={styles.button_group}
+							value={expiry}
+							exclusive
+							onChange={(_e, v) => {
+								if (v !== null) {
+									setExpiry(v);
+								}
+							}}
+						>
+							{[10, 30, 60].map((v, i) => (
+								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small">
+									{v} min
 								</ToggleButton>
 							))}
 						</ToggleButtonGroup>
 					</Box>
 
 					<Box>
-						<Typography sx={{ mt: 4, fontWeight: 400, textTransform: 'uppercase' }} variant="h6" align="center">
-							{/* pay {longDepositAmount.toLocaleString()} BONK and <br /> */}
+						<Typography sx={{ mt: 1, fontWeight: 400, textTransform: 'uppercase' }} variant="h6" align="center">
 							win if BONK is {isCall ? 'above' : 'below'}{' '}
 							<LoadingValue isLoading={!isInitialized}>
 								<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(strike, 4)}</span>
 							</LoadingValue>{' '}
-							in 30 minutes
+							in {expiry} minutes
 							<br />
 							<b>{isCall ? 'above' : 'below'}</b> 👉🏻 <span className={styles.profit}> +{shortDepositAmount.toLocaleString()} BONK</span> 🤑
 							<br />
@@ -170,7 +201,7 @@ const BonkFixedPayout = () => {
 					</Box>
 
 					<LoadingButton
-						sx={{ mt: 2 }}
+						sx={{ mt: 2, borderRadius: 4 }}
 						className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
 						loading={isLoading}
 						variant="contained"
@@ -180,9 +211,10 @@ const BonkFixedPayout = () => {
 					>
 						{wallet.connected ? 'Trade Now' : 'Connect wallet'}
 					</LoadingButton>
-					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: '20px' }} />
+
 					<Collapse in={open}>
 						<Alert
+							sx={{ mt: 1 }}
 							severity="info"
 							onClose={() => {
 								setOpen(false);
@@ -194,9 +226,9 @@ const BonkFixedPayout = () => {
 				</Box>
 			</Box>
 
-			<Box sx={{ width: '50%', ml: 8 }} className={styles.desktop_only}>
+			<Box sx={{ width: '100%', height: '100%' }} className={styles.desktop_only}>
 				<iframe src="https://birdeye.so/tv-widget/DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263" width={'100%'} height={'100%'} />
-				<Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+				<Box sx={{ display: 'flex' }}>
 					<a href="https://birdeye.so/" target="_blank" rel="noopener noreferrer">
 						<Box sx={{ display: 'inline-flex', flexDirection: 'row', justifyItems: 'center', height: '32px' }}>
 							<Typography sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>Powered by</Typography>
