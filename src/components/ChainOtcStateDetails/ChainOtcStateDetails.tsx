@@ -13,6 +13,7 @@ import ClickableIcon from 'components/ClickableIcon';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import LoadingValue from 'components/LoadingValue';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
+import NumericBadge from 'components/NumericBadge';
 import ShareModal from 'components/ShareModal';
 import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';
@@ -112,6 +113,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	const oracleInfo = getOracleByPubkey(otcState.chainData.rateAccount.state.accountsRequiredForRefresh[0].toBase58());
 	const isUsdQuote = oracleInfo?.quoteCurrency === 'USD';
 	const quoteCcy = oracleInfo?.baseCurrency;
+
+	const longPnl = otcState.chainData.getLongPnl(livePricesValue);
+	const shortPnl = otcState.chainData.getShortPnl(livePricesValue);
+
+	const longPnlFormat = formatWithDecimalDigits(longPnl, Number.isInteger(longPnl) ? 0 : 2);
+	const shortPnlFormat = formatWithDecimalDigits(shortPnl, Number.isInteger(shortPnl) ? 0 : 2);
 
 	return (
 		<div className={styles.cards}>
@@ -227,6 +234,13 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</LoadingValue>
 					</div>
 
+					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
+						<div className={styles.column}>
+							<p>Your PnL</p>
+							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${quoteCcy ?? ''}`}</p>
+						</div>
+					)}
+
 					{otcState.chainData.buyerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your side</p>
@@ -236,8 +250,19 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</div>
 					)}
 
+					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
+						<div className={styles.column}>
+							<p>Your PnL</p>
+							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${quoteCcy ?? ''}`}</p>
+						</div>
+					)}
+
 					{otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
 						<div className={styles.column}>
+							<div className={styles.column}>
+								<p>Your PnL</p>
+								<p className={cn(shortPnl >= 0 ? styles.profit : styles.loss)}>{`${shortPnlFormat} ${quoteCcy ?? ''}`}</p>
+							</div>
 							<p>Your side</p>
 							<p>
 								<StatusBadge label={shortLabel} mode="error" />
@@ -301,12 +326,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.chainData.getLongPnl(livePricesValue), -1)}</p>
+										<p>{longPnlFormat}</p>
 									</LoadingValue>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{formatWithDecimalDigits(otcState.chainData.getShortPnl(livePricesValue), -1)}</p>
+										<p>{shortPnlFormat}</p>
 									</LoadingValue>
 								</Grid>
 							</>
