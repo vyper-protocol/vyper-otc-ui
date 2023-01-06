@@ -12,7 +12,7 @@ const Footer = () => {
 	return (
 		<footer className={styles.footer}>
 			<a className={cn(styles.hidden, styles.join)} href={telegram.link}>
-				<span className={styles.text}>Join for RFQ</span>
+				<span className={styles.text}>Join NOW</span>
 				<FaTelegramPlane className={styles.icon} />
 			</a>
 			<div className={styles.appBy}>
@@ -22,7 +22,7 @@ const Footer = () => {
 				</a>
 			</div>
 			<a className={styles.join} href={telegram.link}>
-				<span className={styles.text}>Join for RFQ</span>
+				<span className={styles.text}>Join NOW</span>
 				<FaTelegramPlane className={styles.icon} />
 			</a>
 		</footer>
