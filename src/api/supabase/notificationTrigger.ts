@@ -6,6 +6,7 @@ import { PayoffTypeIds } from 'models/common';
 import { OracleDetail } from 'models/OracleDetail';
 import moment from 'moment';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
+import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import { abbreviateAddress } from 'utils/stringHelpers';
 
@@ -28,17 +29,24 @@ const buildBody = (
 	// TODO: improve access to redeemLogicOption
 	switch (redeemLogicPluginType as PayoffTypeIds) {
 		case 'forward':
-			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\n\nCollateral:\t${
-				mintInfo?.title ?? collateralMint
-			}\nLong:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nShort:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
+			return `\n\nStrike:\t${formatWithDecimalDigits(strike, 4)}\nSize:\t${formatWithDecimalDigits(notional, -1)} ${
+				oracleInfo.baseCurrency ?? ''
+			}\n\nCollateral:\t${mintInfo?.title ?? collateralMint}\nLong:\t${formatWithDecimalDigits(longDepositAmount, -1)} ${
+				mintInfo?.title ?? ''
+			}\nShort:\t${formatWithDecimalDigits(shortDepositAmount, -1)} ${mintInfo?.title ?? ''}`;
 		case 'vanilla_option':
-			return `\n\nStrike:\t${strike.toPrecision(4)}\nSize:\t${notional} ${oracleInfo.baseCurrency ?? ''}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
-				mintInfo?.title ?? collateralMint
-			}\nOption premium:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nOption collateral:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
+			return `\n\nStrike:\t${formatWithDecimalDigits(strike, 4)}\nSize:\t${formatWithDecimalDigits(notional, -1)} ${oracleInfo.baseCurrency ?? ''}\nType:\t${
+				isCall ? 'Call' : 'Put'
+			}\n\nCollateral:\t${mintInfo?.title ?? collateralMint}\nOption premium:\t${formatWithDecimalDigits(longDepositAmount, -1)} ${
+				mintInfo?.title ?? ''
+			}\nOption collateral:\t${formatWithDecimalDigits(shortDepositAmount, -1)} ${mintInfo?.title ?? ''}`;
 		case 'digital':
-			return `\n\nStrike: ${strike.toPrecision(4)}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
+			return `\n\nStrike: ${formatWithDecimalDigits(strike, 4)}\nType:\t${isCall ? 'Call' : 'Put'}\n\nCollateral:\t${
 				mintInfo?.title ?? collateralMint
-			}\nOption premium:\t${longDepositAmount} ${mintInfo?.title ?? ''}\nMax payout:\t${shortDepositAmount} ${mintInfo?.title ?? ''}`;
+			}\nOption premium:\t${formatWithDecimalDigits(longDepositAmount, -1)} ${mintInfo?.title ?? ''}\nMax payout:\t${formatWithDecimalDigits(
+				shortDepositAmount,
+				-1
+			)} ${mintInfo?.title ?? ''}`;
 		default:
 			console.warn('Unsupported redeem logic');
 			return;
@@ -144,9 +152,11 @@ export const buildContractSettledMessage = (
 export const sendSnsPublisherNotification = async (cluster: Cluster, content: string) => {
 	console.log('sending: ', content);
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { error } = await supabase.functions.invoke(SNS_PUBLISHER_RPC_NAME, {
 		body: JSON.stringify({ cluster, content })
 	});
 
-	if (error) console.error(error);
+	// suppressing error logs to avoid annoying bug https://github.com/supabase/gotrue-js/issues/325
+	// if (error) logger.error(error);
 };
