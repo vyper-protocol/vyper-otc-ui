@@ -13,6 +13,7 @@ import ClickableIcon from 'components/ClickableIcon';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import LoadingValue from 'components/LoadingValue';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
+import NumericBadge from 'components/NumericBadge';
 import ShareModal from 'components/ShareModal';
 import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';
@@ -32,7 +33,6 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
-import NumericBadge from 'components/NumericBadge';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: OtcContract;
@@ -234,35 +234,39 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</LoadingValue>
 					</div>
 
+					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
+						<div className={styles.column}>
+							<p>Your PnL</p>
+							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${quoteCcy ?? ''}`}</p>
+						</div>
+					)}
+
 					{otcState.chainData.buyerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
-						<>
-							<div className={styles.column}>
-								<p>Your side</p>
-								<p>
-									<StatusBadge label={longLabel} mode="success" />
-								</p>
-							</div>
-							<div className={styles.column}>
-								<p>Your PnL</p>
-								<p>
-									<StatusBadge label={longPnlFormat} mode="success" />
-								</p>
-							</div>
-						</>
+						<div className={styles.column}>
+							<p>Your side</p>
+							<p>
+								<StatusBadge label={longLabel} mode="success" />
+							</p>
+						</div>
+					)}
+
+					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
+						<div className={styles.column}>
+							<p>Your PnL</p>
+							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${quoteCcy ?? ''}`}</p>
+						</div>
 					)}
 
 					{otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
 						<div className={styles.column}>
+							<div className={styles.column}>
+								<p>Your PnL</p>
+								<p className={cn(shortPnl >= 0 ? styles.profit : styles.loss)}>{`${shortPnlFormat} ${quoteCcy ?? ''}`}</p>
+							</div>
 							<p>Your side</p>
 							<p>
 								<StatusBadge label={shortLabel} mode="error" />
 							</p>
-							<div className={styles.column}>
-								<p>Your PnL</p>
-								<p>
-									<StatusBadge label={shortPnlFormat} mode="error" />
-								</p>
-							</div>
 						</div>
 					)}
 				</div>
