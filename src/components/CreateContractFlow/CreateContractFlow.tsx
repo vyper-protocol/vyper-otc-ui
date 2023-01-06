@@ -107,7 +107,7 @@ const CreateContractFlow = ({
 						getPriceForStrike(newRateType, newRateAccounts, connection, getCurrentCluster()).then((newStrike) => {
 							onContractInitParamsChange((prevValue) =>
 								produce(prevValue, (draft) => {
-									draft.payoffOption.strike = newStrike;
+									draft.payoffOption.strike = +newStrike.toPrecision(6);
 								})
 							);
 						});

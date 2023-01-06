@@ -1,4 +1,4 @@
-import { cdfNormal, BSVanilla, BSDigital, newtonSolver, BSVanillaImplied, BSDigitalImplied, BSDigitalStrike } from './blackScholes';
+import { cdfNormal, BSVanilla, BSDigital, newtonSolver, BSVanillaImplied, BSDigitalImplied, BSDigitalStrike, inverseCdfNormal } from './blackScholes';
 
 test('cdfNormal bottom', () => {
 	expect(cdfNormal(-100)).toBeCloseTo(0, 6);
@@ -18,6 +18,18 @@ test('cdfNormal pos', () => {
 
 test('cdfNormal top', () => {
 	expect(cdfNormal(100)).toBeCloseTo(1, 6);
+});
+
+test('inverseCdfNormal low', () => {
+	expect(inverseCdfNormal(0.25)).toBeCloseTo(-0.67449, 6);
+});
+
+test('inverseCdfNormal mid', () => {
+	expect(inverseCdfNormal(0.5)).toBeCloseTo(0, 6);
+});
+
+test('inverseCdfNormal high', () => {
+	expect(inverseCdfNormal(0.75)).toBeCloseTo(0.67449, 6);
 });
 
 test('BSVanilla call', () => {
@@ -118,7 +130,7 @@ test('newtonSolver BSDigitalImplied', () => {
 	expect(BSDigitalImplied(spot, k, r, t, isCall, price)).toBeCloseTo(0.2, 1);
 });
 
-test('newtonSolver BSDigitalStrike', () => {
+test('BSDigitalStrike', () => {
 	const spot = 100;
 	// const k = 110;
 	const r = 0.1;
@@ -127,5 +139,5 @@ test('newtonSolver BSDigitalStrike', () => {
 	const isCall = true;
 	const price = 0.464906;
 
-	expect(BSDigitalStrike(spot, r, sigma, t, isCall, price)).toBeCloseTo(110, 2);
+	expect(BSDigitalStrike(spot, r, sigma, t, isCall, price)).toBeCloseTo(110, 6);
 });
