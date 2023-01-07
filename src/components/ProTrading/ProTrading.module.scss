@@ -1,0 +1,46 @@
+.button {
+    // margin: 8px 12px;
+    // padding: 4px 12px;
+    // font-size: larger;
+    border-radius: 4px;
+
+    width: 'auto';
+    height: 'auto';
+
+    // size: 3px;
+    border: 1px solid
+}
+
+.buy {
+    background-color: rgba(1, 134, 16, 0.838);
+    color: whitesmoke;
+
+    &:hover {
+        background-color: rgba(0, 201, 23, 0.79);
+    }
+}
+
+.sell {
+    background-color: red;
+    color: whitesmoke;
+
+    &:hover {
+        background-color: rgba(255, 0, 0, 0.79);
+    }
+}
+
+.preview {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: whitesmoke;
+
+    margin: 8px 12px;
+    padding: 4px 12px;
+    font-size: larger;
+    border-radius: 4px;
+
+    width: 'auto';
+
+    justify-content: center;
+    align-items: center;
+}
+
