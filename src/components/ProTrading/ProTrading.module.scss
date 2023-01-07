@@ -1,46 +1,64 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	margin-top: 50px;
+	height: 100%;
+	// background-color: #161a25;
+}
+
 .button {
-    // margin: 8px 12px;
-    // padding: 4px 12px;
-    // font-size: larger;
-    border-radius: 4px;
+	// margin: 8px 12px;
+	// padding: 4px 12px;
+	// font-size: larger;
+	border-radius: 4px;
 
-    width: 'auto';
-    height: 'auto';
+	width: 'auto';
+	height: 'auto';
 
-    // size: 3px;
-    border: 1px solid
+	// size: 3px;
+	// border: 1px solid;
 }
 
 .buy {
-    background-color: rgba(1, 134, 16, 0.838);
-    color: whitesmoke;
+	background-color: rgba(1, 134, 16, 0.838);
+	color: whitesmoke;
 
-    &:hover {
-        background-color: rgba(0, 201, 23, 0.79);
-    }
+	&:hover {
+		background-color: rgba(0, 201, 23, 0.79);
+	}
 }
 
 .sell {
-    background-color: red;
-    color: whitesmoke;
+	background-color: red;
+	color: whitesmoke;
 
-    &:hover {
-        background-color: rgba(255, 0, 0, 0.79);
-    }
+	&:hover {
+		background-color: rgba(255, 0, 0, 0.79);
+	}
+}
+
+.conferm {
+	background-color: rgba(0, 39, 112, 0.908);
+	color: whitesmoke;
+
+	&:hover {
+		background-color: rgba(0, 141, 201, 0.79);
+	}
 }
 
 .preview {
-    background-color: rgba(0, 0, 0, 0.5);
-    color: whitesmoke;
+	background-color: rgba(0, 0, 0, 0.5);
+	color: whitesmoke;
 
-    margin: 8px 12px;
-    padding: 4px 12px;
-    font-size: larger;
-    border-radius: 4px;
+	margin: 8px 12px;
+	padding: 4px 12px;
+	font-size: larger;
+	border-radius: 4px;
 
-    width: 'auto';
+	width: 'auto';
 
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 }
-

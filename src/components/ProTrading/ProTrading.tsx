@@ -51,6 +51,7 @@ const ProPage = () => {
 	const [strike, setStrike] = useState(0);
 
 	const [showPreview, setShowPreview] = useState(false);
+	const [showConfirmTrade, setShowConfirmTrade] = useState(false);
 
 	const multiplierOptions = { 2: 0.01, 5: 0.06, 10: 0.12 };
 	const strikeAdjustment = multiplierOptions[multiplier];
@@ -102,7 +103,7 @@ const ProPage = () => {
 	return (
 		<ThemeProvider theme={darkTheme}>
 			<CssBaseline />
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
+			<Box className={styles.container}>
 				<Typography color="textPrimary">{!wallet.connected ? 'Connnect to trade' : 'Personal Account'}</Typography>
 				<SelectWallet />
 				{/* <LoadingButton
@@ -157,6 +158,9 @@ const ProPage = () => {
 					Leverage
 				</Typography>
 				<Slider defaultValue={2} step={1} min={1} max={10} marks valueLabelDisplay="on" onChangeCommitted={(_e, v) => setMultiplier(v as number)} />
+				<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6" color="textPrimary">
+					Direction
+				</Typography>
 				<ToggleButtonGroup
 					sx={{ mt: 2, mb: 2 }}
 					value={isCall}
@@ -173,6 +177,7 @@ const ProPage = () => {
 						onClick={() => {
 							setIsCall(true);
 							setShowPreview(true);
+							setShowConfirmTrade(true);
 						}}
 						className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
 						disabled={!wallet.connected}
@@ -185,6 +190,7 @@ const ProPage = () => {
 						onClick={() => {
 							setIsCall(false);
 							setShowPreview(true);
+							setShowConfirmTrade(true);
 						}}
 						className={cn(styles.button, !wallet.connected ? '' : styles.sell)}
 						disabled={!wallet.connected}
@@ -194,7 +200,7 @@ const ProPage = () => {
 				</ToggleButtonGroup>
 				{showPreview && wallet.connected ? (
 					<Box className={styles.preview}>
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6" color="textPrimary">
+						<Typography sx={{ fontWeight: 500, mt: 2 }} color="textPrimary">
 							<span> </span>
 							Strike: {isCall ? 'above' : 'below'}{' '}
 							<LoadingValue isLoading={!isInitialized}>
@@ -209,6 +215,13 @@ const ProPage = () => {
 					</Box>
 				) : (
 					'No'
+				)}
+				{showConfirmTrade ? (
+					<Button variant="contained" sx={{ mt: 2 }}>
+						Confirm trade
+					</Button>
+				) : (
+					''
 				)}
 			</Box>
 		</ThemeProvider>

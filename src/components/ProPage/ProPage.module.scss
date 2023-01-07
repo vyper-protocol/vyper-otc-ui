@@ -1,28 +1,28 @@
 .root {
-    height: '100%';
-    width: '100%';
-    // overflow: 'hidden';
+	height: '100%';
+	width: '100%';
+	// overflow: 'hidden';
 }
 
-.left { 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.left {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 
-    width : 30%;
-    height: 100vh;
+	width: 30%;
+	height: 100vh;
 
-    background-color: #161A25;
-    // background-color: #98b982;
+	background-color: #161a25;
+	// background-color: #98b982;
 }
 
-.right { 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.right {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 
-    width : 70%;
-    height: 100vh;
-} 
+	width: 70%;
+	height: 100vh;
+}
