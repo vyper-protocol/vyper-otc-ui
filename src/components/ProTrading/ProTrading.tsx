@@ -58,7 +58,7 @@ const ProPage = () => {
 
 	useEffect(() => {
 		setStrike(BSDigitalStrike(pricesValue[0], 0, 7, expiry / 60 / 24 / 365, isCall, 1 / multiplier) * (isCall ? 1.015 : 0.985));
-	}, [isInitialized, pricesValue, isCall, strikeAdjustment]);
+	}, [isInitialized, pricesValue, isCall, expiry, multiplier]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
@@ -181,6 +181,7 @@ const ProPage = () => {
 						}}
 						className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
 						disabled={!wallet.connected}
+						sx={{ width: '50%', fontWeight: 700 }}
 					>
 						Buy/Long
 					</Button>
@@ -194,6 +195,7 @@ const ProPage = () => {
 						}}
 						className={cn(styles.button, !wallet.connected ? '' : styles.sell)}
 						disabled={!wallet.connected}
+						sx={{ width: '50%', fontWeight: 700 }}
 					>
 						Sell/Short
 					</Button>
