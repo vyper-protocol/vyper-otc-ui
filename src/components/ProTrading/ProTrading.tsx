@@ -157,7 +157,7 @@ const ProPage = () => {
 				<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6" color="textPrimary">
 					Leverage
 				</Typography>
-				<Slider defaultValue={2} step={1} min={1} max={10} marks valueLabelDisplay="on" onChangeCommitted={(_e, v) => setMultiplier(v as number)} />
+				<Slider defaultValue={2} step={1} min={1} max={10} marks valueLabelDisplay="on" onChange={(_e, v) => setMultiplier(v as number)} />
 				<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6" color="textPrimary">
 					Direction
 				</Typography>
@@ -204,7 +204,7 @@ const ProPage = () => {
 					<Box className={styles.preview}>
 						<Typography sx={{ fontWeight: 500, mt: 2 }} color="textPrimary">
 							<span> </span>
-							Strike: {isCall ? 'above' : 'below'}{' '}
+							Strike: {isCall ? 'Above' : 'Below'}{' '}
 							<LoadingValue isLoading={!isInitialized}>
 								<span>${isInitialized && formatWithDecimalDigits(strike, 4)}</span>
 							</LoadingValue>{' '}
@@ -219,7 +219,7 @@ const ProPage = () => {
 					'No'
 				)}
 				{showConfirmTrade ? (
-					<Button variant="contained" sx={{ mt: 2 }}>
+					<Button variant="contained" sx={{ mt: 2 }} onClick={onCreateContractButtonClick} size="large">
 						Confirm trade
 					</Button>
 				) : (
