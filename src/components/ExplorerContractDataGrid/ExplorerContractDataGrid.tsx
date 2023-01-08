@@ -422,6 +422,34 @@ const ExplorerContractDataGrid = () => {
 			}
 		},
 		{
+			type: 'boolean',
+			field: 'dynamicData.sellerClaimed',
+			headerName: 'Seller claimed',
+			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
+			filterable: true,
+			flex: 1,
+			minWidth: 50,
+			valueGetter: (params) => {
+				return params.row.dynamicData?.sellerClaimed;
+			}
+		},
+		{
+			type: 'boolean',
+			field: 'dynamicData.buyerClaimed',
+			headerName: 'Buyer claimed',
+			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
+			filterable: true,
+			flex: 1,
+			minWidth: 50,
+			valueGetter: (params) => {
+				return params.row.dynamicData?.buyerClaimed;
+			}
+		},
+		{
 			field: 'actionsShow',
 			type: 'actions',
 			headerName: 'Show details',
@@ -475,6 +503,8 @@ const ExplorerContractDataGrid = () => {
 								depositExpirationAt: false,
 								'dynamicData.buyerWallet': false,
 								'dynamicData.sellerWallet': false,
+								'dynamicData.buyerClaimed': false,
+								'dynamicData.sellerClaimed': false,
 								createdAt: false
 							}
 						},

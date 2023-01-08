@@ -11,6 +11,8 @@ export class DbOtcDynamicData {
 	pricesAtSettlement: undefined | number[];
 	pnlBuyer: undefined | number;
 	pnlSeller: undefined | number;
+	buyerClaimed: boolean;
+	sellerClaimed: boolean;
 
 	static createFromDBData(data: any): DbOtcDynamicData {
 		const res = new DbOtcDynamicData();
@@ -30,6 +32,8 @@ export class DbOtcDynamicData {
 			res.pricesAtSettlement = [data.prices_at_settlement_1];
 			if (data.prices_at_settlement_2) res.pricesAtSettlement.push(data.prices_at_settlement_2);
 		}
+		res.buyerClaimed = data.buyer_claimed;
+		res.sellerClaimed = data.seller_claimed;
 
 		return res;
 	}
