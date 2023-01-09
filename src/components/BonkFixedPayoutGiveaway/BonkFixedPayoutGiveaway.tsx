@@ -85,7 +85,7 @@ const BonkFixedPayout = () => {
 			};
 
 			// create contract
-			const otcPublicKey = await createContract(provider, txHandler, initParams);
+			const otcPublicKey = await createContract(provider, txHandler, initParams, 'long');
 
 			// Create contract URL
 			router.push(UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
