@@ -13,7 +13,6 @@ import ClickableIcon from 'components/ClickableIcon';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import LoadingValue from 'components/LoadingValue';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
-import NumericBadge from 'components/NumericBadge';
 import ShareModal from 'components/ShareModal';
 import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';

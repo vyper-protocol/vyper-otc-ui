@@ -13,7 +13,7 @@
 
 	.flex {
 		display: flex;
-		justify-content: space-evenly;
+		justify-content: space-between;
 	}
 
 	.row {
@@ -28,8 +28,9 @@
 		text-align: center;
 	}
 
-	.bold {
+	.param {
 		font-weight: 600;
+		padding: 0px 8px;
 	}
 
 	.note {
