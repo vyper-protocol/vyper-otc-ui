@@ -63,7 +63,7 @@ const createContract = async (
 				const createdBy = provider.wallet.publicKey;
 				const aliasId = initParams.aliasId ?? initParams.payoffOption.payoffId;
 
-				await supabaseInsertContract(chainOtcState, createdBy, aliasId, cluster);
+				await supabaseInsertContract(chainOtcState, createdBy, aliasId, cluster, initParams.referralCode);
 			}
 		}
 

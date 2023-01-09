@@ -34,6 +34,8 @@ export type OtcInitializationParams = {
 		rateAccounts: string[];
 	};
 
+	referralCode: string | undefined;
+
 	saveOnDatabase: boolean;
 	sendNotification: boolean;
 };

@@ -11,6 +11,7 @@ import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+import { useURLReferralCode } from 'hooks/useURLReferralCode';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
@@ -21,6 +22,8 @@ import * as UrlBuilder from 'utils/urlBuilder';
 import styles from './BonkFixedPayoutGiveaway.module.scss';
 
 const BonkFixedPayout = () => {
+	const { referralCode } = useURLReferralCode();
+
 	const oracleDetail = getOracleByPubkey('GnL9fGrXVSMyEeoGtrmPzjEaw9JdbNpioQkJj6wfcscY');
 	const mintDetail = getMintByPubkey('DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263');
 
@@ -42,9 +45,6 @@ const BonkFixedPayout = () => {
 	const [strike, setStrike] = useState(0);
 
 	const [open, setOpen] = useState(true);
-
-	// TODO: read from url
-	const ref = 'DaddyGm_';
 
 	useEffect(() => {
 		if (isInitialized) {
@@ -78,12 +78,14 @@ const BonkFixedPayout = () => {
 					ratePluginType: oracleDetail.type,
 					rateAccounts: [oracleDetail.pubkey]
 				},
-				collateralMint: mintDetail.pubkey
+				collateralMint: mintDetail.pubkey,
 				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
+
+				referralCode
 			};
 
 			// create contract
-			const otcPublicKey = await createContract(provider, txHandler, initParams, 'long');
+			const otcPublicKey = await createContract(provider, txHandler, initParams);
 
 			// Create contract URL
 			router.push(UrlBuilder.buildContractSummaryUrl(otcPublicKey.toBase58()));
@@ -104,10 +106,10 @@ const BonkFixedPayout = () => {
 					</Typography>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
 						🐍 by VYPER OTC{' '}
-						{ref && (
+						{referralCode && (
 							<>
 								{'& '}
-								<Link href={`https://twitter.com/${ref}`}>@{ref}</Link>
+								<Link href={`https://twitter.com/${referralCode}`}>{referralCode}</Link>
 							</>
 						)}{' '}
 						🐍
