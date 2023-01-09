@@ -111,8 +111,8 @@ const BonkFixedPayout = () => {
 								setOpen(false);
 							}}
 						>
-							You will pay <b> 1 BONK 🐕</b> from your wallet to enter the trade, and can earn up to 1000000 BONK 🐕 if you win. Offer available for a limited
-							time only.
+							You will pay <b> 1 BONK 🐕</b> from your wallet to enter the trade, and can earn up to {formatWithDecimalDigits(1000000, 0)} BONK 🐕 if you win.
+							Offer available for a limited time only.
 						</Alert>
 					</Collapse>
 					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
