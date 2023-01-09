@@ -9,7 +9,7 @@ import FeaturedProduct from 'components/FeaturedProduct';
 import LoadingValue from 'components/LoadingValue';
 import NumericField from 'components/NumericField';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
+import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
@@ -94,7 +94,7 @@ const ActionPanel = ({ oracleDetail, multiplier }: ActionPanelProps) => {
 			setIsLoading(true);
 
 			const initParams: OtcInitializationParams = {
-				...DEFAULT_INIT_PARAMS,
+				...createDefaultInitParams(),
 
 				depositEnd: moment().add(5, 'minutes').toDate().getTime(),
 				settleStart: settleStart.toDate().getTime(),

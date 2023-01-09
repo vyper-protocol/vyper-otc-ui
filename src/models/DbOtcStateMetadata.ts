@@ -3,7 +3,7 @@ import { PublicKey } from '@solana/web3.js';
 import { AliasTypeIds } from './common';
 
 export class DbOtcStateMetadata {
-	constructor(public createdBy: PublicKey, public aliasId: AliasTypeIds, public data: any) {
+	constructor(public createdBy: PublicKey, public aliasId: AliasTypeIds, public data: any, public referralCode: string | undefined) {
 		//
 	}
 
@@ -12,6 +12,6 @@ export class DbOtcStateMetadata {
 		const alias = v.alias;
 		const data = v.metadata;
 
-		return new DbOtcStateMetadata(createdBy, alias, data);
+		return new DbOtcStateMetadata(createdBy, alias, data, v.referral_code);
 	}
 }

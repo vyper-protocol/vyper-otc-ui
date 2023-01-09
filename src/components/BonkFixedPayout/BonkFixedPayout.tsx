@@ -7,7 +7,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import LoadingValue from 'components/LoadingValue';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
+import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
@@ -56,7 +56,7 @@ const BonkFixedPayout = () => {
 			setIsLoading(true);
 
 			const initParams: OtcInitializationParams = {
-				...DEFAULT_INIT_PARAMS,
+				...createDefaultInitParams(),
 
 				depositEnd: moment()
 					.add(expiry - 1, 'minutes')
