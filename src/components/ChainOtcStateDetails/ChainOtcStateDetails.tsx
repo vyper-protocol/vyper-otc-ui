@@ -16,6 +16,7 @@ import MomentTooltipSpan from 'components/MomentTooltipSpan';
 import ShareModal from 'components/ShareModal';
 import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';
+import { createDefaultInitParams } from 'configs/defaults';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { OtcContract } from 'models/OtcContract';
 import moment from 'moment';
@@ -32,7 +33,6 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
-import { createDefaultInitParams } from 'configs/defaults';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: OtcContract;

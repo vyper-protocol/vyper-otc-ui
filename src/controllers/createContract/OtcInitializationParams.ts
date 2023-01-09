@@ -5,7 +5,6 @@ import { AliasTypeIds, RateTypeIds } from 'models/common';
 import { PayoffTypeIds } from 'models/common';
 import { RatePythState } from 'models/plugins/rate/RatePythState';
 import { RateSwitchboardState } from 'models/plugins/rate/RateSwitchboardState';
-import { formatWithDecimalDigits } from 'utils/numberHelpers';
 
 export type OtcInitializationParams = {
 	collateralMint: string;
