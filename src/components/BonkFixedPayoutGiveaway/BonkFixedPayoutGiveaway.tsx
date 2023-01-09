@@ -13,7 +13,6 @@ import { OtcInitializationParams } from 'controllers/createContract/OtcInitializ
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { BSDigitalStrike } from 'utils/blackScholes';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
@@ -36,13 +35,16 @@ const BonkFixedPayout = () => {
 	const { pricesValue, isInitialized } = useOracleLivePrice(oracleDetail.type, [oracleDetail.pubkey]);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [longDepositAmount, setLongDepositAmount] = useState(1);
-	const [expiry, setExpiry] = useState(30);
+	const longDepositAmount = 1;
+	const expiry = 30;
 
-	const shortDepositAmount = 1000000;
+	const shortDepositAmount = 1_000_000;
 	const [strike, setStrike] = useState(0);
 
 	const [open, setOpen] = useState(true);
+
+	// TODO: read from url
+	const ref = 'DaddyGm_';
 
 	useEffect(() => {
 		if (isInitialized) {
@@ -101,7 +103,14 @@ const BonkFixedPayout = () => {
 						🐕 BONK EXCHANGE 🐕
 					</Typography>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
-						🐍 by VYPER OTC & <Link href="https://twitter.com/DaddyGm_">@DaddyGm_</Link> 🐍
+						🐍 by VYPER OTC{' '}
+						{ref && (
+							<>
+								{'& '}
+								<Link href={`https://twitter.com/${ref}`}>@{ref}</Link>
+							</>
+						)}{' '}
+						🐍
 					</Typography>
 					<Collapse in={open}>
 						<Alert
@@ -111,12 +120,12 @@ const BonkFixedPayout = () => {
 								setOpen(false);
 							}}
 						>
-							You will pay <b> 1 BONK 🐕</b> from your wallet to enter the trade, and can earn up to {formatWithDecimalDigits(1000000, 0)} BONK 🐕 if you win.
-							Offer available for a limited time only.
+							You will pay <b> 1 BONK 🐕</b> from your wallet to enter the trade, and can earn up to {formatWithDecimalDigits(shortDepositAmount, -1)} BONK 🐕
+							if you win. Offer available for a limited time only.
 						</Alert>
 					</Collapse>
 					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
-						<Typography sx={{ fontWeight: 500 }} variant="h6">
+						<Typography sx={{ fontWeight: 500, m: 1 }} variant="h6">
 							I think BONK is going {isCall ? '⬆️' : '⬇️'}
 						</Typography>
 						<ToggleButtonGroup
@@ -139,66 +148,6 @@ const BonkFixedPayout = () => {
 									sx={{ mx: 1.5 }}
 								>
 									{v}
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
-
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Trade Amount 💰
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={longDepositAmount}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setLongDepositAmount(v);
-								}
-							}}
-						>
-							{[1].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v.toLocaleString()} BONK
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
-
-						{/* <Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Multiplier 🔢
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={multiplier}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setMultiplier(v);
-								}
-							}}
-						>
-							{[2, 5, 10].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v}x
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup> */}
-
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Expiry ⏰
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={expiry}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setExpiry(v);
-								}
-							}}
-						>
-							{[30].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v} min
 								</ToggleButton>
 							))}
 						</ToggleButtonGroup>
