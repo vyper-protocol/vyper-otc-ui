@@ -423,22 +423,8 @@ const ExplorerContractDataGrid = () => {
 		},
 		{
 			type: 'boolean',
-			field: 'dynamicData.sellerClaimed',
-			headerName: 'Seller claimed',
-			sortable: true,
-			align: 'center',
-			headerAlign: 'center',
-			filterable: true,
-			flex: 1,
-			minWidth: 50,
-			valueGetter: (params) => {
-				return params.row.dynamicData?.sellerClaimed;
-			}
-		},
-		{
-			type: 'boolean',
 			field: 'dynamicData.buyerClaimed',
-			headerName: 'Buyer claimed',
+			headerName: 'Long claimed',
 			sortable: true,
 			align: 'center',
 			headerAlign: 'center',
@@ -447,6 +433,20 @@ const ExplorerContractDataGrid = () => {
 			minWidth: 50,
 			valueGetter: (params) => {
 				return params.row.dynamicData?.buyerClaimed;
+			}
+		},
+		{
+			type: 'boolean',
+			field: 'dynamicData.sellerClaimed',
+			headerName: 'Short claimed',
+			sortable: true,
+			align: 'center',
+			headerAlign: 'center',
+			filterable: true,
+			flex: 1,
+			minWidth: 50,
+			valueGetter: (params) => {
+				return params.row.dynamicData?.sellerClaimed;
 			}
 		},
 		{
