@@ -32,6 +32,7 @@ import SettleButton from '../actionButtons/SettleButton';
 import WithdrawButton from '../actionButtons/WithdrawButton';
 import Simulator from '../Simulator/Simulator';
 import styles from './ChainOtcStateDetails.module.scss';
+import { createDefaultInitParams } from 'configs/defaults';
 
 export type ChainOtcStateDetailsInput = {
 	otcState: OtcContract;
@@ -61,6 +62,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 		const settleStartMoment = depositEndMoment.clone().add(chainDataSettleAvailableFromAtMoment.diff(chainDataDepositExpirationAtMoment));
 
 		create({
+			...createDefaultInitParams(),
+
 			collateralMint: otcState.chainData.collateralMint.toBase58(),
 			longDepositAmount: otcState.chainData.buyerDepositAmount,
 			shortDepositAmount: otcState.chainData.sellerDepositAmount,
