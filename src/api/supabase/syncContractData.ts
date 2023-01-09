@@ -19,7 +19,8 @@ export const syncContractFromChain = async (otcState: ChainOtcState) => {
 		let pricesAtSettlement2 = undefined;
 		let pnlBuyer = undefined;
 		let pnlSeller = undefined;
-
+		let buyerClaimed = false;
+		let sellerClaimed = false;
 		if (otcState.settleExecuted) {
 			try {
 				pricesAtSettlement1 = otcState.pricesAtSettlement[0];
@@ -27,6 +28,9 @@ export const syncContractFromChain = async (otcState: ChainOtcState) => {
 
 				pnlBuyer = otcState.getLongPnl(otcState.pricesAtSettlement);
 				pnlSeller = otcState.getShortPnl(otcState.pricesAtSettlement);
+
+				buyerClaimed = otcState.programBuyerTAAmount === 0;
+				sellerClaimed = otcState.programSellerTAAmount === 0;
 			} catch {}
 		}
 
@@ -47,7 +51,10 @@ export const syncContractFromChain = async (otcState: ChainOtcState) => {
 			prices_at_settlement_2: pricesAtSettlement2,
 
 			pnl_buyer: pnlBuyer,
-			pnl_seller: pnlSeller
+			pnl_seller: pnlSeller,
+
+			buyer_claimed: buyerClaimed,
+			seller_claimed: sellerClaimed
 		};
 
 		// check if entry exists

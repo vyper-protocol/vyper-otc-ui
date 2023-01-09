@@ -10,7 +10,7 @@ import NonAuditedDisclaimer from 'components/NonAuditedDisclaimer';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
 import Layout from 'components/templates/Layout';
-import { DEFAULT_INIT_PARAMS } from 'configs/defaults';
+import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { getPriceForStrike } from 'controllers/createContract/OtcInitializationParams';
 import { useRouter } from 'next/router';
@@ -29,7 +29,7 @@ const CreateContractPage = () => {
 	const provider = new AnchorProvider(connection, wallet, {});
 	const txHandler = useContext(TxHandlerContext);
 
-	const [initParams, setInitParams] = useState(DEFAULT_INIT_PARAMS);
+	const [initParams, setInitParams] = useState(createDefaultInitParams());
 
 	// eslint-disable-next-line eqeqeq
 	const isPresentTempData = contractStore?.contractData != null;

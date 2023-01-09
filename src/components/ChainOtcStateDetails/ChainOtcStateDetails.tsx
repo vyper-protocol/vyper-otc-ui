@@ -13,10 +13,10 @@ import ClickableIcon from 'components/ClickableIcon';
 import ContractStatusBadge from 'components/ContractStatusBadge';
 import LoadingValue from 'components/LoadingValue';
 import MomentTooltipSpan from 'components/MomentTooltipSpan';
-import NumericBadge from 'components/NumericBadge';
 import ShareModal from 'components/ShareModal';
 import StatusBadge from 'components/StatusBadge';
 import TokenSymbol from 'components/TokenSymbol';
+import { createDefaultInitParams } from 'configs/defaults';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { OtcContract } from 'models/OtcContract';
 import moment from 'moment';
@@ -62,6 +62,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 		const settleStartMoment = depositEndMoment.clone().add(chainDataSettleAvailableFromAtMoment.diff(chainDataDepositExpirationAtMoment));
 
 		create({
+			...createDefaultInitParams(),
+
 			collateralMint: otcState.chainData.collateralMint.toBase58(),
 			longDepositAmount: otcState.chainData.buyerDepositAmount,
 			shortDepositAmount: otcState.chainData.sellerDepositAmount,

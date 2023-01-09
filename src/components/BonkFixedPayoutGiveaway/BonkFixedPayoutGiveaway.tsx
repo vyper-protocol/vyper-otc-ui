@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Alert, Box, Collapse, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Box, Collapse, Link, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -11,17 +11,19 @@ import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+import { useURLReferralCode } from 'hooks/useURLReferralCode';
 import moment from 'moment';
 import { useRouter } from 'next/router';
-import { BSDigitalStrike } from 'utils/blackScholes';
 import { getMintByPubkey } from 'utils/mintDatasetHelper';
 import { formatWithDecimalDigits } from 'utils/numberHelpers';
 import { getOracleByPubkey } from 'utils/oracleDatasetHelper';
 import * as UrlBuilder from 'utils/urlBuilder';
 
-import styles from './BonkFixedPayout.module.scss';
+import styles from './BonkFixedPayoutGiveaway.module.scss';
 
 const BonkFixedPayout = () => {
+	const { referralCode } = useURLReferralCode();
+
 	const oracleDetail = getOracleByPubkey('GnL9fGrXVSMyEeoGtrmPzjEaw9JdbNpioQkJj6wfcscY');
 	const mintDetail = getMintByPubkey('DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263');
 
@@ -36,20 +38,19 @@ const BonkFixedPayout = () => {
 	const { pricesValue, isInitialized } = useOracleLivePrice(oracleDetail.type, [oracleDetail.pubkey]);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [longDepositAmount, setLongDepositAmount] = useState(1_000_000);
-	const [multiplier, setMultiplier] = useState(2);
-	const [expiry, setExpiry] = useState(30);
+	const longDepositAmount = 1;
+	const expiry = 30;
 
-	const shortDepositAmount = longDepositAmount * multiplier;
+	const shortDepositAmount = 1_000_000;
 	const [strike, setStrike] = useState(0);
 
 	const [open, setOpen] = useState(true);
 
 	useEffect(() => {
 		if (isInitialized) {
-			setStrike(BSDigitalStrike(pricesValue[0], 0, 1, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
+			setStrike(pricesValue[0] * (isCall ? 1.02 : 0.98));
 		}
-	}, [isInitialized, pricesValue, isCall, expiry, multiplier]);
+	}, [isInitialized, pricesValue, isCall]);
 
 	const onCreateContractButtonClick = async () => {
 		try {
@@ -65,7 +66,7 @@ const BonkFixedPayout = () => {
 				settleStart: moment().add(expiry, 'minutes').toDate().getTime(),
 
 				longDepositAmount,
-				shortDepositAmount: longDepositAmount * multiplier,
+				shortDepositAmount,
 				aliasId: 'digital',
 				payoffOption: {
 					payoffId: 'digital',
@@ -77,8 +78,10 @@ const BonkFixedPayout = () => {
 					ratePluginType: oracleDetail.type,
 					rateAccounts: [oracleDetail.pubkey]
 				},
-				collateralMint: mintDetail.pubkey
+				collateralMint: mintDetail.pubkey,
 				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
+
+				referralCode
 			};
 
 			// create contract
@@ -99,13 +102,32 @@ const BonkFixedPayout = () => {
 			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4, px: 16 }} className={styles.container}>
 				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
-						🐕 BONK OPTIONS 🐕
+						🐕 BONK EXCHANGE 🐕
 					</Typography>
 					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
-						🐍 by VYPER OTC 🐍
+						🐍 by VYPER OTC{' '}
+						{referralCode && (
+							<>
+								{'& '}
+								<Link href={`https://twitter.com/${referralCode}`}>{referralCode}</Link>
+							</>
+						)}{' '}
+						🐍
 					</Typography>
+					<Collapse in={open}>
+						<Alert
+							sx={{ mt: 1 }}
+							severity="info"
+							onClose={() => {
+								setOpen(false);
+							}}
+						>
+							You will pay <b> 1 BONK 🐕</b> from your wallet to enter the trade, and can earn up to {formatWithDecimalDigits(shortDepositAmount, -1)} BONK 🐕
+							if you win. Offer available for a limited time only.
+						</Alert>
+					</Collapse>
 					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
-						<Typography sx={{ fontWeight: 500 }} variant="h6">
+						<Typography sx={{ fontWeight: 500, m: 1 }} variant="h6">
 							I think BONK is going {isCall ? '⬆️' : '⬇️'}
 						</Typography>
 						<ToggleButtonGroup
@@ -128,66 +150,6 @@ const BonkFixedPayout = () => {
 									sx={{ mx: 1.5 }}
 								>
 									{v}
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
-
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Trade Amount 💰
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={longDepositAmount}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setLongDepositAmount(v);
-								}
-							}}
-						>
-							{[100_000, 500_000, 1_000_000].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v.toLocaleString()}
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
-
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Multiplier 🔢
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={multiplier}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setMultiplier(v);
-								}
-							}}
-						>
-							{[2, 5, 10].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v}x
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
-
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Expiry ⏰
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={expiry}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setExpiry(v);
-								}
-							}}
-						>
-							{[10, 30, 60].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v} min
 								</ToggleButton>
 							))}
 						</ToggleButtonGroup>
@@ -218,18 +180,6 @@ const BonkFixedPayout = () => {
 					>
 						{wallet.connected ? 'Trade Now' : 'Connect wallet'}
 					</LoadingButton>
-
-					<Collapse in={open}>
-						<Alert
-							sx={{ mt: 1 }}
-							severity="info"
-							onClose={() => {
-								setOpen(false);
-							}}
-						>
-							You will pay {longDepositAmount.toLocaleString()} BONK 🐕 from your wallet to enter the trade.
-						</Alert>
-					</Collapse>
 				</Box>
 			</Box>
 

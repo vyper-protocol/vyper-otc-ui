@@ -2,6 +2,7 @@ import { Box, Skeleton } from '@mui/material';
 import { useConnection } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import { getCurrentCluster } from 'components/providers/OtcConnectionProvider';
+import { createDefaultInitParams } from 'configs/defaults';
 import { getPriceForStrike } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
 import { RateTypeIds, PayoffTypeIds, AliasTypeIds } from 'models/common';
@@ -88,6 +89,7 @@ export const TemplateCard = ({
 		const price = await getPriceForStrike(rateId, [getOraclesByTitle(underlying, rateId).pubkey], connection, getCurrentCluster());
 
 		create({
+			...createDefaultInitParams(),
 			collateralMint: collateralMint,
 			longDepositAmount,
 			shortDepositAmount,

@@ -3,12 +3,23 @@
 		{
 			"ticker": "BONK  2x",
 			"title": "Make 1m BONK betting on BONK",
-			"description": "Make 2x on your BONK if the price goes up or down in 30 minutes",
+			"description": "Make 2x on your BONK if the price goes up or down",
 			"tags": ["digital", "crypto"],
 			"clusters": ["mainnet-beta"],
 			"imgSrc": "/bonk-logo.jpg",
 			"isActive": true,
 			"id": "bonk",
+			"icon": "IoIosRocket"
+		},
+		{
+			"ticker": "BONK EARN",
+			"title": "Guess where BONK goes and make 1m BONK",
+			"description": "Earn 1m BONK if you guess if BONK goes up or down in 30 minutes ",
+			"tags": ["digital", "crypto"],
+			"clusters": ["mainnet-beta"],
+			"imgSrc": "/bonk-logo.jpg",
+			"isActive": true,
+			"id": "bonk/promo",
 			"icon": "IoIosRocket"
 		},
 		{
