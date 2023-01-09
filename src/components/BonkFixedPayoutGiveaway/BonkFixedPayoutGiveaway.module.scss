@@ -1,0 +1,97 @@
+@mixin glow-button($color) {
+	// border-color: $color;
+	transition: 0.25s;
+
+	&:hover,
+	&:global(.Mui-selected) {
+		background: $color;
+		color: #fff;
+		box-shadow: 0 0 5px $color, 0 0 10px $color, 0 0 10px $color, 0 0 30px $color;
+		opacity: 0.7;
+		// font-size: 13.5px;
+		border-color: transparent;
+	}
+}
+
+.container {
+	.highlight {
+		font-weight: 700;
+		background: linear-gradient(180deg, #262629 0%, #2f3bdd 52.92%, #bda6f3 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.button_group {
+		margin-top: 4px;
+
+		.button {
+			border-color: #0000002d;
+
+			border-radius: 8px;
+			width: 96px;
+			text-transform: none;
+			color: black;
+			font-size: 14.5px;
+			padding: 8px;
+
+			&.profit {
+				@include glow-button(rgb(35, 211, 0));
+			}
+
+			&.loss {
+				@include glow-button(rgb(204, 8, 8));
+			}
+
+			&.second {
+				@include glow-button(rgb(0, 238, 255));
+			}
+
+			&.third {
+				@include glow-button(rgb(4, 0, 211));
+			}
+
+			&.fourth {
+				@include glow-button(rgb(255, 187, 0));
+			}
+		}
+	}
+
+	.profit {
+		font-weight: 700;
+		color: rgb(40, 199, 40);
+	}
+
+	.loss {
+		font-weight: 700;
+		color: rgb(223, 76, 76);
+	}
+
+	.buy {
+		background-color: rgba(1, 134, 16, 0.838);
+
+		&:hover {
+			background-color: rgba(0, 201, 23, 0.79);
+		}
+	}
+}
+
+.alert {
+	background-color: rgba(235, 223, 60, 0.288);
+	margin-top: 12px;
+	padding: 0px 12px;
+}
+
+.glow {
+	margin: 20px;
+	padding: 20px;
+	-webkit-box-shadow: 0 0 20px rgb(0, 64, 255);
+	-moz-box-shadow: 0 0 20px rgb(55, 0, 255);
+	box-shadow: 0 0 30px rgb(0, 72, 255);
+}
+
+@media screen and (max-width: 600px) {
+	.desktop_only {
+		display: none;
+	}
+}
