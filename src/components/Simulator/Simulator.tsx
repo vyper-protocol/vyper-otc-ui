@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Box, Typography } from '@mui/material';
 import cn from 'classnames';
 import NumericBadge from 'components/NumericBadge';
 import NumericField from 'components/NumericField';
@@ -16,14 +17,9 @@ type SimulatorProps = {
 const Simulator = ({ chainData, className, ref }: SimulatorProps) => {
 	const [prices, setPrices] = useState<number[]>(Array(10).fill(0));
 
-	const tokenSymbol = chainData.collateralTokenInfo?.symbol ?? '';
+	const tokenSymbol = chainData.collateralTokenInfo?.symbol.toUpperCase() ?? '';
 
-	const longPnl = parseFloat(
-		formatWithDecimalDigits(chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[0], 4)
-	);
-	const shortPnl = parseFloat(
-		formatWithDecimalDigits(chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount)[1], 4)
-	);
+	const [longPnl, shortPnl] = chainData.redeemLogicAccount?.state.getPnl(prices, chainData.buyerDepositAmount, chainData.sellerDepositAmount);
 
 	const handleOnPriceChange = (newValue: string, i: number) => {
 		const pricesValueClone = _.clone(prices);
@@ -36,41 +32,28 @@ const Simulator = ({ chainData, className, ref }: SimulatorProps) => {
 			<p className={styles.title}>Simulate your PnL</p>
 			{chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
 				<div key={i} className={cn(styles.flex, styles.margin)}>
-					<NumericField label={c} value={prices[i]} onChange={(newVal: number) => handleOnPriceChange(newVal.toString(), i)} />
+					<NumericField label={'Simulated ' + c.toLowerCase()} value={prices[i]} onChange={(newVal: number) => handleOnPriceChange(newVal.toString(), i)} />
 				</div>
 			))}
 
-			<div className={styles.margin}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', mx: 2 }} className={styles.margin}>
 				{chainData.redeemLogicAccount.state.pluginDetails.map((detail, index) => (
 					<div key={detail.label} className={cn(styles.flex, index % 2 && styles.row)}>
-						<p className={styles.bold}>{detail.label}</p>
-						<p className={styles.bold}>{typeof detail.value === 'number' ? formatWithDecimalDigits(detail.value) : detail.value}</p>
+						<p className={styles.param}>{detail.label}</p>
+						<p className={styles.param}>{typeof detail.value === 'number' ? formatWithDecimalDigits(detail.value, -1) : detail.value}</p>
 					</div>
 				))}
-			</div>
-
-			<div className={cn(styles.flex, styles.margin)}>
-				<div className={styles.center}>
-					Long
-					<br />
-					<NumericBadge label={longPnl + ' ' + tokenSymbol} mode={longPnl > 0 ? 'success' : 'error'} />
-				</div>
-				<div className={styles.center}>
-					Short
-					<br />
-					<NumericBadge label={shortPnl + ' ' + tokenSymbol} mode={shortPnl > 0 ? 'success' : 'error'} />
-				</div>
-			</div>
-
-			<p className={styles.note}>
-				This is the simulated PnL if{' '}
-				{chainData.redeemLogicAccount.state.settlementPricesDescription.map((c, i) => (
-					<span key={i}>
-						{c.toLowerCase()} gets to {prices[i]}
-						{i === chainData.redeemLogicAccount.state.settlementPricesDescription.length - 1 ? '' : ', '}
-					</span>
-				))}
-			</p>
+			</Box>
+			<Box sx={{ mt: 2 }}>
+				<Box className={styles.center} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Typography>Long</Typography>
+					<NumericBadge label={formatWithDecimalDigits(longPnl, -1) + ' ' + tokenSymbol} mode={longPnl >= 0 ? 'success' : 'error'} />
+				</Box>
+				<Box className={styles.center} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Typography>Short</Typography>
+					<NumericBadge label={formatWithDecimalDigits(shortPnl, -1) + ' ' + tokenSymbol} mode={shortPnl > 0 ? 'success' : 'error'} />
+				</Box>
+			</Box>
 		</div>
 	);
 };
