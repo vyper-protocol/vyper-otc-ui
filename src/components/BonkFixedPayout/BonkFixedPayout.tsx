@@ -47,7 +47,7 @@ const BonkFixedPayout = () => {
 
 	useEffect(() => {
 		if (isInitialized) {
-			setStrike(BSDigitalStrike(pricesValue[0], 0, 1, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
+			setStrike(BSDigitalStrike(pricesValue[0], 0, 1 + multiplier * 0.25, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
 		}
 	}, [isInitialized, pricesValue, isCall, expiry, multiplier]);
 

@@ -41,7 +41,7 @@ const BonkFixedPayout = () => {
 	const longDepositAmount = 1;
 	const expiry = 30;
 
-	const shortDepositAmount = 1_000_000;
+	const shortDepositAmount = 500_000;
 	const [strike, setStrike] = useState(0);
 
 	const [open, setOpen] = useState(true);
