@@ -80,7 +80,7 @@ const TopBar = () => {
 			>
 				<Box className={styles.container}>
 					<a className={styles.item} href={UrlBuilder.buildFeaturedUrl()}>
-						<Icon name={'AiFillWarning'} />
+						<Icon name={'FaSearch'} />
 						<Typography className={styles.typography}>{'SEE ALL'}</Typography>
 					</a>
 					{featured.featured

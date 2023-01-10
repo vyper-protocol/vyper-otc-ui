@@ -1,26 +1,26 @@
 {
 	"featured": [
 		{
-			"ticker": "BONK  2x",
-			"title": "Make 1m BONK betting on BONK",
-			"description": "Make 2x on your BONK if the price goes up or down",
+			"ticker": "BONK OPTIONS",
+			"title": "Short term options on BONK",
+			"description": "Earn up to 10X your BONK if the price goes UP or DOWN",
 			"tags": ["digital", "crypto"],
 			"clusters": ["mainnet-beta"],
-			"imgSrc": "/bonk-logo.jpg",
+			"imgSrc": "/bonk-logo.png",
 			"isActive": true,
 			"id": "bonk",
-			"icon": "IoIosRocket"
+			"icon": "FaChartLine"
 		},
 		{
-			"ticker": "BONK EARN",
-			"title": "Guess where BONK goes and make 1m BONK",
-			"description": "Earn 1m BONK if you guess if BONK goes up or down in 30 minutes ",
+			"ticker": "BONK PROMO",
+			"title": "Trade to earn 1M BONK",
+			"description": "Pay 1 BONK and earn 1M BONK if you guess UP or DOWN",
 			"tags": ["digital", "crypto"],
 			"clusters": ["mainnet-beta"],
-			"imgSrc": "/bonk-logo.jpg",
+			"imgSrc": "/promo-logo.png",
 			"isActive": true,
 			"id": "bonk/promo",
-			"icon": "IoIosRocket"
+			"icon": "FaUserFriends"
 		},
 		{
 			"ticker": "SOL 10x",
