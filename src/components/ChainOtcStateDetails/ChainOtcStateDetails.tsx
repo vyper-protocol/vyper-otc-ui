@@ -255,7 +255,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your PnL</p>
-							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${quoteCcy ?? ''}`}</p>
+							<p className={cn(shortPnl >= 0 ? styles.profit : styles.loss)}>{`${shortPnlFormat} ${quoteCcy ?? ''}`}</p>
 						</div>
 					)}
 
