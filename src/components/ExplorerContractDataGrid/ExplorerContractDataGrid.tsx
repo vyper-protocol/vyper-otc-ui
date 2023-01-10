@@ -22,6 +22,7 @@ import MomentTooltipSpan from 'components/MomentTooltipSpan';
 import PublicKeyLink from 'components/PublicKeyLink';
 import StatusBadge from 'components/StatusBadge';
 import fetchContracts from 'controllers/fetchContracts';
+import _ from 'lodash';
 import { AVAILABLE_CONTRACT_STATUS_IDS } from 'models/common';
 import { AVAILABLE_PAYOFF_TYPE_IDS, PayoffTypeIds } from 'models/common';
 import { DbOtcState } from 'models/DbOtcState';
@@ -220,17 +221,22 @@ const ExplorerContractDataGrid = () => {
 			align: 'center',
 			headerAlign: 'center',
 			filterable: true,
-			renderCell: (params: GridRenderCellParams<[string, boolean | null]>) => {
+			renderCell: (params: GridRenderCellParams<string>) => {
+				const splits = params.value.split(';');
 				return (
 					<Box sx={{ display: 'inline-flex' }}>
-						<StatusBadge label={params.value[0]} mode="info" />
-						{typeof params.value[1] === 'boolean' && <StatusBadge label={params.value[1] ? 'call' : 'put'} mode={params.value[1] ? 'success' : 'error'} />}
+						<StatusBadge label={splits[0]} mode="info" />
+						{splits.length > 0 && <StatusBadge label={splits[1] === 'true' ? 'call' : 'put'} mode={splits[1] === 'true' ? 'success' : 'error'} />}
 					</Box>
 				);
 			},
 			valueGetter: (params) => {
-				const dataObj = params.row.redeemLogicAccount.state.getPluginDataObj();
-				return [params.row.metadata?.aliasId ?? params.row.redeemLogicAccount.state.payoffId, dataObj.hasOwnProperty('isCall') ? dataObj.isCall : null];
+				const dataObj = params.row.redeemLogicAccount?.state?.getPluginDataObj();
+				if (dataObj?.hasOwnProperty('isCall')) {
+					return _.join([params.row.metadata?.aliasId, dataObj?.isCall], ';');
+				}
+
+				return params.row.metadata?.aliasId;
 			}
 		},
 		{
