@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Alert, Box, Collapse, Grid, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Box, Collapse, Grid, Link, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
@@ -12,6 +12,7 @@ import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
 import { useOracleLivePrice } from 'hooks/useOracleLivePrice';
+import { useURLReferralCode } from 'hooks/useURLReferralCode';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { BSDigitalStrike } from 'utils/blackScholes';
@@ -23,6 +24,8 @@ import * as UrlBuilder from 'utils/urlBuilder';
 import styles from './SamoFixedPayout.module.scss';
 
 const ActionPanel = () => {
+	const { referralCode } = useURLReferralCode();
+
 	const oracleDetail = getOracleByPubkey('AJCnhHbBc1L3ULfeVkdnXep4rUyWXQC55CZuUUgCjzbG');
 	const mintDetail = getMintByPubkey('7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU');
 
@@ -114,9 +117,19 @@ const ActionPanel = () => {
 					>
 						<Box component="img" src="/samo-logo.png" alt="logo" sx={{ width: '10%' }} />
 					</Typography>
-					{/* <Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
-						🐍 by VYPER OTC 🐍
-					</Typography> */}
+					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
+						SAMO DERIVATIVES
+					</Typography>
+					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
+						🐍 by VYPER OTC{' '}
+						{referralCode && (
+							<>
+								{'& '}
+								<Link href={`https://twitter.com/${referralCode}`}>{referralCode}</Link>
+							</>
+						)}{' '}
+						🐍
+					</Typography>
 					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
 						<Typography sx={{ fontWeight: 500 }} variant="h6">
 							I think SAMO is going {isCall ? '⬆️' : '⬇️'}
