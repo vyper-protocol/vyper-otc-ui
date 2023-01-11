@@ -78,7 +78,10 @@ const ActionPanel = () => {
 					ratePluginType: oracleDetail.type,
 					rateAccounts: [oracleDetail.pubkey]
 				},
-				collateralMint: mintDetail.pubkey
+				collateralMint: mintDetail.pubkey,
+
+				referralCode,
+				isFeatured: true
 			};
 
 			// create contract
