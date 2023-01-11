@@ -47,7 +47,7 @@ const BonkFixedPayout = () => {
 
 	useEffect(() => {
 		if (isInitialized) {
-			setStrike(BSDigitalStrike(pricesValue[0], 0, 1, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
+			setStrike(BSDigitalStrike(pricesValue[0], 0, 1 + multiplier * 0.25, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
 		}
 	}, [isInitialized, pricesValue, isCall, expiry, multiplier]);
 
@@ -77,7 +77,8 @@ const BonkFixedPayout = () => {
 					ratePluginType: oracleDetail.type,
 					rateAccounts: [oracleDetail.pubkey]
 				},
-				collateralMint: mintDetail.pubkey
+				collateralMint: mintDetail.pubkey,
+				isFeatured: true
 				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
 			};
 

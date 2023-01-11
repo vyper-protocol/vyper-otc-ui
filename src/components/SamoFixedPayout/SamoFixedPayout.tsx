@@ -79,7 +79,6 @@ const ActionPanel = () => {
 					rateAccounts: [oracleDetail.pubkey]
 				},
 				collateralMint: mintDetail.pubkey
-				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
 			};
 
 			// create contract
