@@ -12,6 +12,7 @@ export const cloneContractFromChain = async (
 	aliasId: AliasTypeIds,
 	cluster: Cluster,
 	referralCode: string | undefined = undefined,
+	isFeatured: boolean = false,
 	metadata: any = {}
 ) => {
 	await supabase.from(CONTRACTS_TABLE_NAME).insert([
@@ -45,7 +46,8 @@ export const cloneContractFromChain = async (
 			created_by: createdBy.toBase58(),
 			alias: aliasId,
 			metadata: metadata,
-			referral_code: referralCode
+			referral_code: referralCode,
+			is_featured: isFeatured
 		}
 	]);
 };
