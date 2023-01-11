@@ -34,6 +34,7 @@ export type OtcInitializationParams = {
 	};
 
 	referralCode: string | undefined;
+	isFeatured: boolean;
 
 	saveOnDatabase: boolean;
 	sendNotification: boolean;

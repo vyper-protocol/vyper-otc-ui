@@ -81,7 +81,8 @@ const BonkFixedPayout = () => {
 				collateralMint: mintDetail.pubkey,
 				// collateralMint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263'
 
-				referralCode
+				referralCode,
+				isFeatured: true
 			};
 
 			// create contract

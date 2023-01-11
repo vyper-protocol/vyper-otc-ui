@@ -29,6 +29,7 @@ export const createDefaultInitParams = (): OtcInitializationParams => ({
 	},
 
 	referralCode: undefined,
+	isFeatured: false,
 
 	// USDC in mainnet, devUSD in devnet
 	collateralMint: getCurrentCluster() === 'devnet' ? '7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W' : 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
