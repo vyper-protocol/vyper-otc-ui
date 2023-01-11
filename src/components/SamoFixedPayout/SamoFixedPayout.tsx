@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Alert, Box, Collapse, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Box, Collapse, Grid, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { AnchorProvider } from '@project-serum/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import LoadingValue from 'components/LoadingValue';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import TradingViewChart from 'components/TradingViewChart';
+import TradingViewSymbol from 'components/TradingViewSymbol';
 import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -22,7 +22,7 @@ import * as UrlBuilder from 'utils/urlBuilder';
 
 import styles from './SamoFixedPayout.module.scss';
 
-const SamoFixedPayout = () => {
+const ActionPanel = () => {
 	const oracleDetail = getOracleByPubkey('AJCnhHbBc1L3ULfeVkdnXep4rUyWXQC55CZuUUgCjzbG');
 	const mintDetail = getMintByPubkey('7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU');
 
@@ -48,7 +48,7 @@ const SamoFixedPayout = () => {
 
 	useEffect(() => {
 		if (isInitialized) {
-			setStrike(BSDigitalStrike(pricesValue[0], 0, 1, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
+			setStrike(BSDigitalStrike(pricesValue[0], 0, 2, expiry / 60 / 24 / 365, isCall, 1 / multiplier));
 		}
 	}, [isInitialized, pricesValue, isCall, expiry, multiplier]);
 
@@ -156,7 +156,7 @@ const SamoFixedPayout = () => {
 								}
 							}}
 						>
-							{[250, 1_000, 2_500].map((v, i) => (
+							{[250, 500, 1000].map((v, i) => (
 								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
 									{v.toLocaleString()}
 								</ToggleButton>
@@ -196,7 +196,7 @@ const SamoFixedPayout = () => {
 								}
 							}}
 						>
-							{[10, 30, 60].map((v, i) => (
+							{[30, 60, 120].map((v, i) => (
 								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
 									{v} min
 								</ToggleButton>
@@ -240,10 +240,28 @@ const SamoFixedPayout = () => {
 					</Collapse>
 				</Box>
 			</Box>
+			<Box sx={{ mt: 2 }}>{/* CHART GOES HERE */}</Box>
+		</Box>
+	);
+};
 
-			<Box sx={{ width: '60vw', height: '500px' }} className={styles.desktop_only}>
-				<TradingViewChart symbol="OKX:SAMOUSDT" />
-			</Box>
+const Chart = () => (
+	<Box sx={{ width: '60vw', height: '500px' }}>
+		<TradingViewSymbol symbol="OKX:SAMOUSDT" />
+	</Box>
+);
+
+const SamoFixedPayout = () => {
+	return (
+		<Box sx={{ width: '100%', height: '100%' }}>
+			<Grid container spacing={2}>
+				<Grid item xs={12} md={6}>
+					<ActionPanel />
+				</Grid>
+				<Grid item xs={12} md={6}>
+					<Chart />
+				</Grid>
+			</Grid>
 		</Box>
 	);
 };
