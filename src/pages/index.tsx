@@ -5,6 +5,7 @@ import cn from 'classnames';
 import FrequentlyAskedQuestions from 'components/FrequentlyAskedQuestions';
 import SupportedAssetsMarquee from 'components/SupportedAssetsMarquee';
 import TemplateGrid from 'components/TemplateGrid';
+import AchievementsGrid from 'components/AchievementsGrid';
 import Layout from 'components/templates/Layout';
 import resources from 'configs/resources.json';
 import { useGetPlatformStatsQuery } from 'hooks/useGetPlatformStatsQuery';
@@ -120,6 +121,9 @@ const Home = () => {
 					</div>
 					<div>
 						<FrequentlyAskedQuestions></FrequentlyAskedQuestions>
+					</div>
+					<div>
+						<AchievementsGrid />
 					</div>
 				</Stack>
 			</Layout>
