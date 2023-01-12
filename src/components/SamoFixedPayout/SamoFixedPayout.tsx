@@ -7,7 +7,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import cn from 'classnames';
 import LoadingValue from 'components/LoadingValue';
 import { TxHandlerContext } from 'components/providers/TxHandlerProvider';
-import TradingViewSymbol from 'components/TradingViewSymbol';
+import TradingViewChart from 'components/TradingViewChart';
 import { createDefaultInitParams } from 'configs/defaults';
 import createContract from 'controllers/createContract';
 import { OtcInitializationParams } from 'controllers/createContract/OtcInitializationParams';
@@ -101,182 +101,158 @@ const ActionPanel = () => {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', width: '100%', mt: 1, justifyContent: 'center', height: '90vh' }}>
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 1, px: 16 }} className={styles.container}>
-				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 0 }}>
-					<Typography
-						sx={{
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							fontWeight: 300,
-							justifyContent: 'center',
-							paddingBottom: '0px',
-							paddingTop: '0px'
-						}}
-					>
-						<Box component="img" src="/samo-logo.png" alt="logo" sx={{ width: '10%' }} />
-					</Typography>
-					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
-						SAMO DERIVATIVES
-					</Typography>
-					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
-						🐍 by VYPER OTC{' '}
-						{referralCode && (
-							<>
-								{'& '}
-								<Link href={`https://twitter.com/${referralCode}`}>{referralCode}</Link>
-							</>
-						)}{' '}
-						🐍
-					</Typography>
-					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
-						<Typography sx={{ fontWeight: 500 }} variant="h6">
-							I think SAMO is going {isCall ? '⬆️' : '⬇️'}
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={isCall}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setIsCall(v);
-								}
-							}}
-						>
-							{['UP', 'DOWN'].map((v, i) => (
-								<ToggleButton
-									className={cn(styles.button, v === 'UP' ? styles.profit : styles.loss)}
-									key={i}
-									disableRipple
-									value={v === 'UP'}
-									size="small"
-									sx={{ mx: 1.5 }}
-								>
-									{v}
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
+		<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 1 }} className={styles.container}>
+			<Box component="img" src="/samo-logo.png" alt="logo" sx={{ width: '10%' }} />
 
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Trade Amount 💰
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={longDepositAmount}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setLongDepositAmount(v);
-								}
-							}}
+			<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
+				SAMO OPTIONS
+			</Typography>
+			<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
+				🐍 by VYPER OTC{' '}
+				{referralCode && (
+					<>
+						{'& '}
+						<Link href={`https://twitter.com/${referralCode}`}>{referralCode}</Link>
+					</>
+				)}{' '}
+				🐍
+			</Typography>
+			<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
+				<Typography sx={{ fontWeight: 500 }} variant="h6">
+					I think SAMO is going {isCall ? '⬆️' : '⬇️'}
+				</Typography>
+				<ToggleButtonGroup
+					className={styles.button_group}
+					value={isCall}
+					exclusive
+					onChange={(_e, v) => {
+						if (v !== null) {
+							setIsCall(v);
+						}
+					}}
+				>
+					{['UP', 'DOWN'].map((v, i) => (
+						<ToggleButton
+							className={cn(styles.button, v === 'UP' ? styles.profit : styles.loss)}
+							key={i}
+							disableRipple
+							value={v === 'UP'}
+							size="small"
+							sx={{ mx: 1.5 }}
 						>
-							{[250, 500, 1000].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v.toLocaleString()}
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
+							{v}
+						</ToggleButton>
+					))}
+				</ToggleButtonGroup>
 
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Multiplier 🔢
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={multiplier}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setMultiplier(v);
-								}
-							}}
-						>
-							{[2, 5, 10].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v}x
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
+				<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
+					Trade Amount 💰
+				</Typography>
+				<ToggleButtonGroup
+					className={styles.button_group}
+					value={longDepositAmount}
+					exclusive
+					onChange={(_e, v) => {
+						if (v !== null) {
+							setLongDepositAmount(v);
+						}
+					}}
+				>
+					{[250, 500, 1000].map((v, i) => (
+						<ToggleButton className={cn(styles.button, styles.second)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
+							{v.toLocaleString()}
+						</ToggleButton>
+					))}
+				</ToggleButtonGroup>
 
-						<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
-							Expiry ⏰
-						</Typography>
-						<ToggleButtonGroup
-							className={styles.button_group}
-							value={expiry}
-							exclusive
-							onChange={(_e, v) => {
-								if (v !== null) {
-									setExpiry(v);
-								}
-							}}
-						>
-							{[30, 60, 120].map((v, i) => (
-								<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
-									{v} min
-								</ToggleButton>
-							))}
-						</ToggleButtonGroup>
-					</Box>
-					<Box>
-						<Typography sx={{ mt: 1, fontWeight: 400, textTransform: 'uppercase' }} variant="h6" align="center">
-							win if SAMO is {isCall ? 'above' : 'below'}{' '}
-							<LoadingValue isLoading={!isInitialized}>
-								<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(strike, 4)}</span>
-							</LoadingValue>{' '}
-							in {expiry} minutes
-							<br />
-							<b>{isCall ? 'above' : 'below'}</b> 👉🏻 <span className={styles.profit}> +{shortDepositAmount.toLocaleString()} SAMO</span> 🤑
-							<br />
-							<b>{isCall ? 'below' : 'above'}</b> 👉🏻 <span className={styles.loss}> -{longDepositAmount.toLocaleString()} SAMO</span> 💸
-						</Typography>
-					</Box>
-					<LoadingButton
-						sx={{ mt: 2, borderRadius: 4 }}
-						className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
-						loading={isLoading}
-						variant="contained"
-						disabled={!wallet.connected}
-						onClick={onCreateContractButtonClick}
-						size="large"
-					>
-						{wallet.connected ? 'Trade Now' : 'Connect wallet'}
-					</LoadingButton>
-					<Collapse in={open}>
-						<Alert
-							sx={{ mt: 1 }}
-							severity="info"
-							onClose={() => {
-								setOpen(false);
-							}}
-						>
-							You will pay {longDepositAmount.toLocaleString()} SAMO 🐕 from your wallet to enter the trade.
-						</Alert>
-					</Collapse>
-				</Box>
+				<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
+					Multiplier 🔢
+				</Typography>
+				<ToggleButtonGroup
+					className={styles.button_group}
+					value={multiplier}
+					exclusive
+					onChange={(_e, v) => {
+						if (v !== null) {
+							setMultiplier(v);
+						}
+					}}
+				>
+					{[2, 5, 10].map((v, i) => (
+						<ToggleButton className={cn(styles.button, styles.third)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
+							{v}x
+						</ToggleButton>
+					))}
+				</ToggleButtonGroup>
+
+				<Typography sx={{ fontWeight: 500, mt: 2 }} variant="h6">
+					Expiry ⏰
+				</Typography>
+				<ToggleButtonGroup
+					className={styles.button_group}
+					value={expiry}
+					exclusive
+					onChange={(_e, v) => {
+						if (v !== null) {
+							setExpiry(v);
+						}
+					}}
+				>
+					{[30, 60, 120].map((v, i) => (
+						<ToggleButton className={cn(styles.button, styles.fourth)} key={i} disableRipple value={v} size="small" sx={{ mx: 1.5 }}>
+							{v} min
+						</ToggleButton>
+					))}
+				</ToggleButtonGroup>
 			</Box>
-			<Box sx={{ mt: 2 }}>{/* CHART GOES HERE */}</Box>
+			<Box>
+				<Typography sx={{ mt: 1, fontWeight: 400, textTransform: 'uppercase' }} variant="h6" align="center">
+					win if SAMO is {isCall ? 'above' : 'below'}{' '}
+					<LoadingValue isLoading={!isInitialized}>
+						<span className={styles.highlight}>${isInitialized && formatWithDecimalDigits(strike, 4)}</span>
+					</LoadingValue>{' '}
+					in {expiry} minutes
+					<br />
+					<b>{isCall ? 'above' : 'below'}</b> 👉🏻 <span className={styles.profit}> +{shortDepositAmount.toLocaleString()} SAMO</span> 🤑
+					<br />
+					<b>{isCall ? 'below' : 'above'}</b> 👉🏻 <span className={styles.loss}> -{longDepositAmount.toLocaleString()} SAMO</span> 💸
+				</Typography>
+			</Box>
+			<LoadingButton
+				sx={{ mt: 2, borderRadius: 4 }}
+				className={cn(styles.button, !wallet.connected ? '' : styles.buy)}
+				loading={isLoading}
+				variant="contained"
+				disabled={!wallet.connected}
+				onClick={onCreateContractButtonClick}
+				size="large"
+			>
+				{wallet.connected ? 'Trade Now' : 'Connect wallet'}
+			</LoadingButton>
+			<Collapse in={open}>
+				<Alert
+					sx={{ mt: 1 }}
+					severity="info"
+					onClose={() => {
+						setOpen(false);
+					}}
+				>
+					You will pay {longDepositAmount.toLocaleString()} SAMO 🐕 from your wallet to enter the trade.
+				</Alert>
+			</Collapse>
 		</Box>
 	);
 };
 
-const Chart = () => (
-	<Box sx={{ width: '60vw', height: '500px' }}>
-		<TradingViewSymbol symbol="OKX:SAMOUSDT" />
-	</Box>
-);
-
 const SamoFixedPayout = () => {
 	return (
-		<Box sx={{ width: '100%', height: '100%' }}>
-			<Grid container spacing={2}>
-				<Grid item xs={12} md={6}>
-					<ActionPanel />
-				</Grid>
-				<Grid item xs={12} md={6}>
-					<Chart />
-				</Grid>
-			</Grid>
+		<Box sx={{ width: '100%', height: '100%', display: 'flex', mt: 2 }}>
+			<Box sx={{ px: 16 }}>
+				<ActionPanel />
+			</Box>
+			<Box sx={{ width: '100%' }} className={styles.desktop_only}>
+				<TradingViewChart symbol="OKX:SAMOUSDT" />
+			</Box>
 		</Box>
 	);
 };

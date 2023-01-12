@@ -96,13 +96,14 @@ const BonkFixedPayout = () => {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', width: '100%', mt: 1, justifyContent: 'center', height: '93vh' }}>
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4, px: 16 }} className={styles.container}>
-				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
-					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '0px', paddingTop: '0px' }} variant="h4">
+		<Box sx={{ display: 'flex', width: '100%', mt: 2, justifyContent: 'center', height: '93vh' }}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 16 }} className={styles.container}>
+				<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 1 }}>
+					<Box component="img" src="/bonk-logo.png" alt="logo" sx={{ width: '10%' }} />
+					<Typography sx={{ fontWeight: 500, justifyContent: 'center' }} variant="h4">
 						🐕 BONK OPTIONS 🐕
 					</Typography>
-					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px', paddingTop: '0px' }} variant="h6">
+					<Typography sx={{ fontWeight: 500, justifyContent: 'center', paddingBottom: '10px' }} variant="h6">
 						🐍 by VYPER OTC 🐍
 					</Typography>
 					<Box className={styles.glow} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 6 }}>
