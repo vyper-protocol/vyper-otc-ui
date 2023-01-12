@@ -40,6 +40,22 @@ export type ChainOtcStateDetailsInput = {
 	onRefetchClick: () => void;
 };
 
+interface PnlFormat {
+	pnl: number;
+	symbol?: string;
+	withColor?: boolean;
+}
+
+const PnlFormat = ({ pnl, symbol, withColor }: PnlFormat) => {
+	const pnlFormat = formatWithDecimalDigits(pnl, Number.isInteger(pnl) ? 0 : 2);
+	return (
+		<p className={cn(!withColor ? '' : pnl >= 0 ? styles.profit : styles.loss)}>
+			{pnlFormat}
+			{symbol ? ' ' + symbol : ''}
+		</p>
+	);
+};
+
 const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtcStateDetailsInput) => {
 	const wallet = useWallet();
 	const router = useRouter();
@@ -239,7 +255,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your PnL</p>
-							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${collateralTokenInfo?.symbol.toUpperCase() ?? ''}`}</p>
+							<PnlFormat pnl={longPnl} symbol={collateralTokenInfo?.symbol.toUpperCase()} />
 						</div>
 					)}
 
@@ -255,7 +271,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your PnL</p>
-							<p className={cn(shortPnl >= 0 ? styles.profit : styles.loss)}>{`${shortPnlFormat} ${collateralTokenInfo?.symbol.toUpperCase() ?? ''}`}</p>
+							<PnlFormat pnl={shortPnl} symbol={collateralTokenInfo?.symbol.toUpperCase()} />
 						</div>
 					)}
 
@@ -291,30 +307,16 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 						</Grid>
 
 						<Grid className={styles.title} item xs={4}>
-							<p className={styles.column}>Funded</p>
-						</Grid>
-						<Grid className={styles.value} item xs={4}>
-							<LoadingValue isLoading={isFetching}>
-								<BooleanBadge success={otcState.chainData.isLongFunded()} />
-							</LoadingValue>
-						</Grid>
-						<Grid className={styles.value} item xs={4}>
-							<LoadingValue isLoading={isFetching}>
-								<BooleanBadge success={otcState.chainData.isShortFunded()} />
-							</LoadingValue>
-						</Grid>
-
-						<Grid className={styles.title} item xs={4}>
 							<p className={styles.column}>{otcState.chainData.areBothSidesFunded() ? 'Deposited' : 'Required'}</p>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<p>{formatWithDecimalDigits(otcState.chainData.buyerDepositAmount, -1)}</p>
+								<PnlFormat pnl={otcState.chainData.buyerDepositAmount} symbol={collateralTokenInfo?.symbol.toUpperCase()} />
 							</LoadingValue>
 						</Grid>
 						<Grid className={styles.value} item xs={4}>
 							<LoadingValue isLoading={isFetching}>
-								<p>{formatWithDecimalDigits(otcState.chainData.sellerDepositAmount, -1)}</p>
+								<PnlFormat pnl={otcState.chainData.sellerDepositAmount} symbol={collateralTokenInfo?.symbol.toUpperCase()} />
 							</LoadingValue>
 						</Grid>
 						{livePriceIsInitialized && otcState.chainData.isPnlAvailable() && (
@@ -324,12 +326,12 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{longPnlFormat}</p>
+										<PnlFormat pnl={longPnl} symbol={collateralTokenInfo?.symbol.toUpperCase()} withColor />
 									</LoadingValue>
 								</Grid>
 								<Grid className={styles.value} item xs={4}>
 									<LoadingValue isLoading={isFetching}>
-										<p>{shortPnlFormat}</p>
+										<PnlFormat pnl={shortPnl} symbol={collateralTokenInfo?.symbol.toUpperCase()} withColor />
 									</LoadingValue>
 								</Grid>
 							</>
