@@ -13,6 +13,12 @@
 			"isStable": false
 		},
 		{
+			"cluster": "mainnet-beta",
+			"pubkey": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+			"title": "SAMO",
+			"isStable": false
+		},
+		{
 			"cluster": "devnet",
 			"pubkey": "7XSvJnS19TodrQJSbjUR6tEGwmYyL1i9FX7Z5ZQHc53W",
 			"title": "devUSD",
