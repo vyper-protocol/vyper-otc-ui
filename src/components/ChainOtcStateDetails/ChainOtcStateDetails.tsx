@@ -113,8 +113,8 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 	}, [otcState.chainData.settleExecuted, removeListener]);
 
 	const oracleInfo = getOracleByPubkey(otcState.chainData.rateAccount.state.accountsRequiredForRefresh[0].toBase58());
+	const baseCcy = oracleInfo?.baseCurrency;
 	const isUsdQuote = oracleInfo?.quoteCurrency === 'USD';
-	const quoteCcy = oracleInfo?.baseCurrency;
 
 	const longPnl = otcState.chainData.getLongPnl(livePricesValue);
 	const shortPnl = otcState.chainData.getShortPnl(livePricesValue);
@@ -210,7 +210,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 								<p>
 									{c.label.toLowerCase() === 'strike' && isUsdQuote ? '$' : ''}
 									{typeof c.value === 'number' ? formatWithDecimalDigits(c.value) : c.value}
-									{c.label.toLowerCase() === 'size' && quoteCcy ? ` ${quoteCcy}` : ''}
+									{c.label.toLowerCase() === 'size' && baseCcy ? ` ${baseCcy.toUpperCase()}` : ''}
 								</p>
 							</LoadingValue>
 						</div>
@@ -239,7 +239,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.buyerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your PnL</p>
-							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${quoteCcy ?? ''}`}</p>
+							<p className={cn(longPnl >= 0 ? styles.profit : styles.loss)}>{`${longPnlFormat} ${collateralTokenInfo?.symbol.toUpperCase() ?? ''}`}</p>
 						</div>
 					)}
 
@@ -255,7 +255,7 @@ const ChainOtcStateDetails = ({ otcState, isFetching, onRefetchClick }: ChainOtc
 					{otcState.chainData.buyerWallet && otcState.chainData.sellerWallet && wallet?.publicKey?.toBase58() === otcState.chainData.sellerWallet?.toBase58() && (
 						<div className={styles.column}>
 							<p>Your PnL</p>
-							<p className={cn(shortPnl >= 0 ? styles.profit : styles.loss)}>{`${shortPnlFormat} ${quoteCcy ?? ''}`}</p>
+							<p className={cn(shortPnl >= 0 ? styles.profit : styles.loss)}>{`${shortPnlFormat} ${collateralTokenInfo?.symbol.toUpperCase() ?? ''}`}</p>
 						</div>
 					)}
 
